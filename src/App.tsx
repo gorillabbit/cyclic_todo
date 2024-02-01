@@ -1,25 +1,39 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import { Box } from "@mui/material";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import "./App.css";
+import Header from "./components/Header.js";
+import TaskList from "./components/Task/TaskList";
+import LogList from "./components/Log/LogList";
+import InputForms from "./components/InputForms/InputForms";
 
 function App() {
+  const theme = createTheme({
+    typography: {
+      fontFamily: [
+        "Roboto",
+        '"Noto Sans JP"',
+        '"Helvetica"',
+        "Arial",
+        "sans-serif",
+      ].join(","),
+    },
+  });
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <LocalizationProvider dateAdapter={AdapterDateFns}>
+      <ThemeProvider theme={theme}>
+        <Box textAlign="center">
+          <Header />
+          <InputForms />
+          <Box m={2}>
+            <LogList />
+            <TaskList />
+          </Box>
+        </Box>
+      </ThemeProvider>
+    </LocalizationProvider>
   );
 }
 
