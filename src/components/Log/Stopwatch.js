@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 
 const formatElapsedTime = (seconds) => {
   const days = Math.floor(seconds / (3600 * 24));
@@ -36,7 +36,7 @@ const Stopwatch = ({ log }) => {
       clearInterval(interval);
       clearInterval(announceInterval);
     };
-  }, []);
+  }, [log.voiceAnnounceNum, log.voiceAnnounceUnit]);
 
   useEffect(() => {
     if (log.availableVoiceAnnounce && announceCount !== 0) {
