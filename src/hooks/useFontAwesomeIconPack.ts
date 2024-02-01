@@ -15,8 +15,6 @@ export const useFontAwesomeIconPack = () => {
         const fas = { ...module.fas };
         delete fas.faCookie;
         delete fas.faFontAwesomeLogoFull;
-        console.log(Object.keys(fas).length);
-
         const icons = Object.values(fas).map((icon) => ({
           prefix: icon.prefix,
           icon: icon.icon,
