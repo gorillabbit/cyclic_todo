@@ -15,7 +15,10 @@ const StyledCheckbox: React.FC<StyledCheckboxProps> = ({
     <Button
       sx={{ color: "GrayText", borderColor: "GrayText" }}
       variant="outlined"
-      onClick={handleCheckbox}
+      onClick={(e) => {
+        e.stopPropagation();
+        handleCheckbox();
+      }}
     >
       <Checkbox checked={value} />
       {children}

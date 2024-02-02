@@ -67,6 +67,14 @@ export const addDocLog = (log) => {
   }
 };
 
+export const updateDocLog = (id, feature) => {
+  try {
+    return updateDoc(doc(db, "logs", id), feature)
+  } catch (e) {
+    console.error("タスク切り替えエラー: ", e);
+  }
+}
+
 export const deleteDocLog = (id) => {
   try {
     deleteDoc(doc(db, "logs", id));

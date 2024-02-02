@@ -38,4 +38,5 @@ export interface LogType {
   voiceAnnounceNum?: number;
   voiceAnnounceUnit?: string;
   icon?: string;
+  displayFeature: string[];
 }

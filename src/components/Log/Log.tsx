@@ -13,6 +13,7 @@ import { IconName } from "@fortawesome/fontawesome-svg-core";
 import LogStartButton from "./LogStartButton";
 import LogDeleteButton from "./LogDeleteButton";
 import LogCompleteButton from "./LogCompleteButton";
+import LogDisplayFeatureSelector from "./LogDisplayFeatureSelector";
 
 interface LogProps {
   log: LogType;
@@ -98,6 +99,7 @@ const Log: React.FC<LogProps> = ({ log, logsCompleteLogs }) => {
               label={"音声案内 " + log.voiceAnnounceNum + log.voiceAnnounceUnit}
             />
           )}
+          {isOpen && <LogDisplayFeatureSelector log={log} />}
 
           {isOpen &&
             completeLogs.map((log: LogsCompleteLogsType) => (

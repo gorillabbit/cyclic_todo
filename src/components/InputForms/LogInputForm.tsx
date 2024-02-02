@@ -10,7 +10,7 @@ import {
 import { useState } from "react";
 import { addDocLog } from "../../firebase.js";
 import { LogType } from "../../types.js";
-import StyledCheckbox from "./StyledCheckbox";
+import StyledCheckbox from "../StyledCheckbox";
 import FontAwesomeIconPicker from "./FontAwesomeIconPicker";
 import { getAuth } from "firebase/auth";
 
@@ -26,6 +26,7 @@ const defaultNewLog: LogType = {
   voiceAnnounceNum: 1,
   voiceAnnounceUnit: "分",
   icon: "",
+  displayFeature: [],
 };
 
 const auth = getAuth();
