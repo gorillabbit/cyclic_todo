@@ -61,97 +61,107 @@ const LogInputForm = () => {
           onChange={(e) => handleNewLogInput("text", e.target.value)}
           placeholder="記録を入力"
         />
-        <FontAwesomeIconPicker
-          value={newLog.icon ?? ""}
-          onChange={handleNewLogInput}
-        />
-        <StyledCheckbox
-          value={newLog.duration}
-          handleCheckbox={() => handleNewLogInput("duration", !newLog.duration)}
-        >
-          スパン
-        </StyledCheckbox>
-        {newLog.duration && (
+        {newLog.text && (
           <>
-            <StyledCheckbox
-              value={newLog.availableVoiceAnnounce}
-              handleCheckbox={() =>
-                handleNewLogInput(
-                  "availableVoiceAnnounce",
-                  !newLog.availableVoiceAnnounce
-                )
-              }
-            >
-              音声案内
-            </StyledCheckbox>
-            {newLog.availableVoiceAnnounce && (
-              <TextField
-                label="間隔"
-                value={newLog.voiceAnnounceNum}
-                type="number"
-                onChange={(e) =>
-                  handleNewLogInput("voiceAnnounceNum", e.target.value)
-                }
-                sx={{ maxWidth: 100 }}
-              />
-            )}
-            {newLog.availableVoiceAnnounce && (
-              <Select
-                value={newLog.voiceAnnounceUnit}
-                onChange={(e) =>
-                  handleNewLogInput("voiceAnnounceUnit", e.target.value)
-                }
-              >
-                <MenuItem value="秒">秒</MenuItem>
-                <MenuItem value="分">分</MenuItem>
-                <MenuItem value="時">時</MenuItem>
-                <MenuItem value="日">日</MenuItem>
-                <MenuItem value="週">週</MenuItem>
-                <MenuItem value="月">月</MenuItem>
-                <MenuItem value="年">年</MenuItem>
-              </Select>
-            )}
-          </>
-        )}
-        <StyledCheckbox
-          value={newLog.interval}
-          handleCheckbox={() => handleNewLogInput("interval", !newLog.interval)}
-        >
-          標準間隔
-        </StyledCheckbox>
-        {newLog.interval && (
-          <>
-            <TextField
-              label="間隔"
-              value={newLog.intervalNum}
-              type="number"
-              onChange={(e) => handleNewLogInput("intervalNum", e.target.value)}
-              sx={{ maxWidth: 100 }}
+            <FontAwesomeIconPicker
+              value={newLog.icon ?? ""}
+              onChange={handleNewLogInput}
             />
-            <Select
-              value={newLog.intervalUnit}
-              onChange={(e) =>
-                handleNewLogInput("intervalUnit", e.target.value)
+            <StyledCheckbox
+              value={newLog.duration}
+              handleCheckbox={() =>
+                handleNewLogInput("duration", !newLog.duration)
               }
             >
-              <MenuItem value="秒">秒</MenuItem>
-              <MenuItem value="分">分</MenuItem>
-              <MenuItem value="時">時</MenuItem>
-              <MenuItem value="日">日</MenuItem>
-              <MenuItem value="週">週</MenuItem>
-              <MenuItem value="月">月</MenuItem>
-              <MenuItem value="年">年</MenuItem>
-            </Select>
+              スパン
+            </StyledCheckbox>
+            {newLog.duration && (
+              <>
+                <StyledCheckbox
+                  value={newLog.availableVoiceAnnounce}
+                  handleCheckbox={() =>
+                    handleNewLogInput(
+                      "availableVoiceAnnounce",
+                      !newLog.availableVoiceAnnounce
+                    )
+                  }
+                >
+                  音声案内
+                </StyledCheckbox>
+                {newLog.availableVoiceAnnounce && (
+                  <TextField
+                    label="間隔"
+                    value={newLog.voiceAnnounceNum}
+                    type="number"
+                    onChange={(e) =>
+                      handleNewLogInput("voiceAnnounceNum", e.target.value)
+                    }
+                    sx={{ maxWidth: 100 }}
+                  />
+                )}
+                {newLog.availableVoiceAnnounce && (
+                  <Select
+                    value={newLog.voiceAnnounceUnit}
+                    onChange={(e) =>
+                      handleNewLogInput("voiceAnnounceUnit", e.target.value)
+                    }
+                  >
+                    <MenuItem value="秒">秒</MenuItem>
+                    <MenuItem value="分">分</MenuItem>
+                    <MenuItem value="時">時</MenuItem>
+                    <MenuItem value="日">日</MenuItem>
+                    <MenuItem value="週">週</MenuItem>
+                    <MenuItem value="月">月</MenuItem>
+                    <MenuItem value="年">年</MenuItem>
+                  </Select>
+                )}
+              </>
+            )}
+            <StyledCheckbox
+              value={newLog.interval}
+              handleCheckbox={() =>
+                handleNewLogInput("interval", !newLog.interval)
+              }
+            >
+              標準間隔
+            </StyledCheckbox>
+            {newLog.interval && (
+              <>
+                <TextField
+                  label="間隔"
+                  value={newLog.intervalNum}
+                  type="number"
+                  onChange={(e) =>
+                    handleNewLogInput("intervalNum", e.target.value)
+                  }
+                  sx={{ maxWidth: 100 }}
+                />
+                <Select
+                  value={newLog.intervalUnit}
+                  onChange={(e) =>
+                    handleNewLogInput("intervalUnit", e.target.value)
+                  }
+                >
+                  <MenuItem value="秒">秒</MenuItem>
+                  <MenuItem value="分">分</MenuItem>
+                  <MenuItem value="時">時</MenuItem>
+                  <MenuItem value="日">日</MenuItem>
+                  <MenuItem value="週">週</MenuItem>
+                  <MenuItem value="月">月</MenuItem>
+                  <MenuItem value="年">年</MenuItem>
+                </Select>
+              </>
+            )}
+            <StyledCheckbox
+              value={newLog.availableMemo}
+              handleCheckbox={() =>
+                handleNewLogInput("availableMemo", !newLog.availableMemo)
+              }
+            >
+              完了時メモ
+            </StyledCheckbox>
           </>
         )}
-        <StyledCheckbox
-          value={newLog.availableMemo}
-          handleCheckbox={() =>
-            handleNewLogInput("availableMemo", !newLog.availableMemo)
-          }
-        >
-          完了時メモ
-        </StyledCheckbox>
       </FormGroup>
       <Button sx={{ my: 1 }} variant="contained" onClick={addLog}>
         追加

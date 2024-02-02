@@ -78,51 +78,55 @@ const TaskInputForm = () => {
           value={newTask.text}
           onChange={(e) => handleNewTaskInput("text", e.target.value)}
         />
-        <FontAwesomeIconPicker
-          value={newTask.icon ?? ""}
-          onChange={handleNewTaskInput}
-        />
-        <DatePicker
-          label="期日-年月日"
-          value={newTask.dueDate}
-          onChange={(value) => handleNewTaskInput("dueDate", value)}
-          sx={{ maxWidth: 150 }}
-        />
-        <TimePicker
-          ampm={false}
-          label="期日-時刻"
-          value={newTask.dueTime}
-          onChange={(value) => handleNewTaskInput("dueTime", value)}
-          sx={{ maxWidth: 120 }}
-        />
-        <Select
-          label="周期"
-          value={newTask.is周期的}
-          onChange={(e) => handleNewTaskInput("is周期的", e.target.value)}
-        >
-          <MenuItem value="周期なし">周期なし</MenuItem>
-          <MenuItem value="完了後に追加">完了後にタスクを追加</MenuItem>
-          <MenuItem value="必ず追加">必ず追加</MenuItem>
-        </Select>
-        {newTask.is周期的 !== "周期なし" && (
-          <TextField
-            label="周期日数"
-            type="number"
-            value={newTask.周期日数}
-            onChange={(e) => handleNewTaskInput("周期日数", e.target.value)}
-            sx={{ maxWidth: 100 }}
-          />
-        )}
-        {newTask.is周期的 !== "周期なし" && (
-          <Select
-            value={newTask.周期単位}
-            onChange={(e) => handleNewTaskInput("周期単位", e.target.value)}
-          >
-            <MenuItem value="日">日</MenuItem>
-            <MenuItem value="週">週</MenuItem>
-            <MenuItem value="月">月</MenuItem>
-            <MenuItem value="年">年</MenuItem>
-          </Select>
+        {newTask.text && (
+          <>
+            <FontAwesomeIconPicker
+              value={newTask.icon ?? ""}
+              onChange={handleNewTaskInput}
+            />
+            <DatePicker
+              label="期日-年月日"
+              value={newTask.dueDate}
+              onChange={(value) => handleNewTaskInput("dueDate", value)}
+              sx={{ maxWidth: 150 }}
+            />
+            <TimePicker
+              ampm={false}
+              label="期日-時刻"
+              value={newTask.dueTime}
+              onChange={(value) => handleNewTaskInput("dueTime", value)}
+              sx={{ maxWidth: 120 }}
+            />
+            <Select
+              label="周期"
+              value={newTask.is周期的}
+              onChange={(e) => handleNewTaskInput("is周期的", e.target.value)}
+            >
+              <MenuItem value="周期なし">周期なし</MenuItem>
+              <MenuItem value="完了後に追加">完了後にタスクを追加</MenuItem>
+              <MenuItem value="必ず追加">必ず追加</MenuItem>
+            </Select>
+            {newTask.is周期的 !== "周期なし" && (
+              <TextField
+                label="周期日数"
+                type="number"
+                value={newTask.周期日数}
+                onChange={(e) => handleNewTaskInput("周期日数", e.target.value)}
+                sx={{ maxWidth: 100 }}
+              />
+            )}
+            {newTask.is周期的 !== "周期なし" && (
+              <Select
+                value={newTask.周期単位}
+                onChange={(e) => handleNewTaskInput("周期単位", e.target.value)}
+              >
+                <MenuItem value="日">日</MenuItem>
+                <MenuItem value="週">週</MenuItem>
+                <MenuItem value="月">月</MenuItem>
+                <MenuItem value="年">年</MenuItem>
+              </Select>
+            )}
+          </>
         )}
       </FormGroup>
       <Button sx={{ my: 1 }} variant="contained" onClick={addTask}>
