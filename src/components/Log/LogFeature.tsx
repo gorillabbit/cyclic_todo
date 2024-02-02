@@ -93,6 +93,7 @@ const LogFeature: React.FC<LogFeatureProp> = ({
           mapItem.flag &&
           (displayFeature.includes(mapItem.title) || isOpen) && (
             <ChipWrapper
+              key={mapItem.label}
               label={mapItem.label}
               isSelected={displayFeature.includes(mapItem.title)}
               onClick={() => updateDisplayFeature(log, mapItem.title)}
