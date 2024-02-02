@@ -1,10 +1,11 @@
 import { Timestamp } from "firebase/firestore";
 
 export interface TaskType {
+  userId: string;
   id?: string;
   text: string;
-  期日: string | Date;
-  時刻: string | Date;
+  dueDate: string | Date;
+  dueTime: string | Date;
   completed: boolean;
   is周期的: string;
   周期日数?: string;
@@ -22,6 +23,7 @@ export interface LogsCompleteLogsType {
 }
 
 export interface LogType {
+  userId: string;
   id?: string;
   text: string;
   親logId?: string;

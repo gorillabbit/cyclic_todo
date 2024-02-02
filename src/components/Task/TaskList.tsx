@@ -1,11 +1,18 @@
 import { Masonry } from "@mui/lab";
 import { Box, Typography } from "@mui/material";
 import Task from "./Task";
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { db } from "../../firebase.js";
-import { orderBy, collection, onSnapshot, query } from "firebase/firestore";
+import {
+  orderBy,
+  collection,
+  onSnapshot,
+  query,
+  where,
+} from "firebase/firestore";
 import { TaskType } from "../../types.js";
+import { getAuth } from "firebase/auth";
 
 const TaskList = () => {
   const [tasks, setTasks] = useState<TaskType[]>([]);
@@ -26,12 +33,18 @@ const TaskList = () => {
     [tasks]
   );
 
+  const auth = getAuth();
+
   useEffect(() => {
+    if (!auth.currentUser) {
+      return;
+    }
     //Taskの取得
     const tasksQuery = query(
       collection(db, "tasks"),
-      orderBy("期日"),
-      orderBy("時刻")
+      where("userId", "==", auth.currentUser?.uid),
+      orderBy("dueDate"),
+      orderBy("dueTime")
     );
     const unsubscribeTask = onSnapshot(tasksQuery, (querySnapshot) => {
       const tasksData: TaskType[] = querySnapshot.docs.map((doc) => ({
@@ -45,7 +58,7 @@ const TaskList = () => {
     return () => {
       unsubscribeTask();
     };
-  }, []);
+  }, [auth.currentUser]);
 
   return (
     <Box>

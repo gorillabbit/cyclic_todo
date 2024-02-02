@@ -8,6 +8,7 @@ import TaskDetail from "./TaskDetail.js";
 import { TaskType } from "../../types.js";
 import { Box, Button, Card, Typography } from "@mui/material";
 import ChildTasks from "./ChildTask";
+import { getAuth } from "firebase/auth";
 
 interface TaskProps {
   task: TaskType;
@@ -16,20 +17,24 @@ interface TaskProps {
   type?: string;
 }
 
-const toggleCompletion = (
-  task: TaskType,
-  setTasks: React.Dispatch<React.SetStateAction<TaskType[]>>
-) => {
+const auth = getAuth();
+
+const toggleCompletion = (task: TaskType) => {
   updateDocTask(task.id, {
     completed: !task.completed,
     toggleCompletionTimestamp: serverTimestamp(),
   });
 
-  if (task.completed === false && task.is周期的 === "完了後に追加") {
+  if (
+    task.completed === false &&
+    task.is周期的 === "完了後に追加" &&
+    auth.currentUser
+  ) {
     const newTask = {
+      userId: auth.currentUser.uid,
       text: task.text,
-      期日: calculateNext期日(task, new Date()),
-      時刻: task.時刻,
+      dueDate: calculateNext期日(task, new Date()),
+      dueTime: task.dueTime,
       is周期的: "完了後に追加",
       周期日数: task.周期日数,
       周期単位: task.周期単位,
@@ -37,12 +42,11 @@ const toggleCompletion = (
       completed: false,
     };
     addDocTask(newTask);
-    setTasks((tasklist) => [...tasklist, newTask]);
   }
 };
 
 const Task: React.FC<TaskProps> = ({ task, setTasks, tasklist }) => {
-  const backgroundColor = getBackgroundColor(task.期日 + " " + task.時刻);
+  const backgroundColor = getBackgroundColor(task.dueDate + " " + task.dueTime);
   const tasklistStyle = {
     backgroundColor: task.completed ? "#c0c0c0" : backgroundColor,
     color: task.completed ? "#5f5f5f" : "",
@@ -64,8 +68,8 @@ const Task: React.FC<TaskProps> = ({ task, setTasks, tasklist }) => {
           周期{is完了後追加 && " タスク完了後 "} {task.周期日数} {task.周期単位}
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          {task.期日 ? "期日 " : ""}
-          {task.期日?.toString()} {task.時刻?.toString()}
+          {task.dueDate ? "期日 " : ""}
+          {task.dueDate?.toString()} {task.dueTime?.toString()}
         </Typography>
         {open && <TaskDetail task={task} />}
         {open && 子tasks && 子tasks.length > 0 && (
@@ -81,7 +85,7 @@ const Task: React.FC<TaskProps> = ({ task, setTasks, tasklist }) => {
           color={task.completed ? "warning" : "success"}
           variant="contained"
           sx={{ borderRadius: "0px" }}
-          onClick={() => toggleCompletion(task, setTasks)}
+          onClick={() => toggleCompletion(task)}
         >
           {task.completed ? "取り消す" : "完了"}
         </Button>

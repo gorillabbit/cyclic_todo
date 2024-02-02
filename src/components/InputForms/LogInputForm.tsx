@@ -7,13 +7,15 @@ import {
   Box,
 } from "@mui/material";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import { addDocLog } from "../../firebase.js";
 import { LogType } from "../../types.js";
 import StyledCheckbox from "./StyledCheckbox";
 import FontAwesomeIconPicker from "./FontAwesomeIconPicker";
+import { getAuth } from "firebase/auth";
 
 const defaultNewLog: LogType = {
+  userId: "",
   text: "",
   duration: false,
   interval: false,
@@ -25,6 +27,8 @@ const defaultNewLog: LogType = {
   voiceAnnounceUnit: "分",
   icon: "",
 };
+
+const auth = getAuth();
 
 const LogInputForm = () => {
   const [newLog, setNewLog] = useState<LogType>(defaultNewLog);
@@ -38,8 +42,9 @@ const LogInputForm = () => {
   };
 
   const addLog = () => {
-    if (newLog) {
-      addDocLog(newLog);
+    if (newLog && auth.currentUser) {
+      const userId = auth.currentUser.uid;
+      addDocLog({ ...newLog, userId });
       setNewLog(defaultNewLog);
     }
   };

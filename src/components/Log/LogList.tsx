@@ -1,20 +1,34 @@
 import { Masonry } from "@mui/lab";
 import Log from "./Log";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { db } from "../../firebase.js";
-import { orderBy, collection, onSnapshot, query } from "firebase/firestore";
+import {
+  orderBy,
+  collection,
+  onSnapshot,
+  query,
+  where,
+} from "firebase/firestore";
 import { LogType, LogsCompleteLogsType } from "../../types.js";
+import { getAuth } from "firebase/auth";
 
 const LogList = () => {
   const [logList, setLogList] = useState<LogType[]>([]);
   const [logsCompleteLogsList, setLogsCompleteLogsList] = useState<
     LogsCompleteLogsType[]
   >([]);
+  const auth = getAuth();
 
   useEffect(() => {
+    if (!auth.currentUser) {
+      return;
+    }
     //Logの取得
     const fetchLogs = () => {
-      const logQuery = query(collection(db, "logs"));
+      const logQuery = query(
+        collection(db, "logs"),
+        where("userId", "==", auth.currentUser?.uid)
+      );
       return onSnapshot(logQuery, (querySnapshot) => {
         const LogsData = querySnapshot.docs.map((doc) => ({
           id: doc.id,
@@ -46,7 +60,7 @@ const LogList = () => {
       unsubscribeLog();
       unsubscribeLogsCompleteLogs();
     };
-  }, []);
+  }, [auth.currentUser]);
   return (
     <Masonry
       sx={{ margin: "2px" }}

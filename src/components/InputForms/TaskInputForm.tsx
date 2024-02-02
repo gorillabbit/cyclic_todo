@@ -12,19 +12,23 @@ import { addDocTask } from "../../firebase.js";
 import { format } from "date-fns";
 import { TaskType } from "../../types.js";
 import FontAwesomeIconPicker from "./FontAwesomeIconPicker";
+import { getAuth } from "firebase/auth";
 
 const now = new Date();
 
 const defaultNewTask: TaskType = {
+  userId: "",
   text: "",
-  期日: now,
-  時刻: now,
+  dueDate: now,
+  dueTime: now,
   is周期的: "周期なし",
   周期日数: "1",
   周期単位: "日",
   completed: false,
   icon: "",
 };
+
+const auth = getAuth();
 
 const TaskInputForm = () => {
   const [newTask, setNewTask] = useState<TaskType>(defaultNewTask);
@@ -39,20 +43,21 @@ const TaskInputForm = () => {
   const validateTask = (task: TaskType) => {
     return {
       ...task,
-      期日: format(task.期日 as unknown as number, "yyyy年MM月dd日"),
-      時刻: format(task.時刻 as unknown as number, "HH時mm分"),
+      dueDate: format(task.dueDate as unknown as number, "yyyy年MM月dd日"),
+      dueTime: format(task.dueTime as unknown as number, "HH時mm分"),
     };
   };
 
   // タスクの追加
   const addTask = () => {
-    if (newTask) {
+    if (newTask && auth.currentUser) {
       const validatedTask = validateTask(newTask);
       const taskToAdd =
         validatedTask.is周期的 === "周期なし"
           ? omitPeriodicFields(validatedTask)
           : validatedTask;
-      addDocTask(taskToAdd);
+      const userId = auth.currentUser.uid;
+      addDocTask({ ...taskToAdd, userId });
       setNewTask(defaultNewTask);
     }
   };
@@ -79,15 +84,15 @@ const TaskInputForm = () => {
         />
         <DatePicker
           label="期日-年月日"
-          value={newTask.期日}
-          onChange={(value) => handleNewTaskInput("期日", value)}
+          value={newTask.dueDate}
+          onChange={(value) => handleNewTaskInput("dueDate", value)}
           sx={{ maxWidth: 150 }}
         />
         <TimePicker
           ampm={false}
           label="期日-時刻"
-          value={newTask.時刻}
-          onChange={(value) => handleNewTaskInput("時刻", value)}
+          value={newTask.dueTime}
+          onChange={(value) => handleNewTaskInput("dueTime", value)}
           sx={{ maxWidth: 120 }}
         />
         <Select
