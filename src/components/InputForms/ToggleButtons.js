@@ -8,7 +8,7 @@ const ToggleButtons = ({ isTask, setIsTask }) => {
       onClick={() => setIsTask((isTask) => !isTask)}
     >
       <ToggleButton value="タスク">タスク</ToggleButton>
-      <ToggleButton value="ログ">記録</ToggleButton>
+      <ToggleButton value="ログ">ログ</ToggleButton>
     </ToggleButtonGroup>
   );
 };
