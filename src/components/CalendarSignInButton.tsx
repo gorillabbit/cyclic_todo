@@ -46,7 +46,7 @@ const CalendarSignInButton: React.FC<CalendarSignInButtonProp> = ({
       variant="contained"
       onClick={isSignedIn ? handleSignOutClick : handleSignInClick}
     >
-      {isSignedIn ? "Sign Out" : "Sign In"}
+      {isSignedIn ? "Sign Out" : "Googleカレンダー連携"}
     </Button>
   );
 };

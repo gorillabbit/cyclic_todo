@@ -50,7 +50,7 @@ function App() {
                 <Box m={2}>
                   <LogList />
                   <TaskList />
-                  {isGapiMounted && <TimeLine />}
+                  <TimeLine isGapiMounted={isGapiMounted} />
                 </Box>
               </LogProvider>
             </>

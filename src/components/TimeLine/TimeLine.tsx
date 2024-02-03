@@ -5,7 +5,11 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import { gapi } from "gapi-script";
 import { useLog } from "../Context/LogContext";
 
-const Calendar = () => {
+interface CalendarProp {
+  isGapiMounted: boolean;
+}
+
+const Calendar: React.FC<CalendarProp> = ({ isGapiMounted }) => {
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [googleCalendarEvents, setGoogleCalendarEvents] = useState([]);
   const { logList, logsCompleteLogsList } = useLog();
@@ -52,8 +56,10 @@ const Calendar = () => {
     gapi.auth2.getAuthInstance().isSignedIn.listen((isSignedIn: boolean) => {
       setIsSignedIn(isSignedIn);
     });
-    listUpcomingEvents();
-  }, [isSignedIn]);
+    if (isGapiMounted) {
+      listUpcomingEvents();
+    }
+  }, [isGapiMounted, isSignedIn]);
 
   return (
     <>
