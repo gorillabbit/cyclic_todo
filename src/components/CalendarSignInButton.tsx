@@ -1,6 +1,7 @@
-import { Button } from "@mui/material";
+import { Button, Typography } from "@mui/material";
 import { gapi } from "gapi-script";
 import { useEffect, useState } from "react";
+import googleCalendarIcon from "../icons/googleCalendarIcon.svg";
 
 const config = {
   clientId: process.env.REACT_APP_GOOGLE_CALENDER_CLIENT_ID,
@@ -46,7 +47,8 @@ const CalendarSignInButton: React.FC<CalendarSignInButtonProp> = ({
       variant="contained"
       onClick={isSignedIn ? handleSignOutClick : handleSignInClick}
     >
-      {isSignedIn ? "Sign Out" : "Googleカレンダー連携"}
+      <img src={googleCalendarIcon} alt="googleCalendarアイコン" width={30} />
+      {isSignedIn ? "解除" : "連携"}
     </Button>
   );
 };
