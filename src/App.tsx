@@ -27,7 +27,6 @@ function App() {
   });
   const [user, setUser] = useState<User>();
   const [isGapiMounted, setIsGapiMounted] = useState<boolean>(false);
-  console.log(isGapiMounted, gapi.client?.calendar?.events);
 
   useEffect(() => {
     const auth = getAuth();
