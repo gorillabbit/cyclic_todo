@@ -1,7 +1,12 @@
+// import the third-party stylesheets directly from your JS
+import "bootstrap/dist/css/bootstrap.css";
+import "bootstrap-icons/font/bootstrap-icons.css"; // needs additional webpack config!
+
 import { useEffect, useState } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
+import bootstrap5Plugin from "@fullcalendar/bootstrap5";
 import { gapi } from "gapi-script";
 import { useLog } from "../Context/LogContext";
 
@@ -17,7 +22,13 @@ const Calendar: React.FC<CalendarProp> = ({ isGapiMounted }) => {
     const completeLogs = logsCompleteLogsList.filter(
       (completeLog) => completeLog.logId === log.id
     );
-    const events = [];
+    const events: {
+      title: string;
+      start: string | Date;
+      end: string | Date;
+      display: string;
+      color: string;
+    }[] = [];
     while (completeLogs.length > 0) {
       events.push({
         title: log.text,
@@ -64,14 +75,23 @@ const Calendar: React.FC<CalendarProp> = ({ isGapiMounted }) => {
   return (
     <>
       <FullCalendar
-        plugins={[dayGridPlugin, timeGridPlugin]}
+        plugins={[dayGridPlugin, timeGridPlugin, bootstrap5Plugin]}
+        themeSystem="bootstrap5"
         initialView="timeGridWeek"
+        nowIndicator={true}
+        height={1300}
+        titleFormat={{ year: "numeric", month: "2-digit", day: "2-digit" }}
         headerToolbar={{
-          left: "prev,next today",
+          left: "prev,next",
           center: "title",
-          right: "dayGridMonth,timeGridWeek,dayGridWeek,timeGridDay",
+          right: "dayGridMonth,timeGridWeek,timeGridDay",
         }}
         events={[...googleCalendarEvents, ...logEvents.flat()]}
+        views={{
+          dayGridMonth: {
+            titleFormat: { year: "numeric", month: "2-digit" },
+          },
+        }}
         locale="ja"
       />
     </>
