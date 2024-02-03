@@ -9,7 +9,6 @@ import {
 import { app } from "../firebase";
 import { useEffect, useState } from "react";
 import { Avatar, Button, Chip } from "@mui/material";
-
 interface SignInWithGoogleProp {
   setUser: React.Dispatch<React.SetStateAction<User | undefined>>;
 }
@@ -32,12 +31,8 @@ const SignInWithGoogle: React.FC<SignInWithGoogleProp> = ({ setUser }) => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         userAccount ?? setUserAccount(user);
-      } else {
-        // ユーザーがログアウトしている場合の処理
       }
     });
-
-    // クリーンアップ関数
     return () => unsubscribe();
   }, [userAccount]);
 
@@ -48,7 +43,6 @@ const SignInWithGoogle: React.FC<SignInWithGoogleProp> = ({ setUser }) => {
         setUser(undefined);
       })
       .catch((error) => {
-        // エラー処理
         console.error("ログアウト中にエラーが発生しました:", error);
       });
   };
