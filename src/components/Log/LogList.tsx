@@ -1,66 +1,10 @@
 import { Masonry } from "@mui/lab";
 import Log from "./Log";
-import { useState, useEffect } from "react";
-import { db } from "../../firebase.js";
-import {
-  orderBy,
-  collection,
-  onSnapshot,
-  query,
-  where,
-} from "firebase/firestore";
-import { LogType, LogsCompleteLogsType } from "../../types.js";
-import { getAuth } from "firebase/auth";
+import { useLog } from "../Context/LogContext";
 
 const LogList = () => {
-  const [logList, setLogList] = useState<LogType[]>([]);
-  const [logsCompleteLogsList, setLogsCompleteLogsList] = useState<
-    LogsCompleteLogsType[]
-  >([]);
-  const auth = getAuth();
+  const { logList, logsCompleteLogsList } = useLog();
 
-  useEffect(() => {
-    if (!auth.currentUser) {
-      return;
-    }
-    //Logの取得
-    const fetchLogs = () => {
-      const logQuery = query(
-        collection(db, "logs"),
-        where("userId", "==", auth.currentUser?.uid)
-      );
-      return onSnapshot(logQuery, (querySnapshot) => {
-        const LogsData = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...(doc.data() as LogType),
-        }));
-        setLogList(LogsData);
-      });
-    };
-
-    const fetchLogsCompleteLogs = () => {
-      const logsCompleteLogsQuery = query(
-        collection(db, "logsCompleteLogs"),
-        orderBy("timestamp", "desc")
-      );
-      return onSnapshot(logsCompleteLogsQuery, (querySnapshot) => {
-        const logsCompleteLogsData = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...(doc.data() as LogsCompleteLogsType),
-        }));
-        setLogsCompleteLogsList(logsCompleteLogsData);
-      });
-    };
-
-    const unsubscribeLog = fetchLogs();
-    const unsubscribeLogsCompleteLogs = fetchLogsCompleteLogs();
-
-    // コンポーネントがアンマウントされるときに購読を解除
-    return () => {
-      unsubscribeLog();
-      unsubscribeLogsCompleteLogs();
-    };
-  }, [auth.currentUser]);
   return (
     <Masonry
       sx={{ margin: "2px" }}
