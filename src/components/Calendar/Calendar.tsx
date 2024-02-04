@@ -10,6 +10,8 @@ import { useLog } from "../Context/LogContext";
 import { useWindowSize } from "../../hooks/useWindowSize";
 import EventContent from "./EventContent";
 import bootstrap5Plugin from "@fullcalendar/bootstrap5";
+import { useTask } from "../Context/TaskContext";
+import { parse } from "date-fns";
 
 interface CalendarProp {
   isGapiMounted: boolean;
@@ -34,6 +36,26 @@ const Calendar: React.FC<CalendarProp> = ({ isGapiMounted }) => {
       });
     }
     return events;
+  });
+
+  const { taskList } = useTask();
+  const taskEvents = taskList.map((task) => {
+    return [
+      {
+        title: task.text + " 期日",
+        start: parse(
+          (task.dueDate as string) + (task.dueTime as string),
+          "yyyy年MM月dd日HH時mm分",
+          new Date()
+        ),
+        color: "#c43b31",
+      },
+      {
+        title: task.text + " 完了",
+        start: task.completed ? task.toggleCompletionTimestamp?.toDate() : "",
+        color: "#c43b31",
+      },
+    ];
   });
 
   const listUpcomingEvents = () => {
@@ -86,7 +108,11 @@ const Calendar: React.FC<CalendarProp> = ({ isGapiMounted }) => {
           center: isSmallScreen ? "" : "title",
           right: "dayGridMonth,week,timeGridDay",
         }}
-        events={[...googleCalendarEvents, ...logEvents.flat()]}
+        events={[
+          ...googleCalendarEvents,
+          ...logEvents.flat(),
+          ...taskEvents.flat(),
+        ]}
         {...(isSmallScreen && calendarView === "dayGridMonth"
           ? { eventContent: EventContent }
           : {})}

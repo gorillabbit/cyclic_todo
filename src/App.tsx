@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import { User, getAuth, onAuthStateChanged } from "firebase/auth";
 import { LogProvider } from "./components/Context/LogContext";
 import Calendar from "./components/Calendar/Calendar";
+import { TaskProvider } from "./components/Context/TaskContext";
 
 function App() {
   const theme = createTheme({
@@ -44,13 +45,15 @@ function App() {
           {user && (
             <>
               <InputForms />
-              <LogProvider>
-                <Box m={2}>
-                  <LogList />
-                  <TaskList />
-                  <Calendar isGapiMounted={isGapiMounted} />
-                </Box>
-              </LogProvider>
+              <TaskProvider>
+                <LogProvider>
+                  <Box m={2}>
+                    <LogList />
+                    <TaskList />
+                    <Calendar isGapiMounted={isGapiMounted} />
+                  </Box>
+                </LogProvider>
+              </TaskProvider>
             </>
           )}
         </Box>

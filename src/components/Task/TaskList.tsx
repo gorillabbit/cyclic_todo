@@ -1,28 +1,18 @@
 import { Masonry } from "@mui/lab";
 import { Box, Typography } from "@mui/material";
 import Task from "./Task";
-import { useEffect, useMemo, useState } from "react";
-
-import { db } from "../../firebase.js";
-import {
-  orderBy,
-  collection,
-  onSnapshot,
-  query,
-  where,
-} from "firebase/firestore";
-import { TaskType } from "../../types.js";
-import { getAuth } from "firebase/auth";
+import { useMemo } from "react";
+import { useTask } from "../Context/TaskContext";
 
 const TaskList = () => {
-  const [tasks, setTasks] = useState<TaskType[]>([]);
-  const unCompletedTasks = useMemo(
-    () => tasks.filter((task) => !task.completed),
-    [tasks]
+  const { taskList, setTaskList } = useTask();
+  const uncompletedTaskList = useMemo(
+    () => taskList.filter((task) => !task.completed),
+    [taskList]
   );
-  const completedTasks = useMemo(
+  const completedTaskList = useMemo(
     () =>
-      tasks
+      taskList
         .filter((task) => task.completed)
         .sort((a, b) => {
           // タイムスタンプを比較して並び替え
@@ -30,35 +20,8 @@ const TaskList = () => {
           const dateB = b.toggleCompletionTimestamp?.toDate() ?? new Date(0);
           return dateA.getTime() - dateB.getTime();
         }),
-    [tasks]
+    [taskList]
   );
-
-  const auth = getAuth();
-
-  useEffect(() => {
-    if (!auth.currentUser) {
-      return;
-    }
-    //Taskの取得
-    const tasksQuery = query(
-      collection(db, "tasks"),
-      where("userId", "==", auth.currentUser?.uid),
-      orderBy("dueDate"),
-      orderBy("dueTime")
-    );
-    const unsubscribeTask = onSnapshot(tasksQuery, (querySnapshot) => {
-      const tasksData: TaskType[] = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...(doc.data() as TaskType),
-      }));
-      setTasks(tasksData);
-    });
-
-    // コンポーネントがアンマウントされるときに購読を解除
-    return () => {
-      unsubscribeTask();
-    };
-  }, [auth.currentUser]);
 
   return (
     <Box>
@@ -67,20 +30,20 @@ const TaskList = () => {
         sx={{ margin: "2px" }}
         columns={{ xs: 2, sm: 3, md: 4, lg: 5, xl: 6 }}
       >
-        {unCompletedTasks.map((task) => (
+        {uncompletedTaskList.map((task) => (
           <Task
             key={task.id}
             task={task}
-            setTasks={setTasks}
-            tasklist={tasks}
+            setTaskList={setTaskList}
+            tasklist={taskList}
           />
         ))}
-        {completedTasks.map((task) => (
+        {completedTaskList.map((task) => (
           <Task
             key={task.id}
             task={task}
-            setTasks={setTasks}
-            tasklist={tasks}
+            setTaskList={setTaskList}
+            tasklist={taskList}
           />
         ))}
       </Masonry>

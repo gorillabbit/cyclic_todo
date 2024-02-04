@@ -12,7 +12,7 @@ import { getAuth } from "firebase/auth";
 
 interface TaskProps {
   task: TaskType;
-  setTasks: React.Dispatch<React.SetStateAction<TaskType[]>>;
+  setTaskList: React.Dispatch<React.SetStateAction<TaskType[]>>;
   tasklist?: TaskType[];
   type?: string;
 }
@@ -45,7 +45,7 @@ const toggleCompletion = (task: TaskType) => {
   }
 };
 
-const Task: React.FC<TaskProps> = ({ task, setTasks, tasklist }) => {
+const Task: React.FC<TaskProps> = ({ task, setTaskList, tasklist }) => {
   const backgroundColor = getBackgroundColor(task.dueDate + " " + task.dueTime);
   const tasklistStyle = {
     backgroundColor: task.completed ? "#c0c0c0" : backgroundColor,
@@ -73,10 +73,10 @@ const Task: React.FC<TaskProps> = ({ task, setTasks, tasklist }) => {
         </Typography>
         {open && <TaskDetail task={task} />}
         {open && 子tasks && 子tasks.length > 0 && (
-          <ChildTasks tasks={子tasks} setTasks={setTasks} />
+          <ChildTasks tasks={子tasks} setTaskList={setTaskList} />
         )}
         {open && 親tasks && 親tasks.length > 0 && (
-          <ChildTasks tasks={親tasks} setTasks={setTasks} />
+          <ChildTasks tasks={親tasks} setTaskList={setTaskList} />
         )}
       </Box>
       <Box display="flex" width="100%">

@@ -5,15 +5,20 @@ import React from "react";
 
 interface ChildTaskProps {
   tasks: TaskType[];
-  setTasks: React.Dispatch<React.SetStateAction<TaskType[]>>;
+  setTaskList: React.Dispatch<React.SetStateAction<TaskType[]>>;
 }
 
-const ChildTasks: React.FC<ChildTaskProps> = ({ tasks, setTasks }) => {
+const ChildTasks: React.FC<ChildTaskProps> = ({ tasks, setTaskList }) => {
   return (
     <Box border="solid 2px #ffffff">
       子task
       {tasks.map((子task) => (
-        <Task type="子task" key={子task.id} task={子task} setTasks={setTasks} />
+        <Task
+          type="子task"
+          key={子task.id}
+          task={子task}
+          setTaskList={setTaskList}
+        />
       ))}
     </Box>
   );
