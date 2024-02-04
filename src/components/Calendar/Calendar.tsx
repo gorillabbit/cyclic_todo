@@ -9,6 +9,8 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import bootstrap5Plugin from "@fullcalendar/bootstrap5";
 import { gapi } from "gapi-script";
 import { useLog } from "../Context/LogContext";
+import { useWindowSize } from "../../hooks/useWindowSize";
+import EventContent from "./EventContent";
 
 interface CalendarProp {
   isGapiMounted: boolean;
@@ -72,29 +74,40 @@ const Calendar: React.FC<CalendarProp> = ({ isGapiMounted }) => {
     }
   }, [isGapiMounted, isSignedIn]);
 
+  const { width } = useWindowSize();
+  const isSmallScreen = width < 768; // 768px以下を小さい画面と定義
+
+  const [calendarView, setCalendarView] = useState("");
+
   return (
-    <>
-      <FullCalendar
-        plugins={[dayGridPlugin, timeGridPlugin, bootstrap5Plugin]}
-        themeSystem="bootstrap5"
-        initialView="timeGridWeek"
-        nowIndicator={true}
-        height={1300}
-        titleFormat={{ year: "numeric", month: "2-digit", day: "2-digit" }}
-        headerToolbar={{
-          left: "prev,next",
-          center: "title",
-          right: "dayGridMonth,timeGridWeek,timeGridDay",
-        }}
-        events={[...googleCalendarEvents, ...logEvents.flat()]}
-        views={{
-          dayGridMonth: {
-            titleFormat: { year: "numeric", month: "2-digit" },
-          },
-        }}
-        locale="ja"
-      />
-    </>
+    <FullCalendar
+      plugins={[dayGridPlugin, timeGridPlugin, bootstrap5Plugin]}
+      themeSystem="bootstrap5"
+      initialView="week"
+      nowIndicator={true}
+      height={1300}
+      titleFormat={{ year: "numeric", month: "2-digit", day: "2-digit" }}
+      headerToolbar={{
+        left: "prev,next",
+        center: isSmallScreen ? "" : "title",
+        right: "dayGridMonth,week,timeGridDay",
+      }}
+      events={[...googleCalendarEvents, ...logEvents.flat()]}
+      {...(isSmallScreen && calendarView === "dayGridMonth"
+        ? { eventContent: EventContent }
+        : {})}
+      viewDidMount={(e) => setCalendarView(e.view.type)}
+      views={{
+        dayGridMonth: {
+          titleFormat: { year: "numeric", month: "2-digit" },
+        },
+        week: {
+          type: "timeGrid",
+          duration: { days: isSmallScreen ? 4 : 7 },
+        },
+      }}
+      locale="ja"
+    />
   );
 };
 

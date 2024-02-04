@@ -1,4 +1,4 @@
-import { Button, Typography } from "@mui/material";
+import { Button } from "@mui/material";
 import { gapi } from "gapi-script";
 import { useEffect, useState } from "react";
 import googleCalendarIcon from "../icons/googleCalendarIcon.svg";
