@@ -1,9 +1,15 @@
+import "bootstrap/dist/css/bootstrap.css";
+import "bootstrap-icons/font/bootstrap-icons.css"; // needs additional webpack config!
+
 import { useEffect, useState } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import { gapi } from "gapi-script";
 import { useLog } from "../Context/LogContext";
+import { useWindowSize } from "../../hooks/useWindowSize";
+import EventContent from "./EventContent";
+import bootstrap5Plugin from "@fullcalendar/bootstrap5";
 
 interface CalendarProp {
   isGapiMounted: boolean;
@@ -17,7 +23,7 @@ const Calendar: React.FC<CalendarProp> = ({ isGapiMounted }) => {
     const completeLogs = logsCompleteLogsList.filter(
       (completeLog) => completeLog.logId === log.id
     );
-    const events = [];
+    const events: any[] = [];
     while (completeLogs.length > 0) {
       events.push({
         title: log.text,
@@ -61,17 +67,36 @@ const Calendar: React.FC<CalendarProp> = ({ isGapiMounted }) => {
     }
   }, [isGapiMounted, isSignedIn]);
 
+  const { width } = useWindowSize();
+  const isSmallScreen = width < 768; // 768px以下を小さい画面と定義
+
+  const [calendarView, setCalendarView] = useState("");
+
   return (
     <>
       <FullCalendar
-        plugins={[dayGridPlugin, timeGridPlugin]}
-        initialView="timeGridWeek"
+        plugins={[dayGridPlugin, timeGridPlugin, bootstrap5Plugin]}
+        themeSystem="bootstrap5"
+        initialView="week"
+        nowIndicator={true}
+        height={1300}
+        titleFormat={{ year: "numeric", month: "2-digit", day: "2-digit" }}
         headerToolbar={{
-          left: "prev,next today",
-          center: "title",
-          right: "dayGridMonth,timeGridWeek,dayGridWeek,timeGridDay",
+          left: "prev,next",
+          center: isSmallScreen ? "" : "title",
+          right: "dayGridMonth,week,timeGridDay",
         }}
         events={[...googleCalendarEvents, ...logEvents.flat()]}
+        {...(isSmallScreen && calendarView === "dayGridMonth"
+          ? { eventContent: EventContent }
+          : {})}
+        viewDidMount={(e) => setCalendarView(e.view.type)}
+        views={{
+          dayGridMonth: {
+            titleFormat: { year: "numeric", month: "2-digit" },
+          },
+          week: { type: "timeGrid", duration: { days: isSmallScreen ? 4 : 7 } },
+        }}
         locale="ja"
       />
     </>

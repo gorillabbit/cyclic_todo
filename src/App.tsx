@@ -9,9 +9,8 @@ import LogList from "./components/Log/LogList";
 import InputForms from "./components/InputForms/InputForms";
 import { useEffect, useState } from "react";
 import { User, getAuth, onAuthStateChanged } from "firebase/auth";
-import TimeLine from "./components/TimeLine/TimeLine";
 import { LogProvider } from "./components/Context/LogContext";
-import { gapi } from "gapi-script";
+import Calendar from "./components/Calendar/Calendar";
 
 function App() {
   const theme = createTheme({
@@ -49,7 +48,7 @@ function App() {
                 <Box m={2}>
                   <LogList />
                   <TaskList />
-                  <TimeLine isGapiMounted={isGapiMounted} />
+                  <Calendar isGapiMounted={isGapiMounted} />
                 </Box>
               </LogProvider>
             </>
