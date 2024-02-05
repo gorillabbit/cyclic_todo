@@ -12,7 +12,7 @@ import LogStartButton from "./LogStartButton";
 import LogDeleteButton from "./LogDeleteButton";
 import LogCompleteButton from "./LogCompleteButton";
 import LogFeature from "./LogFeature";
-
+import "../../App.css";
 interface LogProps {
   log: LogType;
   logsCompleteLogs: LogsCompleteLogsType[];
@@ -43,9 +43,26 @@ const Log: React.FC<LogProps> = ({ log, logsCompleteLogs, openDialog }) => {
   return (
     <Box>
       <Card
-        sx={{ backgroundColor: "#dfdfdf" }}
+        sx={{
+          backgroundColor: "#dfdfdf",
+          position: "relative",
+        }}
         onClick={() => setIsOpen((prevOpen) => !prevOpen)}
+        raised={isStarted ? true : false}
       >
+        {isStarted && (
+          <Box
+            className="loader"
+            sx={{
+              position: "absolute",
+              width: "100%",
+              height: "100%",
+              zIndex: 1,
+              pointerEvents: "none",
+            }}
+          />
+        )}
+
         <LogHeader lastCompleted={lastCompleted} log={log} />
         <Box m={2} textAlign="left">
           <Typography variant="h5" textAlign="center">
