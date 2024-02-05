@@ -10,11 +10,12 @@ export interface TaskType {
   dueTime: string | Date;
   completed: boolean;
   is周期的: string;
-  周期日数?: string;
-  周期単位?: string;
+  周期日数: string;
+  周期単位: string;
   親taskId?: string;
   toggleCompletionTimestamp?: Timestamp;
-  icon?: string;
+  icon: string;
+  description: string;
 }
 export interface LogsCompleteLogsType {
   id?: string;
@@ -41,4 +42,5 @@ export interface LogType {
   voiceAnnounceUnit?: string;
   icon?: string;
   displayFeature: string[];
+  description: string;
 }

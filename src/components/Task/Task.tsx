@@ -50,7 +50,7 @@ const Task: React.FC<TaskProps> = ({ task, setTaskList, tasklist }) => {
     task.hasDue
       ? task.hasDueTime
         ? task.dueDate + " " + task.dueTime
-        : task.dueDate + " " + "23時59分"
+        : task.dueDate + " 23時59分"
       : ""
   );
   const tasklistStyle = {
@@ -70,6 +70,11 @@ const Task: React.FC<TaskProps> = ({ task, setTaskList, tasklist }) => {
         <Typography variant="h5" textAlign="center">
           {task.text}
         </Typography>
+        {task.description && (
+          <Typography variant="body2" color="text.secondary">
+            {task.description}
+          </Typography>
+        )}
         {task.is周期的 !== "周期なし" && (
           <Typography variant="body2" color="text.secondary">
             周期{is完了後追加 && " タスク完了後 "} {task.周期日数}{" "}

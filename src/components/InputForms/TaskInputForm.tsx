@@ -27,6 +27,7 @@ const defaultNewTask: TaskType = {
   周期単位: "日",
   completed: false,
   icon: "",
+  description: "",
 };
 
 const auth = getAuth();
@@ -83,6 +84,14 @@ const TaskInputForm = () => {
         />
         {newTask.text && (
           <>
+            <TextField
+              fullWidth
+              label="説明"
+              value={newTask.description}
+              onChange={(e) =>
+                handleNewTaskInput("description", e.target.value)
+              }
+            />
             <FontAwesomeIconPicker
               value={newTask.icon ?? ""}
               onChange={handleNewTaskInput}

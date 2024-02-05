@@ -52,6 +52,7 @@ const Log: React.FC<LogProps> = ({ log, logsCompleteLogs }) => {
             )}
             {log.text}
           </Typography>
+          {log.description && <BodyTypography text={log.description} />}
           <BodyTypography
             visibility={isStarted ? "visible" : "hidden"}
             text={isStarted ? <Stopwatch log={log} /> : <div>blank</div>}
