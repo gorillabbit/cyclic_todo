@@ -16,10 +16,12 @@ import LogFeature from "./LogFeature";
 interface LogProps {
   log: LogType;
   logsCompleteLogs: LogsCompleteLogsType[];
+  openDialog?: boolean;
 }
 
-const Log: React.FC<LogProps> = ({ log, logsCompleteLogs }) => {
-  const [isOpen, setIsOpen] = useState<boolean>(false);
+const Log: React.FC<LogProps> = ({ log, logsCompleteLogs, openDialog }) => {
+  //カレンダーから開く場合最初から開いた状態にする
+  const [isOpen, setIsOpen] = useState<boolean>(Boolean(openDialog));
 
   const completeLogs = logsCompleteLogs.filter(
     (logsCompleteLog: LogsCompleteLogsType) => logsCompleteLog.logId === log.id

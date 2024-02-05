@@ -5,7 +5,7 @@ import React from "react";
 
 interface ChildTaskProps {
   tasks: TaskType[];
-  setTaskList: React.Dispatch<React.SetStateAction<TaskType[]>>;
+  setTaskList?: React.Dispatch<React.SetStateAction<TaskType[]>>;
 }
 
 const ChildTasks: React.FC<ChildTaskProps> = ({ tasks, setTaskList }) => {
