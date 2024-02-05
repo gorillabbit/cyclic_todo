@@ -7,20 +7,21 @@ import {
   Box,
 } from "@mui/material";
 import { DatePicker, TimePicker } from "@mui/x-date-pickers";
-import React, { useState } from "react";
+import { useState } from "react";
 import { addDocTask } from "../../firebase.js";
 import { format } from "date-fns";
 import { TaskType } from "../../types.js";
 import FontAwesomeIconPicker from "./FontAwesomeIconPicker";
 import { getAuth } from "firebase/auth";
-
-const now = new Date();
+import StyledCheckbox from "../StyledCheckbox";
 
 const defaultNewTask: TaskType = {
   userId: "",
   text: "",
-  dueDate: now,
-  dueTime: now,
+  hasDue: false,
+  dueDate: new Date(),
+  hasDueTime: false,
+  dueTime: new Date(new Date().setHours(0, 0, 0, 0)),
   is周期的: "周期なし",
   周期日数: "1",
   周期単位: "日",
@@ -44,7 +45,9 @@ const TaskInputForm = () => {
     return {
       ...task,
       dueDate: format(task.dueDate as unknown as number, "yyyy年MM月dd日"),
-      dueTime: format(task.dueTime as unknown as number, "HH時mm分"),
+      dueTime: task.dueTime
+        ? format(task.dueTime as unknown as number, "HH時mm分")
+        : "",
     };
   };
 
@@ -84,19 +87,46 @@ const TaskInputForm = () => {
               value={newTask.icon ?? ""}
               onChange={handleNewTaskInput}
             />
-            <DatePicker
-              label="期日-年月日"
-              value={newTask.dueDate}
-              onChange={(value) => handleNewTaskInput("dueDate", value)}
-              sx={{ maxWidth: 150 }}
-            />
-            <TimePicker
-              ampm={false}
-              label="期日-時刻"
-              value={newTask.dueTime}
-              onChange={(value) => handleNewTaskInput("dueTime", value)}
-              sx={{ maxWidth: 120 }}
-            />
+            <StyledCheckbox
+              value={newTask.hasDue}
+              handleCheckbox={() =>
+                handleNewTaskInput("hasDue", !newTask.hasDue)
+              }
+            >
+              期日
+            </StyledCheckbox>
+
+            {newTask.hasDue && (
+              <DatePicker
+                label="期日-年月日"
+                value={newTask.dueDate}
+                onChange={(value) => handleNewTaskInput("dueDate", value)}
+                sx={{ maxWidth: 150 }}
+              />
+            )}
+
+            {newTask.hasDue && newTask.dueDate && (
+              <>
+                <StyledCheckbox
+                  value={newTask.hasDueTime}
+                  handleCheckbox={() =>
+                    handleNewTaskInput("hasDueTime", !newTask.hasDueTime)
+                  }
+                >
+                  時刻
+                </StyledCheckbox>
+                {newTask.hasDueTime && (
+                  <TimePicker
+                    ampm={false}
+                    label="期日-時刻"
+                    value={newTask.dueTime}
+                    onChange={(value) => handleNewTaskInput("dueTime", value)}
+                    sx={{ maxWidth: 120 }}
+                  />
+                )}
+              </>
+            )}
+
             <Select
               label="周期"
               value={newTask.is周期的}

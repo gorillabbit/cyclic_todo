@@ -43,12 +43,15 @@ const Calendar: React.FC<CalendarProp> = ({ isGapiMounted }) => {
     return [
       {
         title: task.text + " 期日",
-        start: parse(
-          (task.dueDate as string) + (task.dueTime as string),
-          "yyyy年MM月dd日HH時mm分",
-          new Date()
-        ),
+        start: task.hasDue
+          ? parse(
+              (task.dueDate as string) + (task.dueTime as string),
+              "yyyy年MM月dd日HH時mm分",
+              new Date()
+            )
+          : "",
         color: "#c43b31",
+        allDay: task.hasDue && !task.hasDueTime,
       },
       {
         title: task.text + " 完了",

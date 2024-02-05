@@ -46,7 +46,13 @@ const toggleCompletion = (task: TaskType) => {
 };
 
 const Task: React.FC<TaskProps> = ({ task, setTaskList, tasklist }) => {
-  const backgroundColor = getBackgroundColor(task.dueDate + " " + task.dueTime);
+  const backgroundColor = getBackgroundColor(
+    task.hasDue
+      ? task.hasDueTime
+        ? task.dueDate + " " + task.dueTime
+        : task.dueDate + " " + "23時59分"
+      : ""
+  );
   const tasklistStyle = {
     backgroundColor: task.completed ? "#c0c0c0" : backgroundColor,
     color: task.completed ? "#5f5f5f" : "",
@@ -64,13 +70,20 @@ const Task: React.FC<TaskProps> = ({ task, setTaskList, tasklist }) => {
         <Typography variant="h5" textAlign="center">
           {task.text}
         </Typography>
-        <Typography variant="body2" color="text.secondary">
-          周期{is完了後追加 && " タスク完了後 "} {task.周期日数} {task.周期単位}
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          {task.dueDate ? "期日 " : ""}
-          {task.dueDate?.toString()} {task.dueTime?.toString()}
-        </Typography>
+        {task.is周期的 !== "周期なし" && (
+          <Typography variant="body2" color="text.secondary">
+            周期{is完了後追加 && " タスク完了後 "} {task.周期日数}{" "}
+            {task.周期単位}
+          </Typography>
+        )}
+
+        {task.hasDue && (
+          <Typography variant="body2" color="text.secondary">
+            {task.dueDate ? "期日 " : ""}
+            {task.dueDate?.toString()} {task.dueTime?.toString()}
+          </Typography>
+        )}
+
         {open && <TaskDetail task={task} />}
         {open && 子tasks && 子tasks.length > 0 && (
           <ChildTasks tasks={子tasks} setTaskList={setTaskList} />

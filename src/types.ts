@@ -4,7 +4,9 @@ export interface TaskType {
   userId: string;
   id?: string;
   text: string;
+  hasDue: boolean;
   dueDate: string | Date;
+  hasDueTime: boolean;
   dueTime: string | Date;
   completed: boolean;
   is周期的: string;
