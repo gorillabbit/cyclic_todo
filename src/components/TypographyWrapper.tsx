@@ -19,7 +19,7 @@ export const BodyTypography: React.FC<BodyTypographyProps> = ({
       component="div"
       variant="body2"
       color="text.secondary"
-      sx={{ visibility: visibility ?? "visible" }}
+      sx={{ visibility: visibility ?? "visible", whiteSpace: "pre-line" }}
       {...props}
     >
       {children}

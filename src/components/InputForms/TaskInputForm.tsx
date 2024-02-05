@@ -98,6 +98,7 @@ const TaskInputForm: React.FC<TaskInputFormProp> = ({
               fullWidth
               label="説明"
               value={newTask.description}
+              multiline
               onChange={(e) =>
                 handleNewTaskInput("description", e.target.value)
               }

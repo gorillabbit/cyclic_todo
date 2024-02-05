@@ -73,6 +73,7 @@ const LogInputForm: React.FC<LogInputFormProp> = ({ date }) => {
               fullWidth
               label="説明"
               value={newLog.description}
+              multiline
               onChange={(e) => handleNewLogInput("description", e.target.value)}
               placeholder="説明を入力"
             />
