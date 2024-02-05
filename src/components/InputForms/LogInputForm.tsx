@@ -27,6 +27,7 @@ const defaultNewLog: LogType = {
   voiceAnnounceUnit: "分",
   icon: "",
   displayFeature: [],
+  description: "",
 };
 
 const auth = getAuth();
@@ -64,6 +65,13 @@ const LogInputForm = () => {
         />
         {newLog.text && (
           <>
+            <TextField
+              fullWidth
+              label="説明"
+              value={newLog.description}
+              onChange={(e) => handleNewLogInput("description", e.target.value)}
+              placeholder="説明を入力"
+            />
             <FontAwesomeIconPicker
               value={newLog.icon ?? ""}
               onChange={handleNewLogInput}

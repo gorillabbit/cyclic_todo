@@ -42,4 +42,5 @@ export interface LogType {
   voiceAnnounceUnit?: string;
   icon?: string;
   displayFeature: string[];
+  description: string;
 }
