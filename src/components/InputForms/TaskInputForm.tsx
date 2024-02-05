@@ -15,24 +15,34 @@ import FontAwesomeIconPicker from "./FontAwesomeIconPicker";
 import { getAuth } from "firebase/auth";
 import StyledCheckbox from "../StyledCheckbox";
 
-const defaultNewTask: TaskType = {
-  userId: "",
-  text: "",
-  hasDue: false,
-  dueDate: new Date(),
-  hasDueTime: false,
-  dueTime: new Date(new Date().setHours(0, 0, 0, 0)),
-  is周期的: "周期なし",
-  周期日数: "1",
-  周期単位: "日",
-  completed: false,
-  icon: "",
-  description: "",
-};
+interface TaskInputFormProp {
+  date?: Date;
+  openDialog?: boolean;
+  buttonAction?: () => void;
+}
 
 const auth = getAuth();
 
-const TaskInputForm = () => {
+const TaskInputForm: React.FC<TaskInputFormProp> = ({
+  date,
+  openDialog,
+  buttonAction,
+}) => {
+  const defaultNewTask: TaskType = {
+    userId: "",
+    text: "",
+    hasDue: date ? true : false,
+    dueDate: date ?? new Date(),
+    hasDueTime: date ? true : false,
+    dueTime: date ?? new Date(new Date().setHours(0, 0, 0, 0)),
+    is周期的: "周期なし",
+    周期日数: "1",
+    周期単位: "日",
+    completed: false,
+    icon: "",
+    description: "",
+  };
+
   const [newTask, setNewTask] = useState<TaskType>(defaultNewTask);
   const handleNewTaskInput = (name: string, value: any) => {
     if (name === "周期日数" && parseInt(value, 10) <= 0) {
@@ -82,7 +92,7 @@ const TaskInputForm = () => {
           value={newTask.text}
           onChange={(e) => handleNewTaskInput("text", e.target.value)}
         />
-        {newTask.text && (
+        {(newTask.text || openDialog) && (
           <>
             <TextField
               fullWidth
@@ -168,7 +178,14 @@ const TaskInputForm = () => {
           </>
         )}
       </FormGroup>
-      <Button sx={{ my: 1 }} variant="contained" onClick={addTask}>
+      <Button
+        sx={{ my: 1 }}
+        variant="contained"
+        onClick={() => {
+          addTask();
+          buttonAction?.();
+        }}
+      >
         追加
       </Button>
     </Box>

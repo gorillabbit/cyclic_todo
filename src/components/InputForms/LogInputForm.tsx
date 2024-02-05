@@ -14,6 +14,10 @@ import StyledCheckbox from "../StyledCheckbox";
 import FontAwesomeIconPicker from "./FontAwesomeIconPicker";
 import { getAuth } from "firebase/auth";
 
+interface LogInputFormProp {
+  date?: Date;
+}
+
 const defaultNewLog: LogType = {
   userId: "",
   text: "",
@@ -32,7 +36,7 @@ const defaultNewLog: LogType = {
 
 const auth = getAuth();
 
-const LogInputForm = () => {
+const LogInputForm: React.FC<LogInputFormProp> = ({ date }) => {
   const [newLog, setNewLog] = useState<LogType>(defaultNewLog);
 
   const handleNewLogInput = (name: string, value: any) => {

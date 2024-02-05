@@ -13,7 +13,7 @@ import { BodyTypography } from "../TypographyWrapper";
 
 interface TaskProps {
   task: TaskType;
-  setTaskList: React.Dispatch<React.SetStateAction<TaskType[]>>;
+  setTaskList?: React.Dispatch<React.SetStateAction<TaskType[]>>;
   tasklist?: TaskType[];
   type?: string;
 }
