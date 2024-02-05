@@ -9,6 +9,7 @@ import { TaskType } from "../../types.js";
 import { Box, Button, Card, Typography } from "@mui/material";
 import ChildTasks from "./ChildTask";
 import { getAuth } from "firebase/auth";
+import { BodyTypography } from "../TypographyWrapper";
 
 interface TaskProps {
   task: TaskType;
@@ -70,25 +71,26 @@ const Task: React.FC<TaskProps> = ({ task, setTaskList, tasklist }) => {
         <Typography variant="h5" textAlign="center">
           {task.text}
         </Typography>
-        {task.description && (
-          <Typography variant="body2" color="text.secondary">
-            {task.description}
-          </Typography>
-        )}
+        {task.description && <BodyTypography text={task.description} />}
         {task.is周期的 !== "周期なし" && (
-          <Typography variant="body2" color="text.secondary">
-            周期{is完了後追加 && " タスク完了後 "} {task.周期日数}{" "}
-            {task.周期単位}
-          </Typography>
+          <BodyTypography
+            text={
+              "周期" +
+              (is完了後追加 && " タスク完了後 ") +
+              task.周期日数 +
+              task.周期単位
+            }
+          />
         )}
-
         {task.hasDue && (
-          <Typography variant="body2" color="text.secondary">
-            {task.dueDate ? "期日 " : ""}
-            {task.dueDate?.toString()} {task.dueTime?.toString()}
-          </Typography>
+          <BodyTypography
+            text={
+              (task.dueDate ? "期日 " : "") +
+              task.dueDate?.toString() +
+              task.dueTime?.toString()
+            }
+          />
         )}
-
         {open && <TaskDetail task={task} />}
         {open && 子tasks && 子tasks.length > 0 && (
           <ChildTasks tasks={子tasks} setTaskList={setTaskList} />
