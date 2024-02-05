@@ -50,7 +50,7 @@ const Task: React.FC<TaskProps> = ({ task, setTaskList, tasklist }) => {
     task.hasDue
       ? task.hasDueTime
         ? task.dueDate + " " + task.dueTime
-        : task.dueDate + " " + "23時59分"
+        : task.dueDate + " 23時59分"
       : ""
   );
   const tasklistStyle = {
