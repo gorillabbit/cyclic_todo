@@ -43,4 +43,5 @@ export interface LogType {
   icon?: string;
   displayFeature: string[];
   description: string;
+  archived: boolean;
 }

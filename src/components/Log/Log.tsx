@@ -15,6 +15,7 @@ import LogFeature from "./LogFeature";
 import "../../App.css";
 import LogInputForm from "../InputForms/LogInputForm";
 import EditIcon from "@mui/icons-material/Edit";
+import LogArchiveButton from "./LogArchiveButton";
 interface LogProps {
   log: LogType;
   logsCompleteLogs: LogsCompleteLogsType[];
@@ -43,6 +44,7 @@ const Log: React.FC<LogProps> = ({ log, logsCompleteLogs, openDialog }) => {
   const isStarted = completeLogs[0]?.type === "start";
 
   const [isOpenEditDialog, setIsOpenEditDialog] = useState<boolean>(false);
+  console.log(log);
 
   return (
     <>
@@ -103,13 +105,15 @@ const Log: React.FC<LogProps> = ({ log, logsCompleteLogs, openDialog }) => {
               visibility={isStarted ? "visible" : "hidden"}
               text={isStarted ? <Stopwatch log={log} /> : <div>blank</div>}
             />
-            <LogFeature
-              log={log}
-              isLastCompletedAvailable={isLastCompletedAvailable}
-              lastCompleted={lastCompleted}
-              finishLogs={finishLogs}
-              isOpen={isOpen}
-            />
+            {!log.archived && (
+              <LogFeature
+                log={log}
+                isLastCompletedAvailable={isLastCompletedAvailable}
+                lastCompleted={lastCompleted}
+                finishLogs={finishLogs}
+                isOpen={isOpen}
+              />
+            )}
 
             {isOpen &&
               completeLogs.map((log: LogsCompleteLogsType) => (
@@ -118,9 +122,16 @@ const Log: React.FC<LogProps> = ({ log, logsCompleteLogs, openDialog }) => {
           </Box>
 
           <Box display="flex" width="100%">
-            {log.duration && !isStarted && <LogStartButton log={log} />}
-            {(!log.duration || isStarted) && <LogCompleteButton log={log} />}
-            <LogDeleteButton log={log} completeLogs={completeLogs} />
+            {!log.archived && log.duration && !isStarted && (
+              <LogStartButton log={log} />
+            )}
+            {!log.archived && (!log.duration || isStarted) && (
+              <LogCompleteButton log={log} />
+            )}
+            {log.archived && (
+              <LogDeleteButton log={log} completeLogs={completeLogs} />
+            )}
+            <LogArchiveButton log={log} />
           </Box>
         </Card>
       </Box>

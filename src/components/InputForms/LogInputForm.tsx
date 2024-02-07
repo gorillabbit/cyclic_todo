@@ -41,6 +41,7 @@ const LogInputForm: React.FC<LogInputFormProp> = ({
     icon: "",
     displayFeature: [],
     description: "",
+    archived: false,
   };
 
   const [newLog, setNewLog] = useState<LogType>(defaultNewLog);
