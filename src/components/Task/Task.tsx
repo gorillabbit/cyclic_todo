@@ -6,10 +6,22 @@ import { getBackgroundColor } from "../../utilities/taskUtilities.js";
 import { serverTimestamp } from "firebase/firestore";
 import TaskDetail from "./TaskDetail.js";
 import { TaskType } from "../../types.js";
-import { Box, Button, Card, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Card,
+  Dialog,
+  DialogContent,
+  Typography,
+} from "@mui/material";
 import ChildTasks from "./ChildTask";
 import { getAuth } from "firebase/auth";
 import { BodyTypography } from "../TypographyWrapper";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { IconName } from "@fortawesome/fontawesome-svg-core";
+import EditIcon from "@mui/icons-material/Edit";
+import TaskInputForm from "../InputForms/TaskInputForm";
+import { parse } from "date-fns";
 
 interface TaskProps {
   task: TaskType;
@@ -64,62 +76,107 @@ const Task: React.FC<TaskProps> = ({ task, setTaskList, tasklist }) => {
 
   const is完了後追加 = task.is周期的 === "完了後に追加";
   const [open, setOpen] = useState(false);
+  const [isOpenEditDialog, setIsOpenEditDialog] = useState<boolean>(false);
 
   return (
-    <Card sx={tasklistStyle} onClick={() => setOpen((prevOpen) => !prevOpen)}>
-      <Box m={2} textAlign="left">
-        <Typography variant="h5" textAlign="center">
-          {task.text}
-        </Typography>
-        {task.description && <BodyTypography text={task.description} />}
-        {task.is周期的 !== "周期なし" && (
-          <BodyTypography
-            text={
-              "周期" +
-              (is完了後追加 && " タスク完了後 ") +
-              task.周期日数 +
-              task.周期単位
-            }
+    <>
+      <Card sx={tasklistStyle} onClick={() => setOpen((prevOpen) => !prevOpen)}>
+        <Box m={2} textAlign="left">
+          <Box
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            gap={1}
+          >
+            {task.icon && (
+              <FontAwesomeIcon icon={["fas", task.icon as IconName]} />
+            )}
+            <Typography
+              variant="h5"
+              textAlign="center"
+              sx={{ wordBreak: "break-word" }}
+            >
+              {task.text}
+              <EditIcon
+                color="action"
+                sx={{
+                  ml: 1,
+                  cursor: "pointer",
+                }}
+                onClick={() => setIsOpenEditDialog(true)}
+              />
+            </Typography>
+          </Box>
+          {task.description && <BodyTypography text={task.description} />}
+          {task.is周期的 !== "周期なし" && (
+            <BodyTypography
+              text={
+                "周期" +
+                (is完了後追加 && " タスク完了後 ") +
+                task.周期日数 +
+                task.周期単位
+              }
+            />
+          )}
+          {task.hasDue && (
+            <BodyTypography
+              text={
+                (task.dueDate ? "期日 " : "") +
+                task.dueDate?.toString() +
+                task.dueTime?.toString()
+              }
+            />
+          )}
+          {open && <TaskDetail task={task} />}
+          {open && 子tasks && 子tasks.length > 0 && (
+            <ChildTasks tasks={子tasks} setTaskList={setTaskList} />
+          )}
+          {open && 親tasks && 親tasks.length > 0 && (
+            <ChildTasks tasks={親tasks} setTaskList={setTaskList} />
+          )}
+        </Box>
+        <Box display="flex" width="100%">
+          <Button
+            fullWidth
+            color={task.completed ? "warning" : "success"}
+            variant="contained"
+            sx={{ borderRadius: "0px" }}
+            onClick={() => toggleCompletion(task)}
+          >
+            {task.completed ? "取り消す" : "完了"}
+          </Button>
+          <Button
+            fullWidth
+            color="error"
+            variant="contained"
+            sx={{ borderRadius: "0px" }}
+            onClick={() => deleteDocTask(task.id)}
+          >
+            削除
+          </Button>
+        </Box>
+      </Card>
+      <Dialog
+        open={isOpenEditDialog}
+        onClose={() => setIsOpenEditDialog(false)}
+      >
+        <DialogContent>
+          <TaskInputForm
+            openDialog={true}
+            propTask={{
+              ...task,
+              dueDate: parse(
+                task.dueDate as string,
+                "yyyy年MM月dd日",
+                new Date()
+              ),
+              dueTime: parse(task.dueTime as string, "HH時mm分", new Date()),
+            }}
+            setIsOpenEditDialog={setIsOpenEditDialog}
           />
-        )}
-        {task.hasDue && (
-          <BodyTypography
-            text={
-              (task.dueDate ? "期日 " : "") +
-              task.dueDate?.toString() +
-              task.dueTime?.toString()
-            }
-          />
-        )}
-        {open && <TaskDetail task={task} />}
-        {open && 子tasks && 子tasks.length > 0 && (
-          <ChildTasks tasks={子tasks} setTaskList={setTaskList} />
-        )}
-        {open && 親tasks && 親tasks.length > 0 && (
-          <ChildTasks tasks={親tasks} setTaskList={setTaskList} />
-        )}
-      </Box>
-      <Box display="flex" width="100%">
-        <Button
-          fullWidth
-          color={task.completed ? "warning" : "success"}
-          variant="contained"
-          sx={{ borderRadius: "0px" }}
-          onClick={() => toggleCompletion(task)}
-        >
-          {task.completed ? "取り消す" : "完了"}
-        </Button>
-        <Button
-          fullWidth
-          color="error"
-          variant="contained"
-          sx={{ borderRadius: "0px" }}
-          onClick={() => deleteDocTask(task.id)}
-        >
-          削除
-        </Button>
-      </Box>
-    </Card>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 

@@ -123,7 +123,6 @@ const Calendar: React.FC<CalendarProp> = ({ isGapiMounted }) => {
   const [openEventDialog, setOpenEventDialog] = useState(false);
   const [clickedEvent, setClickedEvent] = useState({ source: "", id: "" });
   const handleEventClick = (arg: any) => {
-    console.log(arg);
     if (arg.event._def.extendedProps.source !== "googleCalendar") {
       setClickedEvent({
         source: arg.event._def.extendedProps.source,

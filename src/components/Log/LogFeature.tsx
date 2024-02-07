@@ -18,7 +18,6 @@ const updateDisplayFeature = (log: LogType, feature: string) => {
     const newDisplayFeature = log.displayFeature.filter(
       (item: string) => item !== feature
     );
-    console.log(newDisplayFeature);
     updateDocLog(log.id, { displayFeature: [...newDisplayFeature] });
   } else {
     updateDocLog(log.id, { displayFeature: [...log.displayFeature, feature] });

@@ -8,35 +8,41 @@ import {
 } from "@mui/material";
 
 import { useState } from "react";
-import { addDocLog } from "../../firebase.js";
+import { addDocLog, updateDocLog } from "../../firebase.js";
 import { LogType } from "../../types.js";
 import StyledCheckbox from "../StyledCheckbox";
 import FontAwesomeIconPicker from "./FontAwesomeIconPicker";
 import { getAuth } from "firebase/auth";
 
 interface LogInputFormProp {
-  date?: Date;
+  propLog?: LogType;
+  openDialog?: boolean;
+  setIsOpenEditDialog?: React.Dispatch<React.SetStateAction<boolean>>;
 }
-
-const defaultNewLog: LogType = {
-  userId: "",
-  text: "",
-  duration: false,
-  interval: false,
-  intervalNum: 1,
-  intervalUnit: "日",
-  availableMemo: false,
-  availableVoiceAnnounce: false,
-  voiceAnnounceNum: 1,
-  voiceAnnounceUnit: "分",
-  icon: "",
-  displayFeature: [],
-  description: "",
-};
 
 const auth = getAuth();
 
-const LogInputForm: React.FC<LogInputFormProp> = ({ date }) => {
+const LogInputForm: React.FC<LogInputFormProp> = ({
+  propLog,
+  openDialog,
+  setIsOpenEditDialog,
+}) => {
+  const defaultNewLog: LogType = propLog ?? {
+    userId: "",
+    text: "",
+    duration: false,
+    interval: false,
+    intervalNum: 1,
+    intervalUnit: "日",
+    availableMemo: false,
+    availableVoiceAnnounce: false,
+    voiceAnnounceNum: 1,
+    voiceAnnounceUnit: "分",
+    icon: "",
+    displayFeature: [],
+    description: "",
+  };
+
   const [newLog, setNewLog] = useState<LogType>(defaultNewLog);
 
   const handleNewLogInput = (name: string, value: any) => {
@@ -55,6 +61,14 @@ const LogInputForm: React.FC<LogInputFormProp> = ({ date }) => {
     }
   };
 
+  const editLog = () => {
+    if (newLog && auth.currentUser) {
+      const userId = auth.currentUser.uid;
+      updateDocLog(newLog.id, { ...newLog, userId });
+    }
+    setIsOpenEditDialog?.(false);
+  };
+
   return (
     <Box display="flex">
       <FormGroup row={true} sx={{ gap: 1, m: 1, width: "100%" }}>
@@ -67,7 +81,7 @@ const LogInputForm: React.FC<LogInputFormProp> = ({ date }) => {
           onChange={(e) => handleNewLogInput("text", e.target.value)}
           placeholder="記録を入力"
         />
-        {newLog.text && (
+        {(newLog.text || openDialog) && (
           <>
             <TextField
               fullWidth
@@ -177,8 +191,12 @@ const LogInputForm: React.FC<LogInputFormProp> = ({ date }) => {
           </>
         )}
       </FormGroup>
-      <Button sx={{ my: 1 }} variant="contained" onClick={addLog}>
-        追加
+      <Button
+        sx={{ my: 1 }}
+        variant="contained"
+        onClick={propLog ? editLog : addLog}
+      >
+        {propLog ? "変更" : "追加"}
       </Button>
     </Box>
   );

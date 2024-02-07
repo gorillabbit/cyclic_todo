@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import { DatePicker, TimePicker } from "@mui/x-date-pickers";
 import { useState } from "react";
-import { addDocTask } from "../../firebase.js";
+import { addDocTask, updateDocTask } from "../../firebase.js";
 import { format } from "date-fns";
 import { TaskType } from "../../types.js";
 import FontAwesomeIconPicker from "./FontAwesomeIconPicker";
@@ -19,6 +19,8 @@ interface TaskInputFormProp {
   date?: Date;
   openDialog?: boolean;
   buttonAction?: () => void;
+  propTask?: TaskType;
+  setIsOpenEditDialog?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const auth = getAuth();
@@ -27,8 +29,10 @@ const TaskInputForm: React.FC<TaskInputFormProp> = ({
   date,
   openDialog,
   buttonAction,
+  propTask,
+  setIsOpenEditDialog,
 }) => {
-  const defaultNewTask: TaskType = {
+  const defaultNewTask: TaskType = propTask ?? {
     userId: "",
     text: "",
     hasDue: date ? true : false,
@@ -74,6 +78,16 @@ const TaskInputForm: React.FC<TaskInputFormProp> = ({
       addDocTask({ ...taskToAdd, userId });
       setNewTask(defaultNewTask);
     }
+    buttonAction?.();
+  };
+
+  const editTask = () => {
+    if (newTask && auth.currentUser) {
+      const validatedTask = validateTask(newTask);
+      const userId = auth.currentUser.uid;
+      updateDocTask(validatedTask.id, { ...validatedTask, userId });
+    }
+    setIsOpenEditDialog?.(false);
   };
 
   // 周期的なフィールドを省略
@@ -182,12 +196,9 @@ const TaskInputForm: React.FC<TaskInputFormProp> = ({
       <Button
         sx={{ my: 1 }}
         variant="contained"
-        onClick={() => {
-          addTask();
-          buttonAction?.();
-        }}
+        onClick={propTask ? editTask : addTask}
       >
-        追加
+        {propTask ? "変更" : "追加"}
       </Button>
     </Box>
   );
