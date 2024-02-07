@@ -38,6 +38,11 @@ const TaskList = () => {
             tasklist={taskList}
           />
         ))}
+      </Masonry>
+      <Masonry
+        sx={{ margin: "2px" }}
+        columns={{ xs: 2, sm: 3, md: 4, lg: 5, xl: 6 }}
+      >
         {completedTaskList.map((task) => (
           <Task
             key={task.id}
