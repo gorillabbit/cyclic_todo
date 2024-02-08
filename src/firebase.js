@@ -101,3 +101,42 @@ export const deleteDocLogsCompleteLogs = (id) => {
     console.error("logsCompleteLogs削除エラー: ", e);
   }
 };
+
+export const addDocAccounts = (Account) => {
+  try {
+    return addDoc(collection(db, "Accounts"), Account);
+  } catch (e) {
+    console.error("Accounts追加エラー: ", e);
+  }
+}
+
+export const updateDocAccounts = (id,feature) =>{
+  try {
+    return updateDoc(doc(db, "Accounts", id), feature)
+  } catch (e) {
+    console.error("Accounts切り替えエラー: ", e);
+  }
+}
+
+export const addDocAccountLink = (AccountLink) => {
+  try {
+    return addDoc(collection(db, "AccountLinks"), AccountLink);
+  } catch (e) {
+    console.error("AccountLinks追加エラー: ", e);
+  }
+}
+export const updateDocAccountLinks = (id,feature) => {
+  try {
+    return updateDoc(doc(db, "AccountLinks", id), feature)
+  } catch (e) {
+    console.error("AccountLinks切り替えエラー: ", e);
+  }
+}
+
+export const deleteDocAccountLinks = (id) => {
+  try {
+    deleteDoc(doc(db, "AccountLinks", id));
+  } catch (e) {
+    console.error("AccountLinks削除エラー: ", e);
+  }
+};

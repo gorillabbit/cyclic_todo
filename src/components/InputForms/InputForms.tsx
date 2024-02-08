@@ -3,6 +3,7 @@ import TaskInputForm from "./TaskInputForm";
 import LogInputForm from "./LogInputForm";
 import ToggleButtons from "./ToggleButtons.js";
 import { Box } from "@mui/material";
+import AccountShareButton from "./AccountShareButton";
 
 const InputForms = () => {
   const [isTask, setIsTask] = useState<boolean>(true);
@@ -10,6 +11,7 @@ const InputForms = () => {
   return (
     <Box m={2}>
       <ToggleButtons isTask={isTask} setIsTask={setIsTask} />
+      <AccountShareButton />
       <Box display={isTask ? "block" : "none"}>
         <TaskInputForm />
       </Box>

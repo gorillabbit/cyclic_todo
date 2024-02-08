@@ -44,4 +44,20 @@ export interface LogType {
   displayFeature: string[];
   description: string;
   archived: boolean;
+  accessibleAccounts: string[];
+}
+
+export interface AccountType {
+  uid: string;
+  id?: string;
+  email: string;
+  name: string;
+  linkedAccounts: string[];
+}
+
+export interface AccountLinkType {
+  id?: string;
+  requester: string;
+  receiver: string;
+  status: "pending" | "rejected" | "accepted";
 }

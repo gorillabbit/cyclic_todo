@@ -12,6 +12,7 @@ import { User, getAuth, onAuthStateChanged } from "firebase/auth";
 import { LogProvider } from "./components/Context/LogContext";
 import Calendar from "./components/Calendar/Calendar";
 import { TaskProvider } from "./components/Context/TaskContext";
+import { AccountProvider } from "./components/Context/AccountContext";
 
 function App() {
   const theme = createTheme({
@@ -44,16 +45,18 @@ function App() {
           <Header setUser={setUser} setIsGapiMounted={setIsGapiMounted} />
           {user && (
             <>
-              <InputForms />
-              <TaskProvider>
-                <LogProvider>
-                  <Box m={2}>
-                    <LogList />
-                    <TaskList />
-                    <Calendar isGapiMounted={isGapiMounted} />
-                  </Box>
-                </LogProvider>
-              </TaskProvider>
+              <AccountProvider>
+                <InputForms />
+                <TaskProvider>
+                  <LogProvider>
+                    <Box m={2}>
+                      <LogList />
+                      <TaskList />
+                      <Calendar isGapiMounted={isGapiMounted} />
+                    </Box>
+                  </LogProvider>
+                </TaskProvider>
+              </AccountProvider>
             </>
           )}
         </Box>
