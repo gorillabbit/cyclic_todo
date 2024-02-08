@@ -200,7 +200,10 @@ const AccountShareButton = () => {
           {receivers?.map((receivedRequest) =>
             receivedRequest.status === "pending" ? (
               <Box m={1} key={receivedRequest.id}>
-                <Tooltip title={receivedRequest.requester.email}>
+                <Tooltip
+                  title={receivedRequest.requester.email}
+                  placement="top"
+                >
                   <Chip
                     variant="outlined"
                     label={receivedRequest.requester.name}
@@ -225,7 +228,10 @@ const AccountShareButton = () => {
               </Box>
             ) : receivedRequest.status === "accepted" ? (
               <Box m={1} key={receivedRequest.id}>
-                <Tooltip title={receivedRequest.requester.email}>
+                <Tooltip
+                  title={receivedRequest.requester.email}
+                  placement="top"
+                >
                   <Chip
                     variant="outlined"
                     color="success"
@@ -247,7 +253,7 @@ const AccountShareButton = () => {
           {requests?.map((request) =>
             request.status === "pending" ? (
               <Box m={1} key={request.id}>
-                <Tooltip title={request.receiver.email}>
+                <Tooltip title={request.receiver.email} placement="top">
                   <Chip
                     variant="outlined"
                     label={request.receiver.email}
@@ -263,7 +269,7 @@ const AccountShareButton = () => {
               </Box>
             ) : request.status === "accepted" ? (
               <Box m={1} key={request.id}>
-                <Tooltip title={request.receiver.email}>
+                <Tooltip title={request.receiver.email} placement="top">
                   <Chip
                     variant="outlined"
                     color="success"
