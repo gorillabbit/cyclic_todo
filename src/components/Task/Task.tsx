@@ -88,9 +88,7 @@ const Task: React.FC<TaskProps> = ({ task, setTaskList, tasklist }) => {
             alignItems="center"
             gap={1}
           >
-            {task.icon && (
-              <FontAwesomeIcon icon={["fas", task.icon as IconName]} />
-            )}
+            {task.icon && <></>}
             <Typography
               variant="h5"
               textAlign="center"

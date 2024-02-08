@@ -44,7 +44,6 @@ const Log: React.FC<LogProps> = ({ log, logsCompleteLogs, openDialog }) => {
   const isStarted = completeLogs[0]?.type === "start";
 
   const [isOpenEditDialog, setIsOpenEditDialog] = useState<boolean>(false);
-  console.log(log);
 
   return (
     <>
@@ -78,9 +77,7 @@ const Log: React.FC<LogProps> = ({ log, logsCompleteLogs, openDialog }) => {
               alignItems="center"
               gap={1}
             >
-              {log.icon && (
-                <FontAwesomeIcon icon={["fas", log.icon as IconName]} />
-              )}
+              {log.icon && <></>}
               <Typography
                 variant="h5"
                 textAlign="center"
