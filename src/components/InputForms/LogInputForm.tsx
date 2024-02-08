@@ -5,6 +5,8 @@ import {
   MenuItem,
   Button,
   Box,
+  FormControl,
+  InputLabel,
 } from "@mui/material";
 
 import { useState } from "react";
@@ -13,6 +15,7 @@ import { LogType } from "../../types.js";
 import StyledCheckbox from "../StyledCheckbox";
 import FontAwesomeIconPicker from "./FontAwesomeIconPicker";
 import { getAuth } from "firebase/auth";
+import { useAccount } from "../Context/AccountContext";
 
 interface LogInputFormProp {
   propLog?: LogType;
@@ -27,6 +30,7 @@ const LogInputForm: React.FC<LogInputFormProp> = ({
   openDialog,
   setIsOpenEditDialog,
 }) => {
+  const { Account } = useAccount();
   const defaultNewLog: LogType = propLog ?? {
     userId: "",
     text: "",
@@ -42,6 +46,14 @@ const LogInputForm: React.FC<LogInputFormProp> = ({
     displayFeature: [],
     description: "",
     archived: false,
+    accessibleAccounts: [
+      {
+        name: Account?.name ?? "",
+        email: Account?.email ?? "",
+        icon: Account?.icon ?? "",
+      },
+    ],
+    accessibleAccountsEmails: [Account?.email ?? ""],
   };
 
   const [newLog, setNewLog] = useState<LogType>(defaultNewLog);
@@ -50,6 +62,23 @@ const LogInputForm: React.FC<LogInputFormProp> = ({
     if (name === "intervalNum" && parseInt(value, 10) <= 0) {
       alert("0以下は入力できません。");
       return;
+    }
+
+    if (name === "accessibleAccounts" && value.length !== 0) {
+      value = value.map((account: string) => {
+        const values = account.split(",");
+        return {
+          name: values[0],
+          email: values[1],
+          icon: values[2],
+        };
+      });
+      setNewLog((prev) => ({
+        ...prev,
+        accessibleAccountsEmails: value.map(
+          (account: { email: string }) => account.email
+        ),
+      }));
     }
     setNewLog((prev) => ({ ...prev, [name]: value }));
   };
@@ -189,6 +218,31 @@ const LogInputForm: React.FC<LogInputFormProp> = ({
             >
               完了時メモ
             </StyledCheckbox>
+            <FormControl sx={{ minWidth: 300 }}>
+              <InputLabel>共有アカウント</InputLabel>
+              <Select
+                multiple
+                value={newLog.accessibleAccounts.map(
+                  (account) =>
+                    account.name + "," + account.email + "," + account.icon
+                )}
+                label="共有アカウント"
+                onChange={(e) =>
+                  handleNewLogInput("accessibleAccounts", e.target.value)
+                }
+              >
+                {Account?.linkedAccounts.map((account) => (
+                  <MenuItem
+                    key={account.name}
+                    value={
+                      account.name + "," + account.email + "," + account.icon
+                    }
+                  >
+                    {account.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
           </>
         )}
       </FormGroup>

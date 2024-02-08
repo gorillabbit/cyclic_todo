@@ -1,4 +1,5 @@
 import {
+  Avatar,
   Box,
   Button,
   Chip,
@@ -23,7 +24,6 @@ import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { AccountLinkType } from "../../types";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import CancelIcon from "@mui/icons-material/Cancel";
-import FileDownloadDoneIcon from "@mui/icons-material/FileDownloadDone";
 
 const auth = getAuth();
 
@@ -43,7 +43,7 @@ const AccountShareButton = () => {
     const fetchRequests = () => {
       const AccountQuery = query(
         collection(db, "AccountLinks"),
-        where("requester", "==", auth.currentUser?.email)
+        where("requester.email", "==", auth.currentUser?.email)
       );
       return onSnapshot(AccountQuery, (querySnapshot) => {
         const AccountLinksData = querySnapshot.docs.map((doc) => ({
@@ -59,7 +59,7 @@ const AccountShareButton = () => {
     const fetchReceivers = () => {
       const AccountQuery = query(
         collection(db, "AccountLinks"),
-        where("receiver", "==", auth.currentUser?.email)
+        where("receiver.email", "==", auth.currentUser?.email)
       );
       return onSnapshot(AccountQuery, (querySnapshot) => {
         const AccountLinksData = querySnapshot.docs.map((doc) => ({
@@ -76,7 +76,7 @@ const AccountShareButton = () => {
       unsubscribeRequests();
       unsubscribeReceivers();
     };
-  }, [auth.currentUser]);
+  }, []);
 
   //リクエスト送信側のAccountsは受信側から操作しないので、Acceptされたら加える。リンクが解除されたら削除する
   useEffect(() => {
@@ -95,6 +95,7 @@ const AccountShareButton = () => {
           uid: auth.currentUser?.uid,
           email: auth.currentUser?.email,
           name: auth.currentUser?.displayName,
+          icon: auth.currentUser?.photoURL,
           linkedAccounts: requests
             ?.filter((request) => request.status === "accepted")
             .map((request) => request.receiver),
@@ -109,13 +110,13 @@ const AccountShareButton = () => {
       return setError("自分のメールアドレスです");
     }
     const alreadyRequestedEmails = requests?.filter(
-      (request) => request.receiver === email
+      (request) => request.receiver.email === email
     );
     if (alreadyRequestedEmails && alreadyRequestedEmails.length > 0) {
       return setError("すでに共有依頼を出しています");
     }
     const alreadyReceivedEmails = receivers?.filter(
-      (receiver) => receiver.requester === email
+      (receiver) => receiver.requester.email === email
     );
     if (alreadyReceivedEmails && alreadyReceivedEmails.length > 0) {
       return setError("すでに共有依頼を受けています");
@@ -139,12 +140,19 @@ const AccountShareButton = () => {
   const saveAccounts = () => {
     if (email) {
       addDocAccountLink({
-        requester: auth.currentUser?.email,
-        receiver: email,
+        requester: {
+          email: auth.currentUser?.email,
+          name: auth.currentUser?.displayName,
+          icon: auth.currentUser?.photoURL,
+        },
+        receiver: {
+          email: email,
+          name: "",
+          icon: "",
+        },
         status: "pending",
       });
       setEmail("");
-      setOpen(false);
     } else {
       setError("メールアドレスが入力されていません");
     }
@@ -155,7 +163,14 @@ const AccountShareButton = () => {
   };
 
   const acceptRequest = (receivedRequest: AccountLinkType) => {
-    updateDocAccountLinks(receivedRequest.id, { status: "accepted" });
+    updateDocAccountLinks(receivedRequest.id, {
+      receiver: {
+        email: auth.currentUser?.email,
+        name: auth.currentUser?.displayName,
+        icon: auth.currentUser?.photoURL,
+      },
+      status: "accepted",
+    });
     if (Account) {
       updateDocAccounts(Account.id, {
         linkedAccounts: [...Account.linkedAccounts, receivedRequest.requester],
@@ -165,6 +180,7 @@ const AccountShareButton = () => {
         uid: auth.currentUser?.uid,
         email: auth.currentUser?.email,
         name: auth.currentUser?.displayName,
+        icon: auth.currentUser?.photoURL,
         linkedAccounts: [receivedRequest.requester],
       });
     }
@@ -184,41 +200,45 @@ const AccountShareButton = () => {
           {receivers?.map((receivedRequest) =>
             receivedRequest.status === "pending" ? (
               <Box m={1} key={receivedRequest.id}>
-                <Chip
-                  variant="outlined"
-                  label={receivedRequest.requester}
-                  icon={
-                    <Tooltip title="承認する">
-                      <Box
-                        sx={{ cursor: "pointer" }}
-                        onClick={() => acceptRequest(receivedRequest)}
-                      >
-                        <CheckCircleOutlineIcon />
-                      </Box>
-                    </Tooltip>
-                  }
-                  deleteIcon={
-                    <Tooltip title="拒否する">
-                      <CancelIcon />
-                    </Tooltip>
-                  }
-                  onDelete={() => refuseRequest(receivedRequest)}
-                />
+                <Tooltip title={receivedRequest.requester.email}>
+                  <Chip
+                    variant="outlined"
+                    label={receivedRequest.requester.name}
+                    icon={
+                      <Tooltip title="承認する">
+                        <Box
+                          sx={{ cursor: "pointer" }}
+                          onClick={() => acceptRequest(receivedRequest)}
+                        >
+                          <CheckCircleOutlineIcon />
+                        </Box>
+                      </Tooltip>
+                    }
+                    deleteIcon={
+                      <Tooltip title="拒否する">
+                        <CancelIcon />
+                      </Tooltip>
+                    }
+                    onDelete={() => refuseRequest(receivedRequest)}
+                  />
+                </Tooltip>
               </Box>
             ) : receivedRequest.status === "accepted" ? (
               <Box m={1} key={receivedRequest.id}>
-                <Chip
-                  variant="outlined"
-                  color="success"
-                  label={receivedRequest.requester}
-                  icon={<FileDownloadDoneIcon />}
-                  deleteIcon={
-                    <Tooltip title="解除">
-                      <CancelIcon />
-                    </Tooltip>
-                  }
-                  onDelete={() => cancelRequest(receivedRequest)}
-                />
+                <Tooltip title={receivedRequest.requester.email}>
+                  <Chip
+                    variant="outlined"
+                    color="success"
+                    label={receivedRequest.requester.name}
+                    avatar={<Avatar src={receivedRequest.requester.icon} />}
+                    deleteIcon={
+                      <Tooltip title="解除">
+                        <CancelIcon />
+                      </Tooltip>
+                    }
+                    onDelete={() => cancelRequest(receivedRequest)}
+                  />
+                </Tooltip>
               </Box>
             ) : (
               <></>
@@ -227,32 +247,41 @@ const AccountShareButton = () => {
           {requests?.map((request) =>
             request.status === "pending" ? (
               <Box m={1} key={request.id}>
-                <Chip
-                  variant="outlined"
-                  label={request.receiver}
-                  icon={<Box>送信済み</Box>}
-                  deleteIcon={
-                    <Tooltip title="キャンセル">
-                      <CancelIcon />
-                    </Tooltip>
-                  }
-                  onDelete={() => cancelRequest(request)}
-                />
+                <Tooltip title={request.receiver.email}>
+                  <Chip
+                    variant="outlined"
+                    label={request.receiver.email}
+                    icon={<Box>送信済み</Box>}
+                    deleteIcon={
+                      <Tooltip title="キャンセル">
+                        <CancelIcon />
+                      </Tooltip>
+                    }
+                    onDelete={() => cancelRequest(request)}
+                  />
+                </Tooltip>
               </Box>
             ) : request.status === "accepted" ? (
               <Box m={1} key={request.id}>
-                <Chip
-                  variant="outlined"
-                  color="success"
-                  label={request.receiver}
-                  icon={<FileDownloadDoneIcon />}
-                  deleteIcon={
-                    <Tooltip title="解除">
-                      <CancelIcon />
-                    </Tooltip>
-                  }
-                  onDelete={() => cancelRequest(request)}
-                />
+                <Tooltip title={request.receiver.email}>
+                  <Chip
+                    variant="outlined"
+                    color="success"
+                    label={request.receiver.name}
+                    avatar={
+                      <Avatar
+                        alt={request.receiver.name}
+                        src={request.receiver.icon}
+                      />
+                    }
+                    deleteIcon={
+                      <Tooltip title="解除">
+                        <CancelIcon />
+                      </Tooltip>
+                    }
+                    onDelete={() => cancelRequest(request)}
+                  />
+                </Tooltip>
               </Box>
             ) : (
               <></>
@@ -275,6 +304,9 @@ const AccountShareButton = () => {
               onClick={saveAccounts}
             >
               リンク申請
+            </Button>
+            <Button variant="outlined" onClick={() => setOpen(false)}>
+              閉じる
             </Button>
           </FormGroup>
         </DialogContent>

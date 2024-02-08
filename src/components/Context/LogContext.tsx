@@ -9,6 +9,7 @@ import {
 } from "firebase/firestore";
 import { LogType, LogsCompleteLogsType } from "../../types.js";
 import { getAuth } from "firebase/auth";
+import { useAccount } from "./AccountContext";
 
 interface LogContextProp {
   children: any;
@@ -21,6 +22,7 @@ type LogContextType = {
   setLogsCompleteLogsList: React.Dispatch<
     React.SetStateAction<LogsCompleteLogsType[]>
   >;
+  sharedLogList: LogType[];
 };
 
 // Contextを作成（初期値は空のlogListとダミーのsetLogList関数）
@@ -29,6 +31,7 @@ export const LogContext = createContext<LogContextType>({
   setLogList: () => {},
   logsCompleteLogsList: [],
   setLogsCompleteLogsList: () => {},
+  sharedLogList: [],
 });
 
 export const LogProvider: React.FC<LogContextProp> = ({ children }) => {
@@ -37,6 +40,8 @@ export const LogProvider: React.FC<LogContextProp> = ({ children }) => {
     LogsCompleteLogsType[]
   >([]);
   const auth = getAuth();
+  const { Account } = useAccount();
+  const [sharedLogList, setSharedLogList] = useState<LogType[]>([]);
 
   useEffect(() => {
     if (!auth.currentUser) {
@@ -81,6 +86,30 @@ export const LogProvider: React.FC<LogContextProp> = ({ children }) => {
     };
   }, [auth.currentUser]);
 
+  useEffect(() => {
+    if (!Account) {
+      return;
+    }
+    //共有されたLogの取得
+    const fetchSharedLogs = () => {
+      const logQuery = query(
+        collection(db, "logs"),
+        where("userId", "!=", auth.currentUser?.uid),
+        where("accessibleAccountsEmails", "array-contains", Account.email)
+      );
+      return onSnapshot(logQuery, (querySnapshot) => {
+        const LogsData = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...(doc.data() as LogType),
+        }));
+        setSharedLogList(LogsData);
+      });
+    };
+    const unsubscribeSharedLogs = fetchSharedLogs();
+
+    return () => unsubscribeSharedLogs();
+  }, [Account, auth.currentUser?.uid]);
+
   return (
     <LogContext.Provider
       value={{
@@ -88,6 +117,7 @@ export const LogProvider: React.FC<LogContextProp> = ({ children }) => {
         setLogList,
         logsCompleteLogsList,
         setLogsCompleteLogsList,
+        sharedLogList,
       }}
     >
       {children}

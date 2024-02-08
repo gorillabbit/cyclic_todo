@@ -1,7 +1,16 @@
 import React, { useState } from "react";
 import { LogType, LogsCompleteLogsType } from "../../types";
 import { format } from "date-fns";
-import { Box, Typography, Card, Dialog, DialogContent } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Card,
+  Dialog,
+  DialogContent,
+  Avatar,
+  AvatarGroup,
+  Tooltip,
+} from "@mui/material";
 import { BodyTypography } from "../TypographyWrapper";
 import Stopwatch from "./Stopwatch";
 import LogHeader from "./LogHeader";
@@ -16,6 +25,8 @@ import "../../App.css";
 import LogInputForm from "../InputForms/LogInputForm";
 import EditIcon from "@mui/icons-material/Edit";
 import LogArchiveButton from "./LogArchiveButton";
+import { getAuth } from "firebase/auth";
+
 interface LogProps {
   log: LogType;
   logsCompleteLogs: LogsCompleteLogsType[];
@@ -44,6 +55,9 @@ const Log: React.FC<LogProps> = ({ log, logsCompleteLogs, openDialog }) => {
   const isStarted = completeLogs[0]?.type === "start";
 
   const [isOpenEditDialog, setIsOpenEditDialog] = useState<boolean>(false);
+
+  const auth = getAuth();
+  const isSharedLog = log.userId !== auth.currentUser?.uid;
 
   return (
     <>
@@ -87,14 +101,16 @@ const Log: React.FC<LogProps> = ({ log, logsCompleteLogs, openDialog }) => {
                 }}
               >
                 {log.text}
-                <EditIcon
-                  color="action"
-                  sx={{
-                    ml: 1,
-                    cursor: "pointer",
-                  }}
-                  onClick={() => setIsOpenEditDialog(true)}
-                />
+                {!isSharedLog && (
+                  <EditIcon
+                    color="action"
+                    sx={{
+                      ml: 1,
+                      cursor: "pointer",
+                    }}
+                    onClick={() => setIsOpenEditDialog(true)}
+                  />
+                )}
               </Typography>
             </Box>
             {log.description && <BodyTypography text={log.description} />}
@@ -102,6 +118,20 @@ const Log: React.FC<LogProps> = ({ log, logsCompleteLogs, openDialog }) => {
               visibility={isStarted ? "visible" : "hidden"}
               text={isStarted ? <Stopwatch log={log} /> : <div>blank</div>}
             />
+            <Box>
+              <AvatarGroup>
+                {log.accessibleAccounts?.map((account) => (
+                  <Tooltip key={account.name} title={account.name}>
+                    <Avatar
+                      src={account.icon}
+                      alt={account.name}
+                      sx={{ width: 24, height: 24 }}
+                    />
+                  </Tooltip>
+                ))}
+              </AvatarGroup>
+            </Box>
+
             {!log.archived && (
               <LogFeature
                 log={log}
@@ -125,7 +155,7 @@ const Log: React.FC<LogProps> = ({ log, logsCompleteLogs, openDialog }) => {
             {!log.archived && (!log.duration || isStarted) && (
               <LogCompleteButton log={log} />
             )}
-            {log.archived && (
+            {log.archived && !isSharedLog && (
               <LogDeleteButton log={log} completeLogs={completeLogs} />
             )}
             <LogArchiveButton log={log} />

@@ -18,6 +18,7 @@ export const AccountContext = createContext<AccountContextType>({
     uid: "",
     email: "",
     name: "",
+    icon: "",
     linkedAccounts: [],
   },
 });

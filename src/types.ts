@@ -44,7 +44,8 @@ export interface LogType {
   displayFeature: string[];
   description: string;
   archived: boolean;
-  accessibleAccounts: string[];
+  accessibleAccounts: Pick<AccountType, "email" | "name" | "icon">[];
+  accessibleAccountsEmails: string[];
 }
 
 export interface AccountType {
@@ -52,12 +53,13 @@ export interface AccountType {
   id?: string;
   email: string;
   name: string;
-  linkedAccounts: string[];
+  icon: string;
+  linkedAccounts: Pick<AccountType, "email" | "name" | "icon">[];
 }
 
 export interface AccountLinkType {
   id?: string;
-  requester: string;
-  receiver: string;
+  requester: Pick<AccountType, "email" | "name" | "icon">;
+  receiver: Pick<AccountType, "email" | "name" | "icon">;
   status: "pending" | "rejected" | "accepted";
 }
