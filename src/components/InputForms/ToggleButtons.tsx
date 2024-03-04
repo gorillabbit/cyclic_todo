@@ -1,11 +1,15 @@
 import { ToggleButton, ToggleButtonGroup } from "@mui/material";
 
-const ToggleButtons = ({ isTask, setIsTask }) => {
+interface ToggleButtonsProps {
+  isTask: boolean;
+  setIsTask: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const ToggleButtons: React.FC<ToggleButtonsProps> = ({ isTask, setIsTask }) => {
   return (
     <ToggleButtonGroup
       value={isTask ? "タスク" : "ログ"}
-      variant="contained"
-      onClick={() => setIsTask((isTask) => !isTask)}
+      onChange={() => setIsTask(!isTask)}
     >
       <ToggleButton value="タスク">タスク</ToggleButton>
       <ToggleButton value="ログ">ログ</ToggleButton>

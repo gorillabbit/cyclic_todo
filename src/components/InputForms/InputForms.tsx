@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import TaskInputForm from "./TaskInputForm";
 import LogInputForm from "./LogInputForm";
-import ToggleButtons from "./ToggleButtons.js";
+import ToggleButtons from "./ToggleButtons";
 import { Box } from "@mui/material";
 import AccountShareButton from "./AccountShareButton";
 
