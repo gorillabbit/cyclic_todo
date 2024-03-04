@@ -53,7 +53,6 @@ const Log: React.FC<LogProps> = ({ log, logsCompleteLogs, openDialog }) => {
 
   //durationが開始しているかどうか
   const isStarted = completeLogs[0]?.type === "start";
-
   const [isOpenEditDialog, setIsOpenEditDialog] = useState<boolean>(false);
 
   const auth = getAuth();

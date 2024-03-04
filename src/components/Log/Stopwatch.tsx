@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
+import { LogType } from "../../types";
 
-const formatElapsedTime = (seconds) => {
+const formatElapsedTime = (seconds: number): string => {
   const days = Math.floor(seconds / (3600 * 24));
   const hours = Math.floor((seconds % (3600 * 24)) / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
@@ -15,13 +16,13 @@ const UnitTimeMap = {
   時: 1000 * 60 * 60,
   日: 1000 * 60 * 60 * 24,
   週: 1000 * 60 * 60 * 24 * 7,
-  月: 1000 * 60 * 60 * 24,
-  年: 1000 * 60 * 60 * 24,
+  月: 1000 * 60 * 60 * 24 * 30, // 月の日数を30と仮定
+  年: 1000 * 60 * 60 * 24 * 365, // 年の日数を365と仮定
 };
 
-const Stopwatch = ({ log }) => {
-  const [elapsedTime, setElapsedTime] = useState(0);
-  const [announceCount, setAnnounceCount] = useState(0);
+const Stopwatch: React.FC<{ log: LogType }> = ({ log }) => {
+  const [elapsedTime, setElapsedTime] = useState<number>(0);
+  const [announceCount, setAnnounceCount] = useState<number>(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -30,7 +31,7 @@ const Stopwatch = ({ log }) => {
 
     const announceInterval = setInterval(() => {
       setAnnounceCount((prev) => prev + 1);
-    }, UnitTimeMap[log.voiceAnnounceUnit] * log.voiceAnnounceNum);
+    }, UnitTimeMap[(log.voiceAnnounceUnit ?? "秒") as keyof typeof UnitTimeMap] * (log.voiceAnnounceNum ?? 60));
 
     return () => {
       clearInterval(interval);
@@ -48,8 +49,7 @@ const Stopwatch = ({ log }) => {
         new SpeechSynthesisUtterance(shortedElapsedTime)
       );
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [announceCount]);
+  }, [announceCount, elapsedTime, log.availableVoiceAnnounce]);
 
   return <div>経過 {formatElapsedTime(elapsedTime)}</div>;
 };
