@@ -1,6 +1,6 @@
 import { Button } from "@mui/material";
 import React, { useState } from "react";
-import { addDocLogsCompleteLogs } from "../../firebase";
+import { addDocLogsCompleteLog } from "../../firebase";
 import { LogType } from "../../types.js";
 import MemoDialog from "./MemoDialog";
 
@@ -14,7 +14,7 @@ const logComplete = (log: LogType, memo?: string) => {
     type: "finish",
     memo: memo ?? "",
   };
-  addDocLogsCompleteLogs(logsCompleteLogs);
+  addDocLogsCompleteLog(logsCompleteLogs);
 };
 
 const LogCompleteButton: React.FC<LogCompleteButtonProps> = ({ log }) => {

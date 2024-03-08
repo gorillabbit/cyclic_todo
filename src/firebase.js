@@ -9,11 +9,8 @@ import {
   doc,
   updateDoc,
 } from "firebase/firestore";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
 
 // Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
   authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
@@ -28,115 +25,48 @@ const firebaseConfig = {
 export const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 
-export const addDocTask = (task) => {
+const addDocOperation = async (collectionName, data) => {
   try {
-    return addDoc(collection(db, "tasks"), {
-      ...task,
-      completed: false,
-      timestamp: serverTimestamp(),
-    });
+    return await addDoc(collection(db, collectionName), { ...data, timestamp: serverTimestamp() });
   } catch (e) {
-    console.error("タスク追加エラー: ", e);
-  }
-};
-
-export const deleteDocTask = (id) => {
-  try {
-    deleteDoc(doc(db, "tasks", id));
-  } catch (e) {
-    console.error("タスク削除エラー: ", e);
-  }
-};
-
-export const updateDocTask = (id, feature) => {
-  try {
-    updateDoc(doc(db, "tasks", id), feature);
-  } catch (e) {
-    console.error("タスク切り替えエラー: ", e);
-  }
-};
-
-export const addDocLog = (log) => {
-  try {
-    return addDoc(collection(db, "logs"), {
-      ...log,
-      timestamp: serverTimestamp(),
-    });
-  } catch (e) {
-    console.error("タスク追加エラー: ", e);
-  }
-};
-
-export const updateDocLog = (id, feature) => {
-  try {
-    return updateDoc(doc(db, "logs", id), feature)
-  } catch (e) {
-    console.error("タスク切り替えエラー: ", e);
+    console.error(`addDoc error: `, e);
+    throw new Error(`addDoc error: ${e}`);
   }
 }
 
-export const deleteDocLog = (id) => {
+const updateDocOperation = async (collectionName, id, feature) => {
   try {
-    deleteDoc(doc(db, "logs", id));
+    return await updateDoc(doc(db, collectionName, id), feature)
   } catch (e) {
-    console.error("記録削除エラー: ", e);
-  }
-};
-
-export const addDocLogsCompleteLogs = (log) => {
-  try {
-    return addDoc(collection(db, "logsCompleteLogs"), {
-      ...log,
-      timestamp: serverTimestamp(),
-    });
-  } catch (e) {
-    console.error("タスク追加エラー: ", e);
-  }
-};
-
-export const deleteDocLogsCompleteLogs = (id) => {
-  try {
-    deleteDoc(doc(db, "logsCompleteLogs", id));
-  } catch (e) {
-    console.error("logsCompleteLogs削除エラー: ", e);
-  }
-};
-
-export const addDocAccounts = (Account) => {
-  try {
-    return addDoc(collection(db, "Accounts"), Account);
-  } catch (e) {
-    console.error("Accounts追加エラー: ", e);
+    console.error(`updateDoc error: `, e, collectionName, id, feature);
+    throw new Error(`updateDoc error: ${e} ${collectionName} ${id} ${feature}`);
   }
 }
 
-export const updateDocAccounts = (id,feature) =>{
+const deleteDocOperation = async (collectionName, id) => {
   try {
-    return updateDoc(doc(db, "Accounts", id), feature)
+    return await deleteDoc(doc(db, collectionName, id));
   } catch (e) {
-    console.error("Accounts切り替えエラー: ", e);
+    throw new Error(`deleteDoc error: ${e}`);
   }
 }
 
-export const addDocAccountLink = (AccountLink) => {
-  try {
-    return addDoc(collection(db, "AccountLinks"), AccountLink);
-  } catch (e) {
-    console.error("AccountLinks追加エラー: ", e);
-  }
-}
-export const updateDocAccountLinks = (id,feature) => {
-  try {
-    return updateDoc(doc(db, "AccountLinks", id), feature)
-  } catch (e) {
-    console.error("AccountLinks切り替えエラー: ", e);
-  }
-}
+export const addDocTask = (task) => addDocOperation('tasks', { ...task, completed: false });
+export const updateDocTask = (id, feature) => updateDocOperation('tasks', id, feature);
+export const deleteDocTask = (id) => deleteDocOperation('tasks', id);
 
-export const deleteDocAccountLinks = (id) => {
-  try {
-    deleteDoc(doc(db, "AccountLinks", id));
-  } catch (e) {
-    console.error("AccountLinks削除エラー: ", e);
-  }
-};
+export const addDocLog = (doc) => addDocOperation('logs', { ...doc, reviewed: false });
+export const updateDocLog = (id, content) => updateDocOperation('logs', id, content);
+export const deleteDocLog = (id) => deleteDocOperation('logs', id);
+
+export const addDocLogsCompleteLog = (log) => addDocOperation('logsCompleteLogs', { ...log, processed: true });
+export const updateDocLogsCompleteLog = (id, updates) => updateDocOperation('logsCompleteLogs', id, updates);
+export const deleteDocLogsCompleteLog = (id) => deleteDocOperation('logsCompleteLogs', id);
+
+export const addDocAccount = (account) => addDocOperation('Accounts', account);
+export const updateDocAccount = (id, updates) => updateDocOperation('Accounts', id, updates);
+export const deleteDocAccount = (id) => deleteDocOperation('Accounts', id);
+
+export const addDocAccountLink = (link) => addDocOperation('AccountLinks', link);
+export const updateDocAccountLink = (id, updates) => updateDocOperation('AccountLinks', id, updates);
+export const deleteDocAccountLink = (id) => deleteDocOperation('AccountLinks', id);

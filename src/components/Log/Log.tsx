@@ -15,8 +15,6 @@ import { BodyTypography } from "../TypographyWrapper";
 import Stopwatch from "./Stopwatch";
 import LogHeader from "./LogHeader";
 import CompleteLog from "./CompleteLog";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { IconName } from "@fortawesome/fontawesome-svg-core";
 import LogStartButton from "./LogStartButton";
 import LogDeleteButton from "./LogDeleteButton";
 import LogCompleteButton from "./LogCompleteButton";

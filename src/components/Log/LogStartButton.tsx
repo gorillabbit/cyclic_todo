@@ -1,5 +1,5 @@
 import { Button } from "@mui/material";
-import { addDocLogsCompleteLogs } from "../../firebase";
+import { addDocLogsCompleteLog } from "../../firebase";
 import React from "react";
 import { LogType } from "../../types.js";
 
@@ -16,7 +16,7 @@ const logStart = (
     logId: log.id,
     type: "start",
   };
-  addDocLogsCompleteLogs(logsCompleteLogs);
+  addDocLogsCompleteLog(logsCompleteLogs);
 };
 
 const LogStartButton: React.FC<LogStartButtonProps> = ({ log }) => {

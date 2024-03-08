@@ -1,6 +1,6 @@
 import { Button } from "@mui/material";
 import React from "react";
-import { deleteDocLog, deleteDocLogsCompleteLogs } from "../../firebase";
+import { deleteDocLog, deleteDocLogsCompleteLog } from "../../firebase";
 import { LogType, LogsCompleteLogsType } from "../../types.js";
 
 interface LogDeleteButtonProps {
@@ -11,7 +11,7 @@ interface LogDeleteButtonProps {
 const deleteLog = (log: LogType, completeLogs: LogsCompleteLogsType[]) => {
   deleteDocLog(log.id);
   completeLogs.forEach((element) => {
-    deleteDocLogsCompleteLogs(element.id);
+    deleteDocLogsCompleteLog(element.id);
   });
 };
 

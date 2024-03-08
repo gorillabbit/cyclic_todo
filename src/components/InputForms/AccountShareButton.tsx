@@ -13,11 +13,11 @@ import { getAuth } from "firebase/auth";
 import { ChangeEvent, useEffect, useState } from "react";
 import {
   addDocAccountLink,
-  addDocAccounts,
+  addDocAccount,
   db,
-  deleteDocAccountLinks,
-  updateDocAccountLinks,
-  updateDocAccounts,
+  deleteDocAccountLink,
+  updateDocAccountLink,
+  updateDocAccount,
 } from "../../firebase";
 import { useAccount } from "../Context/AccountContext";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
@@ -41,11 +41,11 @@ const AccountShareButton = () => {
     }
     //requestsの取得
     const fetchRequests = () => {
-      const AccountQuery = query(
+      const RequestsAccountQuery = query(
         collection(db, "AccountLinks"),
         where("requester.email", "==", auth.currentUser?.email)
       );
-      return onSnapshot(AccountQuery, (querySnapshot) => {
+      return onSnapshot(RequestsAccountQuery, (querySnapshot) => {
         const AccountLinksData = querySnapshot.docs.map((doc) => ({
           id: doc.id,
           ...(doc.data() as AccountLinkType),
@@ -57,11 +57,11 @@ const AccountShareButton = () => {
 
     //receiversの取得
     const fetchReceivers = () => {
-      const AccountQuery = query(
+      const ReceiversAccountQuery = query(
         collection(db, "AccountLinks"),
         where("receiver.email", "==", auth.currentUser?.email)
       );
-      return onSnapshot(AccountQuery, (querySnapshot) => {
+      return onSnapshot(ReceiversAccountQuery, (querySnapshot) => {
         const AccountLinksData = querySnapshot.docs.map((doc) => ({
           id: doc.id,
           ...(doc.data() as AccountLinkType),
@@ -84,21 +84,20 @@ const AccountShareButton = () => {
       ?.filter((request) => request.status === "accepted")
       .map((request) => request.receiver);
     if (acceptedRequests && acceptedRequests?.length > 0) {
+      const linkedAccounts = requests
+        ?.filter((request) => request.status === "accepted")
+        .map((request) => request.receiver);
       if (Account) {
-        updateDocAccounts(Account.id, {
-          linkedAccounts: requests
-            ?.filter((request) => request.status === "accepted")
-            .map((request) => request.receiver),
+        updateDocAccount(Account.id, {
+          linkedAccounts: linkedAccounts,
         });
       } else {
-        addDocAccounts({
+        addDocAccount({
           uid: auth.currentUser?.uid,
           email: auth.currentUser?.email,
           name: auth.currentUser?.displayName,
           icon: auth.currentUser?.photoURL,
-          linkedAccounts: requests
-            ?.filter((request) => request.status === "accepted")
-            .map((request) => request.receiver),
+          linkedAccounts: linkedAccounts,
         });
       }
     }
@@ -159,11 +158,11 @@ const AccountShareButton = () => {
   };
 
   const refuseRequest = (receivedRequest: AccountLinkType) => {
-    updateDocAccountLinks(receivedRequest.id, { status: "rejected" });
+    updateDocAccountLink(receivedRequest.id, { status: "rejected" });
   };
 
   const acceptRequest = (receivedRequest: AccountLinkType) => {
-    updateDocAccountLinks(receivedRequest.id, {
+    updateDocAccountLink(receivedRequest.id, {
       receiver: {
         email: auth.currentUser?.email,
         name: auth.currentUser?.displayName,
@@ -172,11 +171,11 @@ const AccountShareButton = () => {
       status: "accepted",
     });
     if (Account) {
-      updateDocAccounts(Account.id, {
+      updateDocAccount(Account.id, {
         linkedAccounts: [...Account.linkedAccounts, receivedRequest.requester],
       });
     } else {
-      addDocAccounts({
+      addDocAccount({
         uid: auth.currentUser?.uid,
         email: auth.currentUser?.email,
         name: auth.currentUser?.displayName,
@@ -187,7 +186,7 @@ const AccountShareButton = () => {
   };
 
   const cancelRequest = (request: AccountLinkType) => {
-    deleteDocAccountLinks(request.id);
+    deleteDocAccountLink(request.id);
   };
 
   return (
