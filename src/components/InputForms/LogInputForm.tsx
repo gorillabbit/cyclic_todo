@@ -11,7 +11,7 @@ import {
 
 import { useState } from "react";
 import { addDocLog, updateDocLog } from "../../firebase.js";
-import { LogType } from "../../types.js";
+import { InputLogType, LogType } from "../../types.js";
 import StyledCheckbox from "../StyledCheckbox";
 import FontAwesomeIconPicker from "./FontAwesomeIconPicker";
 import { getAuth } from "firebase/auth";
@@ -31,7 +31,7 @@ const LogInputForm: React.FC<LogInputFormProp> = ({
   setIsOpenEditDialog,
 }) => {
   const { Account } = useAccount();
-  const defaultNewLog: LogType = propLog ?? {
+  const defaultNewLog: InputLogType = {
     userId: "",
     text: "",
     duration: false,
@@ -56,7 +56,9 @@ const LogInputForm: React.FC<LogInputFormProp> = ({
     accessibleAccountsEmails: [Account?.email ?? ""],
   };
 
-  const [newLog, setNewLog] = useState<LogType>(defaultNewLog);
+  const [newLog, setNewLog] = useState<InputLogType | LogType>(
+    propLog ?? defaultNewLog
+  );
 
   const handleNewLogInput = (name: string, value: any) => {
     if (name === "intervalNum" && parseInt(value, 10) <= 0) {
@@ -94,7 +96,7 @@ const LogInputForm: React.FC<LogInputFormProp> = ({
   const editLog = () => {
     if (newLog && auth.currentUser) {
       const userId = auth.currentUser.uid;
-      updateDocLog(newLog.id, { ...newLog, userId });
+      updateDocLog((newLog as LogType).id, { ...newLog, userId });
     }
     setIsOpenEditDialog?.(false);
   };

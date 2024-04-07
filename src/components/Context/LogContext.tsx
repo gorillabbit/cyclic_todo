@@ -7,7 +7,7 @@ import {
   query,
   where,
 } from "firebase/firestore";
-import { LogType, LogsCompleteLogsType } from "../../types.js";
+import { InputLogType, LogType, LogsCompleteLogsType } from "../../types.js";
 import { getAuth } from "firebase/auth";
 import { useAccount } from "./AccountContext";
 
@@ -56,7 +56,7 @@ export const LogProvider: React.FC<LogContextProp> = ({ children }) => {
       return onSnapshot(logQuery, (querySnapshot) => {
         const LogsData = querySnapshot.docs.map((doc) => ({
           id: doc.id,
-          ...(doc.data() as LogType),
+          ...(doc.data() as InputLogType),
         }));
         setLogList(LogsData);
       });
@@ -100,7 +100,7 @@ export const LogProvider: React.FC<LogContextProp> = ({ children }) => {
       return onSnapshot(logQuery, (querySnapshot) => {
         const LogsData = querySnapshot.docs.map((doc) => ({
           id: doc.id,
-          ...(doc.data() as LogType),
+          ...(doc.data() as InputLogType),
         }));
         setSharedLogList(LogsData);
       });

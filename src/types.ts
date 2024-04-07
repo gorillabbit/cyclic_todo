@@ -25,9 +25,8 @@ export interface LogsCompleteLogsType {
   memo: string;
 }
 
-export interface LogType {
+export interface InputLogType {
   userId: string;
-  id?: string;
   text: string;
   親logId?: string;
   timestamp?: Timestamp;
@@ -46,6 +45,10 @@ export interface LogType {
   archived: boolean;
   accessibleAccounts: Pick<AccountType, "email" | "name" | "icon">[];
   accessibleAccountsEmails: string[];
+}
+
+export interface LogType extends InputLogType {
+  id: string;
 }
 
 export interface AccountType {
