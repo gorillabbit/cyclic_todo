@@ -72,3 +72,7 @@ export const updateDocAccountLink = (id, updates) => updateDocOperation('Account
 export const deleteDocAccountLink = (id) => deleteDocOperation('AccountLinks', id);
 
 export const addDocPurchase = (purchase) => addDocOperation('Purchases', purchase)
+
+export const addDocAsset = (asset) => addDocOperation("Assets", asset)
+export const updateDocAsset = (id, updates) => updateDocOperation('Assets', id, updates);
+export const deleteDocAsset = (id) => deleteDocOperation('Assets', id);

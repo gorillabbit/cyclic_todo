@@ -25,10 +25,11 @@ import {
 } from "../../utilities/purchaseUtilities";
 import DoughnutChart from "./DoughnutChart";
 import AssetsList from "./AssetsList";
-
-const BASE_ASSETS = 115144;
+import { useAsset } from "../Context/AssetContext";
 
 const Purchases = () => {
+  const { sumAssets } = useAsset();
+
   const [purchaseList, setPurchaseList] = useState<PurchaseListType[]>([]);
   const auth = getAuth();
 
@@ -62,13 +63,13 @@ const Purchases = () => {
   const today = new Date();
 
   const currentMoney =
-    BASE_ASSETS +
+    sumAssets +
     calculateSpentAndIncomeResult(
       purchaseList.filter((purchase) => purchase.date.toDate() < today)
     );
 
   const endOfMonthMoneyAmount =
-    BASE_ASSETS +
+    sumAssets +
     calculateSpentAndIncomeResult(
       purchaseList.filter(
         (purchase) =>

@@ -85,3 +85,13 @@ export interface PurchaseType extends Omit<InputPurchaseType, "date"> {
 export interface PurchaseListType extends PurchaseType {
   id: string;
 }
+
+export interface AssetType {
+  userId: string;
+  name: string;
+  balance: number;
+}
+
+export interface AssetListType extends AssetType {
+  id: string;
+}

@@ -15,6 +15,7 @@ import { TaskProvider } from "./components/Context/TaskContext";
 import { AccountProvider } from "./components/Context/AccountContext";
 import PurchaseInput from "./components/Kakeibo/PurchaseInput";
 import Purchases from "./components/Kakeibo/Purchases";
+import { AssetProvider } from "./components/Context/AssetContext";
 
 function App() {
   const theme = createTheme({
@@ -64,7 +65,9 @@ function App() {
                           <TaskList />
                         </>
                       )}
-                      {tabValue === 1 && <Purchases />}
+                      <AssetProvider>
+                        {tabValue === 1 && <Purchases />}
+                      </AssetProvider>
                       <Calendar isGapiMounted={isGapiMounted} />
                     </Box>
                   </LogProvider>
