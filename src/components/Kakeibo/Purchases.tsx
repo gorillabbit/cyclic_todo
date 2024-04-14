@@ -94,6 +94,17 @@ const Purchases = () => {
       <Box> {"今月の使用金額 " + currentMonthSpent}</Box>
       <Box>{"今月の収入" + currentMonthIncome} </Box>
       <Box>{"今月末の残高 " + endOfMonthMoneyAmount} </Box>
+      <Box display="flex">
+        <DoughnutChart
+          purchaseList={currentMonthSpentList}
+          title="今月の使用金額"
+        />
+        <DoughnutChart
+          purchaseList={currentMonthIncomeList}
+          title="今月の収入金額"
+        />
+      </Box>
+
       <TableContainer sx={{ marginY: 2 }}>
         <Table>
           <TableHead>
