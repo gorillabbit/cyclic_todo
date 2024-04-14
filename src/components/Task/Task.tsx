@@ -17,8 +17,6 @@ import {
 import ChildTasks from "./ChildTask";
 import { getAuth } from "firebase/auth";
 import { BodyTypography } from "../TypographyWrapper";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { IconName } from "@fortawesome/fontawesome-svg-core";
 import EditIcon from "@mui/icons-material/Edit";
 import TaskInputForm from "../InputForms/TaskInputForm";
 import { parse } from "date-fns";
