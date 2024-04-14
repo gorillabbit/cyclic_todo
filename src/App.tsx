@@ -1,4 +1,4 @@
-import { Box } from "@mui/material";
+import { Box, Tab, Tabs } from "@mui/material";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
@@ -13,6 +13,8 @@ import { LogProvider } from "./components/Context/LogContext";
 import Calendar from "./components/Calendar/Calendar";
 import { TaskProvider } from "./components/Context/TaskContext";
 import { AccountProvider } from "./components/Context/AccountContext";
+import PurchaseInput from "./components/Kakeibo/PurchaseInput";
+import Purchases from "./components/Kakeibo/Purchases";
 
 function App() {
   const theme = createTheme({
@@ -28,6 +30,7 @@ function App() {
   });
   const [user, setUser] = useState<User>();
   const [isGapiMounted, setIsGapiMounted] = useState<boolean>(false);
+  const [tabValue, setTabValue] = useState<number>(0);
 
   useEffect(() => {
     const auth = getAuth();
@@ -46,12 +49,22 @@ function App() {
           {user && (
             <>
               <AccountProvider>
-                <InputForms />
+                <Tabs value={tabValue} onChange={(e, v) => setTabValue(v)}>
+                  <Tab label="タスク/ログ" />
+                  <Tab label="家計簿" />
+                </Tabs>
+                {tabValue === 0 && <InputForms />}
+                {tabValue === 1 && <PurchaseInput />}
                 <TaskProvider>
                   <LogProvider>
                     <Box m={2}>
-                      <LogList />
-                      <TaskList />
+                      {tabValue === 0 && (
+                        <>
+                          <LogList />
+                          <TaskList />
+                        </>
+                      )}
+                      {tabValue === 1 && <Purchases />}
                       <Calendar isGapiMounted={isGapiMounted} />
                     </Box>
                   </LogProvider>

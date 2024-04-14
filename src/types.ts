@@ -66,3 +66,22 @@ export interface AccountLinkType {
   receiver: Pick<AccountType, "email" | "name" | "icon">;
   status: "pending" | "rejected" | "accepted";
 }
+
+export interface InputPurchaseType {
+  userId: string;
+  title: string;
+  price: number;
+  date: Date;
+  method: string;
+  category: string;
+  income: boolean;
+  description?: string;
+}
+
+export interface PurchaseType extends Omit<InputPurchaseType, "date"> {
+  date: Timestamp;
+}
+
+export interface PurchaseListType extends PurchaseType {
+  id: string;
+}

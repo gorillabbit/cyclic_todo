@@ -70,3 +70,5 @@ export const deleteDocAccount = (id) => deleteDocOperation('Accounts', id);
 export const addDocAccountLink = (link) => addDocOperation('AccountLinks', link);
 export const updateDocAccountLink = (id, updates) => updateDocOperation('AccountLinks', id, updates);
 export const deleteDocAccountLink = (id) => deleteDocOperation('AccountLinks', id);
+
+export const addDocPurchase = (purchase) => addDocOperation('Purchases', purchase)
