@@ -95,7 +95,7 @@ const Purchases = () => {
       <Box> {"今月の使用金額 " + currentMonthSpent}</Box>
       <Box>{"今月の収入" + currentMonthIncome} </Box>
       <Box>{"今月末の残高 " + endOfMonthMoneyAmount} </Box>
-      <Box display="flex">
+      <Box display="flex" flexWrap="wrap">
         <DoughnutChart
           purchaseList={currentMonthSpentList}
           title="今月の使用金額"

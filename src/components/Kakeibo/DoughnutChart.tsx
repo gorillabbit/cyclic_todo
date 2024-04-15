@@ -59,7 +59,7 @@ const DoughnutChart: React.FC<DoughnutChartProps> = ({
   };
 
   return (
-    <Box width="500px" height="500px">
+    <Box width="100%" maxWidth="500px" my={2}>
       <Doughnut data={data} options={options} />
     </Box>
   );
