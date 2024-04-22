@@ -56,7 +56,6 @@ export const AssetProvider: React.FC<AssetContextProp> = ({ children }) => {
           id: doc.id,
           ...(doc.data() as AssetType),
         }));
-        console.log(assetsData);
         setAssetList(assetsData);
       });
     };

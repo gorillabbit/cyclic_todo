@@ -44,6 +44,7 @@ const TaskList = () => {
         variant="contained"
         color="primary"
         onClick={() => setShowCompleted(!showCompleted)}
+        sx={{ marginY: 2 }}
       >
         {showCompleted ? "完了タスクを非表示" : "完了タスクを表示"}
       </Button>

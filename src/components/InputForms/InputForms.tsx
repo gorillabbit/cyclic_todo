@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import TaskInputForm from "./TaskInputForm";
 import LogInputForm from "./LogInputForm";
 import ToggleButtons from "./ToggleButtons";

@@ -13,9 +13,9 @@ import { LogProvider } from "./components/Context/LogContext";
 import Calendar from "./components/Calendar/Calendar";
 import { TaskProvider } from "./components/Context/TaskContext";
 import { AccountProvider } from "./components/Context/AccountContext";
-import PurchaseInput from "./components/Kakeibo/PurchaseInput";
 import Purchases from "./components/Kakeibo/Purchases";
 import { AssetProvider } from "./components/Context/AssetContext";
+import PurchaseInputs from "./components/Kakeibo/PurchaseInputs";
 
 function App() {
   const theme = createTheme({
@@ -55,7 +55,7 @@ function App() {
                   <Tab label="家計簿" />
                 </Tabs>
                 {tabValue === 0 && <InputForms />}
-                {tabValue === 1 && <PurchaseInput />}
+                {tabValue === 1 && <PurchaseInputs />}
                 <TaskProvider>
                   <LogProvider>
                     <Box m={2}>

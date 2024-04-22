@@ -38,6 +38,7 @@ const LogList = () => {
         variant="contained"
         color="primary"
         onClick={() => setShowArchived(!showArchived)}
+        sx={{ marginY: 2 }}
       >
         {showArchived ? "アーカイブログを非表示" : "アーカイブログを表示"}
       </Button>
