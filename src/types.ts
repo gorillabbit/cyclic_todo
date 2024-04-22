@@ -1,5 +1,15 @@
 import { Timestamp } from "firebase/firestore";
 
+// 曜日を表す型を定義
+export type WeekDay =
+  | "日曜日"
+  | "月曜日"
+  | "火曜日"
+  | "水曜日"
+  | "木曜日"
+  | "金曜日"
+  | "土曜日";
+
 export interface TaskType {
   userId: string;
   id?: string;
@@ -76,6 +86,7 @@ export interface InputPurchaseType {
   category: string;
   income: boolean;
   description?: string;
+  parentScheduleId?: string;
 }
 
 export interface PurchaseType extends Omit<InputPurchaseType, "date"> {
@@ -93,5 +104,28 @@ export interface AssetType {
 }
 
 export interface AssetListType extends AssetType {
+  id: string;
+}
+
+export interface InputPurchaseScheduleType {
+  userId: string;
+  title: string;
+  price: number;
+  date?: number;
+  day?: WeekDay;
+  cycle: string;
+  method: string;
+  category: string;
+  income: boolean;
+  description?: string;
+  endDate: Date;
+}
+
+export interface PurchaseScheduleType
+  extends Omit<InputPurchaseScheduleType, "endDate"> {
+  endDate: Timestamp;
+}
+
+export interface PurchaseScheduleListType extends PurchaseScheduleType {
   id: string;
 }

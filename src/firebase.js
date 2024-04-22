@@ -8,6 +8,7 @@ import {
   deleteDoc,
   doc,
   updateDoc,
+  writeBatch
 } from "firebase/firestore";
 
 // Your web app's Firebase configuration
@@ -72,7 +73,20 @@ export const updateDocAccountLink = (id, updates) => updateDocOperation('Account
 export const deleteDocAccountLink = (id) => deleteDocOperation('AccountLinks', id);
 
 export const addDocPurchase = (purchase) => addDocOperation('Purchases', purchase)
+export const updateDocPurchase =  (id, updates) => updateDocOperation('Purchases', id, updates);
+export const batchAddDocPurchase = (purchaseList) => {
+  const batch = writeBatch(db);
+  // オブジェクトをバッチに追加
+  purchaseList.forEach(obj => {
+  const docRef = doc(collection(db, "Purchases")); // collectionNameは適宜替えてください
+  batch.set(docRef, obj);
+  });
+  // バッチ操作を実行
+  batch.commit().catch(error => console.error("バッチ書き込み失敗:", error));
+}
 
 export const addDocAsset = (asset) => addDocOperation("Assets", asset)
 export const updateDocAsset = (id, updates) => updateDocOperation('Assets', id, updates);
 export const deleteDocAsset = (id) => deleteDocOperation('Assets', id);
+
+export const addDocPurchaseSchedule = (PurchaseSchedule) => addDocOperation("PurchaseSchedules", PurchaseSchedule)
