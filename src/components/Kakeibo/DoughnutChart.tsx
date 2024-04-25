@@ -14,6 +14,12 @@ const colors = [
   "rgba(153, 102, 255, 0.6)",
   "rgba(255, 159, 64, 0.6)",
   "rgba(199, 199, 199, 0.6)",
+  "rgba(255, 129, 102, 0.6)",
+  "rgba(99, 180, 255, 0.6)",
+  "rgba(255, 229, 153, 0.6)",
+  "rgba(129, 199, 132, 0.6)",
+  "rgba(175, 102, 255, 0.6)",
+  "rgba(255, 204, 99, 0.6)",
 ];
 
 interface DoughnutChartProps {
@@ -68,7 +74,6 @@ const DoughnutChart: React.FC<DoughnutChartProps> = ({
           borderColor: "white",
           borderWidth: 1,
           labels: subData.map((item) => item.title),
-          label: "詳細出費",
         },
       ],
     };
