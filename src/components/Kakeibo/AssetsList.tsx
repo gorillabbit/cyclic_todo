@@ -84,8 +84,8 @@ const AssetTable = () => {
           <TableRow>
             <TableCell>名前</TableCell>
             <TableCell>残高</TableCell>
-            <TableCell>削除</TableCell>
             <TableCell>変更保存</TableCell>
+            <TableCell>削除</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -114,11 +114,6 @@ const AssetTable = () => {
                 />
               </TableCell>
               <TableCell>
-                <IconButton onClick={() => removeAsset(asset.id)} color="error">
-                  <DeleteIcon />
-                </IconButton>
-              </TableCell>
-              <TableCell>
                 <Button
                   variant="contained"
                   color="primary"
@@ -127,6 +122,11 @@ const AssetTable = () => {
                 >
                   変更
                 </Button>
+              </TableCell>
+              <TableCell>
+                <IconButton onClick={() => removeAsset(asset.id)} color="error">
+                  <DeleteIcon />
+                </IconButton>
               </TableCell>
             </TableRow>
           ))}

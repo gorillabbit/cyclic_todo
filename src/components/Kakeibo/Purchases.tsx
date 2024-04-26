@@ -1,6 +1,6 @@
 import {
   Box,
-  Button,
+  IconButton,
   Paper,
   Table,
   TableBody,
@@ -10,6 +10,9 @@ import {
   TableRow,
   TextField,
 } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
+import DoneIcon from "@mui/icons-material/Done";
 import { getAuth } from "firebase/auth";
 import {
   query,
@@ -20,7 +23,7 @@ import {
   Timestamp,
 } from "firebase/firestore";
 import { useState, useEffect } from "react";
-import { db, updateDocPurchase } from "../../firebase";
+import { db, deleteDocPurchase, updateDocPurchase } from "../../firebase";
 import {
   PurchaseListType,
   PurchaseScheduleListType,
@@ -258,7 +261,8 @@ const Purchases = () => {
                 <TableCell>支払い方法</TableCell>
                 <TableCell>収入</TableCell>
                 <TableCell>備考</TableCell>
-                <TableCell>編集</TableCell>
+                <TableCell padding="none"></TableCell>
+                <TableCell padding="none"></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -322,10 +326,10 @@ const Purchases = () => {
                           size="small"
                         />
                       </TableCell>
-                      <TableCell>
-                        <Button onClick={handleSaveClick} variant="contained">
-                          保存
-                        </Button>
+                      <TableCell padding="none">
+                        <IconButton onClick={handleSaveClick} color="success">
+                          <DoneIcon />
+                        </IconButton>
                       </TableCell>
                     </>
                   ) : (
@@ -339,16 +343,32 @@ const Purchases = () => {
                       <TableCell>{purchase.method}</TableCell>
                       <TableCell>{purchase.income ? "収入" : "支出"}</TableCell>
                       <TableCell>{purchase.description}</TableCell>
-                      <TableCell>
-                        <Button
-                          variant="outlined"
+                      <TableCell padding="none">
+                        <IconButton
                           onClick={() => handleEditClick(purchase)}
+                          sx={{
+                            "&:hover": {
+                              color: "#1976d2", // Color on hover
+                            },
+                          }}
                         >
-                          編集
-                        </Button>
+                          <EditIcon />
+                        </IconButton>
                       </TableCell>
                     </>
                   )}
+                  <TableCell padding="none">
+                    <IconButton
+                      onClick={() => deleteDocPurchase(purchase.id)}
+                      sx={{
+                        "&:hover": {
+                          color: "#d32f2f", // Color on hover
+                        },
+                      }}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
