@@ -1,4 +1,3 @@
-// Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import {
   getFirestore,
@@ -10,6 +9,7 @@ import {
   updateDoc,
   writeBatch
 } from "firebase/firestore";
+import { getPerformance } from "firebase/performance";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -25,6 +25,10 @@ const firebaseConfig = {
 // Initialize Firebase
 export const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
+
+// Initialize Performance Monitoring and get a reference to the service
+getPerformance(app);
+
 
 const addDocOperation = async (collectionName, data) => {
   try {
@@ -84,6 +88,7 @@ export const batchAddDocPurchase = (purchaseList) => {
   // バッチ操作を実行
   batch.commit().catch(error => console.error("バッチ書き込み失敗:", error));
 }
+export const deleteDocPurchase = (id) => deleteDocOperation('Purchases', id)
 
 export const addDocAsset = (asset) => addDocOperation("Assets", asset)
 export const updateDocAsset = (id, updates) => updateDocOperation('Assets', id, updates);
