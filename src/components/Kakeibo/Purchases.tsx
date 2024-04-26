@@ -271,6 +271,7 @@ const Purchases = () => {
                           name="date"
                           value={editFormData.date.toDate()}
                           onChange={handleDateFormChange}
+                          slotProps={{ textField: { size: "small" } }}
                         />
                       </TableCell>
                       <TableCell>
@@ -278,6 +279,7 @@ const Purchases = () => {
                           name="title"
                           value={editFormData.title}
                           onChange={handleEditFormChange}
+                          size="small"
                         />
                       </TableCell>
                       <TableCell>
@@ -285,6 +287,7 @@ const Purchases = () => {
                           name="price"
                           value={editFormData.price}
                           onChange={handleEditFormChange}
+                          size="small"
                         />
                       </TableCell>
                       <TableCell>
@@ -292,6 +295,7 @@ const Purchases = () => {
                           name="category"
                           value={editFormData.category}
                           onChange={handleEditFormChange}
+                          size="small"
                         />
                       </TableCell>
                       <TableCell>
@@ -299,6 +303,7 @@ const Purchases = () => {
                           name="method"
                           value={editFormData.method}
                           onChange={handleEditFormChange}
+                          size="small"
                         />
                       </TableCell>
                       <TableCell>
@@ -306,10 +311,21 @@ const Purchases = () => {
                           name="income"
                           value={editFormData.income ? "収入" : "支出"}
                           onChange={handleEditFormChange}
+                          size="small"
                         />
                       </TableCell>
                       <TableCell>
-                        <Button onClick={handleSaveClick}>保存</Button>
+                        <TextField
+                          name="description"
+                          value={editFormData.description}
+                          onChange={handleEditFormChange}
+                          size="small"
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Button onClick={handleSaveClick} variant="contained">
+                          保存
+                        </Button>
                       </TableCell>
                     </>
                   ) : (
