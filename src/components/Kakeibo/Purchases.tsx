@@ -13,17 +13,9 @@ import {
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import DoneIcon from "@mui/icons-material/Done";
-import { getAuth } from "firebase/auth";
-import {
-  query,
-  collection,
-  where,
-  onSnapshot,
-  orderBy,
-  Timestamp,
-} from "firebase/firestore";
-import { useState, useEffect } from "react";
-import { db, deleteDocPurchase, updateDocPurchase } from "../../firebase";
+import { orderBy, Timestamp } from "firebase/firestore";
+import { memo, useCallback, useMemo, useState } from "react";
+import { deleteDocPurchase, updateDocPurchase } from "../../firebase";
 import {
   PurchaseListType,
   PurchaseScheduleListType,
@@ -40,6 +32,7 @@ import AssetsList from "./AssetsList";
 import { useAsset } from "../Context/AssetContext";
 import { lastDayOfMonth } from "date-fns";
 import { DatePicker } from "@mui/x-date-pickers";
+import { useFirestoreQuery } from "../../utilities/firebaseUtilities";
 
 const defaultNewPurchase: PurchaseListType = {
   id: "",
@@ -53,127 +46,39 @@ const defaultNewPurchase: PurchaseListType = {
   description: "",
 };
 
-const Purchases = () => {
-  const { sumAssets } = useAsset();
-  const [purchaseList, setPurchaseList] = useState<PurchaseListType[]>([]);
-  const [purchaseScheduleList, setPurchaseScheduleList] = useState<
-    PurchaseScheduleListType[]
-  >([]);
-  // 編集中の行のIDを追跡するステート
-  const [editRowId, setEditRowId] = useState<string>("");
-  // 編集中のデータを保持するステート
-  const [editFormData, setEditFormData] =
-    useState<PurchaseListType>(defaultNewPurchase);
-  const auth = getAuth();
-
-  useEffect(() => {
-    if (!auth.currentUser) {
-      return;
-    }
-    //Purchasesの取得
-    const fetchPurchases = () => {
-      const purchaseQuery = query(
-        collection(db, "Purchases"),
-        where("userId", "==", auth.currentUser?.uid),
-        orderBy("date")
-      );
-      return onSnapshot(purchaseQuery, (querySnapshot) => {
-        const purchasesData = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...(doc.data() as PurchaseType),
-        }));
-        setPurchaseList(purchasesData);
-      });
+type PlainPurchaseProps = {
+  currentMonthSpentList: PurchaseListType[];
+  currentMonthIncomeList: PurchaseListType[];
+  currentMoney: number;
+  currentMonthSpent: number;
+  currentMonthIncome: number;
+  endOfMonthMoneyAmount: number;
+  purchaseScheduleList: PurchaseScheduleListType[];
+  purchaseList: PurchaseListType[];
+  editRowId: string;
+  editFormData: PurchaseListType;
+  handleEditFormChange: (event: {
+    target: {
+      name: string;
+      value: any;
     };
-    const unsubscribePurchases = fetchPurchases();
+  }) => void;
+  handleDateFormChange: (value: Date | null | undefined) => void;
+  handleSaveClick: () => void;
+  handleEditClick: (purchase: PurchaseListType) => void;
+};
 
-    const fetchPurchaseSchedules = () => {
-      const purchaseScheduleQuery = query(
-        collection(db, "PurchaseSchedules"),
-        where("userId", "==", auth.currentUser?.uid)
-      );
-      return onSnapshot(purchaseScheduleQuery, (querySnapshot) => {
-        const purchaseSchedulesData = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...(doc.data() as PurchaseScheduleType),
-        }));
-        setPurchaseScheduleList(purchaseSchedulesData);
-      });
-    };
-    const unsubscribePurchaseSchedules = fetchPurchaseSchedules();
-
-    // コンポーネントがアンマウントされるときに購読を解除
-    return () => {
-      unsubscribePurchases();
-      unsubscribePurchaseSchedules();
-    };
-  }, [auth.currentUser]);
-
-  const today = new Date();
-
-  const currentMoney =
-    sumAssets +
-    calculateSpentAndIncomeResult(
-      purchaseList.filter((purchase) => purchase.date.toDate() < today)
-    );
-
-  const endOfMonthMoneyAmount =
-    sumAssets +
-    calculateSpentAndIncomeResult(
-      purchaseList.filter(
-        (purchase) => purchase.date.toDate() < lastDayOfMonth(today)
-      )
-    );
-
-  const currentMonthSpentList = filterCurrentMonthPurchases(
-    purchaseList.filter((purchases) => purchases.income === false)
-  );
-  const currentMonthSpent = sumPrice(currentMonthSpentList);
-
-  const currentMonthIncomeList = filterCurrentMonthPurchases(
-    purchaseList.filter((purchases) => purchases.income === true)
-  );
-  const currentMonthIncome = sumPrice(currentMonthIncomeList);
-
-  // 編集モードに切り替える関数
-  const handleEditClick = (purchase: PurchaseListType) => {
-    setEditRowId(purchase.id);
-    setEditFormData(purchase);
-  };
-
-  // 編集内容を保存する関数
-  const handleSaveClick = () => {
-    // ここに保存ロジックを追加（API呼び出し等）
-    updateDocPurchase(editFormData.id, editFormData);
-    setEditRowId("");
-  };
-
-  // 編集データを更新する関数
-  const handleEditFormChange = (event: {
-    target: { name: string; value: any };
-  }) => {
-    const { name, value } = event.target;
-    setEditFormData({ ...editFormData, [name]: value });
-  };
-  const handleDateFormChange = (value: Date | null | undefined) => {
-    if (value) {
-      setEditFormData({
-        ...editFormData,
-        date: Timestamp.fromDate(value),
-      });
-    }
-  };
-
-  return (
+const PlainPurchases = memo(
+  (props: PlainPurchaseProps): JSX.Element => (
     <>
       <AssetsList />
       <Box display="flex" flexWrap="wrap">
         <DoughnutChart
-          purchaseList={currentMonthSpentList}
+          purchaseList={props.currentMonthSpentList}
           title="今月の使用金額"
         />
         <DoughnutChart
-          purchaseList={currentMonthIncomeList}
+          purchaseList={props.currentMonthIncomeList}
           title="今月の収入金額"
         />
       </Box>
@@ -190,19 +95,19 @@ const Purchases = () => {
             <TableBody>
               <TableRow>
                 <TableCell>現在の所持金</TableCell>
-                <TableCell> {currentMoney}</TableCell>
+                <TableCell> {props.currentMoney}</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell>今月の使用金額</TableCell>
-                <TableCell> {currentMonthSpent}</TableCell>
+                <TableCell> {props.currentMonthSpent}</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell>今月の収入</TableCell>
-                <TableCell> {currentMonthIncome}</TableCell>
+                <TableCell> {props.currentMonthIncome}</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell>今月末の残高</TableCell>
-                <TableCell> {endOfMonthMoneyAmount}</TableCell>
+                <TableCell> {props.endOfMonthMoneyAmount}</TableCell>
               </TableRow>
             </TableBody>
           </Table>
@@ -225,7 +130,7 @@ const Purchases = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {purchaseScheduleList.map((purchaseSchedule) => (
+              {props.purchaseScheduleList.map((purchaseSchedule) => (
                 <TableRow key={purchaseSchedule.id}>
                   <TableCell>
                     {purchaseSchedule.cycle +
@@ -266,68 +171,71 @@ const Purchases = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {purchaseList.map((purchase) => (
+              {props.purchaseList.map((purchase) => (
                 <TableRow key={purchase.id}>
-                  {editRowId === purchase.id ? (
+                  {props.editRowId === purchase.id ? (
                     <>
                       <TableCell>
                         <DatePicker
                           name="date"
-                          value={editFormData.date.toDate()}
-                          onChange={handleDateFormChange}
+                          value={props.editFormData.date.toDate()}
+                          onChange={props.handleDateFormChange}
                           slotProps={{ textField: { size: "small" } }}
                         />
                       </TableCell>
                       <TableCell>
                         <TextField
                           name="title"
-                          value={editFormData.title}
-                          onChange={handleEditFormChange}
+                          value={props.editFormData.title}
+                          onChange={props.handleEditFormChange}
                           size="small"
                         />
                       </TableCell>
                       <TableCell>
                         <TextField
                           name="price"
-                          value={editFormData.price}
-                          onChange={handleEditFormChange}
+                          value={props.editFormData.price}
+                          onChange={props.handleEditFormChange}
                           size="small"
                         />
                       </TableCell>
                       <TableCell>
                         <TextField
                           name="category"
-                          value={editFormData.category}
-                          onChange={handleEditFormChange}
+                          value={props.editFormData.category}
+                          onChange={props.handleEditFormChange}
                           size="small"
                         />
                       </TableCell>
                       <TableCell>
                         <TextField
                           name="method"
-                          value={editFormData.method}
-                          onChange={handleEditFormChange}
+                          value={props.editFormData.method}
+                          onChange={props.handleEditFormChange}
                           size="small"
                         />
                       </TableCell>
                       <TableCell>
                         <TextField
                           name="income"
-                          value={editFormData.income ? "収入" : "支出"}
-                          onChange={handleEditFormChange}
+                          value={props.editFormData.income ? "収入" : "支出"}
+                          onChange={props.handleEditFormChange}
                           size="small"
                         />
                       </TableCell>
                       <TableCell>
                         <TextField
                           name="description"
-                          value={editFormData.description}
-                          onChange={handleEditFormChange}
+                          value={props.editFormData.description}
+                          onChange={props.handleEditFormChange}
                           size="small"
                         />
                       </TableCell>
                       <TableCell padding="none">
-                        <IconButton onClick={handleSaveClick} color="success">
+                        <IconButton
+                          onClick={props.handleSaveClick}
+                          color="success"
+                        >
                           <DoneIcon />
                         </IconButton>
                       </TableCell>
@@ -345,7 +253,7 @@ const Purchases = () => {
                       <TableCell>{purchase.description}</TableCell>
                       <TableCell padding="none">
                         <IconButton
-                          onClick={() => handleEditClick(purchase)}
+                          onClick={() => props.handleEditClick(purchase)}
                           sx={{
                             "&:hover": {
                               color: "#1976d2", // Color on hover
@@ -376,7 +284,125 @@ const Purchases = () => {
         </TableContainer>
       </Paper>
     </>
+  )
+);
+
+const Purchases = (): JSX.Element => {
+  const { sumAssets } = useAsset();
+
+  // 編集中の行のIDを追跡するステート
+  const [editRowId, setEditRowId] = useState<string>("");
+  // 編集中のデータを保持するステート
+  const [editFormData, setEditFormData] =
+    useState<PurchaseListType>(defaultNewPurchase);
+
+  const purchaseQueryConstraints = useMemo(() => [orderBy("date")], []);
+  const { documents: purchaseList } = useFirestoreQuery<
+    PurchaseType,
+    PurchaseListType
+  >("Purchases", purchaseQueryConstraints);
+
+  const purchaseScheduleQueryConstraints = useMemo(() => [], []);
+
+  const { documents: purchaseScheduleList } = useFirestoreQuery<
+    PurchaseScheduleType,
+    PurchaseScheduleListType
+  >("PurchaseSchedules", purchaseScheduleQueryConstraints);
+
+  //サマリーに表示する数字
+  const today = useMemo(() => new Date(), []);
+  const currentMoney = useMemo(
+    () =>
+      sumAssets +
+      calculateSpentAndIncomeResult(
+        purchaseList.filter((purchase) => purchase.date.toDate() < today)
+      ),
+    [purchaseList, sumAssets, today]
   );
+  const endOfMonthMoneyAmount = useMemo(
+    () =>
+      sumAssets +
+      calculateSpentAndIncomeResult(
+        purchaseList.filter(
+          (purchase) => purchase.date.toDate() < lastDayOfMonth(today)
+        )
+      ),
+    [purchaseList, sumAssets, today]
+  );
+  const currentMonthSpentList = useMemo(
+    () =>
+      filterCurrentMonthPurchases(
+        purchaseList.filter((purchases) => purchases.income === false)
+      ),
+    [purchaseList]
+  );
+  const currentMonthSpent = useMemo(
+    () => sumPrice(currentMonthSpentList),
+    [currentMonthSpentList]
+  );
+  const currentMonthIncomeList = useMemo(
+    () =>
+      filterCurrentMonthPurchases(
+        purchaseList.filter((purchases) => purchases.income === true)
+      ),
+    [purchaseList]
+  );
+  const currentMonthIncome = useMemo(
+    () => sumPrice(currentMonthIncomeList),
+    [currentMonthIncomeList]
+  );
+
+  // 編集モードに切り替える関数
+  const handleEditClick = useCallback((purchase: PurchaseListType) => {
+    setEditRowId(purchase.id);
+    setEditFormData(purchase);
+  }, []);
+
+  // 編集内容を保存する関数
+  const handleSaveClick = useCallback(() => {
+    updateDocPurchase(editFormData.id, editFormData);
+    setEditRowId("");
+  }, [editFormData]);
+
+  // 編集データを更新する関数
+  const handleEditFormChange = useCallback(
+    (event: { target: { name: string; value: any } }) => {
+      const { name, value } = event.target;
+      setEditFormData({ ...editFormData, [name]: value });
+    },
+    [editFormData]
+  );
+  // 日付はTimestampに変換する必要があるので変換する
+  const handleDateFormChange = useCallback(
+    (value: Date | null | undefined) => {
+      if (value) {
+        setEditFormData({
+          ...editFormData,
+          date: Timestamp.fromDate(value),
+        });
+      }
+    },
+    [editFormData]
+  );
+
+  const plainProps = {
+    currentMonthSpentList,
+    currentMonthIncomeList,
+    currentMoney,
+    currentMonthSpent,
+    currentMonthIncome,
+    endOfMonthMoneyAmount,
+    purchaseScheduleList,
+    purchaseList,
+    editRowId,
+    editFormData,
+    handleEditFormChange,
+    handleDateFormChange,
+    handleSaveClick,
+    handleEditClick,
+  };
+
+  return <PlainPurchases {...plainProps} />;
 };
 
 export default Purchases;
