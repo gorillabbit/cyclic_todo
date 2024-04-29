@@ -103,6 +103,11 @@ export interface AssetType {
   balance: number;
 }
 
+export interface AssetInputType extends AssetListType {
+  tempName?: string;
+  tempBalance?: number;
+}
+
 export interface AssetListType extends AssetType {
   id: string;
 }
