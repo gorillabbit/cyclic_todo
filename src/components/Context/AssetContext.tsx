@@ -1,11 +1,7 @@
-import { createContext, useContext, useMemo } from "react";
+import { ReactNode, createContext, memo, useContext, useMemo } from "react";
 import { orderBy } from "firebase/firestore";
-import { AssetListType, AssetType } from "../../types.js";
+import { AssetInputType, AssetType } from "../../types.js";
 import { useFirestoreQuery } from "../../utilities/firebaseUtilities";
-
-interface AssetContextProp {
-  children: any;
-}
 
 type AssetContextType = {
   assetList: AssetInputType[];
@@ -13,41 +9,34 @@ type AssetContextType = {
   sumAssets: number;
 };
 
-// Contextを作成（初期値は空のlogListとダミーのsetLogList関数）
+// Contextを作成（初期値は空のassetListとダミーのsetAssetList関数）
 export const AssetContext = createContext<AssetContextType>({
   assetList: [],
   setAssetList: () => {},
   sumAssets: 0,
 });
 
-interface AssetInputType extends AssetListType {
-  tempName?: string;
-  tempBalance?: number;
-}
-
-export const AssetProvider: React.FC<AssetContextProp> = ({ children }) => {
-  const assetQueryConstraints = useMemo(() => [orderBy("timestamp")], []);
-  const { documents: assetList, setDocuments: setAssetList } =
-    useFirestoreQuery<AssetType, AssetInputType>(
-      "Assets",
-      assetQueryConstraints
+export const AssetProvider = memo(
+  ({ children }: { children: ReactNode }): JSX.Element => {
+    const assetQueryConstraints = useMemo(() => [orderBy("timestamp")], []);
+    const { documents: assetList, setDocuments: setAssetList } =
+      useFirestoreQuery<AssetType, AssetInputType>(
+        "Assets",
+        assetQueryConstraints
+      );
+    const sumAssets = useMemo(
+      () => assetList.reduce((acc, asset) => acc + Number(asset.balance), 0),
+      [assetList]
     );
-  const sumAssets = assetList.reduce(
-    (acc, asset) => acc + Number(asset.balance),
-    0
-  );
 
-  return (
-    <AssetContext.Provider
-      value={{
-        assetList,
-        setAssetList,
-        sumAssets,
-      }}
-    >
-      {children}
-    </AssetContext.Provider>
-  );
-};
+    const context = useMemo(() => {
+      return { assetList, setAssetList, sumAssets };
+    }, [assetList, setAssetList, sumAssets]);
+
+    return (
+      <AssetContext.Provider value={context}>{children}</AssetContext.Provider>
+    );
+  }
+);
 
 export const useAsset = () => useContext(AssetContext);
