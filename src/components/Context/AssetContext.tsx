@@ -1,14 +1,7 @@
-import { createContext, useState, useContext, useEffect } from "react";
-import { db } from "../../firebase.js";
-import {
-  orderBy,
-  collection,
-  onSnapshot,
-  query,
-  where,
-} from "firebase/firestore";
+import { createContext, useContext, useMemo } from "react";
+import { orderBy } from "firebase/firestore";
 import { AssetListType, AssetType } from "../../types.js";
-import { getAuth } from "firebase/auth";
+import { useFirestoreQuery } from "../../utilities/firebaseUtilities";
 
 interface AssetContextProp {
   children: any;
@@ -33,39 +26,16 @@ interface AssetInputType extends AssetListType {
 }
 
 export const AssetProvider: React.FC<AssetContextProp> = ({ children }) => {
-  const [assetList, setAssetList] = useState<AssetInputType[]>([]);
+  const assetQueryConstraints = useMemo(() => [orderBy("timestamp")], []);
+  const { documents: assetList, setDocuments: setAssetList } =
+    useFirestoreQuery<AssetType, AssetInputType>(
+      "Assets",
+      assetQueryConstraints
+    );
   const sumAssets = assetList.reduce(
     (acc, asset) => acc + Number(asset.balance),
     0
   );
-  const auth = getAuth();
-
-  // 資産データをFirestoreから読み込む
-  useEffect(() => {
-    if (!auth.currentUser) {
-      return;
-    }
-    const fetchAssets = () => {
-      const assetQuery = query(
-        collection(db, "Assets"),
-        where("userId", "==", auth.currentUser?.uid),
-        orderBy("timestamp")
-      );
-      return onSnapshot(assetQuery, (querySnapshot) => {
-        const assetsData = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...(doc.data() as AssetType),
-        }));
-        setAssetList(assetsData);
-      });
-    };
-    const unsubscribeAssets = fetchAssets();
-
-    // コンポーネントがアンマウントされるときに購読を解除
-    return () => {
-      unsubscribeAssets();
-    };
-  }, [auth.currentUser]);
 
   return (
     <AssetContext.Provider

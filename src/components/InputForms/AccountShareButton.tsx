@@ -10,20 +10,20 @@ import {
   Tooltip,
 } from "@mui/material";
 import { getAuth } from "firebase/auth";
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useMemo, useState } from "react";
 import {
   addDocAccountLink,
   addDocAccount,
-  db,
   deleteDocAccountLink,
   updateDocAccountLink,
   updateDocAccount,
 } from "../../firebase";
 import { useAccount } from "../Context/AccountContext";
-import { collection, onSnapshot, query, where } from "firebase/firestore";
+import { where } from "firebase/firestore";
 import { AccountLinkType } from "../../types";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import CancelIcon from "@mui/icons-material/Cancel";
+import { useFirestoreQuery } from "../../utilities/firebaseUtilities";
 
 const auth = getAuth();
 
@@ -32,51 +32,25 @@ const AccountShareButton = () => {
   const [email, setEmail] = useState<string>("");
   const { Account } = useAccount();
 
-  const [requests, setRequests] = useState<AccountLinkType[]>();
-  const [receivers, setReceivers] = useState<AccountLinkType[]>();
+  const requestsAccountQueryConstraints = useMemo(
+    () => [where("requester.email", "==", auth.currentUser?.email)],
+    []
+  );
+  const { documents: requests } = useFirestoreQuery<AccountLinkType>(
+    "AccountLinks",
+    requestsAccountQueryConstraints,
+    true
+  );
 
-  useEffect(() => {
-    if (!auth.currentUser) {
-      return;
-    }
-    //requestsの取得
-    const fetchRequests = () => {
-      const RequestsAccountQuery = query(
-        collection(db, "AccountLinks"),
-        where("requester.email", "==", auth.currentUser?.email)
-      );
-      return onSnapshot(RequestsAccountQuery, (querySnapshot) => {
-        const AccountLinksData = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...(doc.data() as AccountLinkType),
-        }));
-        setRequests(AccountLinksData);
-      });
-    };
-    const unsubscribeRequests = fetchRequests();
-
-    //receiversの取得
-    const fetchReceivers = () => {
-      const ReceiversAccountQuery = query(
-        collection(db, "AccountLinks"),
-        where("receiver.email", "==", auth.currentUser?.email)
-      );
-      return onSnapshot(ReceiversAccountQuery, (querySnapshot) => {
-        const AccountLinksData = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...(doc.data() as AccountLinkType),
-        }));
-        setReceivers(AccountLinksData);
-      });
-    };
-    const unsubscribeReceivers = fetchReceivers();
-
-    // コンポーネントがアンマウントされるときに購読を解除
-    return () => {
-      unsubscribeRequests();
-      unsubscribeReceivers();
-    };
-  }, []);
+  const receiversAccountQueryConstraints = useMemo(
+    () => [where("receiver.email", "==", auth.currentUser?.email)],
+    []
+  );
+  const { documents: receivers } = useFirestoreQuery<AccountLinkType>(
+    "AccountLinks",
+    receiversAccountQueryConstraints,
+    true
+  );
 
   //リクエスト送信側のAccountsは受信側から操作しないので、Acceptされたら加える。リンクが解除されたら削除する
   useEffect(() => {
