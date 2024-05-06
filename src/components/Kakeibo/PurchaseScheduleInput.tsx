@@ -18,6 +18,7 @@ import {
 } from "../../types";
 import { addDays, addMonths, addYears, nextDay } from "date-fns";
 import { DatePicker } from "@mui/x-date-pickers";
+import { numericProps } from "../../utilities/purchaseUtilities";
 
 const auth = getAuth();
 
@@ -40,20 +41,17 @@ const PurchaseScheduleInput = () => {
     useState<InputPurchaseScheduleType>(defaultNewPurchase);
 
   const handleNewPurchaseScheduleInput = (name: string, value: any) => {
-    if ((name === "price" || name === "date") && parseInt(value, 10) < 0) {
-      alert("0未満は入力できません。");
-      return;
-    }
-    if (name === "date") {
-      const result = Math.abs(Number(value));
-      if (result > 31) {
+    if (name === "price" || name === "date") {
+      const numValue = Number(value);
+      if (Number.isNaN(numValue) || numValue < 0) {
+        alert("0未満は入力できません。");
+        return;
+      }
+      if (name === "date" && numValue > 31) {
         alert("32以上入力できません。");
         return;
       }
-      setNewPurchaseSchedule((prev) => ({
-        ...prev,
-        date: Number.isNaN(result) ? 0 : result,
-      }));
+      setNewPurchaseSchedule((prev) => ({ ...prev, [name]: numValue }));
       return;
     }
     setNewPurchaseSchedule((prev) => ({ ...prev, [name]: value }));
@@ -178,11 +176,11 @@ const PurchaseScheduleInput = () => {
         />
         <TextField
           label="金額"
-          type="number"
           value={newPurchaseSchedule.price}
           onChange={(e) =>
             handleNewPurchaseScheduleInput("price", e.target.value)
           }
+          inputProps={numericProps}
         />
         <Select
           value={newPurchaseSchedule.cycle}
@@ -203,7 +201,7 @@ const PurchaseScheduleInput = () => {
                 <InputAdornment position="start">日</InputAdornment>
               ),
             }}
-            inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
+            inputProps={numericProps}
             sx={{ maxWidth: 150 }}
             onChange={(e) =>
               handleNewPurchaseScheduleInput("date", e.target.value)
