@@ -1,4 +1,5 @@
 import {
+  Autocomplete,
   Box,
   IconButton,
   Paper,
@@ -13,14 +14,13 @@ import {
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import DoneIcon from "@mui/icons-material/Done";
-import { orderBy, Timestamp } from "firebase/firestore";
+import { Timestamp } from "firebase/firestore";
 import { memo, useCallback, useMemo, useState } from "react";
 import { deleteDocPurchase, updateDocPurchase } from "../../firebase";
 import {
   PurchaseListType,
   PurchaseScheduleListType,
   PurchaseScheduleType,
-  PurchaseType,
 } from "../../types";
 import {
   calculateSpentAndIncomeResult,
@@ -33,6 +33,7 @@ import { useAsset } from "../Context/AssetContext";
 import { lastDayOfMonth } from "date-fns";
 import { DatePicker } from "@mui/x-date-pickers";
 import { useFirestoreQuery } from "../../utilities/firebaseUtilities";
+import { usePurchase } from "../Context/PurchaseContext";
 
 const defaultNewPurchase: PurchaseListType = {
   id: "",
@@ -57,6 +58,8 @@ type PlainPurchaseProps = {
   purchaseList: PurchaseListType[];
   editRowId: string;
   editFormData: PurchaseListType;
+  categorySet: string[];
+  methodSet: string[];
   handleEditFormChange: (event: {
     target: {
       name: string;
@@ -66,6 +69,7 @@ type PlainPurchaseProps = {
   handleDateFormChange: (value: Date | null | undefined) => void;
   handleSaveClick: () => void;
   handleEditClick: (purchase: PurchaseListType) => void;
+  handleAutocompleteChange: (name: string, value: string | null) => void;
 };
 
 const PlainPurchases = memo(
@@ -200,19 +204,39 @@ const PlainPurchases = memo(
                         />
                       </TableCell>
                       <TableCell>
-                        <TextField
-                          name="category"
+                        <Autocomplete
                           value={props.editFormData.category}
-                          onChange={props.handleEditFormChange}
-                          size="small"
+                          sx={{ minWidth: 150 }}
+                          options={props.categorySet}
+                          freeSolo
+                          onChange={(e, v) =>
+                            props.handleAutocompleteChange("category", v)
+                          }
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              label="カテゴリー"
+                              size="small"
+                            />
+                          )}
                         />
                       </TableCell>
                       <TableCell>
-                        <TextField
-                          name="method"
+                        <Autocomplete
                           value={props.editFormData.method}
-                          onChange={props.handleEditFormChange}
-                          size="small"
+                          sx={{ minWidth: 150 }}
+                          options={props.methodSet}
+                          freeSolo
+                          onChange={(e, v) =>
+                            props.handleAutocompleteChange("method", v)
+                          }
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              label="支払い方法"
+                              size="small"
+                            />
+                          )}
                         />
                       </TableCell>
                       <TableCell>
@@ -296,11 +320,7 @@ const Purchases = (): JSX.Element => {
   const [editFormData, setEditFormData] =
     useState<PurchaseListType>(defaultNewPurchase);
 
-  const purchaseQueryConstraints = useMemo(() => [orderBy("date")], []);
-  const { documents: purchaseList } = useFirestoreQuery<
-    PurchaseType,
-    PurchaseListType
-  >("Purchases", purchaseQueryConstraints);
+  const { purchaseList, categorySet, methodSet } = usePurchase();
 
   const purchaseScheduleQueryConstraints = useMemo(() => [], []);
 
@@ -368,21 +388,26 @@ const Purchases = (): JSX.Element => {
   const handleEditFormChange = useCallback(
     (event: { target: { name: string; value: any } }) => {
       const { name, value } = event.target;
-      setEditFormData({ ...editFormData, [name]: value });
+      setEditFormData((prev) => ({ ...prev, [name]: value }));
     },
-    [editFormData]
+    []
   );
   // 日付はTimestampに変換する必要があるので変換する
-  const handleDateFormChange = useCallback(
-    (value: Date | null | undefined) => {
-      if (value) {
-        setEditFormData({
-          ...editFormData,
-          date: Timestamp.fromDate(value),
-        });
-      }
+  const handleDateFormChange = useCallback((value: Date | null | undefined) => {
+    if (value) {
+      setEditFormData((prev) => ({
+        ...prev,
+        date: Timestamp.fromDate(value),
+      }));
+    }
+  }, []);
+
+  const handleAutocompleteChange = useCallback(
+    (name: string, value: string | null) => {
+      console.log(name, value);
+      setEditFormData((prev) => ({ ...prev, [name]: value ?? "" }));
     },
-    [editFormData]
+    []
   );
 
   const plainProps = {
@@ -396,8 +421,11 @@ const Purchases = (): JSX.Element => {
     purchaseList,
     editRowId,
     editFormData,
+    categorySet,
+    methodSet,
     handleEditFormChange,
     handleDateFormChange,
+    handleAutocompleteChange,
     handleSaveClick,
     handleEditClick,
   };

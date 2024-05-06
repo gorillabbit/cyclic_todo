@@ -1,4 +1,4 @@
-import { Box, Button, FormGroup, TextField } from "@mui/material";
+import { Autocomplete, Box, Button, FormGroup, TextField } from "@mui/material";
 import StyledCheckbox from "../StyledCheckbox";
 import { DatePicker } from "@mui/x-date-pickers";
 import { memo, useCallback, useMemo, useState } from "react";
@@ -7,6 +7,7 @@ import { getAuth } from "firebase/auth";
 import { InputPurchaseType } from "../../types";
 import { numericProps } from "../../utilities/purchaseUtilities";
 import TemplateButtons from "./TemplateButtons";
+import { usePurchase } from "../Context/PurchaseContext";
 
 const auth = getAuth();
 
@@ -16,6 +17,8 @@ type plainPurchaseInputProps = {
   addPurchase: () => void;
   addTemplate: () => void;
   setNewPurchase: React.Dispatch<React.SetStateAction<InputPurchaseType>>;
+  categorySet: string[];
+  methodSet: string[];
 };
 
 const PlainPurchaseInput = memo(
@@ -45,19 +48,27 @@ const PlainPurchaseInput = memo(
             sx={{ maxWidth: 150 }}
             onChange={(value) => props.handleNewPurchaseInput("date", value)}
           />
-          <TextField
-            label="カテゴリー"
+          <Autocomplete
             value={props.newPurchase.category}
-            onChange={(e) =>
-              props.handleNewPurchaseInput("category", e.target.value)
-            }
+            onChange={(e, v) => props.handleNewPurchaseInput("category", v)}
+            sx={{ minWidth: 150 }}
+            options={props.categorySet}
+            freeSolo
+            renderInput={(params) => (
+              <TextField {...params} label="カテゴリー" />
+            )}
           />
-          <TextField
-            label="支払い方法"
+          <Autocomplete
             value={props.newPurchase.method}
-            onChange={(e) =>
-              props.handleNewPurchaseInput("method", e.target.value)
-            }
+            sx={{ minWidth: 150 }}
+            options={props.methodSet}
+            freeSolo
+            onChange={(e, v) => {
+              props.handleNewPurchaseInput("method", v);
+            }}
+            renderInput={(params) => (
+              <TextField {...params} label="支払い方法" />
+            )}
           />
           <StyledCheckbox
             value={props.newPurchase.income}
@@ -145,12 +156,16 @@ const PurchaseInput = () => {
     }
   }, [newPurchase]);
 
+  const { categorySet, methodSet } = usePurchase();
+
   const plainProps = {
     handleNewPurchaseInput,
     newPurchase,
     addPurchase,
     addTemplate,
     setNewPurchase,
+    categorySet,
+    methodSet,
   };
   return <PlainPurchaseInput {...plainProps} />;
 };
