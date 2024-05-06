@@ -4,10 +4,9 @@ import { DatePicker } from "@mui/x-date-pickers";
 import { memo, useCallback, useMemo, useState } from "react";
 import { addDocPurchase, addDocPurchaseTemplate } from "../../firebase";
 import { getAuth } from "firebase/auth";
-import { InputPurchaseType, PurchaseListType, PurchaseType } from "../../types";
+import { InputPurchaseType } from "../../types";
 import { numericProps } from "../../utilities/purchaseUtilities";
-import { useFirestoreQuery } from "../../utilities/firebaseUtilities";
-import { orderBy } from "firebase/firestore";
+import TemplateButtons from "./TemplateButtons";
 
 const auth = getAuth();
 
@@ -16,25 +15,13 @@ type plainPurchaseInputProps = {
   newPurchase: InputPurchaseType;
   addPurchase: () => void;
   addTemplate: () => void;
-  templates: PurchaseListType[];
-  onClickTemplateButton: (templatePurchase: PurchaseListType) => void;
+  setNewPurchase: React.Dispatch<React.SetStateAction<InputPurchaseType>>;
 };
 
 const PlainPurchaseInput = memo(
   (props: plainPurchaseInputProps): JSX.Element => (
     <>
-      <Box m={0.5}>
-        {props.templates.map((template) => (
-          <Button
-            sx={{ m: 0.5 }}
-            key={template.title}
-            variant="outlined"
-            onClick={() => props.onClickTemplateButton(template)}
-          >
-            {template.title}
-          </Button>
-        ))}
-      </Box>
+      <TemplateButtons setNewPurchase={props.setNewPurchase} />
       <Box display="flex" m={2}>
         <FormGroup row={true} sx={{ gap: 1, m: 1, width: "100%" }}>
           <TextField
@@ -158,32 +145,12 @@ const PurchaseInput = () => {
     }
   }, [newPurchase]);
 
-  const purchaseTemplatesQueryConstraints = useMemo(
-    () => [orderBy("timestamp", "desc")],
-    []
-  );
-  const { documents: templates } = useFirestoreQuery<
-    PurchaseType,
-    PurchaseListType
-  >("PurchaseTemplates", purchaseTemplatesQueryConstraints);
-
-  const onClickTemplateButton = useCallback(
-    (templatePurchase: PurchaseListType) => {
-      setNewPurchase({
-        ...templatePurchase,
-        date: new Date(),
-      });
-    },
-    []
-  );
-
   const plainProps = {
     handleNewPurchaseInput,
     newPurchase,
     addPurchase,
     addTemplate,
-    templates,
-    onClickTemplateButton,
+    setNewPurchase,
   };
   return <PlainPurchaseInput {...plainProps} />;
 };
