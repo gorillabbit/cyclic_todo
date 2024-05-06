@@ -1,8 +1,21 @@
-import React, { useMemo } from "react";
+import React, { memo, useMemo } from "react";
 import { Doughnut } from "react-chartjs-2";
-import { Chart, ArcElement, Tooltip, Legend, Title } from "chart.js";
+import {
+  Chart,
+  ArcElement,
+  Tooltip,
+  Legend,
+  Title,
+  ChartData,
+  CoreChartOptions,
+  DatasetChartOptions,
+  ElementChartOptions,
+  PluginChartOptions,
+  DoughnutControllerChartOptions,
+} from "chart.js";
 import { Box } from "@mui/material";
 import { PurchaseListType } from "../../types";
+import { _DeepPartialObject } from "chart.js/dist/types/utils";
 
 Chart.register(ArcElement, Tooltip, Legend, Title);
 
@@ -27,13 +40,31 @@ interface DoughnutChartProps {
   title: string;
 }
 
-const DoughnutChart: React.FC<DoughnutChartProps> = ({
-  purchaseList,
-  title,
-}) => {
+type plainDoughnutChartProps = {
+  data: ChartData<"doughnut", number[], unknown>;
+  options:
+    | _DeepPartialObject<
+        CoreChartOptions<"doughnut"> &
+          ElementChartOptions<"doughnut"> &
+          PluginChartOptions<"doughnut"> &
+          DatasetChartOptions<"doughnut"> &
+          DoughnutControllerChartOptions
+      >
+    | undefined;
+};
+
+const PlainDoughnutChart = memo(
+  (props: plainDoughnutChartProps): JSX.Element => (
+    <Box width="100%" maxWidth="500px" my={2}>
+      <Doughnut data={props.data} options={props.options} />
+    </Box>
+  )
+);
+
+const DoughnutChart = memo((props: DoughnutChartProps): JSX.Element => {
   const data = useMemo(() => {
     const categoryTotals: Record<string, { price: number; color: string }> = {};
-    purchaseList.forEach(({ category, price }, index) => {
+    props.purchaseList.forEach(({ category, price }, index) => {
       const priceNumber = Number(price);
       if (priceNumber > 0) {
         if (!categoryTotals[category]) {
@@ -47,7 +78,7 @@ const DoughnutChart: React.FC<DoughnutChartProps> = ({
     });
 
     const categories = Object.keys(categoryTotals);
-    const subData = purchaseList
+    const subData = props.purchaseList
       .sort((a, b) => {
         const indexA = categories.indexOf(a.category);
         const indexB = categories.indexOf(b.category);
@@ -77,7 +108,7 @@ const DoughnutChart: React.FC<DoughnutChartProps> = ({
         },
       ],
     };
-  }, [purchaseList]);
+  }, [props.purchaseList]);
 
   const options = {
     plugins: {
@@ -91,16 +122,17 @@ const DoughnutChart: React.FC<DoughnutChartProps> = ({
       },
       title: {
         display: true,
-        text: title,
+        text: props.title,
       },
     },
   };
 
-  return (
-    <Box width="100%" maxWidth="500px" my={2}>
-      <Doughnut data={data} options={options} />
-    </Box>
-  );
-};
+  const plainProps = {
+    data,
+    options,
+  };
+
+  return <PlainDoughnutChart {...plainProps} />;
+});
 
 export default DoughnutChart;

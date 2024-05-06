@@ -1,12 +1,8 @@
-import { createContext, useContext, useMemo } from "react";
+import { ReactNode, createContext, memo, useContext, useMemo } from "react";
 import { orderBy, where } from "firebase/firestore";
 import { InputLogType, LogType, LogsCompleteLogsType } from "../../types.js";
 import { useAccount } from "./AccountContext";
 import { useFirestoreQuery } from "../../utilities/firebaseUtilities";
-
-interface LogContextProp {
-  children: any;
-}
 
 type LogContextType = {
   logList: LogType[];
@@ -21,48 +17,50 @@ export const LogContext = createContext<LogContextType>({
   sharedLogList: [],
 });
 
-export const LogProvider: React.FC<LogContextProp> = ({ children }) => {
-  const { Account } = useAccount();
+export const LogProvider = memo(
+  ({ children }: { children: ReactNode }): JSX.Element => {
+    const { Account } = useAccount();
 
-  const logQueryConstraints = useMemo(() => [], []);
-  const { documents: logList } = useFirestoreQuery<LogType>(
-    "logs",
-    logQueryConstraints
-  );
-
-  const logsCompleteLogsQueryConstraints = useMemo(
-    () => [orderBy("timestamp", "desc")],
-    []
-  );
-  const { documents: logsCompleteLogsList } =
-    useFirestoreQuery<LogsCompleteLogsType>(
-      "logsCompleteLogs",
-      logsCompleteLogsQueryConstraints,
-      true
+    const logQueryConstraints = useMemo(() => [], []);
+    const { documents: logList } = useFirestoreQuery<LogType>(
+      "logs",
+      logQueryConstraints
     );
 
-  const sharedLogsQueryConstraints = useMemo(
-    () => [
-      where("accessibleAccountsEmails", "array-contains", Account?.email ?? ""),
-    ],
-    [Account?.email]
-  );
-  const { documents: sharedLogList } = useFirestoreQuery<InputLogType, LogType>(
-    "logs",
-    sharedLogsQueryConstraints
-  );
+    const logsCompleteLogsQueryConstraints = useMemo(
+      () => [orderBy("timestamp", "desc")],
+      []
+    );
+    const { documents: logsCompleteLogsList } =
+      useFirestoreQuery<LogsCompleteLogsType>(
+        "logsCompleteLogs",
+        logsCompleteLogsQueryConstraints,
+        true
+      );
 
-  return (
-    <LogContext.Provider
-      value={{
-        logList,
-        logsCompleteLogsList,
-        sharedLogList,
-      }}
-    >
-      {children}
-    </LogContext.Provider>
-  );
-};
+    const sharedLogsQueryConstraints = useMemo(
+      () => [
+        where(
+          "accessibleAccountsEmails",
+          "array-contains",
+          Account?.email ?? ""
+        ),
+      ],
+      [Account?.email]
+    );
+    const { documents: sharedLogList } = useFirestoreQuery<
+      InputLogType,
+      LogType
+    >("logs", sharedLogsQueryConstraints);
+
+    const context = useMemo(() => {
+      return { logList, logsCompleteLogsList, sharedLogList };
+    }, [logList, logsCompleteLogsList, sharedLogList]);
+
+    return (
+      <LogContext.Provider value={context}>{children}</LogContext.Provider>
+    );
+  }
+);
 
 export const useLog = () => useContext(LogContext);

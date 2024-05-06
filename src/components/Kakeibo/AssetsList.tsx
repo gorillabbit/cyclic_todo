@@ -15,69 +15,21 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { addDocAsset, deleteDocAsset, updateDocAsset } from "../../firebase";
 import { getAuth } from "firebase/auth";
 import { useAsset } from "../Context/AssetContext";
+import { memo, useCallback } from "react";
+import { AssetInputType } from "../../types";
 
-const auth = getAuth();
+type PlainAssetsListProps = {
+  assetList: AssetInputType[];
+  sumAssets: number;
+  removeAsset: (id: string) => void;
+  saveChanges: (id: string) => void;
+  addAsset: () => void;
+  handleBalanceChange: (id: string, newBalance: number) => void;
+  handleNameChange: (id: string, newName: string) => void;
+};
 
-const AssetTable = () => {
-  const { assetList, setAssetList, sumAssets } = useAsset();
-
-  const handleNameChange = (id: string, newName: string): void => {
-    setAssetList(
-      assetList.map((asset) =>
-        asset.id === id ? { ...asset, tempName: newName } : asset
-      )
-    );
-  };
-
-  const handleBalanceChange = (id: string, newBalance: number): void => {
-    setAssetList(
-      assetList.map((asset) =>
-        asset.id === id ? { ...asset, tempBalance: newBalance } : asset
-      )
-    );
-  };
-
-  const saveChanges = (id: string): void => {
-    const asset = assetList.find((asset) => asset.id === id);
-    if (asset) {
-      const updatedData = {
-        name: asset.tempName || asset.name,
-        balance: asset.tempBalance || asset.balance,
-      };
-      updateDocAsset(id, updatedData);
-      // ローカルステートの tempName と tempBalance をクリア
-      setAssetList(
-        assetList.map((asset) =>
-          asset.id === id
-            ? {
-                ...asset,
-                ...updatedData,
-                tempName: undefined,
-                tempBalance: undefined,
-              }
-            : asset
-        )
-      );
-    }
-  };
-
-  const addAsset = (): void => {
-    if (auth.currentUser) {
-      const userId = auth.currentUser.uid;
-      const newAsset = {
-        userId: userId,
-        name: "",
-        balance: 0,
-      };
-      addDocAsset(newAsset);
-    }
-  };
-
-  const removeAsset = (id: string): void => {
-    deleteDocAsset(id);
-  };
-
-  return (
+const PlainAssetsList = memo(
+  (props: PlainAssetsListProps): JSX.Element => (
     <TableContainer component={Paper} sx={{ marginY: 2 }}>
       <Table>
         <TableHead>
@@ -89,13 +41,15 @@ const AssetTable = () => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {assetList.map((asset) => (
+          {props.assetList.map((asset) => (
             <TableRow key={asset.id}>
               <TableCell>
                 <TextField
                   variant="outlined"
                   value={asset.tempName ?? asset.name}
-                  onChange={(e) => handleNameChange(asset.id, e.target.value)}
+                  onChange={(e) =>
+                    props.handleNameChange(asset.id, e.target.value)
+                  }
                   size="small"
                 />
               </TableCell>
@@ -105,7 +59,7 @@ const AssetTable = () => {
                   variant="outlined"
                   value={asset.tempBalance ?? asset.balance}
                   onChange={(e) =>
-                    handleBalanceChange(
+                    props.handleBalanceChange(
                       asset.id,
                       parseFloat(e.target.value) || 0
                     )
@@ -118,13 +72,16 @@ const AssetTable = () => {
                   variant="contained"
                   color="primary"
                   disabled={!(asset.tempBalance || asset.tempName)}
-                  onClick={() => saveChanges(asset.id)}
+                  onClick={() => props.saveChanges(asset.id)}
                 >
                   変更
                 </Button>
               </TableCell>
               <TableCell>
-                <IconButton onClick={() => removeAsset(asset.id)} color="error">
+                <IconButton
+                  onClick={() => props.removeAsset(asset.id)}
+                  color="error"
+                >
                   <DeleteIcon />
                 </IconButton>
               </TableCell>
@@ -132,17 +89,104 @@ const AssetTable = () => {
           ))}
           <TableRow>
             <TableCell>合計</TableCell>
-            <TableCell>{sumAssets}円</TableCell>
+            <TableCell>{props.sumAssets}円</TableCell>
             <TableCell></TableCell>
             <TableCell></TableCell>
           </TableRow>
         </TableBody>
       </Table>
-      <IconButton onClick={addAsset} color="primary" aria-label="add asset">
+      <IconButton
+        onClick={props.addAsset}
+        color="primary"
+        aria-label="add asset"
+      >
         <AddCircleOutlineIcon />
       </IconButton>
     </TableContainer>
+  )
+);
+
+const auth = getAuth();
+
+const AssetTable = () => {
+  const { assetList, setAssetList, sumAssets } = useAsset();
+
+  const handleNameChange = useCallback(
+    (id: string, newName: string): void => {
+      setAssetList(
+        assetList.map((asset) =>
+          asset.id === id ? { ...asset, tempName: newName } : asset
+        )
+      );
+    },
+    [assetList, setAssetList]
   );
+
+  const handleBalanceChange = useCallback(
+    (id: string, newBalance: number): void => {
+      setAssetList(
+        assetList.map((asset) =>
+          asset.id === id ? { ...asset, tempBalance: newBalance } : asset
+        )
+      );
+    },
+    [assetList, setAssetList]
+  );
+
+  const saveChanges = useCallback(
+    (id: string): void => {
+      const asset = assetList.find((asset) => asset.id === id);
+      if (asset) {
+        const updatedData = {
+          name: asset.tempName || asset.name,
+          balance: asset.tempBalance || asset.balance,
+        };
+        updateDocAsset(id, updatedData);
+        // ローカルステートの tempName と tempBalance をクリア
+        setAssetList(
+          assetList.map((asset) =>
+            asset.id === id
+              ? {
+                  ...asset,
+                  ...updatedData,
+                  tempName: undefined,
+                  tempBalance: undefined,
+                }
+              : asset
+          )
+        );
+      }
+    },
+    [assetList, setAssetList]
+  );
+
+  const addAsset = useCallback((): void => {
+    if (auth.currentUser) {
+      const userId = auth.currentUser.uid;
+      const newAsset = {
+        userId: userId,
+        name: "",
+        balance: 0,
+      };
+      addDocAsset(newAsset);
+    }
+  }, []);
+
+  const removeAsset = useCallback((id: string): void => {
+    deleteDocAsset(id);
+  }, []);
+
+  const plainProps = {
+    assetList,
+    sumAssets,
+    removeAsset,
+    saveChanges,
+    addAsset,
+    handleBalanceChange,
+    handleNameChange,
+  };
+
+  return <PlainAssetsList {...plainProps} />;
 };
 
 export default AssetTable;
