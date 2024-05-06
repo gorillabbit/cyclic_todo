@@ -16,6 +16,7 @@ import { AccountProvider } from "./components/Context/AccountContext";
 import Purchases from "./components/Kakeibo/Purchases";
 import { AssetProvider } from "./components/Context/AssetContext";
 import PurchaseInputs from "./components/Kakeibo/PurchaseInputs";
+import { PurchaseProvider } from "./components/Context/PurchaseContext";
 
 function App() {
   const theme = createTheme({
@@ -50,28 +51,30 @@ function App() {
           {user && (
             <>
               <AccountProvider>
-                <Tabs value={tabValue} onChange={(e, v) => setTabValue(v)}>
-                  <Tab label="タスク/ログ" />
-                  <Tab label="家計簿" />
-                </Tabs>
-                {tabValue === 0 && <InputForms />}
-                {tabValue === 1 && <PurchaseInputs />}
-                <TaskProvider>
-                  <LogProvider>
-                    <Box m={2}>
-                      {tabValue === 0 && (
-                        <>
-                          <LogList />
-                          <TaskList />
-                        </>
-                      )}
-                      <AssetProvider>
-                        {tabValue === 1 && <Purchases />}
-                      </AssetProvider>
-                      <Calendar isGapiMounted={isGapiMounted} />
-                    </Box>
-                  </LogProvider>
-                </TaskProvider>
+                <PurchaseProvider>
+                  <Tabs value={tabValue} onChange={(e, v) => setTabValue(v)}>
+                    <Tab label="タスク/ログ" />
+                    <Tab label="家計簿" />
+                  </Tabs>
+                  {tabValue === 0 && <InputForms />}
+                  {tabValue === 1 && <PurchaseInputs />}
+                  <TaskProvider>
+                    <LogProvider>
+                      <Box m={2}>
+                        {tabValue === 0 && (
+                          <>
+                            <LogList />
+                            <TaskList />
+                          </>
+                        )}
+                        <AssetProvider>
+                          {tabValue === 1 && <Purchases />}
+                        </AssetProvider>
+                        <Calendar isGapiMounted={isGapiMounted} />
+                      </Box>
+                    </LogProvider>
+                  </TaskProvider>
+                </PurchaseProvider>
               </AccountProvider>
             </>
           )}
