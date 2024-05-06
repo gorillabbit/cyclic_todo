@@ -1,3 +1,4 @@
+import { InputBaseComponentProps } from "@mui/material";
 import { PurchaseListType } from "../types";
 
 export const calculateSpentAndIncomeResult = (
@@ -20,3 +21,8 @@ export const filterCurrentMonthPurchases = (
   purchasesList.filter(
     (purchase) => purchase.date.toDate().getMonth() === new Date().getMonth()
   );
+
+export const numericProps: InputBaseComponentProps = {
+  inputMode: "numeric",
+  pattern: "[0-9]*",
+};

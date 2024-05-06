@@ -5,6 +5,7 @@ import { memo, useCallback, useMemo, useState } from "react";
 import { addDocPurchase, addDocPurchaseTemplate } from "../../firebase";
 import { getAuth } from "firebase/auth";
 import { InputPurchaseType } from "../../types";
+import { numericProps } from "../../utilities/purchaseUtilities";
 
 const auth = getAuth();
 
@@ -28,8 +29,8 @@ const PlainPurchaseInput = memo(
         />
         <TextField
           label="金額"
-          type="number"
           value={props.newPurchase.price}
+          inputProps={numericProps}
           onChange={(e) =>
             props.handleNewPurchaseInput("price", e.target.value)
           }
