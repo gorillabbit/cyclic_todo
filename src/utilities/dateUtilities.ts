@@ -10,17 +10,18 @@ import {
   differenceInSeconds,
 } from "date-fns";
 import ja from "date-fns/locale/ja";
+import { TaskType } from "../types";
 
-export const checkTaskDue = (dueString) => {
+export const checkTaskDue = (dueString: string) => {
   const today = new Date();
   const due = parse(dueString, "yyyy年MM月dd日 HH時mm分", new Date(), {
     locale: ja,
   });
-  const diffTime = due - today;
+  const diffTime = due.getTime() - today.getTime();
   return diffTime / (1000 * 60 * 60 * 24);
 };
 
-export const getSpanDate = (date) => {
+export const getSpanDate = (date: string | number | Date) => {
   const today = new Date();
   const due = new Date(date);
   const diffYears = differenceInYears(today, due);
@@ -41,23 +42,23 @@ export const getSpanDate = (date) => {
   };
 };
 
-export const checkLastLogCompleted = (lastCompleted) => {
+export const checkLastLogCompleted = (lastCompleted: string) => {
   const span = getSpanDate(lastCompleted);
   const result = `${span.diffDays}日${span.diffHours}時間${span.diffMinutes}分`;
   return result.replace(/\b0[^\d\s]+\s*/g, "");
 };
 
-export const formatDateJa = (date) => {
+export const formatDateJa = (date: number | Date) => {
   return format(date, "yyyy年MM月dd日");
 };
 
-export const formatTimeJa = (time) => {
+export const formatTimeJa = (time: number | Date) => {
   return format(time, "HH時mm分");
 };
 
-export const calculateNext期日 = (task, 更新元date) => {
+export const calculateNext期日 = (task: TaskType, 更新元date: Date) => {
   const 周期日数 = parseInt(task.周期日数);
-  switch (task.周期3) {
+  switch (task.周期単位) {
     case "日":
       更新元date.setDate(更新元date.getDate() + 周期日数);
       break;

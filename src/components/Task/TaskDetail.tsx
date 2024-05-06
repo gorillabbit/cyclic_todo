@@ -1,8 +1,8 @@
-import React from "react";
 import { format } from "date-fns";
 import { Box, Typography } from "@mui/material";
+import { TaskType } from "../../types";
 
-function TaskDetails({ task }) {
+function TaskDetails({ task }: { task: TaskType }) {
   // 完了タイムスタンプのフォーマット
   const completionTimestamp =
     task.completed && task.toggleCompletionTimestamp

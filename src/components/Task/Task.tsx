@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { addDocTask, deleteDocTask, updateDocTask } from "../../firebase.js";
-import { calculateNext期日 } from "../../utilities/dateUtilities.js";
-import { getBackgroundColor } from "../../utilities/taskUtilities.js";
+import { calculateNext期日 } from "../../utilities/dateUtilities";
+import { getBackgroundColor } from "../../utilities/taskUtilities";
 
 import { serverTimestamp } from "firebase/firestore";
-import TaskDetail from "./TaskDetail.js";
-import { TaskType } from "../../types.js";
+import TaskDetail from "./TaskDetail";
+import { TaskType } from "../../types";
 import {
   Box,
   Button,

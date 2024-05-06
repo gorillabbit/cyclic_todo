@@ -166,7 +166,6 @@ const PurchaseInput = () => {
     PurchaseType,
     PurchaseListType
   >("PurchaseTemplates", purchaseTemplatesQueryConstraints);
-  console.log(templates);
 
   const onClickTemplateButton = useCallback(
     (templatePurchase: PurchaseListType) => {

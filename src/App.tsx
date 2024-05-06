@@ -3,7 +3,7 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import "./App.css";
-import Header from "./components/Header.js";
+import Header from "./components/Header";
 import TaskList from "./components/Task/TaskList";
 import LogList from "./components/Log/LogList";
 import InputForms from "./components/InputForms/InputForms";

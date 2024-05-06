@@ -1,6 +1,6 @@
-import { checkTaskDue } from "./dateUtilities.js";
+import { checkTaskDue } from "./dateUtilities";
 
-export const getBackgroundColor = (dueDate) => {
+export const getBackgroundColor = (dueDate: string) => {
   const diffDays = checkTaskDue(dueDate);
   if (isNaN(diffDays)) {
     return "#F2F2F2";
