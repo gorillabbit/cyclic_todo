@@ -90,6 +90,10 @@ export const batchAddDocPurchase = (purchaseList) => {
 }
 export const deleteDocPurchase = (id) => deleteDocOperation('Purchases', id)
 
+export const addDocPurchaseTemplate = (purchaseTemplates) => addDocOperation("PurchaseTemplates", purchaseTemplates)
+export const updateDocPurchaseTemplate = (id, updates) => updateDocOperation('PurchaseTemplates', id, updates);
+export const deleteDocPurchaseTemplate = (id) => deleteDocOperation('PurchaseTemplates', id);
+
 export const addDocAsset = (asset) => addDocOperation("Assets", asset)
 export const updateDocAsset = (id, updates) => updateDocOperation('Assets', id, updates);
 export const deleteDocAsset = (id) => deleteDocOperation('Assets', id);
