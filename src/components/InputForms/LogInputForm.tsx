@@ -13,7 +13,6 @@ import { useState } from "react";
 import { addDocLog, updateDocLog } from "../../firebase.js";
 import { InputLogType, LogType } from "../../types.js";
 import StyledCheckbox from "../StyledCheckbox";
-import FontAwesomeIconPicker from "./FontAwesomeIconPicker";
 import { getAuth } from "firebase/auth";
 import { useAccount } from "../Context/AccountContext";
 
@@ -122,10 +121,6 @@ const LogInputForm: React.FC<LogInputFormProp> = ({
               multiline
               onChange={(e) => handleNewLogInput("description", e.target.value)}
               placeholder="説明を入力"
-            />
-            <FontAwesomeIconPicker
-              value={newLog.icon ?? ""}
-              onChange={handleNewLogInput}
             />
             <StyledCheckbox
               value={newLog.duration}

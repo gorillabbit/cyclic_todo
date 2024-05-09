@@ -11,7 +11,6 @@ import { useState } from "react";
 import { addDocTask, updateDocTask } from "../../firebase.js";
 import { format } from "date-fns";
 import { TaskType } from "../../types.js";
-import FontAwesomeIconPicker from "./FontAwesomeIconPicker";
 import { getAuth } from "firebase/auth";
 import StyledCheckbox from "../StyledCheckbox";
 
@@ -116,10 +115,6 @@ const TaskInputForm: React.FC<TaskInputFormProp> = ({
               onChange={(e) =>
                 handleNewTaskInput("description", e.target.value)
               }
-            />
-            <FontAwesomeIconPicker
-              value={newTask.icon ?? ""}
-              onChange={handleNewTaskInput}
             />
             <StyledCheckbox
               value={newTask.hasDue}
