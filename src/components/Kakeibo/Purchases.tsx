@@ -1,5 +1,6 @@
 import {
   Box,
+  Button,
   Paper,
   Table,
   TableBody,
@@ -8,17 +9,22 @@ import {
   TableHead,
   TableRow,
 } from "@mui/material";
-import { memo } from "react";
+import { memo, useCallback, useMemo, useState } from "react";
 import { PurchaseListType } from "../../types";
 import { usePurchase } from "../Context/PurchaseContext";
 import PurchaseHeader from "./PurchaseHeader";
 import PurchaseSchedules from "./PurchaseSchedules";
 import PurchasesRow from "./PurchasesRow";
 import AssetsList from "./AssetsList";
+import { addMonths } from "date-fns";
 
 type PlainPurchaseProps = {
   sortedPurchasesWithGroupFlag: PurchaseListType[];
   getGroupPurchases: (groupedPurchase: PurchaseListType) => PurchaseListType[];
+  month: Date;
+  handleNextMonthButton: () => void;
+  handlePastMonthButton: () => void;
+  monthlyPurchases: PurchaseListType[];
 };
 
 const PlainPurchases = memo(
@@ -29,7 +35,19 @@ const PlainPurchases = memo(
       <PurchaseSchedules />
 
       <Paper sx={{ marginY: 2 }}>
-        <Box fontSize={20}>収支リスト</Box>
+        <Box display="flex" justifyContent="center">
+          <Button onClick={props.handlePastMonthButton}>前の月</Button>
+          <Box fontSize={20}>
+            {"収支リスト " +
+              props.month.getFullYear() +
+              "年" +
+              //getMonthは1月=0
+              (props.month.getMonth() + 1) +
+              "月"}
+          </Box>
+          <Button onClick={props.handleNextMonthButton}>次の月</Button>
+        </Box>
+
         <TableContainer>
           <Table size="small">
             <TableHead>
@@ -47,7 +65,7 @@ const PlainPurchases = memo(
               </TableRow>
             </TableHead>
             <TableBody>
-              {props.sortedPurchasesWithGroupFlag.map((purchase) => (
+              {props.monthlyPurchases.map((purchase) => (
                 <PurchasesRow
                   purchase={purchase}
                   key={purchase.id}
@@ -95,6 +113,21 @@ const Purchases = (): JSX.Element => {
     (a, b) => a.date.toMillis() - b.date.toMillis()
   );
 
+  const [month, setMonth] = useState<Date>(new Date());
+  const handleNextMonthButton = useCallback(() => {
+    setMonth((prev) => addMonths(prev, 1));
+  }, []);
+  const handlePastMonthButton = useCallback(() => {
+    setMonth((prev) => addMonths(prev, -1));
+  }, []);
+  const monthlyPurchases = useMemo(
+    () =>
+      sortedPurchasesWithGroupFlag.filter(
+        (purchase) => purchase.date.toDate().getMonth() === month.getMonth()
+      ),
+    [month, sortedPurchasesWithGroupFlag]
+  );
+
   const getGroupPurchases = (groupedPurchase: PurchaseListType) => {
     return purchaseList.filter(
       (purchase) =>
@@ -105,6 +138,10 @@ const Purchases = (): JSX.Element => {
   const plainProps = {
     sortedPurchasesWithGroupFlag,
     getGroupPurchases,
+    month,
+    handleNextMonthButton,
+    handlePastMonthButton,
+    monthlyPurchases,
   };
 
   return <PlainPurchases {...plainProps} />;
