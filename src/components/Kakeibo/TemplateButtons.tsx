@@ -1,13 +1,19 @@
 import { Box, Chip } from "@mui/material";
 import { memo, useCallback, useMemo } from "react";
-import { InputPurchaseType, PurchaseListType, PurchaseType } from "../../types";
+import {
+  InputPurchaseType,
+  PurchaseListType,
+  PurchaseType,
+  defaultMethod,
+} from "../../types";
 import { orderBy } from "firebase/firestore";
 import { useFirestoreQuery } from "../../utilities/firebaseUtilities";
-import { deleteDocPurchaseTemplate } from "../../firebase";
+import { PurchaseTemplates, deleteDocPurchaseTemplate } from "../../firebase";
 
 type plainPlainTemplateButtonsProps = {
   templates: PurchaseListType[];
   onClickTemplateButton: (templatePurchase: PurchaseListType) => void;
+  handleDeleteButtonClick: (templateId: string) => void;
 };
 
 const PlainTemplateButtons = memo(
@@ -16,9 +22,9 @@ const PlainTemplateButtons = memo(
       {props.templates.map((template) => (
         <Chip
           sx={{ m: 0.5 }}
-          key={template.title}
+          key={template.id}
           onClick={() => props.onClickTemplateButton(template)}
-          onDelete={() => deleteDocPurchaseTemplate(template.id)}
+          onDelete={() => props.handleDeleteButtonClick(template.id)}
           label={template.title}
         />
       ))}
@@ -38,21 +44,29 @@ const TemplateButtons = ({
   const { documents: templates } = useFirestoreQuery<
     PurchaseType,
     PurchaseListType
-  >("PurchaseTemplates", purchaseTemplatesQueryConstraints);
+  >(PurchaseTemplates, purchaseTemplatesQueryConstraints);
 
   const onClickTemplateButton = useCallback(
     (templatePurchase: PurchaseListType) => {
+      // idが残ると、idが同じDocが複数作成され、削除できなくなる
+      const { id, ...templatePurchaseWithoutId } = templatePurchase;
       setNewPurchase({
-        ...templatePurchase,
+        ...templatePurchaseWithoutId,
         date: new Date(),
+        method: defaultMethod,
       });
     },
     [setNewPurchase]
   );
 
+  const handleDeleteButtonClick = useCallback((templateId: string) => {
+    deleteDocPurchaseTemplate(templateId);
+  }, []);
+
   const plainProps = {
     templates,
     onClickTemplateButton,
+    handleDeleteButtonClick,
   };
   return <PlainTemplateButtons {...plainProps} />;
 };
