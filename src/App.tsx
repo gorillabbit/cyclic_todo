@@ -48,37 +48,35 @@ const App = (): JSX.Element => {
     <LocalizationProvider dateAdapter={AdapterDateFns}>
       <ThemeProvider theme={theme}>
         <Header setUser={setUser} setIsGapiMounted={setIsGapiMounted} />
+        <Tabs value={tabValue} onChange={(e, v) => setTabValue(v)}>
+          <Tab label="タスク/ログ" />
+          <Tab label="家計簿" />
+        </Tabs>
         {user && (
-          <>
-            <Tabs value={tabValue} onChange={(e, v) => setTabValue(v)}>
-              <Tab label="タスク/ログ" />
-              <Tab label="家計簿" />
-            </Tabs>
-            <AccountProvider>
-              <Box m={2}>
-                {tabValue === 0 && (
-                  <TaskProvider>
-                    <LogProvider>
-                      <InputForms />
-                      <LogList />
-                      <TaskList />
-                      <Calendar isGapiMounted={isGapiMounted} />
-                    </LogProvider>
-                  </TaskProvider>
-                )}
-                {tabValue === 1 && (
-                  <MethodProvider>
-                    <PurchaseProvider>
-                      <AssetProvider>
-                        <PurchaseInputs />
-                        <Purchases />
-                      </AssetProvider>
-                    </PurchaseProvider>
-                  </MethodProvider>
-                )}
-              </Box>
-            </AccountProvider>
-          </>
+          <AccountProvider>
+            <Box m={2} textAlign="center">
+              {tabValue === 0 && (
+                <TaskProvider>
+                  <LogProvider>
+                    <InputForms />
+                    <LogList />
+                    <TaskList />
+                    <Calendar isGapiMounted={isGapiMounted} />
+                  </LogProvider>
+                </TaskProvider>
+              )}
+              {tabValue === 1 && (
+                <MethodProvider>
+                  <PurchaseProvider>
+                    <AssetProvider>
+                      <PurchaseInputs />
+                      <Purchases />
+                    </AssetProvider>
+                  </PurchaseProvider>
+                </MethodProvider>
+              )}
+            </Box>
+          </AccountProvider>
         )}
       </ThemeProvider>
     </LocalizationProvider>

@@ -82,14 +82,21 @@ export interface InputPurchaseType {
   title: string;
   price: number;
   date: Date;
-  method: string;
+  method: MethodListType;
   category: string;
   income: boolean;
   description?: string;
   parentScheduleId?: string;
+  card?: boolean;
+  group?: string;
 }
 
-export interface PurchaseType extends Omit<InputPurchaseType, "date"> {
+export interface InputPurchaseTypeWithStringMethod
+  extends Omit<InputPurchaseType, "method"> {
+  method: string;
+}
+export interface PurchaseType
+  extends Omit<InputPurchaseTypeWithStringMethod, "date"> {
   date: Timestamp;
 }
 
@@ -97,19 +104,31 @@ export interface PurchaseListType extends PurchaseType {
   id: string;
 }
 
+export const defaultNewPurchase: PurchaseListType = {
+  id: "",
+  userId: "",
+  title: "",
+  date: new Timestamp(0, 0),
+  category: "",
+  method: "",
+  price: 0,
+  income: false,
+  description: "",
+};
+
 export interface AssetType {
   userId: string;
   name: string;
   balance: number;
 }
 
+export interface AssetListType extends AssetType {
+  id: string;
+}
+
 export interface AssetInputType extends AssetListType {
   tempName?: string;
   tempBalance?: number;
-}
-
-export interface AssetListType extends AssetType {
-  id: string;
 }
 
 export interface InputPurchaseScheduleType {
@@ -134,3 +153,23 @@ export interface PurchaseScheduleType
 export interface PurchaseScheduleListType extends PurchaseScheduleType {
   id: string;
 }
+
+export interface MethodType {
+  userId: string;
+  label: string;
+  assetId: string;
+  timing: string;
+  timingDate?: number;
+}
+
+export interface MethodListType extends MethodType {
+  id: string;
+}
+
+export const defaultMethod: MethodListType = {
+  userId: "",
+  label: "",
+  assetId: "",
+  timing: "",
+  id: "",
+};

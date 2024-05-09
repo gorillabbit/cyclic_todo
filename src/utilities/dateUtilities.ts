@@ -8,6 +8,8 @@ import {
   differenceInWeeks,
   differenceInYears,
   differenceInSeconds,
+  addMonths,
+  lastDayOfMonth,
 } from "date-fns";
 import ja from "date-fns/locale/ja";
 import { TaskType } from "../types";
@@ -75,4 +77,25 @@ export const calculateNext期日 = (task: TaskType, 更新元date: Date) => {
       break;
   }
   return formatDateJa(更新元date);
+};
+
+export const getCardDate = (dateNum: number) => {
+  // 現在の日付を取得
+  const today = new Date();
+
+  // 翌月の今日を取得
+  const nextMonth = addMonths(today, 1);
+
+  // 翌月の25日を設定
+  let nextMonthDate = new Date(
+    nextMonth.getFullYear(),
+    nextMonth.getMonth(),
+    dateNum
+  );
+
+  // 翌月に25日が存在しない場合、その月の最後の日を取得
+  if (nextMonthDate.getMonth() !== nextMonth.getMonth()) {
+    nextMonthDate = lastDayOfMonth(nextMonth);
+  }
+  return nextMonthDate;
 };

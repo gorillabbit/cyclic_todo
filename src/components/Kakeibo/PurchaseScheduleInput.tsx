@@ -13,7 +13,7 @@ import { addDocPurchaseSchedule, batchAddDocPurchase } from "../../firebase";
 import { getAuth } from "firebase/auth";
 import {
   InputPurchaseScheduleType,
-  InputPurchaseType,
+  InputPurchaseTypeWithStringMethod,
   WeekDay,
 } from "../../types";
 import { addDays, addMonths, addYears, nextDay } from "date-fns";
@@ -148,18 +148,19 @@ const PurchaseScheduleInput = () => {
           newPurchaseSchedule.endDate
         );
       }
-      const batchPurchaseList: InputPurchaseType[] = daysList.map((day) => {
-        return {
-          userId,
-          title: newPurchaseSchedule.title,
-          date: day,
-          category: newPurchaseSchedule.category,
-          method: newPurchaseSchedule.method,
-          price: newPurchaseSchedule.price,
-          income: newPurchaseSchedule.income,
-          description: newPurchaseSchedule.description,
-        };
-      });
+      const batchPurchaseList: InputPurchaseTypeWithStringMethod[] =
+        daysList.map((day) => {
+          return {
+            userId,
+            title: newPurchaseSchedule.title,
+            date: day,
+            category: newPurchaseSchedule.category,
+            method: newPurchaseSchedule.method,
+            price: newPurchaseSchedule.price,
+            income: newPurchaseSchedule.income,
+            description: newPurchaseSchedule.description,
+          };
+        });
       batchAddDocPurchase(batchPurchaseList);
     }
   };

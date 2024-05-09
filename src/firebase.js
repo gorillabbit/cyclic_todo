@@ -76,7 +76,9 @@ export const addDocAccountLink = (link) => addDocOperation('AccountLinks', link)
 export const updateDocAccountLink = (id, updates) => updateDocOperation('AccountLinks', id, updates);
 export const deleteDocAccountLink = (id) => deleteDocOperation('AccountLinks', id);
 
-export const addDocPurchase = (purchase) => addDocOperation('Purchases', purchase)
+export const addDocPurchase = (v) => {
+  console.log(v)
+  addDocOperation('Purchases', v)}
 export const updateDocPurchase =  (id, updates) => updateDocOperation('Purchases', id, updates);
 export const batchAddDocPurchase = (purchaseList) => {
   const batch = writeBatch(db);
@@ -90,12 +92,19 @@ export const batchAddDocPurchase = (purchaseList) => {
 }
 export const deleteDocPurchase = (id) => deleteDocOperation('Purchases', id)
 
-export const addDocPurchaseTemplate = (purchaseTemplates) => addDocOperation("PurchaseTemplates", purchaseTemplates)
-export const updateDocPurchaseTemplate = (id, updates) => updateDocOperation('PurchaseTemplates', id, updates);
-export const deleteDocPurchaseTemplate = (id) => deleteDocOperation('PurchaseTemplates', id);
+export const PurchaseTemplates = "PurchaseTemplates"
+export const addDocPurchaseTemplate = (v) => addDocOperation(PurchaseTemplates, v)
+export const updateDocPurchaseTemplate = (id, updates) => updateDocOperation(PurchaseTemplates, id, updates);
+export const deleteDocPurchaseTemplate = (id) => deleteDocOperation(PurchaseTemplates, id);
 
 export const addDocAsset = (asset) => addDocOperation("Assets", asset)
 export const updateDocAsset = (id, updates) => updateDocOperation('Assets', id, updates);
 export const deleteDocAsset = (id) => deleteDocOperation('Assets', id);
 
 export const addDocPurchaseSchedule = (PurchaseSchedule) => addDocOperation("PurchaseSchedules", PurchaseSchedule)
+
+export const addDocMethod = (v) => {
+  console.log(v)
+  addDocOperation("Methods", v)}
+export const updateDocMethod = (id, updates) => updateDocOperation('Methods', id, updates);
+export const deleteDocMethod = (id) => deleteDocOperation('Methods', id);

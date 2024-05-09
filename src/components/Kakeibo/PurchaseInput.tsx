@@ -4,10 +4,12 @@ import { DatePicker } from "@mui/x-date-pickers";
 import { memo, useCallback, useMemo, useState } from "react";
 import { addDocPurchase, addDocPurchaseTemplate } from "../../firebase";
 import { getAuth } from "firebase/auth";
-import { InputPurchaseType } from "../../types";
+import { InputPurchaseType, MethodListType } from "../../types";
 import { numericProps } from "../../utilities/purchaseUtilities";
 import TemplateButtons from "./TemplateButtons";
 import { usePurchase } from "../Context/PurchaseContext";
+import { useMethod } from "../Context/MethodContext";
+import { getCardDate } from "../../utilities/dateUtilities";
 
 const auth = getAuth();
 
@@ -18,7 +20,7 @@ type plainPurchaseInputProps = {
   addTemplate: () => void;
   setNewPurchase: React.Dispatch<React.SetStateAction<InputPurchaseType>>;
   categorySet: string[];
-  methodSet: string[];
+  methodList: MethodListType[];
 };
 
 const PlainPurchaseInput = memo(
@@ -61,7 +63,7 @@ const PlainPurchaseInput = memo(
           <Autocomplete
             value={props.newPurchase.method}
             sx={{ minWidth: 150 }}
-            options={props.methodSet}
+            options={props.methodList}
             freeSolo
             onChange={(e, v) => {
               props.handleNewPurchaseInput("method", v);
@@ -115,10 +117,11 @@ const PurchaseInput = () => {
       title: "",
       date: new Date(),
       category: "",
-      method: "",
+      method: { id: "", userId: "", label: "", assetId: "", timing: "" },
       price: 0,
       income: false,
       description: "",
+      card: false,
     };
   }, []);
 
@@ -138,9 +141,30 @@ const PurchaseInput = () => {
       alert("品目名を入力してください");
       return;
     }
-    if (newPurchase && auth.currentUser) {
+    if (auth.currentUser) {
       const userId = auth.currentUser.uid;
-      addDocPurchase({ ...newPurchase, userId });
+      if (newPurchase.method.timing === "即時" || !newPurchase.method) {
+        addDocPurchase({
+          ...newPurchase,
+          userId,
+          method: newPurchase.method.id,
+        });
+      } else if (newPurchase.method.timingDate) {
+        addDocPurchase({
+          ...newPurchase,
+          userId,
+          card: true,
+          method: newPurchase.method.id,
+        });
+        addDocPurchase({
+          ...newPurchase,
+          userId,
+          date: getCardDate(newPurchase.method.timingDate),
+          group: newPurchase.method.label,
+          method: newPurchase.method.id,
+          title: newPurchase.method.label,
+        });
+      }
       setNewPurchase(defaultNewPurchase);
     }
   }, [defaultNewPurchase, newPurchase]);
@@ -156,7 +180,8 @@ const PurchaseInput = () => {
     }
   }, [newPurchase]);
 
-  const { categorySet, methodSet } = usePurchase();
+  const { categorySet } = usePurchase();
+  const { methodList } = useMethod();
 
   const plainProps = {
     handleNewPurchaseInput,
@@ -165,7 +190,7 @@ const PurchaseInput = () => {
     addTemplate,
     setNewPurchase,
     categorySet,
-    methodSet,
+    methodList,
   };
   return <PlainPurchaseInput {...plainProps} />;
 };
