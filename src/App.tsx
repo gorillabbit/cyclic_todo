@@ -17,8 +17,9 @@ import Purchases from "./components/Kakeibo/Purchases";
 import { AssetProvider } from "./components/Context/AssetContext";
 import PurchaseInputs from "./components/Kakeibo/PurchaseInputs";
 import { PurchaseProvider } from "./components/Context/PurchaseContext";
+import { MethodProvider } from "./components/Context/MethodContext";
 
-function App() {
+const App = (): JSX.Element => {
   const theme = createTheme({
     typography: {
       fontFamily: [
@@ -46,42 +47,42 @@ function App() {
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
       <ThemeProvider theme={theme}>
-        <Box textAlign="center">
-          <Header setUser={setUser} setIsGapiMounted={setIsGapiMounted} />
-          {user && (
-            <>
-              <AccountProvider>
-                <PurchaseProvider>
-                  <Tabs value={tabValue} onChange={(e, v) => setTabValue(v)}>
-                    <Tab label="タスク/ログ" />
-                    <Tab label="家計簿" />
-                  </Tabs>
-                  {tabValue === 0 && <InputForms />}
-                  {tabValue === 1 && <PurchaseInputs />}
+        <Header setUser={setUser} setIsGapiMounted={setIsGapiMounted} />
+        {user && (
+          <>
+            <Tabs value={tabValue} onChange={(e, v) => setTabValue(v)}>
+              <Tab label="タスク/ログ" />
+              <Tab label="家計簿" />
+            </Tabs>
+            <AccountProvider>
+              <Box m={2}>
+                {tabValue === 0 && (
                   <TaskProvider>
                     <LogProvider>
-                      <Box m={2}>
-                        {tabValue === 0 && (
-                          <>
-                            <LogList />
-                            <TaskList />
-                          </>
-                        )}
-                        <AssetProvider>
-                          {tabValue === 1 && <Purchases />}
-                        </AssetProvider>
-                        <Calendar isGapiMounted={isGapiMounted} />
-                      </Box>
+                      <InputForms />
+                      <LogList />
+                      <TaskList />
+                      <Calendar isGapiMounted={isGapiMounted} />
                     </LogProvider>
                   </TaskProvider>
-                </PurchaseProvider>
-              </AccountProvider>
-            </>
-          )}
-        </Box>
+                )}
+                {tabValue === 1 && (
+                  <MethodProvider>
+                    <PurchaseProvider>
+                      <AssetProvider>
+                        <PurchaseInputs />
+                        <Purchases />
+                      </AssetProvider>
+                    </PurchaseProvider>
+                  </MethodProvider>
+                )}
+              </Box>
+            </AccountProvider>
+          </>
+        )}
       </ThemeProvider>
     </LocalizationProvider>
   );
-}
+};
 
 export default App;
