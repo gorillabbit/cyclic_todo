@@ -28,3 +28,15 @@ export const useWindowSize = () => {
 
   return windowSize;
 };
+
+export const useIsSmall = () => {
+  const [isSmall, setIsSmall] = useState(false);
+  const windowSize = useWindowSize();
+  if (windowSize.width < 750 && isSmall === false) {
+    setIsSmall(true);
+  }
+  if (windowSize.width >= 750 && isSmall === true) {
+    setIsSmall(false);
+  }
+  return isSmall;
+};

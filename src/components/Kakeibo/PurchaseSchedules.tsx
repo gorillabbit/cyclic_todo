@@ -24,32 +24,42 @@ const PlainPurchaseSchedules = memo(
         <Table size="small">
           <TableHead>
             <TableRow>
-              <TableCell>周期</TableCell>
-              <TableCell>品目</TableCell>
-              <TableCell>金額</TableCell>
-              <TableCell>カテゴリー</TableCell>
-              <TableCell>支払い方法</TableCell>
-              <TableCell>収入</TableCell>
-              <TableCell>備考</TableCell>
+              <TableCell sx={{ paddingX: 0.5 }}>周期</TableCell>
+              <TableCell sx={{ paddingX: 0.5 }}>品目</TableCell>
+              <TableCell sx={{ paddingX: 0.5 }}>金額</TableCell>
+              <TableCell sx={{ paddingX: 0.5 }}>分類</TableCell>
+              <TableCell sx={{ paddingX: 0.5 }}>支払い方法</TableCell>
+              <TableCell sx={{ paddingX: 0.5 }}>収入</TableCell>
+              <TableCell sx={{ paddingX: 0.5 }}>備考</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {props.purchaseScheduleList.map((purchaseSchedule) => (
               <TableRow key={purchaseSchedule.id}>
-                <TableCell>
+                <TableCell sx={{ paddingX: 0.5 }}>
                   {purchaseSchedule.cycle +
                     (purchaseSchedule.date
                       ? purchaseSchedule.date + "日"
                       : purchaseSchedule.day)}
                 </TableCell>
-                <TableCell> {purchaseSchedule.title}</TableCell>
-                <TableCell>{purchaseSchedule.price + "円"}</TableCell>
-                <TableCell>{purchaseSchedule.category}</TableCell>
-                <TableCell>{purchaseSchedule.method}</TableCell>
-                <TableCell>
+                <TableCell sx={{ paddingX: 0.5 }}>
+                  {purchaseSchedule.title}
+                </TableCell>
+                <TableCell sx={{ paddingX: 0.5 }}>
+                  {purchaseSchedule.price + "円"}
+                </TableCell>
+                <TableCell sx={{ paddingX: 0.5 }}>
+                  {purchaseSchedule.category}
+                </TableCell>
+                <TableCell sx={{ paddingX: 0.5 }}>
+                  {purchaseSchedule.method}
+                </TableCell>
+                <TableCell sx={{ paddingX: 0.5 }}>
                   {purchaseSchedule.income ? "収入" : "支出"}
                 </TableCell>
-                <TableCell>{purchaseSchedule.description}</TableCell>
+                <TableCell sx={{ paddingX: 0.5 }}>
+                  {purchaseSchedule.description}
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>

@@ -17,6 +17,7 @@ import PurchaseSchedules from "./PurchaseSchedules";
 import PurchasesRow from "./PurchasesRow";
 import AssetsList from "./AssetsList";
 import { addMonths } from "date-fns";
+import { useIsSmall } from "../../hooks/useWindowSize";
 
 type PlainPurchaseProps = {
   sortedPurchasesWithGroupFlag: PurchaseListType[];
@@ -25,6 +26,7 @@ type PlainPurchaseProps = {
   handleNextMonthButton: () => void;
   handlePastMonthButton: () => void;
   monthlyPurchases: PurchaseListType[];
+  isSmall: boolean;
 };
 
 const PlainPurchases = memo(
@@ -52,14 +54,14 @@ const PlainPurchases = memo(
           <Table size="small">
             <TableHead>
               <TableRow>
-                <TableCell></TableCell>
-                <TableCell>日付</TableCell>
-                <TableCell>品目</TableCell>
-                <TableCell>金額</TableCell>
-                <TableCell>カテゴリー</TableCell>
-                <TableCell>支払い方法</TableCell>
-                <TableCell>収入</TableCell>
-                <TableCell>備考</TableCell>
+                <TableCell />
+                <TableCell sx={{ paddingX: 0.5 }}>日付</TableCell>
+                <TableCell sx={{ paddingX: 0.5 }}>品目</TableCell>
+                <TableCell sx={{ paddingX: 0.5 }}>金額</TableCell>
+                <TableCell sx={{ paddingX: 0.5 }}>分類</TableCell>
+                <TableCell sx={{ paddingX: 0.5 }}>支払い方法</TableCell>
+                <TableCell sx={{ paddingX: 0.5 }}>収入</TableCell>
+                {!props.isSmall && <TableCell>備考</TableCell>}
                 <TableCell padding="none"></TableCell>
                 <TableCell padding="none"></TableCell>
               </TableRow>
@@ -70,6 +72,7 @@ const PlainPurchases = memo(
                   purchase={purchase}
                   key={purchase.id}
                   groupPurchases={props.getGroupPurchases(purchase)}
+                  isSmall={props.isSmall}
                 />
               ))}
             </TableBody>
@@ -135,6 +138,8 @@ const Purchases = (): JSX.Element => {
     );
   };
 
+  const isSmall = useIsSmall();
+
   const plainProps = {
     sortedPurchasesWithGroupFlag,
     getGroupPurchases,
@@ -142,6 +147,7 @@ const Purchases = (): JSX.Element => {
     handleNextMonthButton,
     handlePastMonthButton,
     monthlyPurchases,
+    isSmall,
   };
 
   return <PlainPurchases {...plainProps} />;

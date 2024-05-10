@@ -44,6 +44,7 @@ type PlainPurchasesRowProps = {
   handleEditClick: () => void;
   handleAutocompleteChange: (name: string, value: any) => void;
   getMethodName: (methodId: string) => string;
+  isSmall: boolean;
 };
 
 const PlainPurchasesRow = memo(
@@ -52,8 +53,8 @@ const PlainPurchasesRow = memo(
       <TableRow>
         {props.isEdit ? (
           <>
-            <TableCell></TableCell>
-            <TableCell>
+            <TableCell sx={{ paddingX: 0.5 }} />
+            <TableCell sx={{ paddingX: 0.5 }}>
               <DatePicker
                 name="date"
                 value={props.editFormData.date.toDate()}
@@ -62,7 +63,7 @@ const PlainPurchasesRow = memo(
                 sx={{ maxWidth: 190 }}
               />
             </TableCell>
-            <TableCell>
+            <TableCell sx={{ paddingX: 0.5 }}>
               <TextField
                 name="title"
                 value={props.editFormData.title}
@@ -70,7 +71,7 @@ const PlainPurchasesRow = memo(
                 size="small"
               />
             </TableCell>
-            <TableCell>
+            <TableCell sx={{ paddingX: 0.5 }}>
               <TextField
                 name="price"
                 value={props.editFormData.price}
@@ -78,7 +79,7 @@ const PlainPurchasesRow = memo(
                 size="small"
               />
             </TableCell>
-            <TableCell>
+            <TableCell sx={{ paddingX: 0.5 }}>
               <Autocomplete
                 value={props.editFormData.category}
                 sx={{ minWidth: 150 }}
@@ -88,11 +89,11 @@ const PlainPurchasesRow = memo(
                   props.handleAutocompleteChange("category", v)
                 }
                 renderInput={(params) => (
-                  <TextField {...params} label="カテゴリー" size="small" />
+                  <TextField {...params} label="分類" size="small" />
                 )}
               />
             </TableCell>
-            <TableCell>
+            <TableCell sx={{ paddingX: 0.5 }}>
               <Autocomplete
                 value={props.getMethodName(props.editFormData.method)}
                 sx={{ minWidth: 150 }}
@@ -104,7 +105,7 @@ const PlainPurchasesRow = memo(
                 )}
               />
             </TableCell>
-            <TableCell>
+            <TableCell sx={{ paddingX: 0.5 }}>
               <TextField
                 name="income"
                 value={props.editFormData.income ? "収入" : "支出"}
@@ -112,14 +113,16 @@ const PlainPurchasesRow = memo(
                 size="small"
               />
             </TableCell>
-            <TableCell>
-              <TextField
-                name="description"
-                value={props.editFormData.description}
-                onChange={props.handleEditFormChange}
-                size="small"
-              />
-            </TableCell>
+            {!props.isSmall && (
+              <TableCell sx={{ paddingX: 0.5 }}>
+                <TextField
+                  name="description"
+                  value={props.editFormData.description}
+                  onChange={props.handleEditFormChange}
+                  size="small"
+                />
+              </TableCell>
+            )}
             <TableCell padding="none">
               <IconButton onClick={props.handleSaveClick} color="success">
                 <DoneIcon />
@@ -143,21 +146,28 @@ const PlainPurchasesRow = memo(
                 </IconButton>
               )}
             </TableCell>
-            <TableCell>
+            <TableCell sx={{ paddingX: 0.5 }}>
               {props.editFormData.date.toDate().toLocaleString().split(" ")[0]}
             </TableCell>
-            <TableCell> {props.editFormData.title}</TableCell>
-            <TableCell>
+            <TableCell sx={{ paddingX: 0.5 }}>
+              {props.editFormData.title}
+            </TableCell>
+            <TableCell sx={{ paddingX: 0.5 }}>
               {props.editFormData.price + "円"}
               {props.editFormData.card && <Chip label="後払い" />}
             </TableCell>
-            <TableCell>{props.editFormData.category}</TableCell>
-            <TableCell>
+            <TableCell sx={{ paddingX: 0.5 }}>
+              {props.editFormData.category}
+            </TableCell>
+            <TableCell sx={{ paddingX: 0.5 }}>
               {props.getMethodName(props.editFormData.method)}
             </TableCell>
-            <TableCell>{props.editFormData.income ? "収入" : "支出"}</TableCell>
-            <TableCell>{props.editFormData.description}</TableCell>
-
+            <TableCell sx={{ paddingX: 0.5 }}>
+              {props.editFormData.income ? "収入" : "支出"}
+            </TableCell>
+            {!props.isSmall && (
+              <TableCell>{props.editFormData.description}</TableCell>
+            )}
             <TableCell padding="none">
               {!props.isGroup && (
                 <IconButton
@@ -230,9 +240,11 @@ const PlainPurchasesRow = memo(
 const PurchasesRow = ({
   purchase,
   groupPurchases,
+  isSmall,
 }: {
   purchase: PurchaseListType;
   groupPurchases: PurchaseListType[];
+  isSmall: boolean;
 }) => {
   const [isEdit, setIsEdit] = useState<boolean>(false);
   // 編集中のデータを保持するステート
@@ -297,6 +309,7 @@ const PurchasesRow = ({
     open,
     setOpen,
     getMethodName,
+    isSmall,
   };
   return <PlainPurchasesRow {...plainProps} />;
 };
