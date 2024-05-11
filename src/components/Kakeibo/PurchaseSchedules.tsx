@@ -52,7 +52,7 @@ const PlainPurchaseSchedules = memo(
                   {purchaseSchedule.category}
                 </TableCell>
                 <TableCell sx={{ paddingX: 0.5 }}>
-                  {purchaseSchedule.method}
+                  {purchaseSchedule.method.label}
                 </TableCell>
                 <TableCell sx={{ paddingX: 0.5 }}>
                   {purchaseSchedule.income ? "収入" : "支出"}

@@ -40,6 +40,7 @@ type PlainPurchasesRowProps = {
     };
   }) => void;
   handleDateFormChange: (value: Date | null | undefined) => void;
+  handleMethodChange: (value: string | MethodListType | null) => void;
   handleSaveClick: () => void;
   handleEditClick: () => void;
   handleAutocompleteChange: (name: string, value: any) => void;
@@ -95,11 +96,11 @@ const PlainPurchasesRow = memo(
             </TableCell>
             <TableCell sx={{ paddingX: 0.5 }}>
               <Autocomplete
-                value={props.getMethodName(props.editFormData.method)}
+                value={props.editFormData.method}
                 sx={{ minWidth: 150 }}
                 options={props.methodList}
                 freeSolo
-                onChange={(e, v) => props.handleAutocompleteChange("method", v)}
+                onChange={(_e, v) => props.handleMethodChange(v)}
                 renderInput={(params) => (
                   <TextField {...params} label="支払い方法" size="small" />
                 )}
@@ -150,17 +151,20 @@ const PlainPurchasesRow = memo(
               {props.editFormData.date.toDate().toLocaleString().split(" ")[0]}
             </TableCell>
             <TableCell sx={{ paddingX: 0.5 }}>
-              {props.editFormData.title}
+              {props.isGroup
+                ? props.editFormData.method.label + " 引き落し"
+                : props.editFormData.title}
             </TableCell>
             <TableCell sx={{ paddingX: 0.5 }}>
               {props.editFormData.price + "円"}
-              {props.editFormData.card && <Chip label="後払い" />}
+              {props.editFormData.method.timing === "翌月" &&
+                props.editFormData.childPurchaseId && <Chip label="翌月" />}
             </TableCell>
             <TableCell sx={{ paddingX: 0.5 }}>
               {props.editFormData.category}
             </TableCell>
             <TableCell sx={{ paddingX: 0.5 }}>
-              {props.getMethodName(props.editFormData.method)}
+              {props.editFormData.method.label}
             </TableCell>
             <TableCell sx={{ paddingX: 0.5 }}>
               {props.editFormData.income ? "収入" : "支出"}
@@ -246,6 +250,7 @@ const PurchasesRow = ({
   groupPurchases: PurchaseListType[];
   isSmall: boolean;
 }) => {
+  const { methodList } = useMethod();
   const [isEdit, setIsEdit] = useState<boolean>(false);
   // 編集中のデータを保持するステート
   const [editFormData, setEditFormData] = useState<PurchaseListType>(purchase);
@@ -280,18 +285,20 @@ const PurchasesRow = ({
     }));
   }, []);
 
+  const handleMethodChange = useCallback(
+    (value: string | MethodListType | null) => {
+      if (value && typeof value !== "string") {
+        setEditFormData((prev) => ({
+          ...prev,
+          method: value,
+        }));
+      }
+    },
+    []
+  );
   const handleAutocompleteChange = useCallback((name: string, value: any) => {
-    if (name === "method") {
-      setEditFormData((prev) => ({ ...prev, method: value.id }));
-    } else {
-      setEditFormData((prev) => ({ ...prev, [name]: value }));
-    }
+    setEditFormData((prev) => ({ ...prev, [name]: value }));
   }, []);
-
-  const { methodList } = useMethod();
-
-  const getMethodName = (methodId: string) =>
-    methodList.filter((method) => method.id === methodId)[0]?.label ?? "";
 
   const plainProps = {
     purchase,
@@ -303,6 +310,7 @@ const PurchasesRow = ({
     methodList,
     handleEditFormChange,
     handleDateFormChange,
+    handleMethodChange,
     handleSaveClick,
     handleEditClick,
     handleAutocompleteChange,
