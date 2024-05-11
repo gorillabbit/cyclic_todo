@@ -26,3 +26,15 @@ export const numericProps: InputBaseComponentProps = {
   inputMode: "numeric",
   pattern: "[0-9]*",
 };
+export const isValidatedNum = (value: string) => {
+  const numValue = Number(value);
+  if (numValue < 0) {
+    alert("0未満は入力できません");
+    return false;
+  } else if (Number.isNaN(numValue)) {
+    alert("不適切な入力です");
+    return false;
+  } else {
+    return true;
+  }
+};

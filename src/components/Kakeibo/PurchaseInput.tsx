@@ -1,15 +1,22 @@
 import { Autocomplete, Box, Button, FormGroup, TextField } from "@mui/material";
 import StyledCheckbox from "../StyledCheckbox";
 import { DatePicker } from "@mui/x-date-pickers";
-import { memo, useCallback, useMemo, useState } from "react";
+import { memo, useCallback, useState } from "react";
 import { addDocPurchase, addDocPurchaseTemplate } from "../../firebase";
 import { getAuth } from "firebase/auth";
-import { InputPurchaseType, MethodListType } from "../../types";
-import { numericProps } from "../../utilities/purchaseUtilities";
+import {
+  InputPurchaseType,
+  MethodListType,
+  defaultPurchaseInput,
+} from "../../types";
+import {
+  isValidatedNum,
+  numericProps,
+} from "../../utilities/purchaseUtilities";
 import TemplateButtons from "./TemplateButtons";
 import { usePurchase } from "../Context/PurchaseContext";
 import { useMethod } from "../Context/MethodContext";
-import { getCardDate } from "../../utilities/dateUtilities";
+import { getPayLaterDate } from "../../utilities/dateUtilities";
 
 const auth = getAuth();
 
@@ -111,27 +118,17 @@ const PlainPurchaseInput = memo(
 );
 
 const PurchaseInput = () => {
-  const defaultNewPurchase: InputPurchaseType = useMemo(() => {
-    return {
-      userId: "",
-      title: "",
-      date: new Date(),
-      category: "",
-      method: { id: "", userId: "", label: "", assetId: "", timing: "" },
-      price: 0,
-      income: false,
-      description: "",
-      card: false,
-    };
-  }, []);
-
   const [newPurchase, setNewPurchase] =
-    useState<InputPurchaseType>(defaultNewPurchase);
+    useState<InputPurchaseType>(defaultPurchaseInput);
 
   const handleNewPurchaseInput = useCallback((name: string, value: any) => {
-    if (name === "price" && parseInt(value, 10) < 0) {
-      alert("0未満は入力できません。");
-      return;
+    if (name === "price") {
+      if (isValidatedNum(value)) {
+        setNewPurchase((prev) => ({ ...prev, [name]: Number(value) }));
+        return;
+      } else {
+        return;
+      }
     }
     setNewPurchase((prev) => ({ ...prev, [name]: value }));
   }, []);
@@ -147,27 +144,26 @@ const PurchaseInput = () => {
         addDocPurchase({
           ...newPurchase,
           userId,
-          method: newPurchase.method.id,
         });
       } else if (newPurchase.method.timingDate) {
         addDocPurchase({
           ...newPurchase,
           userId,
-          card: true,
-          method: newPurchase.method.id,
-        });
-        addDocPurchase({
-          ...newPurchase,
-          userId,
-          date: getCardDate(newPurchase.method.timingDate),
-          group: newPurchase.method.label,
-          method: newPurchase.method.id,
-          title: newPurchase.method.label,
+          date: getPayLaterDate(
+            newPurchase.date,
+            newPurchase.method.timingDate
+          ),
+        }).then((docRef) => {
+          addDocPurchase({
+            ...newPurchase,
+            userId,
+            childPurchaseId: docRef.id,
+          });
         });
       }
-      setNewPurchase(defaultNewPurchase);
+      setNewPurchase(defaultPurchaseInput);
     }
-  }, [defaultNewPurchase, newPurchase]);
+  }, [newPurchase]);
 
   const addTemplate = useCallback(() => {
     if (newPurchase && auth.currentUser) {
