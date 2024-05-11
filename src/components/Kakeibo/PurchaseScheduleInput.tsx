@@ -18,7 +18,10 @@ import {
 } from "../../types";
 import { addDays, addMonths, addYears, nextDay } from "date-fns";
 import { DatePicker } from "@mui/x-date-pickers";
-import { numericProps } from "../../utilities/purchaseUtilities";
+import {
+  isValidatedNum,
+  numericProps,
+} from "../../utilities/purchaseUtilities";
 
 const auth = getAuth();
 
@@ -43,16 +46,16 @@ const PurchaseScheduleInput = () => {
   const handleNewPurchaseScheduleInput = (name: string, value: any) => {
     if (name === "price" || name === "date") {
       const numValue = Number(value);
-      if (Number.isNaN(numValue) || numValue < 0) {
-        alert("0未満は入力できません。");
+      if (isValidatedNum(value)) {
+        if (name === "date" && numValue > 31) {
+          alert("32以上入力できません。");
+          return;
+        }
+        setNewPurchaseSchedule((prev) => ({ ...prev, [name]: numValue }));
+        return;
+      } else {
         return;
       }
-      if (name === "date" && numValue > 31) {
-        alert("32以上入力できません。");
-        return;
-      }
-      setNewPurchaseSchedule((prev) => ({ ...prev, [name]: numValue }));
-      return;
     }
     setNewPurchaseSchedule((prev) => ({ ...prev, [name]: value }));
   };
