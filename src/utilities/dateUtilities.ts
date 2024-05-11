@@ -79,12 +79,9 @@ export const calculateNext期日 = (task: TaskType, 更新元date: Date) => {
   return formatDateJa(更新元date);
 };
 
-export const getCardDate = (dateNum: number) => {
-  // 現在の日付を取得
-  const today = new Date();
-
-  // 翌月の今日を取得
-  const nextMonth = addMonths(today, 1);
+export const getPayLaterDate = (baseDate: Date, dateNum: number) => {
+  // 翌月を取得
+  const nextMonth = addMonths(baseDate, 1);
 
   // 翌月の25日を設定
   let nextMonthDate = new Date(

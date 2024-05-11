@@ -47,9 +47,9 @@ const PlainMethodList = memo(
           size="small"
         >
           <MenuItem value="即時">即時</MenuItem>
-          <MenuItem value="毎月">毎月</MenuItem>
+          <MenuItem value="翌月">翌月</MenuItem>
         </Select>
-        {props.methodInput.timing === "毎月" && (
+        {props.methodInput.timing === "翌月" && (
           <TextField
             name="timingDate"
             value={props.methodInput.timingDate}

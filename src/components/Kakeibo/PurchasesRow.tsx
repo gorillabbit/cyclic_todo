@@ -12,16 +12,24 @@ import {
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
 import { memo, useCallback, useState } from "react";
-import { deleteDocPurchase, updateDocPurchase } from "../../firebase";
+import {
+  addDocPurchase,
+  deleteDocPurchase,
+  updateDocPurchase,
+} from "../../firebase";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import DoneIcon from "@mui/icons-material/Done";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
-import { MethodListType, PurchaseListType } from "../../types";
-import { Timestamp } from "firebase/firestore";
+import {
+  InputPurchaseRowType,
+  MethodListType,
+  PurchaseListType,
+} from "../../types";
 import { usePurchase } from "../Context/PurchaseContext";
 import { useMethod } from "../Context/MethodContext";
+import { getPayLaterDate } from "../../utilities/dateUtilities";
 
 type PlainPurchasesRowProps = {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -30,7 +38,7 @@ type PlainPurchasesRowProps = {
   groupPurchases: PurchaseListType[];
   isGroup: boolean;
   isEdit: boolean;
-  editFormData: PurchaseListType;
+  editFormData: InputPurchaseRowType;
   categorySet: string[];
   methodList: MethodListType[];
   handleEditFormChange: (event: {
@@ -43,8 +51,8 @@ type PlainPurchasesRowProps = {
   handleMethodChange: (value: string | MethodListType | null) => void;
   handleSaveClick: () => void;
   handleEditClick: () => void;
+  handleDeleteButton: () => void;
   handleAutocompleteChange: (name: string, value: any) => void;
-  getMethodName: (methodId: string) => string;
   isSmall: boolean;
 };
 
@@ -58,7 +66,7 @@ const PlainPurchasesRow = memo(
             <TableCell sx={{ paddingX: 0.5 }}>
               <DatePicker
                 name="date"
-                value={props.editFormData.date.toDate()}
+                value={props.editFormData.date}
                 onChange={props.handleDateFormChange}
                 slotProps={{ textField: { size: "small" } }}
                 sx={{ maxWidth: 190 }}
@@ -148,7 +156,7 @@ const PlainPurchasesRow = memo(
               )}
             </TableCell>
             <TableCell sx={{ paddingX: 0.5 }}>
-              {props.editFormData.date.toDate().toLocaleString().split(" ")[0]}
+              {props.editFormData.date.toLocaleString().split(" ")[0]}
             </TableCell>
             <TableCell sx={{ paddingX: 0.5 }}>
               {props.isGroup
@@ -191,7 +199,7 @@ const PlainPurchasesRow = memo(
         <TableCell padding="none">
           {!props.isGroup && (
             <IconButton
-              onClick={() => deleteDocPurchase(props.purchase.id)}
+              onClick={props.handleDeleteButton}
               sx={{
                 "&:hover": {
                   color: "#d32f2f", // Color on hover
@@ -205,7 +213,7 @@ const PlainPurchasesRow = memo(
       </TableRow>
       {props.isGroup && (
         <TableRow>
-          <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={8}>
+          <TableCell sx={{ paddingY: 0 }} colSpan={8}>
             <Collapse in={props.open} timeout="auto" unmountOnExit>
               <Table size="small">
                 <TableHead>
@@ -253,7 +261,10 @@ const PurchasesRow = ({
   const { methodList } = useMethod();
   const [isEdit, setIsEdit] = useState<boolean>(false);
   // 編集中のデータを保持するステート
-  const [editFormData, setEditFormData] = useState<PurchaseListType>(purchase);
+  const [editFormData, setEditFormData] = useState<InputPurchaseRowType>({
+    ...purchase,
+    date: purchase.date.toDate(),
+  });
   const [open, setOpen] = useState(false);
   const { categorySet } = usePurchase();
   const isGroup = groupPurchases.length > 0;
@@ -265,9 +276,50 @@ const PurchasesRow = ({
 
   // 編集内容を保存する関数
   const handleSaveClick = useCallback(() => {
-    updateDocPurchase(editFormData.id, editFormData);
-    setIsEdit(false);
+    // アップデートし、編集を閉じる
+    const updateCurrentPurchase = (feature: Partial<InputPurchaseRowType>) => {
+      updateDocPurchase(editFormData.id, {
+        ...editFormData,
+        ...feature,
+      });
+      setIsEdit(false);
+    };
+    // 決済Purchaseも変更する
+    const { id, ...childPurchaseWithoutId } = editFormData;
+    // 日付の変更にも対応できるようにする
+    const childPurchase = {
+      ...childPurchaseWithoutId,
+      date: getPayLaterDate(
+        editFormData.date,
+        editFormData.method.timingDate ?? childPurchaseWithoutId.date.getDate()
+      ),
+      childPurchaseId: "",
+    };
+    if (editFormData.childPurchaseId) {
+      if (editFormData.method.timing === "即時") {
+        // 決済を後払いから即時のものにしたとき決済Purchaseを削除する
+        deleteDocPurchase(editFormData.childPurchaseId);
+        // 子タスクを削除したあとで、再び後払いにした場合、存在しない子タスクをupdateしようとしてしまう
+        updateCurrentPurchase({ childPurchaseId: "" });
+        return;
+      }
+      updateDocPurchase(editFormData.childPurchaseId, childPurchase);
+    } else if (editFormData.method.timingDate) {
+      //childPurchaseIdがなく新たにtimingが出てきた場合、子Purchaseを追加し、子PurchaseIdを追加
+      addDocPurchase(childPurchase).then((docRef) =>
+        updateCurrentPurchase({ childPurchaseId: docRef.id })
+      );
+      return;
+    }
+    updateCurrentPurchase({});
   }, [editFormData]);
+
+  const handleDeleteButton = useCallback(() => {
+    if (purchase.childPurchaseId) {
+      deleteDocPurchase(purchase.childPurchaseId);
+    }
+    deleteDocPurchase(purchase.id);
+  }, [purchase.childPurchaseId, purchase.id]);
 
   // 編集データを更新する関数
   const handleEditFormChange = useCallback(
@@ -277,11 +329,10 @@ const PurchasesRow = ({
     },
     []
   );
-  // 日付はTimestampに変換する必要があるので変換する
   const handleDateFormChange = useCallback((value: Date | null | undefined) => {
     setEditFormData((prev) => ({
       ...prev,
-      date: Timestamp.fromDate(value ?? prev.date.toDate()),
+      date: value ?? new Date(),
     }));
   }, []);
 
@@ -313,10 +364,10 @@ const PurchasesRow = ({
     handleMethodChange,
     handleSaveClick,
     handleEditClick,
+    handleDeleteButton,
     handleAutocompleteChange,
     open,
     setOpen,
-    getMethodName,
     isSmall,
   };
   return <PlainPurchasesRow {...plainProps} />;

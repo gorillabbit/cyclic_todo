@@ -99,9 +99,7 @@ export interface InputPurchaseType {
   income: boolean;
   description?: string;
   parentScheduleId?: string;
-  card?: boolean;
-  group?: string;
-  childPurchaseId?: string;
+  childPurchaseId: string;
 }
 
 export interface InputPurchaseRowType extends InputPurchaseType {
@@ -153,7 +151,7 @@ export interface MethodType {
   userId: string;
   label: string;
   assetId: string;
-  timing: string;
+  timing: "即時" | "翌月";
   timingDate?: number;
 }
 
@@ -165,18 +163,24 @@ export const defaultMethod: MethodListType = {
   userId: "",
   label: "",
   assetId: "",
-  timing: "",
+  timing: "即時",
   id: "",
 };
 
-export const defaultPurchase: PurchaseListType = {
-  id: "",
+export const defaultPurchaseInput: InputPurchaseType = {
   userId: "",
   title: "",
-  date: new Timestamp(0, 0),
+  date: new Date(),
   category: "",
   method: defaultMethod,
   price: 0,
   income: false,
   description: "",
+  childPurchaseId: "",
+};
+
+export const defaultPurchase: PurchaseListType = {
+  ...defaultPurchaseInput,
+  id: "",
+  date: new Timestamp(0, 0),
 };

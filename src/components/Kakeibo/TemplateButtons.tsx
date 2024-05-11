@@ -1,11 +1,6 @@
 import { Box, Chip } from "@mui/material";
 import { memo, useCallback, useMemo } from "react";
-import {
-  InputPurchaseType,
-  PurchaseListType,
-  PurchaseType,
-  defaultMethod,
-} from "../../types";
+import { InputPurchaseType, PurchaseListType, PurchaseType } from "../../types";
 import { orderBy } from "firebase/firestore";
 import { useFirestoreQuery } from "../../utilities/firebaseUtilities";
 import { PurchaseTemplates, deleteDocPurchaseTemplate } from "../../firebase";
@@ -53,7 +48,6 @@ const TemplateButtons = ({
       setNewPurchase({
         ...templatePurchaseWithoutId,
         date: new Date(),
-        method: defaultMethod,
       });
     },
     [setNewPurchase]

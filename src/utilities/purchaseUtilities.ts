@@ -26,6 +26,10 @@ export const numericProps: InputBaseComponentProps = {
   inputMode: "numeric",
   pattern: "[0-9]*",
 };
+
+export const isGroupPurchase = (purchase: PurchaseListType) =>
+  purchase.method.timing === "翌月" && !purchase.childPurchaseId;
+
 export const isValidatedNum = (value: string) => {
   const numValue = Number(value);
   if (numValue < 0) {

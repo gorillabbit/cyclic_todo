@@ -18,6 +18,7 @@ import PurchasesRow from "./PurchasesRow";
 import AssetsList from "./AssetsList";
 import { addMonths } from "date-fns";
 import { useIsSmall } from "../../hooks/useWindowSize";
+import { isGroupPurchase } from "../../utilities/purchaseUtilities";
 
 type PlainPurchaseProps = {
   sortedPurchasesWithGroupFlag: PurchaseListType[];
@@ -25,7 +26,6 @@ type PlainPurchaseProps = {
   month: Date;
   handleNextMonthButton: () => void;
   handlePastMonthButton: () => void;
-  monthlyPurchases: PurchaseListType[];
   isSmall: boolean;
 };
 
@@ -67,7 +67,7 @@ const PlainPurchases = memo(
               </TableRow>
             </TableHead>
             <TableBody>
-              {props.monthlyPurchases.map((purchase) => (
+              {props.sortedPurchasesWithGroupFlag.map((purchase) => (
                 <PurchasesRow
                   purchase={purchase}
                   key={purchase.id}
@@ -89,14 +89,21 @@ const Purchases = (): JSX.Element => {
   interface GroupedPurchases {
     [key: string]: PurchaseListType;
   }
+  const [month, setMonth] = useState<Date>(new Date());
+  const monthlyPurchases = useMemo(
+    () =>
+      purchaseList.filter(
+        (purchase) => purchase.date.toDate().getMonth() === month.getMonth()
+      ),
+    [month, purchaseList]
+  );
 
-  const groupedPurchasesDoc = purchaseList.reduce((acc, purchase) => {
-    if (purchase.group) {
-      const keyString = purchase.group + purchase.date.toMillis();
+  const groupedPurchasesDoc = monthlyPurchases.reduce((acc, purchase) => {
+    if (isGroupPurchase(purchase)) {
+      const keyString = purchase.method.label + purchase.date.toMillis();
       if (!acc[keyString]) {
         acc[keyString] = {
           ...purchase,
-          group: purchase.group,
           price: 0,
           date: purchase.date,
         };
@@ -107,36 +114,29 @@ const Purchases = (): JSX.Element => {
   }, {} as GroupedPurchases);
   const groupedPurchases = Object.values(groupedPurchasesDoc);
 
-  const purchasesWithGroupFlag = purchaseList.filter(
-    (purchase) => !purchase.group
+  const purchasesWithoutGroupFlag = monthlyPurchases.filter(
+    (purchase) => !isGroupPurchase(purchase)
   );
-  purchasesWithGroupFlag.push(...groupedPurchases);
+  purchasesWithoutGroupFlag.push(...groupedPurchases);
 
-  const sortedPurchasesWithGroupFlag = purchasesWithGroupFlag.sort(
+  const sortedPurchasesWithGroupFlag = purchasesWithoutGroupFlag.sort(
     (a, b) => a.date.toMillis() - b.date.toMillis()
   );
 
-  const [month, setMonth] = useState<Date>(new Date());
   const handleNextMonthButton = useCallback(() => {
     setMonth((prev) => addMonths(prev, 1));
   }, []);
   const handlePastMonthButton = useCallback(() => {
     setMonth((prev) => addMonths(prev, -1));
   }, []);
-  const monthlyPurchases = useMemo(
-    () =>
-      sortedPurchasesWithGroupFlag.filter(
-        (purchase) => purchase.date.toDate().getMonth() === month.getMonth()
-      ),
-    [month, sortedPurchasesWithGroupFlag]
-  );
 
-  const getGroupPurchases = (groupedPurchase: PurchaseListType) => {
-    return purchaseList.filter(
+  // その月のPurchaseしか表示されないのでこれでいい
+  const getGroupPurchases = (groupedPurchase: PurchaseListType) =>
+    monthlyPurchases.filter(
       (purchase) =>
-        groupedPurchase.group && purchase.group === groupedPurchase.group
+        isGroupPurchase(purchase) &&
+        purchase.method.id === groupedPurchase.method.id
     );
-  };
 
   const isSmall = useIsSmall();
 
@@ -146,7 +146,6 @@ const Purchases = (): JSX.Element => {
     month,
     handleNextMonthButton,
     handlePastMonthButton,
-    monthlyPurchases,
     isSmall,
   };
 

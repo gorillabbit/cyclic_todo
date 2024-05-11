@@ -13,7 +13,7 @@ import { addDocPurchaseSchedule, batchAddDocPurchase } from "../../firebase";
 import { getAuth } from "firebase/auth";
 import {
   InputPurchaseScheduleType,
-  InputPurchaseTypeWithStringMethod,
+  InputPurchaseType,
   WeekDay,
   defaultMethod,
 } from "../../types";
@@ -23,6 +23,7 @@ import {
   isValidatedNum,
   numericProps,
 } from "../../utilities/purchaseUtilities";
+import { DocumentData, DocumentReference } from "firebase/firestore";
 
 const auth = getAuth();
 
@@ -68,8 +69,9 @@ const PurchaseScheduleInput = () => {
     }
     if (newPurchaseSchedule && auth.currentUser) {
       const userId = auth.currentUser.uid;
-      addDocPurchaseSchedule({ ...newPurchaseSchedule, userId });
-      addPurchase();
+      addDocPurchaseSchedule({ ...newPurchaseSchedule, userId }).then(
+        (docRef) => addPurchase(docRef)
+      );
       setNewPurchaseSchedule(defaultNewPurchase);
     }
   };
@@ -136,7 +138,7 @@ const PurchaseScheduleInput = () => {
     return dates;
   };
 
-  const addPurchase = () => {
+  const addPurchase = (docRef: DocumentReference<any, DocumentData>) => {
     if (auth.currentUser) {
       const userId = auth.currentUser.uid;
       let daysList: Date[] = [];
@@ -152,19 +154,20 @@ const PurchaseScheduleInput = () => {
           newPurchaseSchedule.endDate
         );
       }
-      const batchPurchaseList: InputPurchaseTypeWithStringMethod[] =
-        daysList.map((day) => {
-          return {
-            userId,
-            title: newPurchaseSchedule.title,
-            date: day,
-            category: newPurchaseSchedule.category,
-            method: newPurchaseSchedule.method,
-            price: newPurchaseSchedule.price,
-            income: newPurchaseSchedule.income,
-            description: newPurchaseSchedule.description,
-          };
-        });
+      const batchPurchaseList: InputPurchaseType[] = daysList.map((day) => {
+        return {
+          userId,
+          title: newPurchaseSchedule.title,
+          date: day,
+          category: newPurchaseSchedule.category,
+          method: newPurchaseSchedule.method,
+          price: newPurchaseSchedule.price,
+          income: newPurchaseSchedule.income,
+          description: newPurchaseSchedule.description,
+          parentScheduleId: docRef.id,
+          childPurchaseId: "",
+        };
+      });
       batchAddDocPurchase(batchPurchaseList);
     }
   };
@@ -227,7 +230,6 @@ const PurchaseScheduleInput = () => {
             ))}
           </Select>
         )}
-
         <TextField
           label="カテゴリー"
           value={newPurchaseSchedule.category}
@@ -242,7 +244,6 @@ const PurchaseScheduleInput = () => {
             handleNewPurchaseScheduleInput("method", e.target.value)
           }
         />
-
         <StyledCheckbox
           value={newPurchaseSchedule.income}
           handleCheckbox={() =>
