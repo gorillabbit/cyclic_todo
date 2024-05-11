@@ -28,12 +28,10 @@ const PlainAssetsList = memo(
       <Table>
         <TableHead>
           <TableRow>
-            <TableCell></TableCell>
-            <TableCell>名前</TableCell>
-            <TableCell>残高</TableCell>
-            <TableCell>更新</TableCell>
-            <TableCell>変更保存</TableCell>
-            <TableCell>削除</TableCell>
+            <TableCell sx={{ paddingX: 0.5 }}></TableCell>
+            <TableCell sx={{ paddingX: 0.5 }}>名前</TableCell>
+            <TableCell sx={{ paddingX: 0.5 }}>残高</TableCell>
+            <TableCell sx={{ paddingX: 0.5 }} colSpan={3} />
           </TableRow>
         </TableHead>
         <TableBody>
@@ -41,10 +39,8 @@ const PlainAssetsList = memo(
             <AssetRow asset={asset} key={asset.id} />
           ))}
           <TableRow>
-            <TableCell>合計</TableCell>
-            <TableCell>{props.sumAssets}円</TableCell>
-            <TableCell></TableCell>
-            <TableCell></TableCell>
+            <TableCell sx={{ paddingX: 0.5 }}>合計</TableCell>
+            <TableCell sx={{ paddingX: 0.5 }}>{props.sumAssets}円</TableCell>
           </TableRow>
         </TableBody>
       </Table>

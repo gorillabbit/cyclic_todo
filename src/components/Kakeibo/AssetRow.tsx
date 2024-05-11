@@ -69,7 +69,7 @@ const PlainAssetRow = memo(
   (props: PlainAssetRowProps): JSX.Element => (
     <>
       <TableRow>
-        <TableCell>
+        <TableCell sx={{ paddingX: 0.5 }}>
           <IconButton
             aria-label="expand row"
             size="small"
@@ -78,7 +78,7 @@ const PlainAssetRow = memo(
             {props.open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
         </TableCell>
-        <TableCell>
+        <TableCell sx={{ paddingX: 0.5 }}>
           <TextField
             variant="outlined"
             value={props.assetInput.name ?? props.asset.name}
@@ -87,7 +87,7 @@ const PlainAssetRow = memo(
             size="small"
           />
         </TableCell>
-        <TableCell sx={{ display: "flex" }}>
+        <TableCell sx={{ display: "flex", paddingX: 0.5 }}>
           <TextField
             variant="outlined"
             value={
@@ -104,7 +104,7 @@ const PlainAssetRow = memo(
             </Box>
           )}
         </TableCell>
-        <TableCell>
+        <TableCell sx={{ paddingX: 0.5 }}>
           <Button
             variant="contained"
             color="primary"
@@ -114,7 +114,7 @@ const PlainAssetRow = memo(
             更新
           </Button>
         </TableCell>
-        <TableCell>
+        <TableCell sx={{ paddingX: 0.5 }}>
           <Button
             variant="contained"
             color="primary"
@@ -124,7 +124,7 @@ const PlainAssetRow = memo(
             変更
           </Button>
         </TableCell>
-        <TableCell>
+        <TableCell sx={{ paddingX: 0.5 }}>
           <IconButton onClick={props.removeAsset} color="error">
             <DeleteIcon />
           </IconButton>
