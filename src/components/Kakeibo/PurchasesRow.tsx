@@ -62,7 +62,7 @@ const PlainPurchasesRow = memo(
       <TableRow>
         {props.isEdit ? (
           <>
-            <TableCell sx={{ paddingX: 0.5 }} />
+            <TableCell />
             <TableCell sx={{ paddingX: 0.5 }}>
               <DatePicker
                 name="date"

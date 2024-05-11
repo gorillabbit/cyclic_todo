@@ -42,3 +42,14 @@ export const isValidatedNum = (value: string) => {
     return true;
   }
 };
+
+export const getFilteredPurchase = (
+  purchasesList: PurchaseListType[],
+  income: "income" | "spent"
+) => {
+  if (income === "income") {
+    return purchasesList.filter((purchases) => purchases.income === true);
+  } else {
+    return purchasesList.filter((purchases) => purchases.income === false);
+  }
+};

@@ -14,8 +14,8 @@ import { PurchaseListType } from "../../types";
 import { lastDayOfMonth } from "date-fns";
 import {
   calculateSpentAndIncomeResult,
-  filterCurrentMonthPurchases,
-  sumPrice,
+  getFilteredPurchase,
+  isGroupPurchase,
 } from "../../utilities/purchaseUtilities";
 import { useAsset } from "../Context/AssetContext";
 
@@ -23,8 +23,6 @@ type PlainPurchaseHeaderProps = {
   currentMonthSpentList: PurchaseListType[];
   currentMonthIncomeList: PurchaseListType[];
   currentMoney: number;
-  currentMonthSpent: number;
-  currentMonthIncome: number;
   endOfMonthMoneyAmount: number;
 };
 
@@ -57,14 +55,6 @@ const PlainPurchaseHeader = memo(
                 <TableCell> {props.currentMoney}</TableCell>
               </TableRow>
               <TableRow>
-                <TableCell>今月の使用金額</TableCell>
-                <TableCell> {props.currentMonthSpent}</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>今月の収入</TableCell>
-                <TableCell> {props.currentMonthIncome}</TableCell>
-              </TableRow>
-              <TableRow>
                 <TableCell>今月末の残高</TableCell>
                 <TableCell> {props.endOfMonthMoneyAmount}</TableCell>
               </TableRow>
@@ -88,7 +78,10 @@ const PurchaseHeader = ({
     () =>
       sumAssets +
       calculateSpentAndIncomeResult(
-        purchaseList.filter((purchase) => purchase.date.toDate() < today)
+        purchaseList.filter(
+          (purchase) =>
+            purchase.date.toDate() < today && isGroupPurchase(purchase)
+        )
       ),
     [purchaseList, sumAssets, today]
   );
@@ -102,34 +95,12 @@ const PurchaseHeader = ({
       ),
     [purchaseList, sumAssets, today]
   );
-  const currentMonthSpentList = useMemo(
-    () =>
-      filterCurrentMonthPurchases(
-        purchaseList.filter((purchases) => purchases.income === false)
-      ),
-    [purchaseList]
-  );
-  const currentMonthSpent = useMemo(
-    () => sumPrice(currentMonthSpentList),
-    [currentMonthSpentList]
-  );
-  const currentMonthIncomeList = useMemo(
-    () =>
-      filterCurrentMonthPurchases(
-        purchaseList.filter((purchases) => purchases.income === true)
-      ),
-    [purchaseList]
-  );
-  const currentMonthIncome = useMemo(
-    () => sumPrice(currentMonthIncomeList),
-    [currentMonthIncomeList]
-  );
+  const currentMonthSpentList = getFilteredPurchase(purchaseList, "spent");
+  const currentMonthIncomeList = getFilteredPurchase(purchaseList, "income");
   const plainProps = {
     currentMonthSpentList,
     currentMonthIncomeList,
     currentMoney,
-    currentMonthSpent,
-    currentMonthIncome,
     endOfMonthMoneyAmount,
   };
   return <PlainPurchaseHeader {...plainProps} />;

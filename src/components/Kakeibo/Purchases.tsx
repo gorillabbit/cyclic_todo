@@ -18,7 +18,11 @@ import PurchasesRow from "./PurchasesRow";
 import AssetsList from "./AssetsList";
 import { addMonths } from "date-fns";
 import { useIsSmall } from "../../hooks/useWindowSize";
-import { isGroupPurchase } from "../../utilities/purchaseUtilities";
+import {
+  getFilteredPurchase,
+  isGroupPurchase,
+  sumPrice,
+} from "../../utilities/purchaseUtilities";
 
 type PlainPurchaseProps = {
   sortedPurchasesWithGroupFlag: PurchaseListType[];
@@ -27,6 +31,8 @@ type PlainPurchaseProps = {
   handleNextMonthButton: () => void;
   handlePastMonthButton: () => void;
   isSmall: boolean;
+  spentSum: number;
+  incomeSum: number;
 };
 
 const PlainPurchases = memo(
@@ -53,6 +59,16 @@ const PlainPurchases = memo(
         <TableContainer>
           <Table size="small">
             <TableHead>
+              <TableRow>
+                <TableCell />
+                <TableCell sx={{ paddingX: 0.5 }}>支出</TableCell>
+                <TableCell sx={{ paddingX: 0.5 }}>{props.spentSum}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell />
+                <TableCell sx={{ paddingX: 0.5 }}>収入</TableCell>
+                <TableCell sx={{ paddingX: 0.5 }}>{props.incomeSum}</TableCell>
+              </TableRow>
               <TableRow>
                 <TableCell />
                 <TableCell sx={{ paddingX: 0.5 }}>日付</TableCell>
@@ -140,6 +156,13 @@ const Purchases = (): JSX.Element => {
 
   const isSmall = useIsSmall();
 
+  const spentSum = sumPrice(
+    getFilteredPurchase(sortedPurchasesWithGroupFlag, "spent")
+  );
+  const incomeSum = sumPrice(
+    getFilteredPurchase(sortedPurchasesWithGroupFlag, "income")
+  );
+
   const plainProps = {
     sortedPurchasesWithGroupFlag,
     getGroupPurchases,
@@ -147,6 +170,8 @@ const Purchases = (): JSX.Element => {
     handleNextMonthButton,
     handlePastMonthButton,
     isSmall,
+    spentSum,
+    incomeSum,
   };
 
   return <PlainPurchases {...plainProps} />;
