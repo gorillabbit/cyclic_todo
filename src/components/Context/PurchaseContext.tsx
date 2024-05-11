@@ -6,14 +6,12 @@ import { useFirestoreQuery } from "../../utilities/firebaseUtilities";
 type PurchaseContextType = {
   purchaseList: PurchaseListType[];
   categorySet: string[];
-  methodSet: string[];
 };
 
 // Contextを作成（初期値は空のPurchaseListとダミーのsetPurchaseList関数）
 export const PurchaseContext = createContext<PurchaseContextType>({
   purchaseList: [],
   categorySet: [],
-  methodSet: [],
 });
 
 export const PurchaseProvider = memo(
@@ -29,15 +27,10 @@ export const PurchaseProvider = memo(
       (item, index) => categoryList.indexOf(item) === index && !!item
     );
     categorySet.push("");
-    const methodList = purchaseList.map((purchase) => purchase.method);
-    const methodSet = methodList.filter(
-      (item, index) => methodList.indexOf(item) === index && !!item
-    );
-    methodSet.push("");
 
     const context = useMemo(() => {
-      return { purchaseList, categorySet, methodSet };
-    }, [categorySet, methodSet, purchaseList]);
+      return { purchaseList, categorySet };
+    }, [categorySet, purchaseList]);
 
     return (
       <PurchaseContext.Provider value={context}>
