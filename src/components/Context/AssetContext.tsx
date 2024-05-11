@@ -1,10 +1,10 @@
 import { ReactNode, createContext, memo, useContext, useMemo } from "react";
 import { orderBy } from "firebase/firestore";
-import { AssetInputType, AssetType } from "../../types.js";
+import { AssetListType, AssetType } from "../../types.js";
 import { useFirestoreQuery } from "../../utilities/firebaseUtilities";
 
 type AssetContextType = {
-  assetList: AssetInputType[];
+  assetList: AssetListType[];
   sumAssets: number;
 };
 
@@ -19,7 +19,7 @@ export const AssetProvider = memo(
     const assetQueryConstraints = useMemo(() => [orderBy("timestamp")], []);
     const { documents: assetList } = useFirestoreQuery<
       AssetType,
-      AssetInputType
+      AssetListType
     >("Assets", assetQueryConstraints);
     const sumAssets = useMemo(
       () => assetList.reduce((acc, asset) => acc + Number(asset.balance), 0),

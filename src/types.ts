@@ -10,9 +10,8 @@ export type WeekDay =
   | "金曜日"
   | "土曜日";
 
-export interface TaskType {
+export interface TaskInputType {
   userId: string;
-  id?: string;
   text: string;
   hasDue: boolean;
   dueDate: string | Date;
@@ -27,12 +26,19 @@ export interface TaskType {
   icon: string;
   description: string;
 }
-export interface LogsCompleteLogsType {
-  id?: string;
+
+export interface TaskType extends TaskInputType {
+  id: string;
+}
+export interface LogsCompleteLogsInputType {
   logId: string;
   timestamp?: Timestamp;
   type?: string;
   memo: string;
+}
+
+export interface LogsCompleteLogsType extends LogsCompleteLogsInputType {
+  id: string;
 }
 
 export interface InputLogType {
@@ -61,20 +67,26 @@ export interface LogType extends InputLogType {
   id: string;
 }
 
-export interface AccountType {
+export interface AccountInputType {
   uid: string;
-  id?: string;
   email: string;
   name: string;
   icon: string;
   linkedAccounts: Pick<AccountType, "email" | "name" | "icon">[];
 }
 
-export interface AccountLinkType {
-  id?: string;
+export interface AccountType extends AccountInputType {
+  id: string;
+}
+
+export interface AccountLinkInputType {
   requester: Pick<AccountType, "email" | "name" | "icon">;
   receiver: Pick<AccountType, "email" | "name" | "icon">;
   status: "pending" | "rejected" | "accepted";
+}
+
+export interface AccountLinkType extends AccountLinkInputType {
+  id: string;
 }
 
 export interface InputPurchaseType {
@@ -89,32 +101,20 @@ export interface InputPurchaseType {
   parentScheduleId?: string;
   card?: boolean;
   group?: string;
+  childPurchaseId?: string;
 }
 
-export interface InputPurchaseTypeWithStringMethod
-  extends Omit<InputPurchaseType, "method"> {
-  method: string;
+export interface InputPurchaseRowType extends InputPurchaseType {
+  id: string;
 }
-export interface PurchaseType
-  extends Omit<InputPurchaseTypeWithStringMethod, "date"> {
+
+export interface PurchaseType extends Omit<InputPurchaseType, "date"> {
   date: Timestamp;
 }
 
 export interface PurchaseListType extends PurchaseType {
   id: string;
 }
-
-export const defaultNewPurchase: PurchaseListType = {
-  id: "",
-  userId: "",
-  title: "",
-  date: new Timestamp(0, 0),
-  category: "",
-  method: "",
-  price: 0,
-  income: false,
-  description: "",
-};
 
 export interface AssetType {
   userId: string;
@@ -126,11 +126,6 @@ export interface AssetListType extends AssetType {
   id: string;
 }
 
-export interface AssetInputType extends AssetListType {
-  tempName?: string;
-  tempBalance?: number;
-}
-
 export interface InputPurchaseScheduleType {
   userId: string;
   title: string;
@@ -138,7 +133,7 @@ export interface InputPurchaseScheduleType {
   date?: number;
   day?: WeekDay;
   cycle: string;
-  method: string;
+  method: MethodListType;
   category: string;
   income: boolean;
   description?: string;
@@ -172,4 +167,16 @@ export const defaultMethod: MethodListType = {
   assetId: "",
   timing: "",
   id: "",
+};
+
+export const defaultPurchase: PurchaseListType = {
+  id: "",
+  userId: "",
+  title: "",
+  date: new Timestamp(0, 0),
+  category: "",
+  method: defaultMethod,
+  price: 0,
+  income: false,
+  description: "",
 };

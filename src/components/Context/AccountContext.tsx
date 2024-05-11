@@ -1,7 +1,7 @@
 import { createContext, useState, useContext, useEffect } from "react";
-import { db } from "../../firebase.js";
+import { db } from "../../firebase";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
-import { AccountType } from "../../types.js";
+import { AccountInputType, AccountType } from "../../types.js";
 import { getAuth } from "firebase/auth";
 
 interface AccountContextProp {
@@ -15,6 +15,7 @@ type AccountContextType = {
 // Contextを作成（初期値は空のAccountListとダミーのsetAccountList関数）
 export const AccountContext = createContext<AccountContextType>({
   Account: {
+    id: "",
     uid: "",
     email: "",
     name: "",
@@ -40,7 +41,7 @@ export const AccountProvider: React.FC<AccountContextProp> = ({ children }) => {
       return onSnapshot(AccountQuery, (querySnapshot) => {
         const AccountsData = querySnapshot.docs.map((doc) => ({
           id: doc.id,
-          ...(doc.data() as AccountType),
+          ...(doc.data() as AccountInputType),
         }));
         setAccount(AccountsData[0]);
       });

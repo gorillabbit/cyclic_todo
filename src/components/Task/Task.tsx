@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import { addDocTask, deleteDocTask, updateDocTask } from "../../firebase.js";
+import { addDocTask, deleteDocTask, updateDocTask } from "../../firebase";
 import { calculateNext期日 } from "../../utilities/dateUtilities";
 import { getBackgroundColor } from "../../utilities/taskUtilities";
 
-import { serverTimestamp } from "firebase/firestore";
+import { Timestamp } from "firebase/firestore";
 import TaskDetail from "./TaskDetail";
 import { TaskType } from "../../types";
 import {
@@ -19,7 +19,7 @@ import { getAuth } from "firebase/auth";
 import { BodyTypography } from "../TypographyWrapper";
 import EditIcon from "@mui/icons-material/Edit";
 import TaskInputForm from "../InputForms/TaskInputForm";
-import { parse } from "date-fns";
+import { getUnixTime, parse } from "date-fns";
 
 interface TaskProps {
   task: TaskType;
@@ -33,7 +33,7 @@ const auth = getAuth();
 const toggleCompletion = (task: TaskType) => {
   updateDocTask(task.id, {
     completed: !task.completed,
-    toggleCompletionTimestamp: serverTimestamp(),
+    toggleCompletionTimestamp: new Timestamp(getUnixTime(new Date()), 0),
   });
 
   if (
@@ -51,6 +51,10 @@ const toggleCompletion = (task: TaskType) => {
       周期単位: task.周期単位,
       親taskId: task.親taskId ?? task.id,
       completed: false,
+      hasDue: false,
+      hasDueTime: false,
+      icon: "",
+      description: "",
     };
     addDocTask(newTask);
   }

@@ -15,6 +15,7 @@ const logStart = (
   const logsCompleteLogs = {
     logId: log.id,
     type: "start",
+    memo: "",
   };
   addDocLogsCompleteLog(logsCompleteLogs);
 };

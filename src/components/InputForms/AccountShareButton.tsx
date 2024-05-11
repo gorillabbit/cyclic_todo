@@ -67,10 +67,10 @@ const AccountShareButton = () => {
         });
       } else {
         addDocAccount({
-          uid: auth.currentUser?.uid,
-          email: auth.currentUser?.email,
-          name: auth.currentUser?.displayName,
-          icon: auth.currentUser?.photoURL,
+          uid: auth.currentUser?.uid ?? "",
+          email: auth.currentUser?.email ?? "",
+          name: auth.currentUser?.displayName ?? "",
+          icon: auth.currentUser?.photoURL ?? "",
           linkedAccounts: linkedAccounts,
         });
       }
@@ -114,9 +114,9 @@ const AccountShareButton = () => {
     if (email) {
       addDocAccountLink({
         requester: {
-          email: auth.currentUser?.email,
-          name: auth.currentUser?.displayName,
-          icon: auth.currentUser?.photoURL,
+          email: auth.currentUser?.email ?? "",
+          name: auth.currentUser?.displayName ?? "",
+          icon: auth.currentUser?.photoURL ?? "",
         },
         receiver: {
           email: email,
@@ -138,9 +138,9 @@ const AccountShareButton = () => {
   const acceptRequest = (receivedRequest: AccountLinkType) => {
     updateDocAccountLink(receivedRequest.id, {
       receiver: {
-        email: auth.currentUser?.email,
-        name: auth.currentUser?.displayName,
-        icon: auth.currentUser?.photoURL,
+        email: auth.currentUser?.email ?? "",
+        name: auth.currentUser?.displayName ?? "",
+        icon: auth.currentUser?.photoURL ?? "",
       },
       status: "accepted",
     });
@@ -150,10 +150,10 @@ const AccountShareButton = () => {
       });
     } else {
       addDocAccount({
-        uid: auth.currentUser?.uid,
-        email: auth.currentUser?.email,
-        name: auth.currentUser?.displayName,
-        icon: auth.currentUser?.photoURL,
+        uid: auth.currentUser?.uid ?? "",
+        email: auth.currentUser?.email ?? "",
+        name: auth.currentUser?.displayName ?? "",
+        icon: auth.currentUser?.photoURL ?? "",
         linkedAccounts: [receivedRequest.requester],
       });
     }

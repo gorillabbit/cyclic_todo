@@ -13,11 +13,11 @@ import { addDocAsset } from "../../firebase";
 import { getAuth } from "firebase/auth";
 import { useAsset } from "../Context/AssetContext";
 import { memo, useCallback } from "react";
-import { AssetInputType } from "../../types";
+import { AssetListType } from "../../types";
 import AssetRow from "./AssetRow";
 
 type PlainAssetsListProps = {
-  assetList: AssetInputType[];
+  assetList: AssetListType[];
   sumAssets: number;
   addAsset: () => void;
 };

@@ -10,7 +10,12 @@ import {
   TableHead,
 } from "@mui/material";
 import { memo, useCallback, useMemo, useState } from "react";
-import { AssetInputType, MethodListType, MethodType } from "../../types";
+import {
+  AssetListType,
+  AssetType,
+  MethodListType,
+  MethodType,
+} from "../../types";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -21,8 +26,8 @@ import MethodList from "./MethodList";
 import { useMethod } from "../Context/MethodContext";
 
 type PlainAssetRowProps = {
-  asset: AssetInputType;
-  assetInput: AssetInputType;
+  asset: AssetListType;
+  assetInput: AssetType;
   handleAssetInput: (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => void;
@@ -111,9 +116,9 @@ const PlainAssetRow = memo(
   )
 );
 
-const AssetRow = ({ asset }: { asset: AssetInputType }) => {
+const AssetRow = ({ asset }: { asset: AssetListType }) => {
   const [open, setOpen] = useState(false);
-  const [assetInput, setAssetInput] = useState<AssetInputType>(asset);
+  const [assetInput, setAssetInput] = useState<AssetListType>(asset);
 
   const handleAssetInput = useCallback(
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {

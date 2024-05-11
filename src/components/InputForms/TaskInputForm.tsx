@@ -8,9 +8,9 @@ import {
 } from "@mui/material";
 import { DatePicker, TimePicker } from "@mui/x-date-pickers";
 import { useState } from "react";
-import { addDocTask, updateDocTask } from "../../firebase.js";
+import { addDocTask, updateDocTask } from "../../firebase";
 import { format } from "date-fns";
-import { TaskType } from "../../types.js";
+import { TaskInputType, TaskType } from "../../types.js";
 import { getAuth } from "firebase/auth";
 import StyledCheckbox from "../StyledCheckbox";
 
@@ -31,7 +31,7 @@ const TaskInputForm: React.FC<TaskInputFormProp> = ({
   propTask,
   setIsOpenEditDialog,
 }) => {
-  const defaultNewTask: TaskType = propTask ?? {
+  const defaultNewTask: TaskInputType = propTask ?? {
     userId: "",
     text: "",
     hasDue: date ? true : false,
@@ -46,7 +46,7 @@ const TaskInputForm: React.FC<TaskInputFormProp> = ({
     description: "",
   };
 
-  const [newTask, setNewTask] = useState<TaskType>(defaultNewTask);
+  const [newTask, setNewTask] = useState<TaskInputType>(defaultNewTask);
   const handleNewTaskInput = (name: string, value: any) => {
     if (name === "周期日数" && parseInt(value, 10) <= 0) {
       alert("0以下は入力できません。");
@@ -55,7 +55,7 @@ const TaskInputForm: React.FC<TaskInputFormProp> = ({
     setNewTask((prev) => ({ ...prev, [name]: value }));
   };
 
-  const validateTask = (task: TaskType) => {
+  const validateTask = (task: TaskInputType) => {
     return {
       ...task,
       dueDate: format(task.dueDate as unknown as number, "yyyy年MM月dd日"),
@@ -69,12 +69,8 @@ const TaskInputForm: React.FC<TaskInputFormProp> = ({
   const addTask = () => {
     if (newTask && auth.currentUser) {
       const validatedTask = validateTask(newTask);
-      const taskToAdd =
-        validatedTask.is周期的 === "周期なし"
-          ? omitPeriodicFields(validatedTask)
-          : validatedTask;
       const userId = auth.currentUser.uid;
-      addDocTask({ ...taskToAdd, userId });
+      addDocTask({ ...validatedTask, userId });
       setNewTask(defaultNewTask);
     }
     buttonAction?.();
@@ -82,18 +78,16 @@ const TaskInputForm: React.FC<TaskInputFormProp> = ({
 
   const editTask = () => {
     if (newTask && auth.currentUser) {
-      const validatedTask = validateTask(newTask);
+      const validatedTask = validateTask(newTask) as TaskType;
       const userId = auth.currentUser.uid;
-      updateDocTask(validatedTask.id, { ...validatedTask, userId });
+      updateDocTask(validatedTask.id, {
+        ...validatedTask,
+        userId,
+      });
     }
     setIsOpenEditDialog?.(false);
   };
 
-  // 周期的なフィールドを省略
-  function omitPeriodicFields(task: TaskType) {
-    const { 周期日数, 周期単位, ...rest } = task;
-    return rest;
-  }
   return (
     <Box display="flex">
       <FormGroup row={true} sx={{ gap: 1, m: 1, width: "100%" }}>

@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 
 import { useState } from "react";
-import { addDocLog, updateDocLog } from "../../firebase.js";
+import { addDocLog, updateDocLog } from "../../firebase";
 import { InputLogType, LogType } from "../../types.js";
 import StyledCheckbox from "../StyledCheckbox";
 import { getAuth } from "firebase/auth";
