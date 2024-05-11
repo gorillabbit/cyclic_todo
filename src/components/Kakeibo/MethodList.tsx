@@ -13,7 +13,10 @@ import { memo, useCallback, useMemo, useState } from "react";
 import { MethodListType } from "../../types";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { deleteDocMethod, updateDocMethod } from "../../firebase";
-import { numericProps } from "../../utilities/purchaseUtilities";
+import {
+  isValidatedNum,
+  numericProps,
+} from "../../utilities/purchaseUtilities";
 
 type PlainMethodListProps = {
   method: MethodListType;
@@ -90,6 +93,14 @@ const MethodList = ({ method }: { method: MethodListType }) => {
   const handleMethodInput = useCallback(
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       const { name, value } = e.target;
+      if (name === "timingDate") {
+        if (isValidatedNum(value) && Number(value) < 32) {
+          setMethodInput((prev) => ({ ...prev, [name]: Number(value) }));
+          return;
+        } else {
+          return;
+        }
+      }
       setMethodInput((prev) => ({ ...prev, [name]: value }));
     },
     []
@@ -101,22 +112,23 @@ const MethodList = ({ method }: { method: MethodListType }) => {
   }, []);
 
   const saveChanges = useCallback(() => {
+    if (method.timing === "翌月" && method.timingDate < 1) {
+      alert("決済日は1以上を指定してください");
+      return;
+    }
     updateDocMethod(method.id, methodInput);
-  }, [method.id, methodInput]);
+  }, [method.id, method.timing, method.timingDate, methodInput]);
 
   const removeMethod = useCallback(() => {
     deleteDocMethod(method.id);
   }, [method.id]);
 
-  const isChanged = useMemo(() => {
-    if (method.label !== methodInput.label) {
-      return true;
-    } else if (method.timing !== methodInput.timing) {
-      return true;
-    } else {
-      return false;
-    }
-  }, [method, methodInput]);
+  const isChanged = useMemo(
+    () =>
+      method.label !== methodInput.label ||
+      method.timing !== methodInput.timing,
+    [method, methodInput]
+  );
 
   const plainProps = {
     method,

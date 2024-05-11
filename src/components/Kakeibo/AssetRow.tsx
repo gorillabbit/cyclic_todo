@@ -8,6 +8,7 @@ import {
   Table,
   TableBody,
   TableHead,
+  Box,
 } from "@mui/material";
 import { memo, useCallback, useMemo, useState } from "react";
 import {
@@ -15,15 +16,29 @@ import {
   AssetType,
   MethodListType,
   MethodType,
+  BalanceLog,
+  defaultMethod,
 } from "../../types";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-import { addDocMethod, deleteDocAsset, updateDocAsset } from "../../firebase";
+import {
+  addDocMethod,
+  deleteDocAsset,
+  deleteDocMethod,
+  updateDocAsset,
+} from "../../firebase";
 import { getAuth } from "firebase/auth";
 import MethodList from "./MethodList";
 import { useMethod } from "../Context/MethodContext";
+import {
+  calculateSpentAndIncomeResult,
+  numericProps,
+} from "../../utilities/purchaseUtilities";
+import { usePurchase } from "../Context/PurchaseContext";
+import { Timestamp } from "firebase/firestore";
+import { getUnixTime } from "date-fns";
 
 type PlainAssetRowProps = {
   asset: AssetListType;
@@ -31,13 +46,23 @@ type PlainAssetRowProps = {
   handleAssetInput: (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => void;
-  isChanged: boolean;
+  isNameChanged: boolean;
+  isBalanceChanged: boolean;
   removeAsset: () => void;
   saveChanges: () => void;
+  updateLog: () => void;
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   filteredMethodList: MethodListType[];
   addMethod: () => void;
+  relatedPurchases: number;
+  handleBalanceInput: (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => void;
+  balanceInput: number;
+  isAddedPurchases: boolean;
+  currentBalance: number;
+  displayBalance: number;
 };
 
 const PlainAssetRow = memo(
@@ -62,21 +87,38 @@ const PlainAssetRow = memo(
             size="small"
           />
         </TableCell>
-        <TableCell>
+        <TableCell sx={{ display: "flex" }}>
           <TextField
-            type="number"
             variant="outlined"
-            value={props.assetInput.balance ?? props.asset.balance}
+            value={
+              props.isBalanceChanged ? props.balanceInput : props.displayBalance
+            }
             name="balance"
-            onChange={props.handleAssetInput}
+            onChange={props.handleBalanceInput}
             size="small"
+            inputProps={numericProps}
           />
+          {props.isAddedPurchases && (
+            <Box alignContent="center" ml={1}>
+              {"→ " + props.currentBalance}
+            </Box>
+          )}
         </TableCell>
         <TableCell>
           <Button
             variant="contained"
             color="primary"
-            disabled={!props.isChanged}
+            disabled={!props.isAddedPurchases}
+            onClick={props.updateLog}
+          >
+            更新
+          </Button>
+        </TableCell>
+        <TableCell>
+          <Button
+            variant="contained"
+            color="primary"
+            disabled={!props.isNameChanged && !props.isBalanceChanged}
             onClick={props.saveChanges}
           >
             変更
@@ -89,7 +131,7 @@ const PlainAssetRow = memo(
         </TableCell>
       </TableRow>
       <TableRow>
-        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+        <TableCell sx={{ paddingY: 0 }} colSpan={6}>
           <Collapse in={props.open} timeout="auto" unmountOnExit>
             <Table size="small" aria-label="purchases">
               <TableHead>
@@ -119,6 +161,10 @@ const PlainAssetRow = memo(
 const AssetRow = ({ asset }: { asset: AssetListType }) => {
   const [open, setOpen] = useState(false);
   const [assetInput, setAssetInput] = useState<AssetListType>(asset);
+  const [balanceLogs, setBalanceLogs] = useState(asset.balanceLog);
+  const latestLog = balanceLogs.slice(-1)[0];
+  const displayBalance = latestLog.balance;
+  const [balanceInput, setBalanceInput] = useState<number>(displayBalance);
 
   const handleAssetInput = useCallback(
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -128,42 +174,90 @@ const AssetRow = ({ asset }: { asset: AssetListType }) => {
     []
   );
 
+  const handleBalanceInput = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { value } = e.target;
+    const numValue = Number(value);
+    Number.isNaN(numValue)
+      ? alert("不適切な入力です")
+      : setBalanceInput(numValue);
+  };
+
+  const isNameChanged = useMemo(
+    () => asset.name !== assetInput.name,
+    [asset.name, assetInput.name]
+  );
+
+  const isBalanceChanged = useMemo(
+    () => displayBalance !== balanceInput,
+    [balanceInput, displayBalance]
+  );
+
+  const getNewLog = useCallback(
+    (balance: number): BalanceLog => ({
+      timestamp: new Timestamp(getUnixTime(new Date()), 0),
+      balance: balance,
+    }),
+    []
+  );
+
+  // 配列を更新してもreactが更新されないため。stateで更新する必要がある
   const saveChanges = useCallback(() => {
-    updateDocAsset(asset.id, assetInput);
-  }, [asset.id, assetInput]);
-
-  const removeAsset = useCallback(() => {
-    deleteDocAsset(asset.id);
-  }, [asset.id]);
-
-  const isChanged = useMemo(() => {
-    if (asset.name !== assetInput.name) {
-      return true;
-    } else if (asset.balance !== assetInput.balance) {
-      return true;
-    } else {
-      return false;
+    const updates = assetInput;
+    const newLog = getNewLog(balanceInput);
+    if (isBalanceChanged) {
+      updates.balanceLog.push(newLog);
     }
-  }, [asset, assetInput]);
+    updateDocAsset(asset.id, updates);
+    setBalanceLogs((prev) => [...prev, newLog]);
+  }, [asset.id, assetInput, balanceInput, getNewLog, isBalanceChanged]);
 
   const { methodList } = useMethod();
   const filteredMethodList = methodList.filter(
     (method) => method.assetId === asset.id
   );
 
+  const removeAsset = useCallback(() => {
+    deleteDocAsset(asset.id);
+    if (filteredMethodList.length > 0) {
+      filteredMethodList.forEach((method) => deleteDocMethod(method.id));
+    }
+  }, [asset.id, filteredMethodList]);
+
   const auth = getAuth();
   const addMethod = useCallback(() => {
     if (auth.currentUser) {
       const userId = auth.currentUser.uid;
       const newMethod: MethodType = {
-        userId: userId,
-        label: "",
+        ...defaultMethod,
+        userId,
         assetId: asset.id,
-        timing: "即時",
       };
       addDocMethod(newMethod);
     }
   }, [asset.id, auth.currentUser]);
+
+  const { purchaseList } = usePurchase();
+  const relatedPurchases = calculateSpentAndIncomeResult(
+    purchaseList.filter(
+      (purchase) =>
+        purchase.method?.assetId === asset.id &&
+        purchase.date.toDate() < new Date() &&
+        latestLog.timestamp.toDate() < purchase.date.toDate()
+    )
+  );
+
+  const currentBalance = displayBalance + relatedPurchases;
+  const isAddedPurchases = relatedPurchases !== 0;
+  const updateLog = useCallback(() => {
+    const balanceLog = getNewLog(currentBalance);
+    updateDocAsset(asset.id, {
+      balanceLog: [...assetInput.balanceLog, balanceLog],
+    });
+    setBalanceLogs((prev) => [...prev, balanceLog]);
+    setBalanceInput(currentBalance);
+  }, [asset.id, assetInput.balanceLog, currentBalance, getNewLog]);
 
   const plainProps = {
     asset,
@@ -171,11 +265,19 @@ const AssetRow = ({ asset }: { asset: AssetListType }) => {
     setOpen,
     assetInput,
     handleAssetInput,
-    isChanged,
+    isNameChanged,
+    isBalanceChanged,
     saveChanges,
+    updateLog,
     removeAsset,
     filteredMethodList,
     addMethod,
+    relatedPurchases,
+    handleBalanceInput,
+    balanceInput,
+    isAddedPurchases,
+    currentBalance,
+    displayBalance,
   };
 
   return <PlainAssetRow {...plainProps} />;

@@ -15,7 +15,7 @@ import {
   InputPurchaseScheduleType,
   InputPurchaseType,
   WeekDay,
-  defaultMethod,
+  defaultMethodList,
 } from "../../types";
 import { addDays, addMonths, addYears, nextDay } from "date-fns";
 import { DatePicker } from "@mui/x-date-pickers";
@@ -35,7 +35,7 @@ const PurchaseScheduleInput = () => {
     date: 1,
     day: "月曜日",
     category: "",
-    method: defaultMethod,
+    method: defaultMethodList,
     price: 0,
     income: false,
     description: "",

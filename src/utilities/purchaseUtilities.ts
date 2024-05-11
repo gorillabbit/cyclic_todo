@@ -1,5 +1,5 @@
 import { InputBaseComponentProps } from "@mui/material";
-import { PurchaseListType } from "../types";
+import { AssetListType, PurchaseListType } from "../types";
 
 export const calculateSpentAndIncomeResult = (
   purchasesList: PurchaseListType[]
@@ -53,3 +53,8 @@ export const getFilteredPurchase = (
     return purchasesList.filter((purchases) => purchases.income === false);
   }
 };
+
+export const getLatestBalance = (asset: AssetListType) =>
+  Number(asset.balanceLog.slice(-1)[0].balance)
+    ? Number(asset.balanceLog.slice(-1)[0].balance)
+    : 0;

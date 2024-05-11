@@ -114,10 +114,24 @@ export interface PurchaseListType extends PurchaseType {
   id: string;
 }
 
-export interface AssetType {
+export interface InputBalanceLog {
+  timestamp: Date;
+  balance: number;
+}
+
+export interface BalanceLog {
+  timestamp: Timestamp;
+  balance: number;
+}
+
+export interface InputAssetType {
   userId: string;
   name: string;
-  balance: number;
+  balanceLog: InputBalanceLog[];
+}
+
+export interface AssetType extends Omit<InputAssetType, "balanceLog"> {
+  balanceLog: BalanceLog[];
 }
 
 export interface AssetListType extends AssetType {
@@ -152,18 +166,23 @@ export interface MethodType {
   label: string;
   assetId: string;
   timing: "即時" | "翌月";
-  timingDate?: number;
+  timingDate: number;
 }
 
 export interface MethodListType extends MethodType {
   id: string;
 }
 
-export const defaultMethod: MethodListType = {
+export const defaultMethod: MethodType = {
   userId: "",
   label: "",
   assetId: "",
   timing: "即時",
+  timingDate: 0,
+};
+
+export const defaultMethodList: MethodListType = {
+  ...defaultMethod,
   id: "",
 };
 
@@ -172,7 +191,7 @@ export const defaultPurchaseInput: InputPurchaseType = {
   title: "",
   date: new Date(),
   category: "",
-  method: defaultMethod,
+  method: defaultMethodList,
   price: 0,
   income: false,
   description: "",

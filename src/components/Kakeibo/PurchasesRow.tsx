@@ -267,7 +267,7 @@ const PurchasesRow = ({
   });
   const [open, setOpen] = useState(false);
   const { categorySet } = usePurchase();
-  const isGroup = groupPurchases.length > 0;
+  const isGroup = groupPurchases.length > 0 && !purchase.childPurchaseId;
 
   // 編集モードに切り替える関数
   const handleEditClick = useCallback(() => {

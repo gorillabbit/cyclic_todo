@@ -22,11 +22,11 @@ import {
   InputPurchaseType,
   InputPurchaseScheduleType,
   AssetType,
-  AssetListType,
   TaskInputType,
   AccountInputType,
   AccountLinkInputType,
   LogsCompleteLogsInputType,
+  InputAssetType,
 } from "./types";
 
 // Your web app's Firebase configuration
@@ -138,9 +138,9 @@ export const addDocPurchaseTemplate = (v: InputPurchaseType) =>
 export const deleteDocPurchaseTemplate = (id: string) =>
   deleteDocOperation(PurchaseTemplates, id);
 
-export const addDocAsset = (asset: AssetType) =>
+export const addDocAsset = (asset: InputAssetType) =>
   addDocOperation("Assets", asset);
-export const updateDocAsset = (id: string, updates: AssetListType) =>
+export const updateDocAsset = (id: string, updates: Partial<AssetType>) =>
   updateDocOperation("Assets", id, updates);
 export const deleteDocAsset = (id: string) => deleteDocOperation("Assets", id);
 

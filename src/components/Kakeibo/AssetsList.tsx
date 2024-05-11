@@ -31,6 +31,7 @@ const PlainAssetsList = memo(
             <TableCell></TableCell>
             <TableCell>名前</TableCell>
             <TableCell>残高</TableCell>
+            <TableCell>更新</TableCell>
             <TableCell>変更保存</TableCell>
             <TableCell>削除</TableCell>
           </TableRow>
@@ -68,7 +69,7 @@ const AssetTable = () => {
       const newAsset = {
         userId: userId,
         name: "",
-        balance: 0,
+        balanceLog: [{ timestamp: new Date(), balance: 0 }],
       };
       addDocAsset(newAsset);
     }
