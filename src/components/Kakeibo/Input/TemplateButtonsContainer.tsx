@@ -7,16 +7,16 @@ import {
 } from "../../../types";
 import { orderBy } from "firebase/firestore";
 import { useFirestoreQuery } from "../../../utilities/firebaseUtilities";
-import { PurchaseTemplates } from "../../../firebase";
 import TemplateButton from "./TemplateButton";
+import { dbNames } from "../../../firebase";
 
-type plainPlainTemplateButtonsContainerProps = {
+type PlainTemplateButtonsContainerProps = {
   templates: PurchaseListType[];
   setNewPurchase: (value: React.SetStateAction<InputPurchaseType>) => void;
 };
 
 const PlainTemplateButtonsContainer = memo(
-  (props: plainPlainTemplateButtonsContainerProps): JSX.Element => (
+  (props: PlainTemplateButtonsContainerProps): JSX.Element => (
     <>
       <Box m={0.5}>
         {props.templates.map((template) => (
@@ -43,7 +43,7 @@ const TemplateButtonsContainer = ({
   const { documents: templates } = useFirestoreQuery<
     PurchaseType,
     PurchaseListType
-  >(PurchaseTemplates, purchaseTemplatesQueryConstraints);
+  >(dbNames.purchaseTemplate, purchaseTemplatesQueryConstraints);
 
   const plainProps = {
     templates,

@@ -173,6 +173,20 @@ export interface MethodListType extends MethodType {
   id: string;
 }
 
+export interface InputTransferType {
+  userId: string;
+  price: number;
+  date: Date;
+  from: MethodListType;
+  to: MethodListType;
+  description: string;
+}
+
+export interface TransferType extends Omit<InputTransferType, "date"> {
+  id: string;
+  date: Timestamp;
+}
+
 export const defaultMethod: MethodType = {
   userId: "",
   label: "",
@@ -202,4 +216,13 @@ export const defaultPurchase: PurchaseListType = {
   ...defaultPurchaseInput,
   id: "",
   date: new Timestamp(0, 0),
+};
+
+export const defaultTransferInput: InputTransferType = {
+  userId: "",
+  price: 0,
+  date: new Date(),
+  from: defaultMethodList,
+  to: defaultMethodList,
+  description: "",
 };

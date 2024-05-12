@@ -27,6 +27,7 @@ import {
   AccountLinkInputType,
   LogsCompleteLogsInputType,
   InputAssetType,
+  InputTransferType,
 } from "./types";
 
 // Your web app's Firebase configuration
@@ -80,79 +81,97 @@ const deleteDocOperation = async (collectionName: string, id: string) => {
   }
 };
 
+export const dbNames = {
+  task: "tasks",
+  log: "logs",
+  logsCompleteLog: "logsCompleteLogs",
+  account: "Accounts",
+  accountLink: "AccountLinks",
+  purchase: "Purchases",
+  purchaseTemplate: "PurchaseTemplates",
+  asset: "Assets",
+  purchaseSchedule: "PurchaseSchedules",
+  method: "Methods",
+  transferTemplate: "TransferTemplates",
+};
+
 export const addDocTask = (task: TaskInputType) =>
-  addDocOperation("tasks", { ...task, completed: false });
+  addDocOperation(dbNames.task, { ...task, completed: false });
 export const updateDocTask = (id: string, feature: Partial<TaskType>) =>
-  updateDocOperation("tasks", id, feature);
-export const deleteDocTask = (id: string) => deleteDocOperation("tasks", id);
+  updateDocOperation(dbNames.task, id, feature);
+export const deleteDocTask = (id: string) =>
+  deleteDocOperation(dbNames.task, id);
 
 export const addDocLog = (doc: InputLogType) =>
-  addDocOperation("logs", { ...doc, reviewed: false });
+  addDocOperation(dbNames.log, { ...doc, reviewed: false });
 export const updateDocLog = (id: string, feature: Partial<LogType>) =>
-  updateDocOperation("logs", id, feature);
-export const deleteDocLog = (id: string) => deleteDocOperation("logs", id);
+  updateDocOperation(dbNames.log, id, feature);
+export const deleteDocLog = (id: string) => deleteDocOperation(dbNames.log, id);
 
 export const addDocLogsCompleteLog = (log: LogsCompleteLogsInputType) =>
-  addDocOperation("logsCompleteLogs", { ...log, processed: true });
+  addDocOperation(dbNames.logsCompleteLog, { ...log, processed: true });
 export const deleteDocLogsCompleteLog = (id: string) =>
-  deleteDocOperation("logsCompleteLogs", id);
+  deleteDocOperation(dbNames.logsCompleteLog, id);
 
 export const addDocAccount = (account: AccountInputType) =>
-  addDocOperation("Accounts", account);
+  addDocOperation(dbNames.account, account);
 export const updateDocAccount = (id: string, updates: Partial<AccountType>) =>
-  updateDocOperation("Accounts", id, updates);
+  updateDocOperation(dbNames.account, id, updates);
 export const deleteDocAccount = (id: string) =>
-  deleteDocOperation("Accounts", id);
+  deleteDocOperation(dbNames.account, id);
 
 export const addDocAccountLink = (link: AccountLinkInputType) =>
-  addDocOperation("AccountLinks", link);
+  addDocOperation(dbNames.accountLink, link);
 export const updateDocAccountLink = (
   id: string,
   updates: Partial<AccountLinkType>
-) => updateDocOperation("AccountLinks", id, updates);
+) => updateDocOperation(dbNames.accountLink, id, updates);
 export const deleteDocAccountLink = (id: string) =>
-  deleteDocOperation("AccountLinks", id);
+  deleteDocOperation(dbNames.accountLink, id);
 
 export const addDocPurchase = (v: InputPurchaseType) =>
-  addDocOperation("Purchases", v);
+  addDocOperation(dbNames.purchase, v);
 export const updateDocPurchase = (
   id: string,
   updates: Partial<InputPurchaseRowType>
-) => updateDocOperation("Purchases", id, updates);
+) => updateDocOperation(dbNames.purchase, id, updates);
 export const batchAddDocPurchase = (purchaseList: InputPurchaseType[]) => {
   const batch = writeBatch(db);
   // オブジェクトをバッチに追加
   purchaseList.forEach((obj) => {
-    const docRef = doc(collection(db, "Purchases")); // collectionNameは適宜替えてください
+    const docRef = doc(collection(db, dbNames.purchase)); // collectionNameは適宜替えてください
     batch.set(docRef, obj);
   });
   // バッチ操作を実行
   batch.commit().catch((error) => console.error("バッチ書き込み失敗:", error));
 };
 export const deleteDocPurchase = (id: string) =>
-  deleteDocOperation("Purchases", id);
+  deleteDocOperation(dbNames.purchase, id);
 
-export const PurchaseTemplates = "PurchaseTemplates";
 export const addDocPurchaseTemplate = (v: InputPurchaseType) =>
-  addDocOperation(PurchaseTemplates, v);
+  addDocOperation(dbNames.purchaseTemplate, v);
 export const deleteDocPurchaseTemplate = (id: string) =>
-  deleteDocOperation(PurchaseTemplates, id);
+  deleteDocOperation(dbNames.purchaseTemplate, id);
 
 export const addDocAsset = (asset: InputAssetType) =>
-  addDocOperation("Assets", asset);
+  addDocOperation(dbNames.asset, asset);
 export const updateDocAsset = (id: string, updates: Partial<AssetType>) =>
-  updateDocOperation("Assets", id, updates);
-export const deleteDocAsset = (id: string) => deleteDocOperation("Assets", id);
+  updateDocOperation(dbNames.asset, id, updates);
+export const deleteDocAsset = (id: string) =>
+  deleteDocOperation(dbNames.asset, id);
 
 export const addDocPurchaseSchedule = (
   PurchaseSchedule: InputPurchaseScheduleType
-) => addDocOperation("PurchaseSchedules", PurchaseSchedule);
+) => addDocOperation(dbNames.purchaseSchedule, PurchaseSchedule);
 
-export const addDocMethod = (v: MethodType) => {
-  console.log(v);
-  addDocOperation("Methods", v);
-};
+export const addDocMethod = (v: MethodType) =>
+  addDocOperation(dbNames.method, v);
 export const updateDocMethod = (id: string, updates: MethodListType) =>
-  updateDocOperation("Methods", id, updates);
+  updateDocOperation(dbNames.method, id, updates);
 export const deleteDocMethod = (id: string) =>
-  deleteDocOperation("Methods", id);
+  deleteDocOperation(dbNames.method, id);
+
+export const addDocTransferTemplate = (v: InputTransferType) =>
+  addDocOperation(dbNames.transferTemplate, v);
+export const deleteDocTransferTemplate = (id: string) =>
+  deleteDocOperation(dbNames.transferTemplate, id);

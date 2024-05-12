@@ -4,7 +4,7 @@ import { InputPurchaseType, PurchaseListType } from "../../../types";
 import { deleteDocPurchaseTemplate } from "../../../firebase";
 import DeleteConfirmDialog from "../DeleteConfirmDialog";
 
-type plainPlainTemplateButtonProps = {
+type PlainTemplateButtonProps = {
   template: PurchaseListType;
   onClickTemplateButton: () => void;
   handleDeleteButtonClick: () => void;
@@ -14,7 +14,7 @@ type plainPlainTemplateButtonProps = {
 };
 
 const PlainTemplateButton = memo(
-  (props: plainPlainTemplateButtonProps): JSX.Element => (
+  (props: PlainTemplateButtonProps): JSX.Element => (
     <>
       <Chip
         sx={{ m: 0.5 }}
@@ -23,13 +23,7 @@ const PlainTemplateButton = memo(
         label={props.template.title}
       />
       <DeleteConfirmDialog
-        target={
-          <Chip
-            sx={{ m: 0.5 }}
-            key={props.template.id}
-            label={props.template.title}
-          />
-        }
+        target={<Chip sx={{ m: 0.5 }} label={props.template.title} />}
         openDialog={props.openDialog}
         setOpenDialog={props.setOpenDialog}
         deleteAction={props.deleteAction}
