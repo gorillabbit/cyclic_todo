@@ -44,8 +44,8 @@ const PlainTransferInput = memo(
   (props: plainTransferInputProps): JSX.Element => (
     <>
       <TransferTemplateButtonsContainer setNewTransfer={props.setNewTransfer} />
-      <Box display="flex" m={2}>
-        <FormGroup row={true} sx={{ gap: 1, m: 1, width: "100%" }}>
+      <Box display="flex">
+        <FormGroup row={true} sx={{ gap: 1, mr: 1, width: "100%" }}>
           <TextField
             label="金額"
             value={props.newTransfer.price}

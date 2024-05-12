@@ -34,8 +34,8 @@ const PlainPurchaseInput = memo(
   (props: plainPurchaseInputProps): JSX.Element => (
     <>
       <TemplateButtons setNewPurchase={props.setNewPurchase} />
-      <Box display="flex" m={2}>
-        <FormGroup row={true} sx={{ gap: 1, m: 1, width: "100%" }}>
+      <Box display="flex">
+        <FormGroup row={true} sx={{ gap: 1, mr: 1, width: "100%" }}>
           <TextField
             label="品目"
             value={props.newPurchase.title}
@@ -96,7 +96,7 @@ const PlainPurchaseInput = memo(
             }
           />
         </FormGroup>
-        <Box my={1} gap={1} display="flex" flexDirection="column">
+        <Box gap={1} display="flex" flexDirection="column">
           <Button
             sx={{ height: "50%" }}
             variant="contained"

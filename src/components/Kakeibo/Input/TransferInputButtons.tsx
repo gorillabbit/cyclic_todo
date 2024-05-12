@@ -9,7 +9,7 @@ type PlainTransferInputButtonsProps = {
 
 const PlainTransferInputButtons = memo(
   (props: PlainTransferInputButtonsProps): JSX.Element => (
-    <Box my={1} gap={1} display="flex" flexDirection="column">
+    <Box gap={1} display="flex" flexDirection="column">
       <Button
         sx={{ height: "50%" }}
         variant="contained"

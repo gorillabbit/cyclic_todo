@@ -173,8 +173,8 @@ const PurchaseScheduleInput = () => {
   };
 
   return (
-    <Box display="flex" m={2}>
-      <FormGroup row={true} sx={{ gap: 1, m: 1, width: "100%" }}>
+    <Box display="flex">
+      <FormGroup row={true} sx={{ gap: 1, mr: 1, width: "100%" }}>
         <TextField
           label="品目"
           value={newPurchaseSchedule.title}
@@ -270,7 +270,7 @@ const PurchaseScheduleInput = () => {
           onChange={(value) => handleNewPurchaseScheduleInput("endDate", value)}
         />
       </FormGroup>
-      <Button sx={{ my: 1 }} variant="contained" onClick={addPurchaseSchedule}>
+      <Button variant="contained" onClick={addPurchaseSchedule}>
         追加
       </Button>
     </Box>

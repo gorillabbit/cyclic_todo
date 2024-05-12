@@ -8,11 +8,12 @@ const InputForms = () => {
   const [isSchedule, setIsSchedule] = useState<string>("記録");
   //愚直に三項演算子で条件分岐すると、コンポーネントが再レンダリングされて入力内容が保存されない
   return (
-    <Box m={2}>
+    <>
       <ToggleButtonGroup
         value={isSchedule}
         exclusive
         onChange={(_e, v) => setIsSchedule(v)}
+        sx={{ my: 1 }}
       >
         <ToggleButton value="記録">記録</ToggleButton>
         <ToggleButton value="予定">予定</ToggleButton>
@@ -27,7 +28,7 @@ const InputForms = () => {
       <Box display={isSchedule === "送金" ? "block" : "none"}>
         <TransferInput />
       </Box>
-    </Box>
+    </>
   );
 };
 
