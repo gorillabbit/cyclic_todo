@@ -23,6 +23,7 @@ const PlainTemplateButtonsContainer = memo(
           <TemplateButton
             template={template}
             setNewPurchase={props.setNewPurchase}
+            key={template.id}
           />
         ))}
       </Box>

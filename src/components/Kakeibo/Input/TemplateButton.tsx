@@ -18,7 +18,6 @@ const PlainTemplateButton = memo(
     <>
       <Chip
         sx={{ m: 0.5 }}
-        key={props.template.id}
         onClick={() => props.onClickTemplateButton()}
         onDelete={props.handleDeleteButtonClick}
         label={props.template.title}
