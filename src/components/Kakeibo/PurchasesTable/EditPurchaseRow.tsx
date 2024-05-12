@@ -1,0 +1,314 @@
+import {
+  TableCell,
+  TextField,
+  Autocomplete,
+  IconButton,
+  TableRow,
+} from "@mui/material";
+import { DatePicker } from "@mui/x-date-pickers";
+import { memo, useCallback } from "react";
+import DoneIcon from "@mui/icons-material/Done";
+import {
+  InputPurchaseRowType,
+  MethodListType,
+  PurchaseListType,
+} from "../../../types";
+import { useMethod } from "../../Context/MethodContext";
+import { usePurchase } from "../../Context/PurchaseContext";
+import {
+  updateDocPurchase,
+  deleteDocPurchase,
+  addDocPurchase,
+} from "../../../firebase";
+import { getPayLaterDate } from "../../../utilities/dateUtilities";
+
+type PlainEditPurchaseRowProps = {
+  editFormData: InputPurchaseRowType;
+  handleDateFormChange: (value: Date | null | undefined) => void;
+  handleEditFormChange: (event: {
+    target: {
+      name: string;
+      value: any;
+    };
+  }) => void;
+  categorySet: string[];
+  handleAutocompleteChange: (name: string, value: any) => void;
+  methodList: MethodListType[];
+  handleMethodChange: (value: string | MethodListType | null) => void;
+  isSmall: boolean;
+  handleSaveClick: () => void;
+};
+
+const PlainEditPurchaseRow = memo(
+  (props: PlainEditPurchaseRowProps): JSX.Element => (
+    <>
+      {props.isSmall ? (
+        <>
+          <TableRow>
+            <TableCell />
+            <TableCell sx={{ paddingX: 0.5 }}>
+              <DatePicker
+                name="date"
+                value={props.editFormData.date}
+                onChange={props.handleDateFormChange}
+                slotProps={{ textField: { size: "small" } }}
+                sx={{ maxWidth: 190 }}
+              />
+            </TableCell>
+            <TableCell sx={{ paddingX: 0.5 }}>
+              <TextField
+                name="title"
+                value={props.editFormData.title}
+                onChange={props.handleEditFormChange}
+                size="small"
+              />
+            </TableCell>
+            <TableCell sx={{ paddingX: 0.5 }}>
+              <TextField
+                name="price"
+                value={props.editFormData.price}
+                onChange={props.handleEditFormChange}
+                size="small"
+              />
+            </TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell sx={{ paddingX: 0.5 }} />
+            <TableCell sx={{ paddingX: 0.5 }}>
+              <Autocomplete
+                value={props.editFormData.category}
+                sx={{ minWidth: 150 }}
+                options={props.categorySet}
+                freeSolo
+                onChange={(e, v) =>
+                  props.handleAutocompleteChange("category", v)
+                }
+                renderInput={(params) => (
+                  <TextField {...params} label="分類" size="small" />
+                )}
+              />
+            </TableCell>
+            <TableCell sx={{ paddingX: 0.5 }}>
+              <Autocomplete
+                value={props.editFormData.method}
+                sx={{ minWidth: 150 }}
+                options={props.methodList}
+                freeSolo
+                onChange={(_e, v) => props.handleMethodChange(v)}
+                renderInput={(params) => (
+                  <TextField {...params} label="支払い方法" size="small" />
+                )}
+              />
+            </TableCell>
+            <TableCell sx={{ paddingX: 0.5 }}>
+              <TextField
+                name="income"
+                value={props.editFormData.income ? "収入" : "支出"}
+                onChange={props.handleEditFormChange}
+                size="small"
+              />
+            </TableCell>
+            {!props.isSmall && (
+              <TableCell sx={{ paddingX: 0.5 }}>
+                <TextField
+                  name="description"
+                  value={props.editFormData.description}
+                  onChange={props.handleEditFormChange}
+                  size="small"
+                />
+              </TableCell>
+            )}
+            <TableCell padding="none">
+              <IconButton onClick={props.handleSaveClick} color="success">
+                <DoneIcon />
+              </IconButton>
+            </TableCell>
+          </TableRow>
+        </>
+      ) : (
+        <TableRow>
+          <TableCell />
+          <TableCell sx={{ paddingX: 0.5 }}>
+            <DatePicker
+              name="date"
+              value={props.editFormData.date}
+              onChange={props.handleDateFormChange}
+              slotProps={{ textField: { size: "small" } }}
+              sx={{ maxWidth: 190 }}
+            />
+          </TableCell>
+          <TableCell sx={{ paddingX: 0.5 }}>
+            <TextField
+              name="title"
+              value={props.editFormData.title}
+              onChange={props.handleEditFormChange}
+              size="small"
+            />
+          </TableCell>
+          <TableCell sx={{ paddingX: 0.5 }}>
+            <TextField
+              name="price"
+              value={props.editFormData.price}
+              onChange={props.handleEditFormChange}
+              size="small"
+            />
+          </TableCell>
+          <TableCell sx={{ paddingX: 0.5 }}>
+            <Autocomplete
+              value={props.editFormData.category}
+              sx={{ minWidth: 150 }}
+              options={props.categorySet}
+              freeSolo
+              onChange={(e, v) => props.handleAutocompleteChange("category", v)}
+              renderInput={(params) => (
+                <TextField {...params} label="分類" size="small" />
+              )}
+            />
+          </TableCell>
+          <TableCell sx={{ paddingX: 0.5 }}>
+            <Autocomplete
+              value={props.editFormData.method}
+              sx={{ minWidth: 150 }}
+              options={props.methodList}
+              freeSolo
+              onChange={(_e, v) => props.handleMethodChange(v)}
+              renderInput={(params) => (
+                <TextField {...params} label="支払い方法" size="small" />
+              )}
+            />
+          </TableCell>
+          <TableCell sx={{ paddingX: 0.5 }}>
+            <TextField
+              name="income"
+              value={props.editFormData.income ? "収入" : "支出"}
+              onChange={props.handleEditFormChange}
+              size="small"
+            />
+          </TableCell>
+          {!props.isSmall && (
+            <TableCell sx={{ paddingX: 0.5 }}>
+              <TextField
+                name="description"
+                value={props.editFormData.description}
+                onChange={props.handleEditFormChange}
+                size="small"
+              />
+            </TableCell>
+          )}
+          <TableCell padding="none">
+            <IconButton onClick={props.handleSaveClick} color="success">
+              <DoneIcon />
+            </IconButton>
+          </TableCell>
+        </TableRow>
+      )}
+    </>
+  )
+);
+const EditPurchaseRow = ({
+  purchase,
+  setIsEdit,
+  editFormData,
+  setEditFormData,
+  isSmall,
+}: {
+  purchase: PurchaseListType;
+  setIsEdit: React.Dispatch<React.SetStateAction<boolean>>;
+  editFormData: InputPurchaseRowType;
+  setEditFormData: React.Dispatch<React.SetStateAction<InputPurchaseRowType>>;
+  isSmall: boolean;
+}) => {
+  const { methodList } = useMethod();
+  const { categorySet } = usePurchase();
+
+  // 編集内容を保存する関数
+  const handleSaveClick = useCallback(() => {
+    // アップデートし、編集を閉じる
+    const updateCurrentPurchase = (feature: Partial<InputPurchaseRowType>) => {
+      updateDocPurchase(editFormData.id, {
+        ...editFormData,
+        ...feature,
+      });
+      setIsEdit(false);
+    };
+    // 決済Purchaseも変更する
+    const { id, ...childPurchaseWithoutId } = editFormData;
+    // 日付の変更にも対応できるようにする
+    const childPurchase = {
+      ...childPurchaseWithoutId,
+      date: getPayLaterDate(
+        editFormData.date,
+        editFormData.method.timingDate ?? childPurchaseWithoutId.date.getDate()
+      ),
+      childPurchaseId: "",
+    };
+    if (editFormData.childPurchaseId) {
+      if (editFormData.method.timing === "即時") {
+        // 決済を後払いから即時のものにしたとき決済Purchaseを削除する
+        deleteDocPurchase(editFormData.childPurchaseId);
+        // 子タスクを削除したあとで、再び後払いにした場合、存在しない子タスクをupdateしようとしてしまう
+        updateCurrentPurchase({ childPurchaseId: "" });
+        return;
+      }
+      updateDocPurchase(editFormData.childPurchaseId, childPurchase);
+    } else if (editFormData.method.timingDate) {
+      //childPurchaseIdがなく新たにtimingが出てきた場合、子Purchaseを追加し、子PurchaseIdを追加
+      addDocPurchase(childPurchase).then((docRef) =>
+        updateCurrentPurchase({ childPurchaseId: docRef.id })
+      );
+      return;
+    }
+    updateCurrentPurchase({});
+  }, [editFormData, setIsEdit]);
+
+  // 編集データを更新する関数
+  const handleEditFormChange = useCallback(
+    (event: { target: { name: string; value: any } }) => {
+      const { name, value } = event.target;
+      setEditFormData((prev) => ({ ...prev, [name]: value }));
+    },
+    [setEditFormData]
+  );
+  const handleDateFormChange = useCallback(
+    (value: Date | null | undefined) => {
+      setEditFormData((prev) => ({
+        ...prev,
+        date: value ?? new Date(),
+      }));
+    },
+    [setEditFormData]
+  );
+
+  const handleMethodChange = useCallback(
+    (value: string | MethodListType | null) => {
+      if (value && typeof value !== "string") {
+        setEditFormData((prev) => ({
+          ...prev,
+          method: value,
+        }));
+      }
+    },
+    [setEditFormData]
+  );
+  const handleAutocompleteChange = useCallback(
+    (name: string, value: any) => {
+      setEditFormData((prev) => ({ ...prev, [name]: value }));
+    },
+    [setEditFormData]
+  );
+
+  const plainProps = {
+    editFormData,
+    categorySet,
+    methodList,
+    handleEditFormChange,
+    handleDateFormChange,
+    handleMethodChange,
+    handleSaveClick,
+    handleAutocompleteChange,
+    isSmall,
+  };
+  return <PlainEditPurchaseRow {...plainProps} />;
+};
+
+export default EditPurchaseRow;

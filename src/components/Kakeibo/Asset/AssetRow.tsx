@@ -40,9 +40,9 @@ import { usePurchase } from "../../Context/PurchaseContext";
 import { Timestamp } from "firebase/firestore";
 import { getUnixTime } from "date-fns";
 import DeleteConfirmDialog from "../DeleteConfirmDialog";
+import { useIsSmall } from "../../../hooks/useWindowSize";
 
 type PlainAssetRowProps = {
-  asset: AssetListType;
   assetInput: AssetType;
   handleAssetInput: (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -56,7 +56,6 @@ type PlainAssetRowProps = {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   filteredMethodList: MethodListType[];
   addMethod: () => void;
-  relatedPurchases: number;
   handleBalanceInput: (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => void;
@@ -67,73 +66,161 @@ type PlainAssetRowProps = {
   openDialog: boolean;
   setOpenDialog: React.Dispatch<React.SetStateAction<boolean>>;
   deleteAction: () => void;
+  isSmall: boolean;
 };
 
 const PlainAssetRow = memo(
   (props: PlainAssetRowProps): JSX.Element => (
     <>
-      <TableRow>
-        <TableCell sx={{ paddingX: 0.5 }}>
-          <IconButton
-            aria-label="expand row"
-            size="small"
-            onClick={() => props.setOpen(!props.open)}
-          >
-            {props.open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-          </IconButton>
-        </TableCell>
-        <TableCell sx={{ paddingX: 0.5 }}>
-          <TextField
-            variant="outlined"
-            value={props.assetInput.name ?? props.asset.name}
-            name="name"
-            onChange={props.handleAssetInput}
-            size="small"
-          />
-        </TableCell>
-        <TableCell sx={{ display: "flex", paddingX: 0.5 }}>
-          <TextField
-            variant="outlined"
-            value={
-              props.isBalanceChanged ? props.balanceInput : props.displayBalance
-            }
-            name="balance"
-            onChange={props.handleBalanceInput}
-            size="small"
-            inputProps={numericProps}
-          />
-          {props.isAddedPurchases && (
-            <Box alignContent="center" ml={1}>
-              {"→ " + props.currentBalance}
-            </Box>
-          )}
-        </TableCell>
-        <TableCell sx={{ paddingX: 0.5 }}>
-          <Button
-            variant="contained"
-            color="primary"
-            disabled={!props.isAddedPurchases}
-            onClick={props.updateLog}
-          >
-            更新
-          </Button>
-        </TableCell>
-        <TableCell sx={{ paddingX: 0.5 }}>
-          <Button
-            variant="contained"
-            color="primary"
-            disabled={!props.isNameChanged && !props.isBalanceChanged}
-            onClick={props.saveChanges}
-          >
-            変更
-          </Button>
-        </TableCell>
-        <TableCell sx={{ paddingX: 0.5 }}>
-          <IconButton onClick={props.removeAsset} color="error">
-            <DeleteIcon />
-          </IconButton>
-        </TableCell>
-      </TableRow>
+      {props.isSmall ? (
+        <>
+          <TableRow>
+            <TableCell sx={{ paddingX: 0.5 }}>
+              <IconButton
+                aria-label="expand row"
+                size="small"
+                onClick={() => props.setOpen(!props.open)}
+              >
+                {props.open ? (
+                  <KeyboardArrowUpIcon />
+                ) : (
+                  <KeyboardArrowDownIcon />
+                )}
+              </IconButton>
+            </TableCell>
+            <TableCell sx={{ paddingX: 0.5 }}>
+              <TextField
+                variant="outlined"
+                value={props.assetInput.name}
+                name="name"
+                onChange={props.handleAssetInput}
+                size="small"
+                sx={{ maxWidth: 150 }}
+              />
+            </TableCell>
+            <TableCell sx={{ display: "flex", paddingX: 0.5 }}>
+              <TextField
+                variant="outlined"
+                value={
+                  props.isBalanceChanged
+                    ? props.balanceInput
+                    : props.displayBalance
+                }
+                name="balance"
+                onChange={props.handleBalanceInput}
+                size="small"
+                inputProps={numericProps}
+                sx={{ maxWidth: 150 }}
+              />
+              {props.isAddedPurchases && (
+                <Box alignContent="center" ml={1}>
+                  {"→ " + props.currentBalance}
+                </Box>
+              )}
+            </TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell sx={{ paddingX: 0.5 }} colSpan={2} />
+            <TableCell
+              sx={{
+                pt: 0.5,
+                px: 0.5,
+                display: "flex",
+                gap: 1,
+                flexDirection: "row-reverse",
+              }}
+            >
+              <Button
+                variant="contained"
+                color="primary"
+                disabled={!props.isAddedPurchases}
+                onClick={props.updateLog}
+              >
+                更新
+              </Button>
+              <Button
+                variant="contained"
+                color="primary"
+                disabled={!props.isNameChanged && !props.isBalanceChanged}
+                onClick={props.saveChanges}
+              >
+                変更
+              </Button>
+              <IconButton onClick={props.removeAsset} color="error">
+                <DeleteIcon />
+              </IconButton>
+            </TableCell>
+          </TableRow>
+        </>
+      ) : (
+        <TableRow>
+          <TableCell sx={{ paddingX: 0.5 }}>
+            <IconButton
+              aria-label="expand row"
+              size="small"
+              onClick={() => props.setOpen(!props.open)}
+            >
+              {props.open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+            </IconButton>
+          </TableCell>
+          <TableCell sx={{ paddingX: 0.5 }}>
+            <TextField
+              variant="outlined"
+              value={props.assetInput.name}
+              name="name"
+              onChange={props.handleAssetInput}
+              size="small"
+              sx={{ maxWidth: 150 }}
+            />
+          </TableCell>
+          <TableCell sx={{ display: "flex", paddingX: 0.5 }}>
+            <TextField
+              variant="outlined"
+              value={
+                props.isBalanceChanged
+                  ? props.balanceInput
+                  : props.displayBalance
+              }
+              name="balance"
+              onChange={props.handleBalanceInput}
+              size="small"
+              inputProps={numericProps}
+              sx={{ maxWidth: 150 }}
+            />
+            {props.isAddedPurchases && (
+              <Box alignContent="center" ml={1}>
+                {"→ " + props.currentBalance}
+              </Box>
+            )}
+          </TableCell>
+          <TableCell sx={{ paddingX: 0.5 }}>
+            <Button
+              variant="contained"
+              color="primary"
+              disabled={!props.isAddedPurchases}
+              onClick={props.updateLog}
+            >
+              更新
+            </Button>
+          </TableCell>
+          <TableCell sx={{ paddingX: 0.5 }}>
+            <Button
+              variant="contained"
+              color="primary"
+              disabled={!props.isNameChanged && !props.isBalanceChanged}
+              onClick={props.saveChanges}
+            >
+              変更
+            </Button>
+          </TableCell>
+          <TableCell sx={{ paddingX: 0.5 }}>
+            <IconButton onClick={props.removeAsset} color="error">
+              <DeleteIcon />
+            </IconButton>
+          </TableCell>
+        </TableRow>
+      )}
+
       <TableRow>
         <TableCell sx={{ paddingY: 0 }} colSpan={6}>
           <Collapse in={props.open} timeout="auto" unmountOnExit>
@@ -158,7 +245,7 @@ const PlainAssetRow = memo(
         </TableCell>
       </TableRow>
       <DeleteConfirmDialog
-        target={props.asset.name}
+        target={props.assetInput.name}
         openDialog={props.openDialog}
         setOpenDialog={props.setOpenDialog}
         deleteAction={props.deleteAction}
@@ -175,6 +262,7 @@ const AssetRow = ({ asset }: { asset: AssetListType }) => {
   const latestLog = balanceLogs.slice(-1)[0];
   const displayBalance = latestLog.balance;
   const [balanceInput, setBalanceInput] = useState<number>(displayBalance);
+  const isSmall = useIsSmall();
 
   const handleAssetInput = useCallback(
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -274,7 +362,6 @@ const AssetRow = ({ asset }: { asset: AssetListType }) => {
   }, [asset.id, assetInput.balanceLog, currentBalance, getNewLog]);
 
   const plainProps = {
-    asset,
     open,
     setOpen,
     assetInput,
@@ -286,7 +373,6 @@ const AssetRow = ({ asset }: { asset: AssetListType }) => {
     removeAsset,
     filteredMethodList,
     addMethod,
-    relatedPurchases,
     handleBalanceInput,
     balanceInput,
     isAddedPurchases,
@@ -295,6 +381,7 @@ const AssetRow = ({ asset }: { asset: AssetListType }) => {
     openDialog,
     setOpenDialog,
     deleteAction,
+    isSmall,
   };
 
   return <PlainAssetRow {...plainProps} />;

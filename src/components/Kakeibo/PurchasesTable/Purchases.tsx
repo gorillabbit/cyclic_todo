@@ -42,59 +42,81 @@ const PlainPurchases = memo(
       <PurchaseHeader purchaseList={props.sortedPurchasesWithGroupFlag} />
       <PurchaseSchedules />
 
-      <Paper sx={{ marginY: 2 }}>
-        <Box display="flex" justifyContent="center">
-          <Button onClick={props.handlePastMonthButton}>前の月</Button>
-          <Box fontSize={20}>
-            {"収支リスト " +
-              props.month.getFullYear() +
-              "年" +
-              //getMonthは1月=0
-              (props.month.getMonth() + 1) +
-              "月"}
-          </Box>
-          <Button onClick={props.handleNextMonthButton}>次の月</Button>
+      <Box display="flex" justifyContent="center">
+        <Button onClick={props.handlePastMonthButton}>前の月</Button>
+        <Box fontSize={20}>
+          {"収支リスト " +
+            props.month.getFullYear() +
+            "年" +
+            //getMonthは1月=0
+            (props.month.getMonth() + 1) +
+            "月"}
         </Box>
+        <Button onClick={props.handleNextMonthButton}>次の月</Button>
+      </Box>
 
-        <TableContainer>
-          <Table size="small">
-            <TableHead>
+      <TableContainer component={Paper} sx={{ mb: 2 }}>
+        <Table size="small">
+          <TableHead>
+            <TableRow>
+              <TableCell />
+              <TableCell sx={{ paddingX: 0.5 }}>支出</TableCell>
+              <TableCell sx={{ paddingX: 0.5 }}>{props.spentSum}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell />
+              <TableCell sx={{ paddingX: 0.5 }}>収入</TableCell>
+              <TableCell sx={{ paddingX: 0.5 }}>{props.incomeSum}</TableCell>
+            </TableRow>
+          </TableHead>
+        </Table>
+      </TableContainer>
+
+      <TableContainer component={Paper}>
+        <Table size="small">
+          <TableHead>
+            {props.isSmall ? (
+              <>
+                <TableRow>
+                  <TableCell padding="none" />
+                  <TableCell sx={{ paddingX: 0.5 }}>日付</TableCell>
+                  <TableCell sx={{ paddingX: 0.5 }}>品目</TableCell>
+                  <TableCell sx={{ paddingX: 0.5 }}>金額</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell padding="none" />
+                  <TableCell sx={{ paddingX: 0.5 }}>分類</TableCell>
+                  <TableCell sx={{ paddingX: 0.5 }}>支払い方法</TableCell>
+                  <TableCell sx={{ paddingX: 0.5 }}>収入</TableCell>
+                </TableRow>
+              </>
+            ) : (
               <TableRow>
-                <TableCell />
-                <TableCell sx={{ paddingX: 0.5 }}>支出</TableCell>
-                <TableCell sx={{ paddingX: 0.5 }}>{props.spentSum}</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell />
-                <TableCell sx={{ paddingX: 0.5 }}>収入</TableCell>
-                <TableCell sx={{ paddingX: 0.5 }}>{props.incomeSum}</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell />
+                <TableCell padding="none" />
                 <TableCell sx={{ paddingX: 0.5 }}>日付</TableCell>
                 <TableCell sx={{ paddingX: 0.5 }}>品目</TableCell>
                 <TableCell sx={{ paddingX: 0.5 }}>金額</TableCell>
                 <TableCell sx={{ paddingX: 0.5 }}>分類</TableCell>
                 <TableCell sx={{ paddingX: 0.5 }}>支払い方法</TableCell>
                 <TableCell sx={{ paddingX: 0.5 }}>収入</TableCell>
-                {!props.isSmall && <TableCell>備考</TableCell>}
-                <TableCell padding="none"></TableCell>
-                <TableCell padding="none"></TableCell>
+                <TableCell sx={{ paddingX: 0.5 }}>備考</TableCell>
+                <TableCell padding="none" />
+                <TableCell padding="none" />
               </TableRow>
-            </TableHead>
-            <TableBody>
-              {props.sortedPurchasesWithGroupFlag.map((purchase) => (
-                <PurchasesRow
-                  purchase={purchase}
-                  key={purchase.id}
-                  groupPurchases={props.getGroupPurchases(purchase)}
-                  isSmall={props.isSmall}
-                />
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Paper>
+            )}
+          </TableHead>
+          <TableBody>
+            {props.sortedPurchasesWithGroupFlag.map((purchase) => (
+              <PurchasesRow
+                purchase={purchase}
+                key={purchase.id}
+                groupPurchases={props.getGroupPurchases(purchase)}
+                isSmall={props.isSmall}
+              />
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
     </>
   )
 );
