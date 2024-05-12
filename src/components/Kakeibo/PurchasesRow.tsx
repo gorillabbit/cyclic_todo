@@ -30,6 +30,7 @@ import {
 import { usePurchase } from "../Context/PurchaseContext";
 import { useMethod } from "../Context/MethodContext";
 import { getPayLaterDate } from "../../utilities/dateUtilities";
+import DeleteConfirmDialog from "./DeleteConfirmDialog";
 
 type PlainPurchasesRowProps = {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -52,8 +53,11 @@ type PlainPurchasesRowProps = {
   handleSaveClick: () => void;
   handleEditClick: () => void;
   handleDeleteButton: () => void;
+  deleteAction: () => void;
   handleAutocompleteChange: (name: string, value: any) => void;
   isSmall: boolean;
+  openDialog: boolean;
+  setOpenDialog: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const PlainPurchasesRow = memo(
@@ -245,6 +249,12 @@ const PlainPurchasesRow = memo(
           </TableCell>
         </TableRow>
       )}
+      <DeleteConfirmDialog
+        target={props.purchase.title}
+        openDialog={props.openDialog}
+        setOpenDialog={props.setOpenDialog}
+        deleteAction={props.deleteAction}
+      />
     </>
   )
 );
@@ -266,6 +276,7 @@ const PurchasesRow = ({
     date: purchase.date.toDate(),
   });
   const [open, setOpen] = useState(false);
+  const [openDialog, setOpenDialog] = useState<boolean>(false);
   const { categorySet } = usePurchase();
   const isGroup = groupPurchases.length > 0 && !purchase.childPurchaseId;
 
@@ -315,6 +326,10 @@ const PurchasesRow = ({
   }, [editFormData]);
 
   const handleDeleteButton = useCallback(() => {
+    setOpenDialog(true);
+  }, []);
+
+  const deleteAction = useCallback(() => {
     if (purchase.childPurchaseId) {
       deleteDocPurchase(purchase.childPurchaseId);
     }
@@ -365,10 +380,13 @@ const PurchasesRow = ({
     handleSaveClick,
     handleEditClick,
     handleDeleteButton,
+    deleteAction,
     handleAutocompleteChange,
     open,
     setOpen,
     isSmall,
+    openDialog,
+    setOpenDialog,
   };
   return <PlainPurchasesRow {...plainProps} />;
 };

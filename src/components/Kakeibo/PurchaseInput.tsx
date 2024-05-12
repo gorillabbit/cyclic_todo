@@ -13,7 +13,7 @@ import {
   isValidatedNum,
   numericProps,
 } from "../../utilities/purchaseUtilities";
-import TemplateButtons from "./TemplateButtons";
+import TemplateButtons from "./TemplateButtonsContainer";
 import { usePurchase } from "../Context/PurchaseContext";
 import { useMethod } from "../Context/MethodContext";
 import { getPayLaterDate } from "../../utilities/dateUtilities";

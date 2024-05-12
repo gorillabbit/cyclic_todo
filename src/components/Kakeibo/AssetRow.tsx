@@ -39,6 +39,7 @@ import {
 import { usePurchase } from "../Context/PurchaseContext";
 import { Timestamp } from "firebase/firestore";
 import { getUnixTime } from "date-fns";
+import DeleteConfirmDialog from "./DeleteConfirmDialog";
 
 type PlainAssetRowProps = {
   asset: AssetListType;
@@ -63,6 +64,9 @@ type PlainAssetRowProps = {
   isAddedPurchases: boolean;
   currentBalance: number;
   displayBalance: number;
+  openDialog: boolean;
+  setOpenDialog: React.Dispatch<React.SetStateAction<boolean>>;
+  deleteAction: () => void;
 };
 
 const PlainAssetRow = memo(
@@ -136,10 +140,9 @@ const PlainAssetRow = memo(
             <Table size="small" aria-label="purchases">
               <TableHead>
                 <TableRow>
-                  <TableCell>名前</TableCell>
-                  <TableCell>決済タイミング</TableCell>
-                  <TableCell>変更保存</TableCell>
-                  <TableCell>削除</TableCell>
+                  <TableCell sx={{ paddingX: 0.5 }}>名前</TableCell>
+                  <TableCell sx={{ paddingX: 0.5 }}>決済タイミング</TableCell>
+                  <TableCell sx={{ paddingX: 0.5 }} colSpan={2} />
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -154,12 +157,19 @@ const PlainAssetRow = memo(
           </Collapse>
         </TableCell>
       </TableRow>
+      <DeleteConfirmDialog
+        target={props.asset.name}
+        openDialog={props.openDialog}
+        setOpenDialog={props.setOpenDialog}
+        deleteAction={props.deleteAction}
+      />
     </>
   )
 );
 
 const AssetRow = ({ asset }: { asset: AssetListType }) => {
   const [open, setOpen] = useState(false);
+  const [openDialog, setOpenDialog] = useState<boolean>(false);
   const [assetInput, setAssetInput] = useState<AssetListType>(asset);
   const [balanceLogs, setBalanceLogs] = useState(asset.balanceLog);
   const latestLog = balanceLogs.slice(-1)[0];
@@ -219,6 +229,10 @@ const AssetRow = ({ asset }: { asset: AssetListType }) => {
   );
 
   const removeAsset = useCallback(() => {
+    setOpenDialog(true);
+  }, []);
+
+  const deleteAction = useCallback(() => {
     deleteDocAsset(asset.id);
     if (filteredMethodList.length > 0) {
       filteredMethodList.forEach((method) => deleteDocMethod(method.id));
@@ -278,6 +292,9 @@ const AssetRow = ({ asset }: { asset: AssetListType }) => {
     isAddedPurchases,
     currentBalance,
     displayBalance,
+    openDialog,
+    setOpenDialog,
+    deleteAction,
   };
 
   return <PlainAssetRow {...plainProps} />;
