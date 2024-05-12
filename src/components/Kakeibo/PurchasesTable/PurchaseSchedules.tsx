@@ -9,8 +9,8 @@ import {
   TableBody,
 } from "@mui/material";
 import { memo, useMemo } from "react";
-import { PurchaseScheduleListType, PurchaseScheduleType } from "../../types";
-import { useFirestoreQuery } from "../../utilities/firebaseUtilities";
+import { PurchaseScheduleListType, PurchaseScheduleType } from "../../../types";
+import { useFirestoreQuery } from "../../../utilities/firebaseUtilities";
 
 type PlainPurchaseSchedulesProps = {
   purchaseScheduleList: PurchaseScheduleListType[];

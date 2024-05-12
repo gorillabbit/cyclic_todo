@@ -14,7 +14,7 @@ import {
   DoughnutControllerChartOptions,
 } from "chart.js";
 import { Box } from "@mui/material";
-import { PurchaseListType } from "../../types";
+import { PurchaseListType } from "../../../types";
 import { _DeepPartialObject } from "chart.js/dist/types/utils";
 
 Chart.register(ArcElement, Tooltip, Legend, Title);

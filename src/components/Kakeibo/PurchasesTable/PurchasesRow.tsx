@@ -16,7 +16,7 @@ import {
   addDocPurchase,
   deleteDocPurchase,
   updateDocPurchase,
-} from "../../firebase";
+} from "../../../firebase";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import DoneIcon from "@mui/icons-material/Done";
@@ -26,11 +26,11 @@ import {
   InputPurchaseRowType,
   MethodListType,
   PurchaseListType,
-} from "../../types";
-import { usePurchase } from "../Context/PurchaseContext";
-import { useMethod } from "../Context/MethodContext";
-import { getPayLaterDate } from "../../utilities/dateUtilities";
-import DeleteConfirmDialog from "./DeleteConfirmDialog";
+} from "../../../types";
+import { usePurchase } from "../../Context/PurchaseContext";
+import { useMethod } from "../../Context/MethodContext";
+import { getPayLaterDate } from "../../../utilities/dateUtilities";
+import DeleteConfirmDialog from "../DeleteConfirmDialog";
 
 type PlainPurchasesRowProps = {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;

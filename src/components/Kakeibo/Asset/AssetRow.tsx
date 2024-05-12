@@ -18,7 +18,7 @@ import {
   MethodType,
   BalanceLog,
   defaultMethod,
-} from "../../types";
+} from "../../../types";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -28,18 +28,18 @@ import {
   deleteDocAsset,
   deleteDocMethod,
   updateDocAsset,
-} from "../../firebase";
+} from "../../../firebase";
 import { getAuth } from "firebase/auth";
 import MethodList from "./MethodList";
-import { useMethod } from "../Context/MethodContext";
+import { useMethod } from "../../Context/MethodContext";
 import {
   calculateSpentAndIncomeResult,
   numericProps,
-} from "../../utilities/purchaseUtilities";
-import { usePurchase } from "../Context/PurchaseContext";
+} from "../../../utilities/purchaseUtilities";
+import { usePurchase } from "../../Context/PurchaseContext";
 import { Timestamp } from "firebase/firestore";
 import { getUnixTime } from "date-fns";
-import DeleteConfirmDialog from "./DeleteConfirmDialog";
+import DeleteConfirmDialog from "../DeleteConfirmDialog";
 
 type PlainAssetRowProps = {
   asset: AssetListType;

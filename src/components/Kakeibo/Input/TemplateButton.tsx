@@ -1,8 +1,8 @@
 import { Chip } from "@mui/material";
 import { memo, useCallback, useState } from "react";
-import { InputPurchaseType, PurchaseListType } from "../../types";
-import { deleteDocPurchaseTemplate } from "../../firebase";
-import DeleteConfirmDialog from "./DeleteConfirmDialog";
+import { InputPurchaseType, PurchaseListType } from "../../../types";
+import { deleteDocPurchaseTemplate } from "../../../firebase";
+import DeleteConfirmDialog from "../DeleteConfirmDialog";
 
 type plainPlainTemplateButtonProps = {
   template: PurchaseListType;

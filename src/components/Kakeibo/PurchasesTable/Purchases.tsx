@@ -10,19 +10,19 @@ import {
   TableRow,
 } from "@mui/material";
 import { memo, useCallback, useMemo, useState } from "react";
-import { PurchaseListType } from "../../types";
-import { usePurchase } from "../Context/PurchaseContext";
+import { PurchaseListType } from "../../../types";
+import { usePurchase } from "../../Context/PurchaseContext";
 import PurchaseHeader from "./PurchaseHeader";
 import PurchaseSchedules from "./PurchaseSchedules";
 import PurchasesRow from "./PurchasesRow";
-import AssetsList from "./AssetsList";
+import AssetsList from "../Asset/AssetsList";
 import { addMonths } from "date-fns";
-import { useIsSmall } from "../../hooks/useWindowSize";
+import { useIsSmall } from "../../../hooks/useWindowSize";
 import {
   getFilteredPurchase,
   isGroupPurchase,
   sumPrice,
-} from "../../utilities/purchaseUtilities";
+} from "../../../utilities/purchaseUtilities";
 
 type PlainPurchaseProps = {
   sortedPurchasesWithGroupFlag: PurchaseListType[];

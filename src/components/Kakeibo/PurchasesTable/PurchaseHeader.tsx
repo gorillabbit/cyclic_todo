@@ -10,14 +10,14 @@ import {
 } from "@mui/material";
 import { memo, useMemo } from "react";
 import DoughnutChart from "./DoughnutChart";
-import { PurchaseListType } from "../../types";
+import { PurchaseListType } from "../../../types";
 import { lastDayOfMonth } from "date-fns";
 import {
   calculateSpentAndIncomeResult,
   getFilteredPurchase,
   isGroupPurchase,
-} from "../../utilities/purchaseUtilities";
-import { useAsset } from "../Context/AssetContext";
+} from "../../../utilities/purchaseUtilities";
+import { useAsset } from "../../Context/AssetContext";
 
 type PlainPurchaseHeaderProps = {
   currentMonthSpentList: PurchaseListType[];

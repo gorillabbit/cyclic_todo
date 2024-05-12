@@ -13,9 +13,9 @@ import { LogProvider } from "./components/Context/LogContext";
 import Calendar from "./components/Calendar/Calendar";
 import { TaskProvider } from "./components/Context/TaskContext";
 import { AccountProvider } from "./components/Context/AccountContext";
-import Purchases from "./components/Kakeibo/Purchases";
+import Purchases from "./components/Kakeibo/PurchasesTable/Purchases";
 import { AssetProvider } from "./components/Context/AssetContext";
-import PurchaseInputs from "./components/Kakeibo/PurchaseInputs";
+import PurchaseInputs from "./components/Kakeibo/Input/PurchaseInputs";
 import { PurchaseProvider } from "./components/Context/PurchaseContext";
 import { MethodProvider } from "./components/Context/MethodContext";
 

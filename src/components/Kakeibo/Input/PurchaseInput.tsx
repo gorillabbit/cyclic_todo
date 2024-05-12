@@ -1,22 +1,22 @@
 import { Autocomplete, Box, Button, FormGroup, TextField } from "@mui/material";
-import StyledCheckbox from "../StyledCheckbox";
+import StyledCheckbox from "../../StyledCheckbox";
 import { DatePicker } from "@mui/x-date-pickers";
 import { memo, useCallback, useState } from "react";
-import { addDocPurchase, addDocPurchaseTemplate } from "../../firebase";
+import { addDocPurchase, addDocPurchaseTemplate } from "../../../firebase";
 import { getAuth } from "firebase/auth";
 import {
   InputPurchaseType,
   MethodListType,
   defaultPurchaseInput,
-} from "../../types";
+} from "../../../types";
 import {
   isValidatedNum,
   numericProps,
-} from "../../utilities/purchaseUtilities";
+} from "../../../utilities/purchaseUtilities";
 import TemplateButtons from "./TemplateButtonsContainer";
-import { usePurchase } from "../Context/PurchaseContext";
-import { useMethod } from "../Context/MethodContext";
-import { getPayLaterDate } from "../../utilities/dateUtilities";
+import { usePurchase } from "../../Context/PurchaseContext";
+import { useMethod } from "../../Context/MethodContext";
+import { getPayLaterDate } from "../../../utilities/dateUtilities";
 
 const auth = getAuth();
 

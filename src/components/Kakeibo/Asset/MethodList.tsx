@@ -10,13 +10,13 @@ import {
   InputAdornment,
 } from "@mui/material";
 import { memo, useCallback, useMemo, useState } from "react";
-import { MethodListType } from "../../types";
+import { MethodListType } from "../../../types";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { deleteDocMethod, updateDocMethod } from "../../firebase";
+import { deleteDocMethod, updateDocMethod } from "../../../firebase";
 import {
   isValidatedNum,
   numericProps,
-} from "../../utilities/purchaseUtilities";
+} from "../../../utilities/purchaseUtilities";
 
 type PlainMethodListProps = {
   method: MethodListType;

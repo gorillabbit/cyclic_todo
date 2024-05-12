@@ -7,22 +7,22 @@ import {
   Select,
   TextField,
 } from "@mui/material";
-import StyledCheckbox from "../StyledCheckbox";
+import StyledCheckbox from "../../StyledCheckbox";
 import { useState } from "react";
-import { addDocPurchaseSchedule, batchAddDocPurchase } from "../../firebase";
+import { addDocPurchaseSchedule, batchAddDocPurchase } from "../../../firebase";
 import { getAuth } from "firebase/auth";
 import {
   InputPurchaseScheduleType,
   InputPurchaseType,
   WeekDay,
   defaultMethodList,
-} from "../../types";
+} from "../../../types";
 import { addDays, addMonths, addYears, nextDay } from "date-fns";
 import { DatePicker } from "@mui/x-date-pickers";
 import {
   isValidatedNum,
   numericProps,
-} from "../../utilities/purchaseUtilities";
+} from "../../../utilities/purchaseUtilities";
 import { DocumentData, DocumentReference } from "firebase/firestore";
 
 const auth = getAuth();

@@ -1,9 +1,13 @@
 import { Box } from "@mui/material";
 import { memo, useMemo } from "react";
-import { InputPurchaseType, PurchaseListType, PurchaseType } from "../../types";
+import {
+  InputPurchaseType,
+  PurchaseListType,
+  PurchaseType,
+} from "../../../types";
 import { orderBy } from "firebase/firestore";
-import { useFirestoreQuery } from "../../utilities/firebaseUtilities";
-import { PurchaseTemplates } from "../../firebase";
+import { useFirestoreQuery } from "../../../utilities/firebaseUtilities";
+import { PurchaseTemplates } from "../../../firebase";
 import TemplateButton from "./TemplateButton";
 
 type plainPlainTemplateButtonsContainerProps = {
