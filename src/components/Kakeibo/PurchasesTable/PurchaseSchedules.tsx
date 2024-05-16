@@ -17,7 +17,7 @@ type PlainPurchaseSchedulesProps = {
 };
 
 const PlainPurchaseSchedules = memo(
-  (props: PlainPurchaseSchedulesProps): JSX.Element => (
+  ({ purchaseScheduleList }: PlainPurchaseSchedulesProps): JSX.Element => (
     <Paper sx={{ marginY: 2 }}>
       <Box fontSize={20}>予定収支</Box>
       <TableContainer>
@@ -34,7 +34,7 @@ const PlainPurchaseSchedules = memo(
             </TableRow>
           </TableHead>
           <TableBody>
-            {props.purchaseScheduleList.map((purchaseSchedule) => (
+            {purchaseScheduleList.map((purchaseSchedule) => (
               <TableRow key={purchaseSchedule.id}>
                 <TableCell sx={{ paddingX: 0.5 }}>
                   {purchaseSchedule.cycle +

@@ -14,19 +14,26 @@ type PlainTemplateButtonProps = {
 };
 
 const PlainTemplateButton = memo(
-  (props: PlainTemplateButtonProps): JSX.Element => (
+  ({
+    template,
+    onClickTemplateButton,
+    handleDeleteButtonClick,
+    openDialog,
+    setOpenDialog,
+    deleteAction,
+  }: PlainTemplateButtonProps): JSX.Element => (
     <>
       <Chip
         sx={{ m: 0.5 }}
-        onClick={() => props.onClickTemplateButton()}
-        onDelete={props.handleDeleteButtonClick}
-        label={props.template.title}
+        onClick={onClickTemplateButton}
+        onDelete={handleDeleteButtonClick}
+        label={template.title}
       />
       <DeleteConfirmDialog
-        target={<Chip sx={{ m: 0.5 }} label={props.template.title} />}
-        openDialog={props.openDialog}
-        setOpenDialog={props.setOpenDialog}
-        deleteAction={props.deleteAction}
+        target={<Chip sx={{ m: 0.5 }} label={template.title} />}
+        openDialog={openDialog}
+        setOpenDialog={setOpenDialog}
+        deleteAction={deleteAction}
       />
     </>
   )

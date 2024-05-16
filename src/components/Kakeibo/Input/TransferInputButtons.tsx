@@ -8,21 +8,25 @@ type PlainTransferInputButtonsProps = {
 };
 
 const PlainTransferInputButtons = memo(
-  (props: PlainTransferInputButtonsProps): JSX.Element => (
+  ({
+    methodError,
+    addTransfer,
+    addTemplate,
+  }: PlainTransferInputButtonsProps): JSX.Element => (
     <Box gap={1} display="flex" flexDirection="column">
       <Button
         sx={{ height: "50%" }}
         variant="contained"
-        disabled={!!props.methodError}
-        onClick={props.addTransfer}
+        disabled={!!methodError}
+        onClick={addTransfer}
       >
         追加
       </Button>
       <Button
         sx={{ height: "50%" }}
         variant="outlined"
-        disabled={!!props.methodError}
-        onClick={props.addTemplate}
+        disabled={!!methodError}
+        onClick={addTemplate}
       >
         ボタン化
       </Button>

@@ -17,151 +17,91 @@ type PlainNormalPurchaseRowProps = {
 };
 
 const PlainNormalPurchaseRow = memo(
-  (props: PlainNormalPurchaseRowProps): JSX.Element => (
+  ({
+    isGroup,
+    setOpen,
+    open,
+    editFormData,
+    isSmall,
+    handleEditClick,
+    handleDeleteButton,
+  }: PlainNormalPurchaseRowProps): JSX.Element => (
     <>
-      {props.isSmall ? (
-        <>
-          <TableRow sx={{ pb: 0.5 }}>
-            <TableCell sx={{ paddingX: 0.5 }}>
-              {props.isGroup && (
-                <IconButton
-                  aria-label="expand row"
-                  size="small"
-                  onClick={() => props.setOpen(!props.open)}
-                >
-                  {props.open ? (
-                    <KeyboardArrowUpIcon />
-                  ) : (
-                    <KeyboardArrowDownIcon />
-                  )}
-                </IconButton>
-              )}
-            </TableCell>
-            <TableCell sx={{ paddingX: 0.5 }}>
-              {props.editFormData.date.toLocaleString().split(" ")[0]}
-            </TableCell>
-            <TableCell sx={{ paddingX: 0.5 }}>
-              {props.isGroup
-                ? props.editFormData.method.label + " 引き落し"
-                : props.editFormData.title}
-            </TableCell>
-            <TableCell sx={{ paddingX: 0.5 }}>
-              {props.editFormData.price + "円"}
-              {props.editFormData.method.timing === "翌月" &&
-                props.editFormData.childPurchaseId && <Chip label="翌月" />}
-            </TableCell>
-          </TableRow>
-          <TableRow>
-            <TableCell sx={{ paddingX: 0.5 }} />
-            <TableCell sx={{ paddingX: 0.5 }}>
-              {props.editFormData.category}
-            </TableCell>
-            <TableCell sx={{ paddingX: 0.5 }}>
-              {props.editFormData.method.label}
-            </TableCell>
-            <TableCell sx={{ paddingX: 0.5 }}>
-              {props.editFormData.income ? "収入" : "支出"}
-            </TableCell>
-            {!props.isSmall && (
-              <TableCell>{props.editFormData.description}</TableCell>
-            )}
-            <TableCell padding="none" sx={{ display: "flex" }}>
-              {!props.isGroup && (
-                <>
-                  <IconButton
-                    onClick={props.handleEditClick}
-                    sx={{
-                      "&:hover": {
-                        color: "#1976d2", // Color on hover
-                      },
-                    }}
-                  >
-                    <EditIcon />
-                  </IconButton>
-                  <IconButton
-                    onClick={props.handleDeleteButton}
-                    sx={{
-                      "&:hover": {
-                        color: "#d32f2f", // Color on hover
-                      },
-                    }}
-                  >
-                    <DeleteIcon />
-                  </IconButton>
-                </>
-              )}
-            </TableCell>
-          </TableRow>
-        </>
-      ) : (
-        <TableRow>
-          <TableCell sx={{ paddingX: 0.5 }}>
-            {props.isGroup && (
-              <IconButton
-                aria-label="expand row"
-                size="small"
-                onClick={() => props.setOpen(!props.open)}
-              >
-                {props.open ? (
-                  <KeyboardArrowUpIcon />
-                ) : (
-                  <KeyboardArrowDownIcon />
-                )}
-              </IconButton>
-            )}
-          </TableCell>
-          <TableCell sx={{ paddingX: 0.5 }}>
-            {props.editFormData.date.toLocaleString().split(" ")[0]}
-          </TableCell>
-          <TableCell sx={{ paddingX: 0.5 }}>
-            {props.isGroup
-              ? props.editFormData.method.label + " 引き落し"
-              : props.editFormData.title}
-          </TableCell>
-          <TableCell sx={{ paddingX: 0.5 }}>
-            {props.editFormData.price + "円"}
-            {props.editFormData.method.timing === "翌月" &&
-              props.editFormData.childPurchaseId && <Chip label="翌月" />}
-          </TableCell>
-          <TableCell sx={{ paddingX: 0.5 }}>
-            {props.editFormData.category}
-          </TableCell>
-          <TableCell sx={{ paddingX: 0.5 }}>
-            {props.editFormData.method.label}
-          </TableCell>
-          <TableCell sx={{ paddingX: 0.5 }}>
-            {props.editFormData.income ? "収入" : "支出"}
-          </TableCell>
-          {!props.isSmall && (
-            <TableCell>{props.editFormData.description}</TableCell>
+      <TableRow sx={{ pb: 0.5 }}>
+        <TableCell sx={{ paddingX: 0.5 }}>
+          {isGroup && (
+            <IconButton
+              aria-label="expand row"
+              size="small"
+              onClick={() => setOpen(!open)}
+            >
+              {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+            </IconButton>
           )}
-          <TableCell padding="none">
-            {!props.isGroup && (
+        </TableCell>
+        <TableCell sx={{ paddingX: 0.5 }}>
+          {editFormData.date.toLocaleString().split(" ")[0]}
+        </TableCell>
+        <TableCell sx={{ paddingX: 0.5 }}>
+          {isGroup
+            ? `${editFormData.method.label} 引き落し`
+            : editFormData.title}
+        </TableCell>
+        <TableCell sx={{ paddingX: 0.5 }}>
+          {editFormData.price + "円"}
+          {editFormData.method.timing === "翌月" &&
+            editFormData.childPurchaseId && <Chip label="翌月" />}
+        </TableCell>
+        {!isSmall && (
+          <>
+            <TableCell sx={{ paddingX: 0.5 }}>
+              {editFormData.category}
+            </TableCell>
+            <TableCell sx={{ paddingX: 0.5 }}>
+              {editFormData.method.label}
+            </TableCell>
+            <TableCell sx={{ paddingX: 0.5 }}>
+              {editFormData.income ? "収入" : "支出"}
+            </TableCell>
+            <TableCell>{editFormData.description}</TableCell>
+          </>
+        )}
+        <TableCell padding="none" sx={{ display: "flex" }}>
+          {!isGroup && (
+            <>
               <IconButton
-                onClick={props.handleEditClick}
+                onClick={handleEditClick}
                 sx={{
                   "&:hover": {
-                    color: "#1976d2", // Color on hover
+                    color: "#1976d2",
                   },
                 }}
               >
                 <EditIcon />
               </IconButton>
-            )}
-          </TableCell>
-          <TableCell padding="none">
-            {!props.isGroup && (
               <IconButton
-                onClick={props.handleDeleteButton}
+                onClick={handleDeleteButton}
                 sx={{
                   "&:hover": {
-                    color: "#d32f2f", // Color on hover
+                    color: "#d32f2f",
                   },
                 }}
               >
                 <DeleteIcon />
               </IconButton>
-            )}
+            </>
+          )}
+        </TableCell>
+      </TableRow>
+      {isSmall && (
+        <TableRow>
+          <TableCell sx={{ paddingX: 0.5 }} />
+          <TableCell sx={{ paddingX: 0.5 }}>{editFormData.category}</TableCell>
+          <TableCell sx={{ paddingX: 0.5 }}>
+            {editFormData.method.label}
+          </TableCell>
+          <TableCell sx={{ paddingX: 0.5 }}>
+            {editFormData.income ? "収入" : "支出"}
           </TableCell>
         </TableRow>
       )}
@@ -186,7 +126,6 @@ const NormalPurchaseRow = ({
   setIsEdit: (value: React.SetStateAction<boolean>) => void;
   setOpenDialog: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
-  // 編集モードに切り替える関数
   const handleEditClick = useCallback(() => {
     setIsEdit(true);
   }, [setIsEdit]);

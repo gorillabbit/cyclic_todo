@@ -30,31 +30,45 @@ type PlainPurchasesRowProps = {
 };
 
 const PlainPurchasesRow = memo(
-  (props: PlainPurchasesRowProps): JSX.Element => (
+  ({
+    setOpen,
+    open,
+    purchase,
+    groupPurchases,
+    isGroup,
+    isEdit,
+    setIsEdit,
+    editFormData,
+    setEditFormData,
+    deleteAction,
+    isSmall,
+    openDialog,
+    setOpenDialog,
+  }: PlainPurchasesRowProps): JSX.Element => (
     <>
-      {props.isEdit ? (
+      {isEdit ? (
         <EditPurchaseRow
-          purchase={props.purchase}
-          setIsEdit={props.setIsEdit}
-          editFormData={props.editFormData}
-          setEditFormData={props.setEditFormData}
-          isSmall={props.isSmall}
+          purchase={purchase}
+          setIsEdit={setIsEdit}
+          editFormData={editFormData}
+          setEditFormData={setEditFormData}
+          isSmall={isSmall}
         />
       ) : (
         <NormalPurchaseRow
-          isGroup={props.isGroup}
-          setOpen={props.setOpen}
-          open={props.open}
-          editFormData={props.editFormData}
-          isSmall={props.isSmall}
-          setIsEdit={props.setIsEdit}
-          setOpenDialog={props.setOpenDialog}
+          isGroup={isGroup}
+          setOpen={setOpen}
+          open={open}
+          editFormData={editFormData}
+          isSmall={isSmall}
+          setIsEdit={setIsEdit}
+          setOpenDialog={setOpenDialog}
         />
       )}
-      {props.isGroup && (
+      {isGroup && (
         <TableRow>
           <TableCell sx={{ paddingY: 0 }} colSpan={8}>
-            <Collapse in={props.open} timeout="auto" unmountOnExit>
+            <Collapse in={open} timeout="auto" unmountOnExit>
               <Table size="small">
                 <TableHead>
                   <TableRow>
@@ -67,16 +81,23 @@ const PlainPurchasesRow = memo(
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {props.groupPurchases.map((purchase) => (
-                    <TableRow key={purchase.id}>
+                  {groupPurchases.map((groupPurchase) => (
+                    <TableRow key={groupPurchase.id}>
                       <TableCell>
-                        {purchase.date.toDate().toLocaleString().split(" ")[0]}
+                        {
+                          groupPurchase.date
+                            .toDate()
+                            .toLocaleString()
+                            .split(" ")[0]
+                        }
                       </TableCell>
-                      <TableCell> {purchase.title}</TableCell>
-                      <TableCell>{purchase.price + "円"}</TableCell>
-                      <TableCell>{purchase.category}</TableCell>
-                      <TableCell>{purchase.income ? "収入" : "支出"}</TableCell>
-                      <TableCell>{purchase.description}</TableCell>
+                      <TableCell>{groupPurchase.title}</TableCell>
+                      <TableCell>{groupPurchase.price + "円"}</TableCell>
+                      <TableCell>{groupPurchase.category}</TableCell>
+                      <TableCell>
+                        {groupPurchase.income ? "収入" : "支出"}
+                      </TableCell>
+                      <TableCell>{groupPurchase.description}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -86,10 +107,10 @@ const PlainPurchasesRow = memo(
         </TableRow>
       )}
       <DeleteConfirmDialog
-        target={props.purchase.title}
-        openDialog={props.openDialog}
-        setOpenDialog={props.setOpenDialog}
-        deleteAction={props.deleteAction}
+        target={purchase.title}
+        openDialog={openDialog}
+        setOpenDialog={setOpenDialog}
+        deleteAction={deleteAction}
       />
     </>
   )
@@ -108,8 +129,6 @@ const PurchasesRow = ({
   const [open, setOpen] = useState(false);
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const isGroup = groupPurchases.length > 0 && !purchase.childPurchaseId;
-
-  // 編集中のデータを保持するステート
   const [editFormData, setEditFormData] = useState<InputPurchaseRowType>({
     ...purchase,
     date: purchase.date.toDate(),

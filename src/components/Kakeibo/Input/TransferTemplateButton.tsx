@@ -5,7 +5,6 @@ import { deleteDocTransferTemplate } from "../../../firebase";
 import DeleteConfirmDialog from "../DeleteConfirmDialog";
 
 type PlainTransferTemplateButtonProps = {
-  transfer: TransferType;
   onClickTransferTemplateButton: () => void;
   handleDeleteButtonClick: () => void;
   openDialog: boolean;
@@ -15,19 +14,26 @@ type PlainTransferTemplateButtonProps = {
 };
 
 const PlainTransferTemplateButton = memo(
-  (props: PlainTransferTemplateButtonProps): JSX.Element => (
+  ({
+    onClickTransferTemplateButton,
+    handleDeleteButtonClick,
+    openDialog,
+    setOpenDialog,
+    deleteAction,
+    chipTitle,
+  }: PlainTransferTemplateButtonProps): JSX.Element => (
     <>
       <Chip
         sx={{ m: 0.5 }}
-        onClick={() => props.onClickTransferTemplateButton()}
-        onDelete={props.handleDeleteButtonClick}
-        label={props.chipTitle}
+        onClick={onClickTransferTemplateButton}
+        onDelete={handleDeleteButtonClick}
+        label={chipTitle}
       />
       <DeleteConfirmDialog
-        target={<Chip sx={{ m: 0.5 }} label={props.chipTitle} />}
-        openDialog={props.openDialog}
-        setOpenDialog={props.setOpenDialog}
-        deleteAction={props.deleteAction}
+        target={<Chip sx={{ m: 0.5 }} label={chipTitle} />}
+        openDialog={openDialog}
+        setOpenDialog={setOpenDialog}
+        deleteAction={deleteAction}
       />
     </>
   )
@@ -59,16 +65,9 @@ const TransferTemplateButton = ({
     deleteDocTransferTemplate(transfer.id);
   }, [transfer.id]);
 
-  const chipTitle =
-    transfer.from.label +
-    "→" +
-    transfer.to.label +
-    "：" +
-    transfer.price +
-    "円";
+  const chipTitle = `${transfer.from.label}→${transfer.to.label}：${transfer.price}円`;
 
   const plainProps = {
-    transfer,
     onClickTransferTemplateButton,
     handleDeleteButtonClick,
     openDialog,

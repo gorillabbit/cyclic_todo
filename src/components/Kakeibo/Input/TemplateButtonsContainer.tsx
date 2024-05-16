@@ -16,18 +16,19 @@ type PlainTemplateButtonsContainerProps = {
 };
 
 const PlainTemplateButtonsContainer = memo(
-  (props: PlainTemplateButtonsContainerProps): JSX.Element => (
-    <>
-      <Box m={0.5}>
-        {props.templates.map((template) => (
-          <TemplateButton
-            template={template}
-            setNewPurchase={props.setNewPurchase}
-            key={template.id}
-          />
-        ))}
-      </Box>
-    </>
+  ({
+    templates,
+    setNewPurchase,
+  }: PlainTemplateButtonsContainerProps): JSX.Element => (
+    <Box m={0.5}>
+      {templates.map((template) => (
+        <TemplateButton
+          template={template}
+          setNewPurchase={setNewPurchase}
+          key={template.id}
+        />
+      ))}
+    </Box>
   )
 );
 

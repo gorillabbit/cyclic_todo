@@ -3,7 +3,6 @@ import {
   getFirestore,
   collection,
   addDoc,
-  serverTimestamp,
   deleteDoc,
   doc,
   updateDoc,
@@ -30,7 +29,7 @@ import {
   InputTransferType,
 } from "./types";
 
-// Your web app's Firebase configuration
+// Firebase configuration
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
   authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
@@ -44,15 +43,14 @@ const firebaseConfig = {
 // Initialize Firebase
 export const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
+getPerformance(app); // Initialize Performance Monitoring
 
-// Initialize Performance Monitoring and get a reference to the service
-getPerformance(app);
-
+// Utility functions for Firestore operations
 const addDocOperation = async (collectionName: string, data: any) => {
   try {
     return await addDoc(collection(db, collectionName), {
       ...data,
-      timestamp: serverTimestamp(),
+      timestamp: new Date(),
     });
   } catch (e) {
     console.error(`addDoc error: `, e);
@@ -81,6 +79,7 @@ const deleteDocOperation = async (collectionName: string, id: string) => {
   }
 };
 
+// Firestore collection names
 export const dbNames = {
   task: "tasks",
   log: "logs",
@@ -137,12 +136,10 @@ export const updateDocPurchase = (
 ) => updateDocOperation(dbNames.purchase, id, updates);
 export const batchAddDocPurchase = (purchaseList: InputPurchaseType[]) => {
   const batch = writeBatch(db);
-  // オブジェクトをバッチに追加
   purchaseList.forEach((obj) => {
-    const docRef = doc(collection(db, dbNames.purchase)); // collectionNameは適宜替えてください
+    const docRef = doc(collection(db, dbNames.purchase));
     batch.set(docRef, obj);
   });
-  // バッチ操作を実行
   batch.commit().catch((error) => console.error("バッチ書き込み失敗:", error));
 };
 export const deleteDocPurchase = (id: string) =>

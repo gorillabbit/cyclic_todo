@@ -9,23 +9,24 @@ type PlainDeleteConfirmDialogProps = {
 };
 
 const PlainDeleteConfirmDialog = memo(
-  (props: PlainDeleteConfirmDialogProps): JSX.Element => (
-    <Dialog open={props.openDialog} onClose={() => props.setOpenDialog(false)}>
+  ({
+    target,
+    openDialog,
+    setOpenDialog,
+    confirmDelete,
+  }: PlainDeleteConfirmDialogProps): JSX.Element => (
+    <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
       <Box display="flex" alignItems="center" m={2}>
-        {props.target}を削除します
+        {target}を削除します
       </Box>
       <Box gap={1} display="flex" m={2}>
-        <Button
-          variant="contained"
-          color="error"
-          onClick={() => props.confirmDelete()}
-        >
+        <Button variant="contained" color="error" onClick={confirmDelete}>
           削除
         </Button>
         <Button
           variant="contained"
           color="primary"
-          onClick={() => props.setOpenDialog(false)}
+          onClick={() => setOpenDialog(false)}
         >
           キャンセル
         </Button>

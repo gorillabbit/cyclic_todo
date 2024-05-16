@@ -25,7 +25,7 @@ import {
 } from "../../../utilities/purchaseUtilities";
 
 type PlainPurchaseProps = {
-  sortedPurchasesWithGroupFlag: PurchaseListType[];
+  purchasesWithoutGroupFlag: PurchaseListType[];
   getGroupPurchases: (groupedPurchase: PurchaseListType) => PurchaseListType[];
   month: Date;
   handleNextMonthButton: () => void;
@@ -36,23 +36,32 @@ type PlainPurchaseProps = {
 };
 
 const PlainPurchases = memo(
-  (props: PlainPurchaseProps): JSX.Element => (
+  ({
+    purchasesWithoutGroupFlag,
+    getGroupPurchases,
+    month,
+    handleNextMonthButton,
+    handlePastMonthButton,
+    isSmall,
+    spentSum,
+    incomeSum,
+  }: PlainPurchaseProps): JSX.Element => (
     <>
       <AssetsList />
-      <PurchaseHeader purchaseList={props.sortedPurchasesWithGroupFlag} />
+      <PurchaseHeader purchaseList={purchasesWithoutGroupFlag} />
       <PurchaseSchedules />
 
       <Box display="flex" justifyContent="center">
-        <Button onClick={props.handlePastMonthButton}>前の月</Button>
+        <Button onClick={handlePastMonthButton}>前の月</Button>
         <Box fontSize={20}>
           {"収支リスト " +
-            props.month.getFullYear() +
+            month.getFullYear() +
             "年" +
             //getMonthは1月=0
-            (props.month.getMonth() + 1) +
+            (month.getMonth() + 1) +
             "月"}
         </Box>
-        <Button onClick={props.handleNextMonthButton}>次の月</Button>
+        <Button onClick={handleNextMonthButton}>次の月</Button>
       </Box>
 
       <TableContainer component={Paper} sx={{ mb: 2 }}>
@@ -61,12 +70,12 @@ const PlainPurchases = memo(
             <TableRow>
               <TableCell />
               <TableCell sx={{ paddingX: 0.5 }}>支出</TableCell>
-              <TableCell sx={{ paddingX: 0.5 }}>{props.spentSum}</TableCell>
+              <TableCell sx={{ paddingX: 0.5 }}>{spentSum}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell />
               <TableCell sx={{ paddingX: 0.5 }}>収入</TableCell>
-              <TableCell sx={{ paddingX: 0.5 }}>{props.incomeSum}</TableCell>
+              <TableCell sx={{ paddingX: 0.5 }}>{incomeSum}</TableCell>
             </TableRow>
           </TableHead>
         </Table>
@@ -75,7 +84,7 @@ const PlainPurchases = memo(
       <TableContainer component={Paper}>
         <Table size="small">
           <TableHead>
-            {props.isSmall ? (
+            {isSmall ? (
               <>
                 <TableRow>
                   <TableCell padding="none" />
@@ -106,12 +115,12 @@ const PlainPurchases = memo(
             )}
           </TableHead>
           <TableBody>
-            {props.sortedPurchasesWithGroupFlag.map((purchase) => (
+            {purchasesWithoutGroupFlag.map((purchase) => (
               <PurchasesRow
                 purchase={purchase}
                 key={purchase.id}
-                groupPurchases={props.getGroupPurchases(purchase)}
-                isSmall={props.isSmall}
+                groupPurchases={getGroupPurchases(purchase)}
+                isSmall={isSmall}
               />
             ))}
           </TableBody>
@@ -123,10 +132,6 @@ const PlainPurchases = memo(
 
 const Purchases = (): JSX.Element => {
   const { purchaseList } = usePurchase();
-
-  interface GroupedPurchases {
-    [key: string]: PurchaseListType;
-  }
   const [month, setMonth] = useState<Date>(new Date());
   const monthlyPurchases = useMemo(
     () =>
@@ -136,29 +141,35 @@ const Purchases = (): JSX.Element => {
     [month, purchaseList]
   );
 
-  const groupedPurchasesDoc = monthlyPurchases.reduce((acc, purchase) => {
-    if (isGroupPurchase(purchase)) {
-      const keyString = purchase.method.label + purchase.date.toMillis();
-      if (!acc[keyString]) {
-        acc[keyString] = {
-          ...purchase,
-          price: 0,
-          date: purchase.date,
-        };
+  const groupedPurchasesDoc = useMemo(() => {
+    return monthlyPurchases.reduce((acc, purchase) => {
+      if (isGroupPurchase(purchase)) {
+        const keyString = purchase.method.label + purchase.date.toMillis();
+        if (!acc[keyString]) {
+          acc[keyString] = {
+            ...purchase,
+            price: 0,
+            date: purchase.date,
+          };
+        }
+        acc[keyString].price += Number(purchase.price);
       }
-      acc[keyString].price += Number(purchase.price);
-    }
-    return acc;
-  }, {} as GroupedPurchases);
-  const groupedPurchases = Object.values(groupedPurchasesDoc);
+      return acc;
+    }, {} as { [key: string]: PurchaseListType });
+  }, [monthlyPurchases]);
 
-  const purchasesWithoutGroupFlag = monthlyPurchases.filter(
-    (purchase) => !isGroupPurchase(purchase)
+  const groupedPurchases = useMemo(
+    () => Object.values(groupedPurchasesDoc),
+    [groupedPurchasesDoc]
   );
-  purchasesWithoutGroupFlag.push(...groupedPurchases);
 
-  const sortedPurchasesWithGroupFlag = purchasesWithoutGroupFlag.sort(
-    (a, b) => a.date.toMillis() - b.date.toMillis()
+  const purchasesWithoutGroupFlag = useMemo(
+    () =>
+      [
+        ...monthlyPurchases.filter((purchase) => !isGroupPurchase(purchase)),
+        ...groupedPurchases,
+      ].sort((a, b) => a.date.toMillis() - b.date.toMillis()),
+    [monthlyPurchases, groupedPurchases]
   );
 
   const handleNextMonthButton = useCallback(() => {
@@ -169,24 +180,29 @@ const Purchases = (): JSX.Element => {
   }, []);
 
   // その月のPurchaseしか表示されないのでこれでいい
-  const getGroupPurchases = (groupedPurchase: PurchaseListType) =>
-    monthlyPurchases.filter(
-      (purchase) =>
-        isGroupPurchase(purchase) &&
-        purchase.method.id === groupedPurchase.method.id
-    );
+  const getGroupPurchases = useCallback(
+    (groupedPurchase: PurchaseListType) =>
+      monthlyPurchases.filter(
+        (purchase) =>
+          isGroupPurchase(purchase) &&
+          purchase.method.id === groupedPurchase.method.id
+      ),
+    [monthlyPurchases]
+  );
 
   const isSmall = useIsSmall();
 
-  const spentSum = sumPrice(
-    getFilteredPurchase(sortedPurchasesWithGroupFlag, "spent")
+  const spentSum = useMemo(
+    () => sumPrice(getFilteredPurchase(purchasesWithoutGroupFlag, "spent")),
+    [purchasesWithoutGroupFlag]
   );
-  const incomeSum = sumPrice(
-    getFilteredPurchase(sortedPurchasesWithGroupFlag, "income")
+  const incomeSum = useMemo(
+    () => sumPrice(getFilteredPurchase(purchasesWithoutGroupFlag, "income")),
+    [purchasesWithoutGroupFlag]
   );
 
   const plainProps = {
-    sortedPurchasesWithGroupFlag,
+    purchasesWithoutGroupFlag,
     getGroupPurchases,
     month,
     handleNextMonthButton,
@@ -195,7 +211,6 @@ const Purchases = (): JSX.Element => {
     spentSum,
     incomeSum,
   };
-
   return <PlainPurchases {...plainProps} />;
 };
 

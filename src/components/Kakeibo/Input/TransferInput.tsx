@@ -30,7 +30,7 @@ import TransferTemplateButtonsContainer from "./TransferTemplateButtonContainer"
 
 const auth = getAuth();
 
-type plainTransferInputProps = {
+type PlainTransferInputProps = {
   handleNewTransferInput: (name: string, value: any) => void;
   newTransfer: InputTransferType;
   addTransfer: () => void;
@@ -41,80 +41,74 @@ type plainTransferInputProps = {
 };
 
 const PlainTransferInput = memo(
-  (props: plainTransferInputProps): JSX.Element => (
+  ({
+    handleNewTransferInput,
+    newTransfer,
+    addTransfer,
+    addTemplate,
+    setNewTransfer,
+    methodList,
+    methodError,
+  }: PlainTransferInputProps): JSX.Element => (
     <>
-      <TransferTemplateButtonsContainer setNewTransfer={props.setNewTransfer} />
+      <TransferTemplateButtonsContainer setNewTransfer={setNewTransfer} />
       <Box display="flex">
-        <FormGroup row={true} sx={{ gap: 1, mr: 1, width: "100%" }}>
+        <FormGroup row sx={{ gap: 1, mr: 1, width: "100%" }}>
           <TextField
             label="金額"
-            value={props.newTransfer.price}
+            value={newTransfer.price}
             inputProps={numericProps}
-            onChange={(e) =>
-              props.handleNewTransferInput("price", e.target.value)
-            }
+            onChange={(e) => handleNewTransferInput("price", e.target.value)}
           />
           <DatePicker
             label="日付"
-            value={props.newTransfer.date}
+            value={newTransfer.date}
             sx={{ maxWidth: 150 }}
-            onChange={(value) => props.handleNewTransferInput("date", value)}
+            onChange={(value) => handleNewTransferInput("date", value)}
           />
           <Autocomplete
-            value={props.newTransfer.from}
+            value={newTransfer.from}
             sx={{ minWidth: 150 }}
-            options={props.methodList}
+            options={methodList}
             freeSolo
-            onChange={(_e, v) => {
-              props.handleNewTransferInput("from", v);
-            }}
+            onChange={(_e, v) => handleNewTransferInput("from", v)}
             renderInput={(params) => (
-              <TextField
-                {...params}
-                error={!!props.methodError}
-                label="送金元"
-              />
+              <TextField {...params} error={!!methodError} label="送金元" />
             )}
           />
           <Autocomplete
-            value={props.newTransfer.to}
+            value={newTransfer.to}
             sx={{ minWidth: 150 }}
-            options={props.methodList}
+            options={methodList}
             freeSolo
-            onChange={(_e, v) => {
-              props.handleNewTransferInput("to", v);
-            }}
+            onChange={(_e, v) => handleNewTransferInput("to", v)}
             renderInput={(params) => (
-              <TextField
-                {...params}
-                error={!!props.methodError}
-                label="送金先"
-              />
+              <TextField {...params} error={!!methodError} label="送金先" />
             )}
           />
           <TextField
             label="備考"
-            value={props.newTransfer.description}
+            value={newTransfer.description}
             onChange={(e) =>
-              props.handleNewTransferInput("description", e.target.value)
+              handleNewTransferInput("description", e.target.value)
             }
           />
         </FormGroup>
-        {props.methodError ? (
-          <Tooltip title={props.methodError}>
+        {methodError ? (
+          <Tooltip title={methodError}>
             <>
               <TransferInputButtons
-                methodError={props.methodError}
-                addTransfer={props.addTransfer}
-                addTemplate={props.addTemplate}
+                methodError={methodError}
+                addTransfer={addTransfer}
+                addTemplate={addTemplate}
               />
             </>
           </Tooltip>
         ) : (
           <TransferInputButtons
-            methodError={props.methodError}
-            addTransfer={props.addTransfer}
-            addTemplate={props.addTemplate}
+            methodError={methodError}
+            addTransfer={addTransfer}
+            addTemplate={addTemplate}
           />
         )}
       </Box>
@@ -130,35 +124,28 @@ const TransferInput = () => {
     if (name === "price") {
       if (isValidatedNum(value)) {
         setNewTransfer((prev) => ({ ...prev, [name]: Number(value) }));
-        return;
-      } else {
-        return;
       }
+      return;
     }
     setNewTransfer((prev) => ({ ...prev, [name]: value }));
   }, []);
 
   const methodError = useMemo(() => {
-    if (!newTransfer.to?.assetId || !newTransfer.from?.assetId) {
+    if (!newTransfer.to.assetId || !newTransfer.from.assetId) {
       return "送金元と送金先は必須です";
     }
-    if (newTransfer.to?.assetId === newTransfer.from?.assetId) {
+    if (newTransfer.to.assetId === newTransfer.from.assetId) {
       return "同じ資産には送金できません";
     }
-    if (newTransfer.to?.timing === "翌月") {
+    if (newTransfer.to.timing === "翌月") {
       return "後払いの決済方法に入金はできません";
     }
-  }, [
-    newTransfer.from?.assetId,
-    newTransfer.to?.assetId,
-    newTransfer.to?.timing,
-  ]);
+  }, [newTransfer]);
 
   const addTransfer = useCallback(async () => {
     if (auth.currentUser) {
       const userId = auth.currentUser.uid;
-      const purchaseTitle =
-        newTransfer.from.label + "から" + newTransfer.to.label;
+      const purchaseTitle = `${newTransfer.from.label}から${newTransfer.to.label}`;
       const basePurchase = {
         userId,
         price: newTransfer.price,
@@ -172,25 +159,25 @@ const TransferInput = () => {
       if (newTransfer.from.timing === "翌月" && newTransfer.from.timingDate) {
         const childTransfer: InputPurchaseType = {
           ...basePurchase,
-          title: "【送金】" + purchaseTitle,
+          title: `【送金】${purchaseTitle}`,
           date: getPayLaterDate(newTransfer.date, newTransfer.from.timingDate),
           method: newTransfer.from,
         };
         // awaitないとfirestoreへの書き込みが完了する前にbatch書き込みが完了してしまうので
-        await addDocPurchase(childTransfer).then(
-          (docRef) => (childId = docRef.id)
-        );
+        await addDocPurchase(childTransfer).then((docRef) => {
+          childId = docRef.id;
+        });
       }
       const transferPurchases: InputPurchaseType[] = [
         {
           ...basePurchase,
-          title: "【送金】" + purchaseTitle,
+          title: `【送金】${purchaseTitle}`,
           method: newTransfer.from,
           childPurchaseId: childId,
         },
         {
           ...basePurchase,
-          title: "【入金】" + purchaseTitle,
+          title: `【入金】${purchaseTitle}`,
           method: newTransfer.to,
           income: true,
         },
@@ -198,16 +185,10 @@ const TransferInput = () => {
       batchAddDocPurchase(transferPurchases);
     }
     setNewTransfer(defaultTransferInput);
-  }, [
-    newTransfer.date,
-    newTransfer.description,
-    newTransfer.from,
-    newTransfer.price,
-    newTransfer.to,
-  ]);
+  }, [newTransfer]);
 
   const addTemplate = useCallback(() => {
-    if (newTransfer && auth.currentUser) {
+    if (auth.currentUser) {
       const userId = auth.currentUser.uid;
       addDocTransferTemplate({ ...newTransfer, userId });
     }

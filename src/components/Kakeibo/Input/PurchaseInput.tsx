@@ -20,7 +20,7 @@ import { getPayLaterDate } from "../../../utilities/dateUtilities";
 
 const auth = getAuth();
 
-type plainPurchaseInputProps = {
+type PlainPurchaseInputProps = {
   handleNewPurchaseInput: (name: string, value: any) => void;
   newPurchase: InputPurchaseType;
   addPurchase: () => void;
@@ -31,58 +31,60 @@ type plainPurchaseInputProps = {
 };
 
 const PlainPurchaseInput = memo(
-  (props: plainPurchaseInputProps): JSX.Element => (
+  ({
+    handleNewPurchaseInput,
+    newPurchase,
+    addPurchase,
+    addTemplate,
+    setNewPurchase,
+    categorySet,
+    methodList,
+  }: PlainPurchaseInputProps): JSX.Element => (
     <>
-      <TemplateButtons setNewPurchase={props.setNewPurchase} />
+      <TemplateButtons setNewPurchase={setNewPurchase} />
       <Box display="flex">
-        <FormGroup row={true} sx={{ gap: 1, mr: 1, width: "100%" }}>
+        <FormGroup row sx={{ gap: 1, mr: 1, width: "100%" }}>
           <TextField
             label="品目"
-            value={props.newPurchase.title}
-            onChange={(e) =>
-              props.handleNewPurchaseInput("title", e.target.value)
-            }
+            value={newPurchase.title}
+            onChange={(e) => handleNewPurchaseInput("title", e.target.value)}
           />
           <TextField
             label="金額"
-            value={props.newPurchase.price}
+            value={newPurchase.price}
             inputProps={numericProps}
-            onChange={(e) =>
-              props.handleNewPurchaseInput("price", e.target.value)
-            }
+            onChange={(e) => handleNewPurchaseInput("price", e.target.value)}
           />
           <DatePicker
             label="日付"
-            value={props.newPurchase.date}
+            value={newPurchase.date}
             sx={{ maxWidth: 150 }}
-            onChange={(value) => props.handleNewPurchaseInput("date", value)}
+            onChange={(value) => handleNewPurchaseInput("date", value)}
           />
           <Autocomplete
-            value={props.newPurchase.category}
-            onChange={(e, v) => props.handleNewPurchaseInput("category", v)}
+            value={newPurchase.category}
+            onChange={(e, v) => handleNewPurchaseInput("category", v)}
             sx={{ minWidth: 150 }}
-            options={props.categorySet}
+            options={categorySet}
             freeSolo
             renderInput={(params) => (
               <TextField {...params} label="カテゴリー" />
             )}
           />
           <Autocomplete
-            value={props.newPurchase.method}
+            value={newPurchase.method}
             sx={{ minWidth: 150 }}
-            options={props.methodList}
+            options={methodList}
             freeSolo
-            onChange={(e, v) => {
-              props.handleNewPurchaseInput("method", v);
-            }}
+            onChange={(e, v) => handleNewPurchaseInput("method", v)}
             renderInput={(params) => (
               <TextField {...params} label="支払い方法" />
             )}
           />
           <StyledCheckbox
-            value={props.newPurchase.income}
+            value={newPurchase.income}
             handleCheckbox={() =>
-              props.handleNewPurchaseInput("income", !props.newPurchase.income)
+              handleNewPurchaseInput("income", !newPurchase.income)
             }
           >
             収入
@@ -90,9 +92,9 @@ const PlainPurchaseInput = memo(
           <TextField
             label="備考"
             multiline
-            value={props.newPurchase.description}
+            value={newPurchase.description}
             onChange={(e) =>
-              props.handleNewPurchaseInput("description", e.target.value)
+              handleNewPurchaseInput("description", e.target.value)
             }
           />
         </FormGroup>
@@ -100,14 +102,14 @@ const PlainPurchaseInput = memo(
           <Button
             sx={{ height: "50%" }}
             variant="contained"
-            onClick={props.addPurchase}
+            onClick={addPurchase}
           >
             追加
           </Button>
           <Button
             sx={{ height: "50%" }}
             variant="outlined"
-            onClick={props.addTemplate}
+            onClick={addTemplate}
           >
             ボタン化
           </Button>
@@ -125,10 +127,8 @@ const PurchaseInput = () => {
     if (name === "price") {
       if (isValidatedNum(value)) {
         setNewPurchase((prev) => ({ ...prev, [name]: Number(value) }));
-        return;
-      } else {
-        return;
       }
+      return;
     }
     setNewPurchase((prev) => ({ ...prev, [name]: value }));
   }, []);
@@ -140,26 +140,22 @@ const PurchaseInput = () => {
     }
     if (auth.currentUser) {
       const userId = auth.currentUser.uid;
+      const purchaseData = { ...newPurchase, userId };
       if (newPurchase.method.timing === "即時" || !newPurchase.method) {
-        addDocPurchase({
-          ...newPurchase,
-          userId,
-        });
+        addDocPurchase(purchaseData);
       } else if (newPurchase.method.timingDate) {
-        addDocPurchase({
-          ...newPurchase,
-          userId,
-          date: getPayLaterDate(
-            newPurchase.date,
-            newPurchase.method.timingDate
-          ),
-        }).then((docRef) => {
-          addDocPurchase({
-            ...newPurchase,
-            userId,
-            childPurchaseId: docRef.id,
-          });
-        });
+        const payLaterDate = getPayLaterDate(
+          newPurchase.date,
+          newPurchase.method.timingDate
+        );
+        addDocPurchase({ ...purchaseData, date: payLaterDate }).then(
+          (docRef) => {
+            addDocPurchase({
+              ...purchaseData,
+              childPurchaseId: docRef.id,
+            });
+          }
+        );
       }
       setNewPurchase(defaultPurchaseInput);
     }

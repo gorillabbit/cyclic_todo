@@ -40,17 +40,27 @@ type PlainEditPurchaseRowProps = {
 };
 
 const PlainEditPurchaseRow = memo(
-  (props: PlainEditPurchaseRowProps): JSX.Element => (
+  ({
+    editFormData,
+    handleDateFormChange,
+    handleEditFormChange,
+    categorySet,
+    handleAutocompleteChange,
+    methodList,
+    handleMethodChange,
+    isSmall,
+    handleSaveClick,
+  }: PlainEditPurchaseRowProps): JSX.Element => (
     <>
-      {props.isSmall ? (
+      {isSmall ? (
         <>
           <TableRow>
             <TableCell />
             <TableCell sx={{ paddingX: 0.5 }}>
               <DatePicker
                 name="date"
-                value={props.editFormData.date}
-                onChange={props.handleDateFormChange}
+                value={editFormData.date}
+                onChange={handleDateFormChange}
                 slotProps={{ textField: { size: "small" } }}
                 sx={{ maxWidth: 190 }}
               />
@@ -58,16 +68,16 @@ const PlainEditPurchaseRow = memo(
             <TableCell sx={{ paddingX: 0.5 }}>
               <TextField
                 name="title"
-                value={props.editFormData.title}
-                onChange={props.handleEditFormChange}
+                value={editFormData.title}
+                onChange={handleEditFormChange}
                 size="small"
               />
             </TableCell>
             <TableCell sx={{ paddingX: 0.5 }}>
               <TextField
                 name="price"
-                value={props.editFormData.price}
-                onChange={props.handleEditFormChange}
+                value={editFormData.price}
+                onChange={handleEditFormChange}
                 size="small"
               />
             </TableCell>
@@ -76,13 +86,11 @@ const PlainEditPurchaseRow = memo(
             <TableCell sx={{ paddingX: 0.5 }} />
             <TableCell sx={{ paddingX: 0.5 }}>
               <Autocomplete
-                value={props.editFormData.category}
+                value={editFormData.category}
                 sx={{ minWidth: 150 }}
-                options={props.categorySet}
+                options={categorySet}
                 freeSolo
-                onChange={(e, v) =>
-                  props.handleAutocompleteChange("category", v)
-                }
+                onChange={(e, v) => handleAutocompleteChange("category", v)}
                 renderInput={(params) => (
                   <TextField {...params} label="分類" size="small" />
                 )}
@@ -90,11 +98,11 @@ const PlainEditPurchaseRow = memo(
             </TableCell>
             <TableCell sx={{ paddingX: 0.5 }}>
               <Autocomplete
-                value={props.editFormData.method}
+                value={editFormData.method}
                 sx={{ minWidth: 150 }}
-                options={props.methodList}
+                options={methodList}
                 freeSolo
-                onChange={(_e, v) => props.handleMethodChange(v)}
+                onChange={(_e, v) => handleMethodChange(v)}
                 renderInput={(params) => (
                   <TextField {...params} label="支払い方法" size="small" />
                 )}
@@ -103,23 +111,23 @@ const PlainEditPurchaseRow = memo(
             <TableCell sx={{ paddingX: 0.5 }}>
               <TextField
                 name="income"
-                value={props.editFormData.income ? "収入" : "支出"}
-                onChange={props.handleEditFormChange}
+                value={editFormData.income ? "収入" : "支出"}
+                onChange={handleEditFormChange}
                 size="small"
               />
             </TableCell>
-            {!props.isSmall && (
+            {!isSmall && (
               <TableCell sx={{ paddingX: 0.5 }}>
                 <TextField
                   name="description"
-                  value={props.editFormData.description}
-                  onChange={props.handleEditFormChange}
+                  value={editFormData.description}
+                  onChange={handleEditFormChange}
                   size="small"
                 />
               </TableCell>
             )}
             <TableCell padding="none">
-              <IconButton onClick={props.handleSaveClick} color="success">
+              <IconButton onClick={handleSaveClick} color="success">
                 <DoneIcon />
               </IconButton>
             </TableCell>
@@ -131,8 +139,8 @@ const PlainEditPurchaseRow = memo(
           <TableCell sx={{ paddingX: 0.5 }}>
             <DatePicker
               name="date"
-              value={props.editFormData.date}
-              onChange={props.handleDateFormChange}
+              value={editFormData.date}
+              onChange={handleDateFormChange}
               slotProps={{ textField: { size: "small" } }}
               sx={{ maxWidth: 190 }}
             />
@@ -140,26 +148,26 @@ const PlainEditPurchaseRow = memo(
           <TableCell sx={{ paddingX: 0.5 }}>
             <TextField
               name="title"
-              value={props.editFormData.title}
-              onChange={props.handleEditFormChange}
+              value={editFormData.title}
+              onChange={handleEditFormChange}
               size="small"
             />
           </TableCell>
           <TableCell sx={{ paddingX: 0.5 }}>
             <TextField
               name="price"
-              value={props.editFormData.price}
-              onChange={props.handleEditFormChange}
+              value={editFormData.price}
+              onChange={handleEditFormChange}
               size="small"
             />
           </TableCell>
           <TableCell sx={{ paddingX: 0.5 }}>
             <Autocomplete
-              value={props.editFormData.category}
+              value={editFormData.category}
               sx={{ minWidth: 150 }}
-              options={props.categorySet}
+              options={categorySet}
               freeSolo
-              onChange={(e, v) => props.handleAutocompleteChange("category", v)}
+              onChange={(e, v) => handleAutocompleteChange("category", v)}
               renderInput={(params) => (
                 <TextField {...params} label="分類" size="small" />
               )}
@@ -167,11 +175,11 @@ const PlainEditPurchaseRow = memo(
           </TableCell>
           <TableCell sx={{ paddingX: 0.5 }}>
             <Autocomplete
-              value={props.editFormData.method}
+              value={editFormData.method}
               sx={{ minWidth: 150 }}
-              options={props.methodList}
+              options={methodList}
               freeSolo
-              onChange={(_e, v) => props.handleMethodChange(v)}
+              onChange={(_e, v) => handleMethodChange(v)}
               renderInput={(params) => (
                 <TextField {...params} label="支払い方法" size="small" />
               )}
@@ -180,23 +188,23 @@ const PlainEditPurchaseRow = memo(
           <TableCell sx={{ paddingX: 0.5 }}>
             <TextField
               name="income"
-              value={props.editFormData.income ? "収入" : "支出"}
-              onChange={props.handleEditFormChange}
+              value={editFormData.income ? "収入" : "支出"}
+              onChange={handleEditFormChange}
               size="small"
             />
           </TableCell>
-          {!props.isSmall && (
+          {!isSmall && (
             <TableCell sx={{ paddingX: 0.5 }}>
               <TextField
                 name="description"
-                value={props.editFormData.description}
-                onChange={props.handleEditFormChange}
+                value={editFormData.description}
+                onChange={handleEditFormChange}
                 size="small"
               />
             </TableCell>
           )}
           <TableCell padding="none">
-            <IconButton onClick={props.handleSaveClick} color="success">
+            <IconButton onClick={handleSaveClick} color="success">
               <DoneIcon />
             </IconButton>
           </TableCell>
@@ -205,6 +213,7 @@ const PlainEditPurchaseRow = memo(
     </>
   )
 );
+
 const EditPurchaseRow = ({
   purchase,
   setIsEdit,
@@ -261,7 +270,6 @@ const EditPurchaseRow = ({
     updateCurrentPurchase({});
   }, [editFormData, setIsEdit]);
 
-  // 編集データを更新する関数
   const handleEditFormChange = useCallback(
     (event: { target: { name: string; value: any } }) => {
       const { name, value } = event.target;
@@ -269,6 +277,7 @@ const EditPurchaseRow = ({
     },
     [setEditFormData]
   );
+
   const handleDateFormChange = useCallback(
     (value: Date | null | undefined) => {
       setEditFormData((prev) => ({
@@ -290,6 +299,7 @@ const EditPurchaseRow = ({
     },
     [setEditFormData]
   );
+
   const handleAutocompleteChange = useCallback(
     (name: string, value: any) => {
       setEditFormData((prev) => ({ ...prev, [name]: value }));

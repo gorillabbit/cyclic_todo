@@ -90,7 +90,7 @@ const TaskInputForm: React.FC<TaskInputFormProp> = ({
 
   return (
     <Box display="flex">
-      <FormGroup row={true} sx={{ gap: 1, m: 1, width: "100%" }}>
+      <FormGroup row sx={{ gap: 1, m: 1, width: "100%" }}>
         <TextField
           autoFocus
           fullWidth

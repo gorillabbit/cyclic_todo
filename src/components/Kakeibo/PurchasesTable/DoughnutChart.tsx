@@ -40,7 +40,7 @@ interface DoughnutChartProps {
   title: string;
 }
 
-type plainDoughnutChartProps = {
+type PlainDoughnutChartProps = {
   data: ChartData<"doughnut", number[], unknown>;
   options:
     | _DeepPartialObject<
@@ -54,85 +54,86 @@ type plainDoughnutChartProps = {
 };
 
 const PlainDoughnutChart = memo(
-  (props: plainDoughnutChartProps): JSX.Element => (
+  ({ data, options }: PlainDoughnutChartProps): JSX.Element => (
     <Box width="100%" maxWidth="500px" my={2}>
-      <Doughnut data={props.data} options={props.options} />
+      <Doughnut data={data} options={options} />
     </Box>
   )
 );
 
-const DoughnutChart = memo((props: DoughnutChartProps): JSX.Element => {
-  const data = useMemo(() => {
-    const categoryTotals: Record<string, { price: number; color: string }> = {};
-    props.purchaseList.forEach(({ category, price }, index) => {
-      const priceNumber = Number(price);
-      if (priceNumber > 0) {
-        if (!categoryTotals[category]) {
-          categoryTotals[category] = {
-            price: 0,
-            color: colors[index % colors.length],
-          };
+const DoughnutChart = memo(
+  ({ purchaseList, title }: DoughnutChartProps): JSX.Element => {
+    const data = useMemo(() => {
+      const categoryTotals: Record<string, { price: number; color: string }> =
+        {};
+      purchaseList.forEach(({ category, price }, index) => {
+        const priceNumber = Number(price);
+        if (priceNumber > 0) {
+          if (!categoryTotals[category]) {
+            categoryTotals[category] = {
+              price: 0,
+              color: colors[index % colors.length],
+            };
+          }
+          categoryTotals[category].price += priceNumber;
         }
-        categoryTotals[category].price += priceNumber;
-      }
-    });
+      });
 
-    const categories = Object.keys(categoryTotals);
-    const subData = props.purchaseList
-      .sort((a, b) => {
-        const indexA = categories.indexOf(a.category);
-        const indexB = categories.indexOf(b.category);
-        return indexA - indexB;
-      })
-      .filter((item) => item.price > 0 && categories.includes(item.category));
+      const categories = Object.keys(categoryTotals);
+      const subData = purchaseList
+        .sort((a, b) => {
+          const indexA = categories.indexOf(a.category);
+          const indexB = categories.indexOf(b.category);
+          return indexA - indexB;
+        })
+        .filter((item) => item.price > 0 && categories.includes(item.category));
 
-    return {
-      datasets: [
-        {
-          data: categories.map((category) => categoryTotals[category].price),
-          backgroundColor: categories.map(
-            (category) => categoryTotals[category].color
-          ),
-          borderColor: "white",
-          borderWidth: 1,
-          labels: categories,
+      return {
+        datasets: [
+          {
+            data: categories.map((category) => categoryTotals[category].price),
+            backgroundColor: categories.map(
+              (category) => categoryTotals[category].color
+            ),
+            borderColor: "white",
+            borderWidth: 1,
+            labels: categories,
+          },
+          {
+            data: subData.map((item) => Number(item.price)),
+            backgroundColor: subData.map(
+              (item) => categoryTotals[item.category].color
+            ),
+            borderColor: "white",
+            borderWidth: 1,
+            labels: subData.map((item) => item.title),
+          },
+        ],
+      };
+    }, [purchaseList]);
+
+    const options = useMemo(
+      () => ({
+        plugins: {
+          tooltip: {
+            callbacks: {
+              label: (tooltipItem: any) =>
+                `${tooltipItem.dataset.labels[tooltipItem.dataIndex]}: ${
+                  tooltipItem.formattedValue
+                }`,
+            },
+          },
+          title: {
+            display: true,
+            text: title,
+          },
         },
-        {
-          data: subData.map((item) => Number(item.price)),
-          backgroundColor: subData.map(
-            (item) => categoryTotals[item.category].color
-          ),
-          borderColor: "white",
-          borderWidth: 1,
-          labels: subData.map((item) => item.title),
-        },
-      ],
-    };
-  }, [props.purchaseList]);
+      }),
+      [title]
+    );
 
-  const options = {
-    plugins: {
-      tooltip: {
-        callbacks: {
-          label: (tooltipItem: any) =>
-            `${tooltipItem.dataset.labels[tooltipItem.dataIndex]}: ${
-              tooltipItem.formattedValue
-            }`,
-        },
-      },
-      title: {
-        display: true,
-        text: props.title,
-      },
-    },
-  };
-
-  const plainProps = {
-    data,
-    options,
-  };
-
-  return <PlainDoughnutChart {...plainProps} />;
-});
+    return <PlainDoughnutChart data={data} options={options} />;
+  }
+);
 
 export default DoughnutChart;

@@ -27,15 +27,20 @@ type PlainPurchaseHeaderProps = {
 };
 
 const PlainPurchaseHeader = memo(
-  (props: PlainPurchaseHeaderProps): JSX.Element => (
+  ({
+    currentMonthSpentList,
+    currentMonthIncomeList,
+    currentMoney,
+    endOfMonthMoneyAmount,
+  }: PlainPurchaseHeaderProps): JSX.Element => (
     <>
       <Box display="flex" flexWrap="wrap">
         <DoughnutChart
-          purchaseList={props.currentMonthSpentList}
+          purchaseList={currentMonthSpentList}
           title="今月の使用金額"
         />
         <DoughnutChart
-          purchaseList={props.currentMonthIncomeList}
+          purchaseList={currentMonthIncomeList}
           title="今月の収入金額"
         />
       </Box>
@@ -52,11 +57,11 @@ const PlainPurchaseHeader = memo(
             <TableBody>
               <TableRow>
                 <TableCell>現在の所持金</TableCell>
-                <TableCell> {props.currentMoney}</TableCell>
+                <TableCell>{currentMoney}</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell>今月末の残高</TableCell>
-                <TableCell> {props.endOfMonthMoneyAmount}</TableCell>
+                <TableCell>{endOfMonthMoneyAmount}</TableCell>
               </TableRow>
             </TableBody>
           </Table>
@@ -71,32 +76,31 @@ const PurchaseHeader = ({
 }: {
   purchaseList: PurchaseListType[];
 }): JSX.Element => {
-  //サマリーに表示する数字
   const { sumAssets } = useAsset();
   const today = useMemo(() => new Date(), []);
-  const currentMoney = useMemo(
-    () =>
-      sumAssets +
-      calculateSpentAndIncomeResult(
-        purchaseList.filter(
-          (purchase) =>
-            purchase.date.toDate() < today && isGroupPurchase(purchase)
-        )
-      ),
-    [purchaseList, sumAssets, today]
+  const currentMoney = useMemo(() => {
+    const filteredPurchases = purchaseList.filter(
+      (purchase) => purchase.date.toDate() < today && isGroupPurchase(purchase)
+    );
+    return sumAssets + calculateSpentAndIncomeResult(filteredPurchases);
+  }, [purchaseList, sumAssets, today]);
+
+  const endOfMonthMoneyAmount = useMemo(() => {
+    const filteredPurchases = purchaseList.filter(
+      (purchase) => purchase.date.toDate() < lastDayOfMonth(today)
+    );
+    return sumAssets + calculateSpentAndIncomeResult(filteredPurchases);
+  }, [purchaseList, sumAssets, today]);
+
+  const currentMonthSpentList = useMemo(
+    () => getFilteredPurchase(purchaseList, "spent"),
+    [purchaseList]
   );
-  const endOfMonthMoneyAmount = useMemo(
-    () =>
-      sumAssets +
-      calculateSpentAndIncomeResult(
-        purchaseList.filter(
-          (purchase) => purchase.date.toDate() < lastDayOfMonth(today)
-        )
-      ),
-    [purchaseList, sumAssets, today]
+
+  const currentMonthIncomeList = useMemo(
+    () => getFilteredPurchase(purchaseList, "income"),
+    [purchaseList]
   );
-  const currentMonthSpentList = getFilteredPurchase(purchaseList, "spent");
-  const currentMonthIncomeList = getFilteredPurchase(purchaseList, "income");
   const plainProps = {
     currentMonthSpentList,
     currentMonthIncomeList,
