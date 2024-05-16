@@ -5,6 +5,7 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { InputPurchaseRowType } from "../../../types";
+import PaymentsIcon from "@mui/icons-material/Payments";
 
 type PlainNormalPurchaseRowProps = {
   isGroup: boolean;
@@ -61,7 +62,7 @@ const PlainNormalPurchaseRow = memo(
               {editFormData.method.label}
             </TableCell>
             <TableCell sx={{ paddingX: 0.5 }}>
-              {editFormData.income ? "収入" : "支出"}
+              <PaymentsIcon color={editFormData.income ? "success" : "error"} />
             </TableCell>
             <TableCell>{editFormData.description}</TableCell>
           </>
@@ -101,7 +102,7 @@ const PlainNormalPurchaseRow = memo(
             {editFormData.method.label}
           </TableCell>
           <TableCell sx={{ paddingX: 0.5 }}>
-            {editFormData.income ? "収入" : "支出"}
+            <PaymentsIcon color={editFormData.income ? "success" : "error"} />
           </TableCell>
         </TableRow>
       )}
