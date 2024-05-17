@@ -72,10 +72,9 @@ const PlainPurchaseInput = memo(
             )}
           />
           <Autocomplete
-            value={newPurchase.method}
+            value={newPurchase.method.label ? newPurchase.method : null}
             sx={{ minWidth: 150 }}
             options={methodList}
-            freeSolo
             onChange={(e, v) => handleNewPurchaseInput("method", v)}
             renderInput={(params) => (
               <TextField {...params} label="支払い方法" />

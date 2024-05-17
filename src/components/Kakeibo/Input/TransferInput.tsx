@@ -67,20 +67,18 @@ const PlainTransferInput = memo(
             onChange={(value) => handleNewTransferInput("date", value)}
           />
           <Autocomplete
-            value={newTransfer.from}
+            value={newTransfer.from.label ? newTransfer.from : null}
             sx={{ minWidth: 150 }}
             options={methodList}
-            freeSolo
             onChange={(_e, v) => handleNewTransferInput("from", v)}
             renderInput={(params) => (
               <TextField {...params} error={!!methodError} label="送金元" />
             )}
           />
           <Autocomplete
-            value={newTransfer.to}
+            value={newTransfer.to.label ? newTransfer.to : null}
             sx={{ minWidth: 150 }}
             options={methodList}
-            freeSolo
             onChange={(_e, v) => handleNewTransferInput("to", v)}
             renderInput={(params) => (
               <TextField {...params} error={!!methodError} label="送金先" />
@@ -117,6 +115,7 @@ const PlainTransferInput = memo(
 );
 
 const TransferInput = () => {
+  const { methodList } = useMethod();
   const [newTransfer, setNewTransfer] =
     useState<InputTransferType>(defaultTransferInput);
 
@@ -193,8 +192,6 @@ const TransferInput = () => {
       addDocTransferTemplate({ ...newTransfer, userId });
     }
   }, [newTransfer]);
-
-  const { methodList } = useMethod();
 
   const plainProps = {
     handleNewTransferInput,

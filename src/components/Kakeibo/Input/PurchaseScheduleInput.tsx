@@ -1,4 +1,5 @@
 import {
+  Autocomplete,
   Box,
   Button,
   FormGroup,
@@ -9,7 +10,12 @@ import {
 } from "@mui/material";
 import StyledCheckbox from "../../StyledCheckbox";
 import { useState, useCallback } from "react";
-import { addDocPurchaseSchedule, batchAddDocPurchase } from "../../../firebase";
+import {
+  addDocPurchaseSchedule,
+  batchAddDocPurchase,
+  db,
+  dbNames,
+} from "../../../firebase";
 import { getAuth } from "firebase/auth";
 import {
   InputPurchaseScheduleType,
@@ -23,7 +29,14 @@ import {
   isValidatedNum,
   numericProps,
 } from "../../../utilities/purchaseUtilities";
-import { DocumentData, DocumentReference } from "firebase/firestore";
+import {
+  DocumentData,
+  DocumentReference,
+  collection,
+  doc,
+} from "firebase/firestore";
+import { useMethod } from "../../Context/MethodContext";
+import { getPayLaterDate } from "../../../utilities/dateUtilities";
 
 const auth = getAuth();
 
@@ -62,6 +75,7 @@ const weekDaysString: WeekDay[] = [
 ];
 
 const PurchaseScheduleInput = () => {
+  const { methodList } = useMethod();
   const [newPurchaseSchedule, setNewPurchaseSchedule] =
     useState<InputPurchaseScheduleType>(defaultNewPurchase);
 
@@ -138,19 +152,31 @@ const PurchaseScheduleInput = () => {
             newPurchaseSchedule.endDate
           );
         }
-        const batchPurchaseList: InputPurchaseType[] = daysList.map((day) => ({
-          userId,
-          title: newPurchaseSchedule.title,
-          date: day,
-          category: newPurchaseSchedule.category,
-          method: newPurchaseSchedule.method,
-          price: newPurchaseSchedule.price,
-          income: newPurchaseSchedule.income,
-          description: newPurchaseSchedule.description,
-          parentScheduleId: docRef.id,
-          childPurchaseId: "",
-        }));
-        batchAddDocPurchase(batchPurchaseList);
+        const batchPurchaseList: InputPurchaseType[][] = daysList.map((day) => {
+          const docId = doc(collection(db, dbNames.purchase)).id;
+          const newPurchase = {
+            ...newPurchaseSchedule,
+            userId,
+            parentScheduleId: docRef.id,
+          };
+          const createdPurchase: (InputPurchaseType & { id?: string })[] = [
+            {
+              ...newPurchase,
+              id: docId,
+              date: day,
+              childPurchaseId: "",
+            },
+          ];
+          if (newPurchaseSchedule.method.timing === "翌月") {
+            createdPurchase.push({
+              ...newPurchase,
+              date: getPayLaterDate(day, newPurchaseSchedule.method.timingDate),
+              childPurchaseId: docId,
+            });
+          }
+          return createdPurchase;
+        });
+        batchAddDocPurchase(batchPurchaseList.flat());
       }
     },
     [newPurchaseSchedule]
@@ -235,12 +261,14 @@ const PurchaseScheduleInput = () => {
             handleNewPurchaseScheduleInput("category", e.target.value)
           }
         />
-        <TextField
-          label="支払い方法"
-          value={newPurchaseSchedule.method}
-          onChange={(e) =>
-            handleNewPurchaseScheduleInput("method", e.target.value)
+        <Autocomplete
+          value={
+            newPurchaseSchedule.method?.id ? newPurchaseSchedule.method : null
           }
+          sx={{ minWidth: 150 }}
+          options={methodList}
+          onChange={(_e, v) => handleNewPurchaseScheduleInput("method", v)}
+          renderInput={(params) => <TextField {...params} label="支払い方法" />}
         />
         <StyledCheckbox
           value={newPurchaseSchedule.income}
