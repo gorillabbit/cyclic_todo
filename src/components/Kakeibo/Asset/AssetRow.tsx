@@ -346,7 +346,8 @@ const AssetRow = ({ asset }: { asset: AssetListType }) => {
       (purchase) =>
         purchase.method?.assetId === asset.id &&
         purchase.date.toDate() < new Date() &&
-        latestLog.timestamp.toDate() < purchase.date.toDate()
+        latestLog.timestamp.toDate() < purchase.date.toDate() &&
+        !purchase.childPurchaseId
     )
   );
 
