@@ -17,6 +17,7 @@ import {
   isValidatedNum,
   numericProps,
 } from "../../../utilities/purchaseUtilities";
+import { useMethod } from "../../Context/MethodContext";
 
 type PlainMethodListProps = {
   method: MethodListType;
@@ -28,6 +29,7 @@ type PlainMethodListProps = {
   isChanged: boolean;
   removeMethod: () => void;
   saveChanges: () => void;
+  inputError: string;
 };
 
 const PlainMethodList = memo(
@@ -40,6 +42,8 @@ const PlainMethodList = memo(
           name="label"
           onChange={props.handleMethodInput}
           size="small"
+          error={!!props.inputError}
+          helperText={props.inputError}
         />
       </TableCell>
       <TableCell sx={{ paddingX: 0.5 }}>
@@ -72,7 +76,7 @@ const PlainMethodList = memo(
         <Button
           variant="contained"
           color="primary"
-          disabled={!props.isChanged}
+          disabled={!props.isChanged || !!props.inputError}
           onClick={props.saveChanges}
         >
           変更
@@ -88,6 +92,7 @@ const PlainMethodList = memo(
 );
 
 const MethodList = ({ method }: { method: MethodListType }) => {
+  const { methodList } = useMethod();
   const [methodInput, setMethodInput] = useState<MethodListType>(method);
 
   const handleMethodInput = useCallback(
@@ -97,14 +102,26 @@ const MethodList = ({ method }: { method: MethodListType }) => {
         if (isValidatedNum(value) && Number(value) < 32) {
           setMethodInput((prev) => ({ ...prev, [name]: Number(value) }));
           return;
-        } else {
-          return;
         }
+        return;
       }
       setMethodInput((prev) => ({ ...prev, [name]: value }));
     },
     []
   );
+
+  const inputError = useMemo(() => {
+    if (
+      methodList.filter(
+        (method) =>
+          method.label === methodInput.label && method.id !== methodInput.id
+      ).length > 0
+    ) {
+      return "他の支払い方法と同じ名前は禁止です";
+    } else {
+      return "";
+    }
+  }, [methodInput, methodList]);
 
   const handleSelectInput = useCallback((e: SelectChangeEvent<string>) => {
     const { name, value } = e.target;
@@ -138,6 +155,7 @@ const MethodList = ({ method }: { method: MethodListType }) => {
     isChanged,
     saveChanges,
     removeMethod,
+    inputError,
   };
 
   return <PlainMethodList {...plainProps} />;
