@@ -136,7 +136,9 @@ const Purchases = (): JSX.Element => {
   const monthlyPurchases = useMemo(
     () =>
       purchaseList.filter(
-        (purchase) => purchase.date.toDate().getMonth() === month.getMonth()
+        (purchase) =>
+          purchase.date.toDate().getMonth() === month.getMonth() &&
+          purchase.date.toDate().getFullYear() === month.getFullYear()
       ),
     [month, purchaseList]
   );
