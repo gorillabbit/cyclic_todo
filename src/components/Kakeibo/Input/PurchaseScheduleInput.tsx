@@ -22,6 +22,7 @@ import {
   weekDaysString,
 } from "../../../utilities/purchaseUtilities";
 import { useMethod } from "../../Context/MethodContext";
+import { usePurchase } from "../../Context/PurchaseContext";
 
 const auth = getAuth();
 
@@ -41,6 +42,7 @@ const defaultNewPurchase: InputPurchaseScheduleType = {
 };
 
 const PurchaseScheduleInput = () => {
+  const { categorySet } = usePurchase();
   const { methodList } = useMethod();
   const [newPurchaseSchedule, setNewPurchaseSchedule] =
     useState<InputPurchaseScheduleType>(defaultNewPurchase);
@@ -141,12 +143,13 @@ const PurchaseScheduleInput = () => {
           sx={{ maxWidth: 150 }}
           onChange={(value) => handleNewPurchaseScheduleInput("endDate", value)}
         />
-        <TextField
-          label="カテゴリー"
+        <Autocomplete
           value={newPurchaseSchedule.category}
-          onChange={(e) =>
-            handleNewPurchaseScheduleInput("category", e.target.value)
-          }
+          onChange={(e, v) => handleNewPurchaseScheduleInput("category", v)}
+          sx={{ minWidth: 150 }}
+          options={categorySet}
+          freeSolo
+          renderInput={(params) => <TextField {...params} label="カテゴリー" />}
         />
         <Autocomplete
           value={
