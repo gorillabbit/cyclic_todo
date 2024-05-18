@@ -70,151 +70,116 @@ type PlainAssetRowProps = {
 };
 
 const PlainAssetRow = memo(
-  (props: PlainAssetRowProps): JSX.Element => (
+  ({
+    open,
+    setOpen,
+    assetInput,
+    handleAssetInput,
+    isNameChanged,
+    isBalanceChanged,
+    saveChanges,
+    updateLog,
+    removeAsset,
+    filteredMethodList,
+    addMethod,
+    handleBalanceInput,
+    balanceInput,
+    isAddedPurchases,
+    currentBalance,
+    displayBalance,
+    openDialog,
+    setOpenDialog,
+    deleteAction,
+    isSmall,
+  }: PlainAssetRowProps): JSX.Element => (
     <>
-      {props.isSmall ? (
-        <>
-          <TableRow>
-            <TableCell sx={{ paddingX: 0.5 }}>
-              <IconButton
-                aria-label="expand row"
-                size="small"
-                onClick={() => props.setOpen(!props.open)}
-              >
-                {props.open ? (
-                  <KeyboardArrowUpIcon />
-                ) : (
-                  <KeyboardArrowDownIcon />
-                )}
-              </IconButton>
-            </TableCell>
-            <TableCell sx={{ paddingX: 0.5 }}>
-              <TextField
-                variant="outlined"
-                value={props.assetInput.name}
-                name="name"
-                onChange={props.handleAssetInput}
-                size="small"
-                sx={{ maxWidth: 150 }}
-              />
-            </TableCell>
-            <TableCell sx={{ display: "flex", paddingX: 0.5 }}>
-              <TextField
-                variant="outlined"
-                value={
-                  props.isBalanceChanged
-                    ? props.balanceInput
-                    : props.displayBalance
-                }
-                name="balance"
-                onChange={props.handleBalanceInput}
-                size="small"
-                inputProps={numericProps}
-                sx={{ maxWidth: 150 }}
-              />
-              {props.isAddedPurchases && (
-                <Box alignContent="center" ml={1}>
-                  {"→ " + props.currentBalance}
-                </Box>
-              )}
-            </TableCell>
-          </TableRow>
-          <TableRow>
-            <TableCell sx={{ paddingX: 0.5 }} colSpan={2} />
-            <TableCell
-              sx={{
-                pt: 0.5,
-                px: 0.5,
-                display: "flex",
-                gap: 1,
-                flexDirection: "row-reverse",
-              }}
-            >
+      <TableRow>
+        <TableCell sx={{ px: 0.5 }}>
+          <IconButton
+            aria-label="expand row"
+            size="small"
+            onClick={() => setOpen(!open)}
+          >
+            {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+          </IconButton>
+        </TableCell>
+        <TableCell sx={{ px: 0.5 }}>
+          <TextField
+            variant="outlined"
+            value={assetInput.name}
+            name="name"
+            onChange={handleAssetInput}
+            size="small"
+            sx={{ maxWidth: 150 }}
+          />
+        </TableCell>
+        <TableCell sx={{ display: "flex", px: 0.5 }}>
+          <TextField
+            variant="outlined"
+            value={isBalanceChanged ? balanceInput : displayBalance}
+            name="balance"
+            onChange={handleBalanceInput}
+            size="small"
+            inputProps={numericProps}
+            sx={{ maxWidth: 150 }}
+          />
+          {isAddedPurchases && (
+            <Box alignContent="center" ml={1}>
+              {"→ " + currentBalance}
+            </Box>
+          )}
+        </TableCell>
+        {!isSmall && (
+          <>
+            <TableCell>
               <Button
-                variant="contained"
+                sx={{ mx: 0.5 }}
+                variant={isAddedPurchases ? "contained" : "text"}
                 color="primary"
-                disabled={!props.isAddedPurchases}
-                onClick={props.updateLog}
+                disabled={!isAddedPurchases}
+                onClick={updateLog}
               >
                 更新
               </Button>
               <Button
-                variant="contained"
+                variant={
+                  isNameChanged || isBalanceChanged ? "contained" : "text"
+                }
                 color="primary"
-                disabled={!props.isNameChanged && !props.isBalanceChanged}
-                onClick={props.saveChanges}
+                disabled={!isNameChanged && !isBalanceChanged}
+                onClick={saveChanges}
               >
                 変更
               </Button>
-              <IconButton onClick={props.removeAsset} color="error">
+              <IconButton onClick={removeAsset} color="error">
                 <DeleteIcon />
               </IconButton>
             </TableCell>
-          </TableRow>
-        </>
-      ) : (
+          </>
+        )}
+      </TableRow>
+      {isSmall && (
         <TableRow>
-          <TableCell sx={{ paddingX: 0.5 }}>
-            <IconButton
-              aria-label="expand row"
-              size="small"
-              onClick={() => props.setOpen(!props.open)}
-            >
-              {props.open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-            </IconButton>
-          </TableCell>
-          <TableCell sx={{ paddingX: 0.5 }}>
-            <TextField
-              variant="outlined"
-              value={props.assetInput.name}
-              name="name"
-              onChange={props.handleAssetInput}
-              size="small"
-              sx={{ maxWidth: 150 }}
-            />
-          </TableCell>
-          <TableCell sx={{ display: "flex", paddingX: 0.5 }}>
-            <TextField
-              variant="outlined"
-              value={
-                props.isBalanceChanged
-                  ? props.balanceInput
-                  : props.displayBalance
-              }
-              name="balance"
-              onChange={props.handleBalanceInput}
-              size="small"
-              inputProps={numericProps}
-              sx={{ maxWidth: 150 }}
-            />
-            {props.isAddedPurchases && (
-              <Box alignContent="center" ml={1}>
-                {"→ " + props.currentBalance}
-              </Box>
-            )}
-          </TableCell>
-          <TableCell sx={{ paddingX: 0.5 }}>
+          <TableCell sx={{ px: 0.5 }} colSpan={2} />
+          <TableCell sx={{ px: 0.5 }}>
             <Button
-              variant="contained"
+              sx={{ mx: 0.5 }}
+              variant={isAddedPurchases ? "contained" : "text"}
               color="primary"
-              disabled={!props.isAddedPurchases}
-              onClick={props.updateLog}
+              disabled={!isAddedPurchases}
+              onClick={updateLog}
             >
               更新
             </Button>
-          </TableCell>
-          <TableCell sx={{ paddingX: 0.5 }}>
             <Button
-              variant="contained"
+              variant={isNameChanged || isBalanceChanged ? "contained" : "text"}
               color="primary"
-              disabled={!props.isNameChanged && !props.isBalanceChanged}
-              onClick={props.saveChanges}
+              disabled={!isNameChanged && !isBalanceChanged}
+              onClick={saveChanges}
             >
               変更
             </Button>
-          </TableCell>
-          <TableCell sx={{ paddingX: 0.5 }}>
-            <IconButton onClick={props.removeAsset} color="error">
+            <IconButton onClick={removeAsset} color="error">
               <DeleteIcon />
             </IconButton>
           </TableCell>
@@ -223,32 +188,32 @@ const PlainAssetRow = memo(
 
       <TableRow>
         <TableCell sx={{ paddingY: 0 }} colSpan={6}>
-          <Collapse in={props.open} timeout="auto" unmountOnExit>
+          <Collapse in={open} timeout="auto" unmountOnExit>
             <Table size="small" aria-label="purchases">
               <TableHead>
                 <TableRow>
-                  <TableCell sx={{ paddingX: 0.5 }}>名前</TableCell>
-                  <TableCell sx={{ paddingX: 0.5 }}>決済タイミング</TableCell>
-                  <TableCell sx={{ paddingX: 0.5 }} colSpan={2} />
+                  <TableCell sx={{ px: 0.5 }}>名前</TableCell>
+                  <TableCell sx={{ px: 0.5 }}>決済タイミング</TableCell>
+                  <TableCell sx={{ px: 0.5 }} colSpan={2} />
                 </TableRow>
               </TableHead>
               <TableBody>
-                {props.filteredMethodList.map((method) => (
+                {filteredMethodList.map((method) => (
                   <MethodList method={method} key={method.id} />
                 ))}
               </TableBody>
             </Table>
-            <IconButton onClick={props.addMethod} color="primary">
+            <IconButton onClick={addMethod} color="primary">
               <AddCircleOutlineIcon />
             </IconButton>
           </Collapse>
         </TableCell>
       </TableRow>
       <DeleteConfirmDialog
-        target={props.assetInput.name}
-        openDialog={props.openDialog}
-        setOpenDialog={props.setOpenDialog}
-        deleteAction={props.deleteAction}
+        target={assetInput.name}
+        openDialog={openDialog}
+        setOpenDialog={setOpenDialog}
+        deleteAction={deleteAction}
       />
     </>
   )
