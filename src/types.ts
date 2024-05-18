@@ -100,6 +100,7 @@ export interface InputPurchaseType {
   description?: string;
   parentScheduleId?: string;
   childPurchaseId: string;
+  isUncertain?: boolean;
 }
 
 export interface InputPurchaseRowType extends InputPurchaseType {
@@ -150,6 +151,7 @@ export interface InputPurchaseScheduleType {
   income: boolean;
   description?: string;
   endDate: Date;
+  isUncertain: boolean;
 }
 
 export interface InputPurchaseScheduleRowType

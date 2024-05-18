@@ -37,6 +37,7 @@ const defaultNewPurchase: InputPurchaseScheduleType = {
   income: false,
   description: "",
   endDate: addYears(new Date(), 1),
+  isUncertain: false,
 };
 
 const PurchaseScheduleInput = () => {
@@ -134,6 +135,12 @@ const PurchaseScheduleInput = () => {
             ))}
           </Select>
         )}
+        <DatePicker
+          label="期日"
+          value={newPurchaseSchedule.endDate}
+          sx={{ maxWidth: 150 }}
+          onChange={(value) => handleNewPurchaseScheduleInput("endDate", value)}
+        />
         <TextField
           label="カテゴリー"
           value={newPurchaseSchedule.category}
@@ -161,6 +168,17 @@ const PurchaseScheduleInput = () => {
         >
           収入
         </StyledCheckbox>
+        <StyledCheckbox
+          value={newPurchaseSchedule.isUncertain}
+          handleCheckbox={() =>
+            handleNewPurchaseScheduleInput(
+              "isUncertain",
+              !newPurchaseSchedule.isUncertain
+            )
+          }
+        >
+          未確定
+        </StyledCheckbox>
         <TextField
           label="備考"
           multiline
@@ -168,12 +186,6 @@ const PurchaseScheduleInput = () => {
           onChange={(e) =>
             handleNewPurchaseScheduleInput("description", e.target.value)
           }
-        />
-        <DatePicker
-          label="期日"
-          value={newPurchaseSchedule.endDate}
-          sx={{ maxWidth: 150 }}
-          onChange={(value) => handleNewPurchaseScheduleInput("endDate", value)}
         />
       </FormGroup>
       <Button variant="contained" onClick={addPurchaseSchedule}>

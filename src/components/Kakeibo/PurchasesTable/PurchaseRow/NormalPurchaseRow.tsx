@@ -1,4 +1,4 @@
-import { TableCell, IconButton, Chip, TableRow } from "@mui/material";
+import { TableCell, IconButton, Chip, TableRow, Button } from "@mui/material";
 import { memo, useCallback } from "react";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -14,6 +14,7 @@ type PlainNormalPurchaseRowProps = {
   editFormData: InputPurchaseRowType;
   isSmall: boolean;
   handleEditClick: () => void;
+  handleEditPriceButtonClick: () => void;
   handleDeleteButton: () => void;
 };
 
@@ -25,6 +26,7 @@ const PlainNormalPurchaseRow = memo(
     editFormData,
     isSmall,
     handleEditClick,
+    handleEditPriceButtonClick,
     handleDeleteButton,
   }: PlainNormalPurchaseRowProps): JSX.Element => (
     <>
@@ -52,6 +54,7 @@ const PlainNormalPurchaseRow = memo(
           {editFormData.price + "円"}
           {editFormData.method.timing === "翌月" &&
             editFormData.childPurchaseId && <Chip label="翌月" />}
+          {editFormData.isUncertain && <Chip label="未確定" />}
         </TableCell>
         {!isSmall && (
           <>
@@ -88,6 +91,11 @@ const PlainNormalPurchaseRow = memo(
                   >
                     <DeleteIcon />
                   </IconButton>
+                  {editFormData.isUncertain && (
+                    <Button onClick={handleEditPriceButtonClick}>
+                      金額確定
+                    </Button>
+                  )}
                 </>
               )}
             </TableCell>
@@ -143,6 +151,7 @@ const NormalPurchaseRow = ({
   editFormData,
   isSmall,
   setIsEdit,
+  setIsEditPrice,
   setOpenDialog,
 }: {
   isGroup: boolean;
@@ -151,6 +160,7 @@ const NormalPurchaseRow = ({
   editFormData: InputPurchaseRowType;
   isSmall: boolean;
   setIsEdit: (value: React.SetStateAction<boolean>) => void;
+  setIsEditPrice: React.Dispatch<React.SetStateAction<boolean>>;
   setOpenDialog: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const handleEditClick = useCallback(() => {
@@ -161,6 +171,11 @@ const NormalPurchaseRow = ({
     setOpenDialog(true);
   }, [setOpenDialog]);
 
+  const handleEditPriceButtonClick = useCallback(
+    () => setIsEditPrice(true),
+    [setIsEditPrice]
+  );
+
   const plainProps = {
     isGroup,
     setOpen,
@@ -168,6 +183,7 @@ const NormalPurchaseRow = ({
     editFormData,
     isSmall,
     handleEditClick,
+    handleEditPriceButtonClick,
     handleDeleteButton,
   };
   return <PlainNormalPurchaseRow {...plainProps} />;

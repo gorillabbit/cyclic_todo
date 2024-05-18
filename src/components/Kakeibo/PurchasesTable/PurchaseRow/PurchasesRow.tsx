@@ -12,6 +12,7 @@ import { InputPurchaseRowType, PurchaseListType } from "../../../../types";
 import DeleteConfirmDialog from "../../DeleteConfirmDialog";
 import EditPurchaseRow from "./EditPurchaseRow";
 import NormalPurchaseRow from "./NormalPurchaseRow";
+import EditPricePurchaseRow from "./EditPricePurchaseRow";
 
 type PlainPurchasesRowProps = {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -27,6 +28,8 @@ type PlainPurchasesRowProps = {
   isSmall: boolean;
   openDialog: boolean;
   setOpenDialog: React.Dispatch<React.SetStateAction<boolean>>;
+  isEditPrice: boolean;
+  setIsEditPrice: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const PlainPurchasesRow = memo(
@@ -44,11 +47,20 @@ const PlainPurchasesRow = memo(
     isSmall,
     openDialog,
     setOpenDialog,
+    isEditPrice,
+    setIsEditPrice,
   }: PlainPurchasesRowProps): JSX.Element => (
     <>
       {isEdit ? (
         <EditPurchaseRow
           setIsEdit={setIsEdit}
+          editFormData={editFormData}
+          setEditFormData={setEditFormData}
+          isSmall={isSmall}
+        />
+      ) : isEditPrice ? (
+        <EditPricePurchaseRow
+          setIsEditPrice={setIsEditPrice}
           editFormData={editFormData}
           setEditFormData={setEditFormData}
           isSmall={isSmall}
@@ -61,6 +73,7 @@ const PlainPurchasesRow = memo(
           editFormData={editFormData}
           isSmall={isSmall}
           setIsEdit={setIsEdit}
+          setIsEditPrice={setIsEditPrice}
           setOpenDialog={setOpenDialog}
         />
       )}
@@ -125,6 +138,7 @@ const PurchasesRow = ({
   isSmall: boolean;
 }) => {
   const [isEdit, setIsEdit] = useState<boolean>(false);
+  const [isEditPrice, setIsEditPrice] = useState<boolean>(false);
   const [open, setOpen] = useState(false);
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const isGroup = groupPurchases.length > 0 && !purchase.childPurchaseId;
@@ -154,6 +168,8 @@ const PurchasesRow = ({
     isSmall,
     openDialog,
     setOpenDialog,
+    isEditPrice,
+    setIsEditPrice,
   };
   return <PlainPurchasesRow {...plainProps} />;
 };
