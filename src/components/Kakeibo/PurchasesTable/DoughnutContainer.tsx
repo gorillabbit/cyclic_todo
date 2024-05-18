@@ -37,7 +37,9 @@ const DoughnutContainer = ({
 }) => {
   const PayLaterCategoryPurchase = monthlyPurchases.map((purchase) => ({
     ...purchase,
-    category: isLaterPayment(purchase) ? "カード支払い" : purchase.category,
+    category: isLaterPayment(purchase)
+      ? purchase.method.label + "支払い"
+      : purchase.category,
   }));
 
   const currentMonthSpentList = useMemo(
