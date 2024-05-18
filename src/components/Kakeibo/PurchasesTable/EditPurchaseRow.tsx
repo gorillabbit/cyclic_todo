@@ -8,11 +8,7 @@ import {
 import { DatePicker } from "@mui/x-date-pickers";
 import { memo, useCallback } from "react";
 import DoneIcon from "@mui/icons-material/Done";
-import {
-  InputPurchaseRowType,
-  MethodListType,
-  PurchaseListType,
-} from "../../../types";
+import { InputPurchaseRowType, MethodListType } from "../../../types";
 import { useMethod } from "../../Context/MethodContext";
 import { usePurchase } from "../../Context/PurchaseContext";
 import {
@@ -215,13 +211,11 @@ const PlainEditPurchaseRow = memo(
 );
 
 const EditPurchaseRow = ({
-  purchase,
   setIsEdit,
   editFormData,
   setEditFormData,
   isSmall,
 }: {
-  purchase: PurchaseListType;
   setIsEdit: React.Dispatch<React.SetStateAction<boolean>>;
   editFormData: InputPurchaseRowType;
   setEditFormData: React.Dispatch<React.SetStateAction<InputPurchaseRowType>>;

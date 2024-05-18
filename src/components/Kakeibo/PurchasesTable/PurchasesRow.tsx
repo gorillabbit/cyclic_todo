@@ -48,7 +48,6 @@ const PlainPurchasesRow = memo(
     <>
       {isEdit ? (
         <EditPurchaseRow
-          purchase={purchase}
           setIsEdit={setIsEdit}
           editFormData={editFormData}
           setEditFormData={setEditFormData}
