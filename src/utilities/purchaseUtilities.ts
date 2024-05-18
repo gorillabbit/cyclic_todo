@@ -92,10 +92,8 @@ export const deleteScheduledPurchases = (
   purchaseList: PurchaseListType[],
   purchaseScheduleId: string
 ) => {
-  console.log(purchaseList, purchaseScheduleId);
   purchaseList.forEach((purchase) => {
     if (purchase.parentScheduleId === purchaseScheduleId) {
-      console.log("delete", purchase.id);
       deleteDocPurchase(purchase.id);
     }
   });
@@ -208,7 +206,6 @@ export const addScheduledPurchase = (
       }
       return createdPurchase;
     });
-    console.log(batchPurchaseList.flat());
     batchAddDocPurchase(batchPurchaseList.flat());
   }
 };
