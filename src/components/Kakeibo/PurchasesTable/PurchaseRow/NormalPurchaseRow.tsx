@@ -31,7 +31,7 @@ const PlainNormalPurchaseRow = memo(
   }: PlainNormalPurchaseRowProps): JSX.Element => (
     <>
       <TableRow sx={{ pb: 0.5 }}>
-        <TableCell sx={{ paddingX: 0.5 }}>
+        <TableCell sx={{ px: 0.5 }}>
           {isGroup && (
             <IconButton
               aria-label="expand row"
@@ -42,11 +42,11 @@ const PlainNormalPurchaseRow = memo(
             </IconButton>
           )}
         </TableCell>
-        <TableCell sx={{ paddingX: 0.5 }}>
+        <TableCell sx={{ px: 0.5 }}>
           {editFormData.date.toLocaleString().split(" ")[0]}
         </TableCell>
-        <TableCell sx={{ paddingX: 0.5 }}>{editFormData.title}</TableCell>
-        <TableCell sx={{ paddingX: 0.5 }}>
+        <TableCell sx={{ px: 0.5 }}>{editFormData.title}</TableCell>
+        <TableCell sx={{ px: 0.5 }}>
           {editFormData.price + "円"}
           {editFormData.method.timing === "翌月" &&
             editFormData.childPurchaseId && <Chip label="翌月" />}
@@ -54,17 +54,13 @@ const PlainNormalPurchaseRow = memo(
         </TableCell>
         {!isSmall && (
           <>
-            <TableCell sx={{ paddingX: 0.5 }}>
-              {editFormData.category}
-            </TableCell>
-            <TableCell sx={{ paddingX: 0.5 }}>
-              {editFormData.method.label}
-            </TableCell>
-            <TableCell sx={{ paddingX: 0.5 }}>
+            <TableCell sx={{ px: 0.5 }}>{editFormData.category}</TableCell>
+            <TableCell sx={{ px: 0.5 }}>{editFormData.method.label}</TableCell>
+            <TableCell sx={{ px: 0.5 }}>
               <PaymentsIcon color={editFormData.income ? "success" : "error"} />
             </TableCell>
             <TableCell>{editFormData.description}</TableCell>
-            <TableCell sx={{ display: "flex", paddingX: 0.5 }}>
+            <TableCell sx={{ display: "flex", px: 0.5 }}>
               {!isGroup && (
                 <>
                   <IconButton
@@ -100,15 +96,13 @@ const PlainNormalPurchaseRow = memo(
       </TableRow>
       {isSmall && (
         <TableRow>
-          <TableCell sx={{ paddingX: 0.5 }} />
-          <TableCell sx={{ paddingX: 0.5 }}>{editFormData.category}</TableCell>
-          <TableCell sx={{ paddingX: 0.5 }}>
-            {editFormData.method.label}
-          </TableCell>
-          <TableCell sx={{ paddingX: 0.5 }}>
+          <TableCell sx={{ px: 0.5 }} />
+          <TableCell sx={{ px: 0.5 }}>{editFormData.category}</TableCell>
+          <TableCell sx={{ px: 0.5 }}>{editFormData.method.label}</TableCell>
+          <TableCell sx={{ px: 0.5 }}>
             <PaymentsIcon color={editFormData.income ? "success" : "error"} />
           </TableCell>
-          <TableCell sx={{ display: "flex", paddingX: 0.5 }}>
+          <TableCell sx={{ display: "flex", px: 0.5 }}>
             {!isGroup && (
               <>
                 <IconButton

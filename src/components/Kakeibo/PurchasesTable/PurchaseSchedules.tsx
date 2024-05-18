@@ -25,15 +25,15 @@ const PlainPurchaseSchedules = memo(
         <Table size="small">
           <TableHead>
             <TableRow>
-              <TableCell sx={{ paddingX: 0.5 }}>周期</TableCell>
-              <TableCell sx={{ paddingX: 0.5 }}>期日</TableCell>
-              <TableCell sx={{ paddingX: 0.5 }}>品目</TableCell>
-              <TableCell sx={{ paddingX: 0.5 }}>金額</TableCell>
-              <TableCell sx={{ paddingX: 0.5 }}>分類</TableCell>
-              <TableCell sx={{ paddingX: 0.5 }}>支払い方法</TableCell>
-              <TableCell sx={{ paddingX: 0.5 }}>収入</TableCell>
-              <TableCell sx={{ paddingX: 0.5 }}>未確定</TableCell>
-              <TableCell sx={{ paddingX: 0.5 }}>備考</TableCell>
+              <TableCell sx={{ px: 0.5 }}>周期</TableCell>
+              <TableCell sx={{ px: 0.5 }}>期日</TableCell>
+              <TableCell sx={{ px: 0.5 }}>品目</TableCell>
+              <TableCell sx={{ px: 0.5 }}>金額</TableCell>
+              <TableCell sx={{ px: 0.5 }}>分類</TableCell>
+              <TableCell sx={{ px: 0.5 }}>支払い方法</TableCell>
+              <TableCell sx={{ px: 0.5 }}>収入</TableCell>
+              <TableCell sx={{ px: 0.5 }}>未確定</TableCell>
+              <TableCell sx={{ px: 0.5 }}>備考</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>

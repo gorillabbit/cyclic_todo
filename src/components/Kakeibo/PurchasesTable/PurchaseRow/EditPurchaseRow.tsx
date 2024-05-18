@@ -49,8 +49,8 @@ const PlainEditPurchaseRow = memo(
   }: PlainEditPurchaseRowProps): JSX.Element => (
     <>
       <TableRow>
-        <TableCell sx={{ paddingX: 0.5 }} />
-        <TableCell sx={{ paddingX: 0.5 }}>
+        <TableCell sx={{ px: 0.5 }} />
+        <TableCell sx={{ px: 0.5 }}>
           <DatePicker
             name="date"
             value={editFormData.date}
@@ -59,7 +59,7 @@ const PlainEditPurchaseRow = memo(
             sx={{ maxWidth: 190 }}
           />
         </TableCell>
-        <TableCell sx={{ paddingX: 0.5 }}>
+        <TableCell sx={{ px: 0.5 }}>
           <TextField
             name="title"
             value={editFormData.title}
@@ -67,7 +67,7 @@ const PlainEditPurchaseRow = memo(
             size="small"
           />
         </TableCell>
-        <TableCell sx={{ paddingX: 0.5 }}>
+        <TableCell sx={{ px: 0.5 }}>
           <TextField
             name="price"
             value={editFormData.price}
@@ -77,7 +77,7 @@ const PlainEditPurchaseRow = memo(
         </TableCell>
         {!isSmall && (
           <>
-            <TableCell sx={{ paddingX: 0.5 }}>
+            <TableCell sx={{ px: 0.5 }}>
               <Autocomplete
                 value={editFormData.category}
                 sx={{ minWidth: 150 }}
@@ -89,7 +89,7 @@ const PlainEditPurchaseRow = memo(
                 )}
               />
             </TableCell>
-            <TableCell sx={{ paddingX: 0.5 }}>
+            <TableCell sx={{ px: 0.5 }}>
               <Autocomplete
                 value={editFormData.method}
                 sx={{ minWidth: 150 }}
@@ -101,7 +101,7 @@ const PlainEditPurchaseRow = memo(
                 )}
               />
             </TableCell>
-            <TableCell sx={{ paddingX: 0.5 }}>
+            <TableCell sx={{ px: 0.5 }}>
               <TextField
                 name="income"
                 value={editFormData.income ? "収入" : "支出"}
@@ -109,7 +109,7 @@ const PlainEditPurchaseRow = memo(
                 size="small"
               />
             </TableCell>
-            <TableCell sx={{ paddingX: 0.5 }}>
+            <TableCell sx={{ px: 0.5 }}>
               <TextField
                 name="description"
                 value={editFormData.description}
@@ -128,8 +128,8 @@ const PlainEditPurchaseRow = memo(
       {isSmall && (
         <>
           <TableRow>
-            <TableCell sx={{ paddingX: 0.5 }} />
-            <TableCell sx={{ paddingX: 0.5 }}>
+            <TableCell sx={{ px: 0.5 }} />
+            <TableCell sx={{ px: 0.5 }}>
               <Autocomplete
                 value={editFormData.category}
                 sx={{ minWidth: 150 }}
@@ -141,7 +141,7 @@ const PlainEditPurchaseRow = memo(
                 )}
               />
             </TableCell>
-            <TableCell sx={{ paddingX: 0.5 }}>
+            <TableCell sx={{ px: 0.5 }}>
               <Autocomplete
                 value={editFormData.method}
                 sx={{ minWidth: 150 }}
@@ -153,7 +153,7 @@ const PlainEditPurchaseRow = memo(
                 )}
               />
             </TableCell>
-            <TableCell sx={{ paddingX: 0.5 }}>
+            <TableCell sx={{ px: 0.5 }}>
               <TextField
                 name="income"
                 value={editFormData.income ? "収入" : "支出"}
@@ -161,7 +161,7 @@ const PlainEditPurchaseRow = memo(
                 size="small"
               />
             </TableCell>
-            <TableCell sx={{ paddingX: 0.5 }}>
+            <TableCell sx={{ px: 0.5 }}>
               <TextField
                 name="description"
                 value={editFormData.description}

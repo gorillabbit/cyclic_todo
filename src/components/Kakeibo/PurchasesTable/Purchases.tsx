@@ -72,13 +72,13 @@ const PlainPurchases = memo(
           <TableHead>
             <TableRow>
               <TableCell />
-              <TableCell sx={{ paddingX: 0.5 }}>支出</TableCell>
-              <TableCell sx={{ paddingX: 0.5 }}>{spentSum}</TableCell>
+              <TableCell sx={{ px: 0.5 }}>支出</TableCell>
+              <TableCell sx={{ px: 0.5 }}>{spentSum}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell />
-              <TableCell sx={{ paddingX: 0.5 }}>収入</TableCell>
-              <TableCell sx={{ paddingX: 0.5 }}>{incomeSum}</TableCell>
+              <TableCell sx={{ px: 0.5 }}>収入</TableCell>
+              <TableCell sx={{ px: 0.5 }}>{incomeSum}</TableCell>
             </TableRow>
           </TableHead>
         </Table>
@@ -91,27 +91,27 @@ const PlainPurchases = memo(
               <>
                 <TableRow>
                   <TableCell padding="none" />
-                  <TableCell sx={{ paddingX: 0.5 }}>日付</TableCell>
-                  <TableCell sx={{ paddingX: 0.5 }}>品目</TableCell>
-                  <TableCell sx={{ paddingX: 0.5 }}>金額</TableCell>
+                  <TableCell sx={{ px: 0.5 }}>日付</TableCell>
+                  <TableCell sx={{ px: 0.5 }}>品目</TableCell>
+                  <TableCell sx={{ px: 0.5 }}>金額</TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell padding="none" />
-                  <TableCell sx={{ paddingX: 0.5 }}>分類</TableCell>
-                  <TableCell sx={{ paddingX: 0.5 }}>支払い方法</TableCell>
-                  <TableCell sx={{ paddingX: 0.5 }}>収入</TableCell>
+                  <TableCell sx={{ px: 0.5 }}>分類</TableCell>
+                  <TableCell sx={{ px: 0.5 }}>支払い方法</TableCell>
+                  <TableCell sx={{ px: 0.5 }}>収入</TableCell>
                 </TableRow>
               </>
             ) : (
               <TableRow>
                 <TableCell padding="none" />
-                <TableCell sx={{ paddingX: 0.5 }}>日付</TableCell>
-                <TableCell sx={{ paddingX: 0.5 }}>品目</TableCell>
-                <TableCell sx={{ paddingX: 0.5 }}>金額</TableCell>
-                <TableCell sx={{ paddingX: 0.5 }}>分類</TableCell>
-                <TableCell sx={{ paddingX: 0.5 }}>支払い方法</TableCell>
-                <TableCell sx={{ paddingX: 0.5 }}>収入</TableCell>
-                <TableCell sx={{ paddingX: 0.5 }}>備考</TableCell>
+                <TableCell sx={{ px: 0.5 }}>日付</TableCell>
+                <TableCell sx={{ px: 0.5 }}>品目</TableCell>
+                <TableCell sx={{ px: 0.5 }}>金額</TableCell>
+                <TableCell sx={{ px: 0.5 }}>分類</TableCell>
+                <TableCell sx={{ px: 0.5 }}>支払い方法</TableCell>
+                <TableCell sx={{ px: 0.5 }}>収入</TableCell>
+                <TableCell sx={{ px: 0.5 }}>備考</TableCell>
                 <TableCell padding="none" />
                 <TableCell padding="none" />
               </TableRow>

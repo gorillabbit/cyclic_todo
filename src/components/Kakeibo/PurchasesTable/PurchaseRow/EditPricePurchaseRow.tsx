@@ -27,12 +27,12 @@ const PlainEditPricePurchaseRow = memo(
   }: PlainEditPricePurchaseRowProps): JSX.Element => (
     <>
       <TableRow>
-        <TableCell sx={{ paddingX: 0.5 }} />
-        <TableCell sx={{ paddingX: 0.5 }}>
+        <TableCell sx={{ px: 0.5 }} />
+        <TableCell sx={{ px: 0.5 }}>
           {editFormData.date.toLocaleString().split(" ")[0]}
         </TableCell>
-        <TableCell sx={{ paddingX: 0.5 }}>{editFormData.title}</TableCell>
-        <TableCell sx={{ paddingX: 0.5 }}>
+        <TableCell sx={{ px: 0.5 }}>{editFormData.title}</TableCell>
+        <TableCell sx={{ px: 0.5 }}>
           <TextField
             name="price"
             value={editFormData.price}
@@ -43,13 +43,9 @@ const PlainEditPricePurchaseRow = memo(
         </TableCell>
         {!isSmall && (
           <>
-            <TableCell sx={{ paddingX: 0.5 }}>
-              {editFormData.category}
-            </TableCell>
-            <TableCell sx={{ paddingX: 0.5 }}>
-              {editFormData.method.label}
-            </TableCell>
-            <TableCell sx={{ paddingX: 0.5 }}>
+            <TableCell sx={{ px: 0.5 }}>{editFormData.category}</TableCell>
+            <TableCell sx={{ px: 0.5 }}>{editFormData.method.label}</TableCell>
+            <TableCell sx={{ px: 0.5 }}>
               <PaymentsIcon color={editFormData.income ? "success" : "error"} />
             </TableCell>
             <TableCell>{editFormData.description}</TableCell>
@@ -64,14 +60,10 @@ const PlainEditPricePurchaseRow = memo(
       {isSmall && (
         <>
           <TableRow>
-            <TableCell sx={{ paddingX: 0.5 }} />
-            <TableCell sx={{ paddingX: 0.5 }}>
-              {editFormData.category}
-            </TableCell>
-            <TableCell sx={{ paddingX: 0.5 }}>
-              {editFormData.method.label}
-            </TableCell>
-            <TableCell sx={{ paddingX: 0.5 }}>
+            <TableCell sx={{ px: 0.5 }} />
+            <TableCell sx={{ px: 0.5 }}>{editFormData.category}</TableCell>
+            <TableCell sx={{ px: 0.5 }}>{editFormData.method.label}</TableCell>
+            <TableCell sx={{ px: 0.5 }}>
               <PaymentsIcon color={editFormData.income ? "success" : "error"} />
             </TableCell>
             <TableCell padding="none">

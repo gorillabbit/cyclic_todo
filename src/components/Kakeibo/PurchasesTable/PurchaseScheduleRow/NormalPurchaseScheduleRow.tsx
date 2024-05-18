@@ -18,24 +18,24 @@ const PlainNormalPurchaseScheduleRow = memo(
     handleDeleteButton,
   }: PlainNormalPurchaseScheduleRowProps): JSX.Element => (
     <TableRow key={editFormData.id}>
-      <TableCell sx={{ paddingX: 0.5 }}>
+      <TableCell sx={{ px: 0.5 }}>
         {editFormData.cycle +
           (editFormData.date ? editFormData.date + "日" : editFormData.day)}
       </TableCell>
-      <TableCell sx={{ paddingX: 0.5 }}>
+      <TableCell sx={{ px: 0.5 }}>
         {editFormData.endDate.toLocaleString().split(" ")[0]}
       </TableCell>
-      <TableCell sx={{ paddingX: 0.5 }}>{editFormData.title}</TableCell>
-      <TableCell sx={{ paddingX: 0.5 }}>{editFormData.price + "円"}</TableCell>
-      <TableCell sx={{ paddingX: 0.5 }}>{editFormData.category}</TableCell>
-      <TableCell sx={{ paddingX: 0.5 }}>{editFormData.method.label}</TableCell>
-      <TableCell sx={{ paddingX: 0.5 }}>
+      <TableCell sx={{ px: 0.5 }}>{editFormData.title}</TableCell>
+      <TableCell sx={{ px: 0.5 }}>{editFormData.price + "円"}</TableCell>
+      <TableCell sx={{ px: 0.5 }}>{editFormData.category}</TableCell>
+      <TableCell sx={{ px: 0.5 }}>{editFormData.method.label}</TableCell>
+      <TableCell sx={{ px: 0.5 }}>
         <PaymentsIcon color={editFormData.income ? "success" : "error"} />
       </TableCell>
-      <TableCell sx={{ paddingX: 0.5 }}>
+      <TableCell sx={{ px: 0.5 }}>
         {editFormData.isUncertain && <Chip label="未確定" />}
       </TableCell>
-      <TableCell sx={{ paddingX: 0.5 }}>{editFormData.description}</TableCell>
+      <TableCell sx={{ px: 0.5 }}>{editFormData.description}</TableCell>
       <TableCell padding="none" sx={{ display: "flex" }}>
         <>
           <IconButton

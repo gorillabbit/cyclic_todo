@@ -35,7 +35,7 @@ type PlainMethodListProps = {
 const PlainMethodList = memo(
   (props: PlainMethodListProps): JSX.Element => (
     <TableRow key={props.method.id}>
-      <TableCell sx={{ paddingX: 0.5 }}>
+      <TableCell sx={{ px: 0.5 }}>
         <TextField
           variant="outlined"
           value={props.methodInput.label}
@@ -46,7 +46,7 @@ const PlainMethodList = memo(
           helperText={props.inputError}
         />
       </TableCell>
-      <TableCell sx={{ paddingX: 0.5 }}>
+      <TableCell sx={{ px: 0.5 }}>
         <Select
           value={props.methodInput.timing}
           name="timing"
@@ -72,7 +72,7 @@ const PlainMethodList = memo(
           />
         )}
       </TableCell>
-      <TableCell sx={{ paddingX: 0.5 }}>
+      <TableCell sx={{ px: 0.5 }}>
         <Button
           variant="contained"
           color="primary"
@@ -82,7 +82,7 @@ const PlainMethodList = memo(
           変更
         </Button>
       </TableCell>
-      <TableCell sx={{ paddingX: 0.5 }}>
+      <TableCell sx={{ px: 0.5 }}>
         <IconButton onClick={props.removeMethod} color="error">
           <DeleteIcon />
         </IconButton>
