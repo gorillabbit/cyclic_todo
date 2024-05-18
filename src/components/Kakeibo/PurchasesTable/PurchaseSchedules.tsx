@@ -11,6 +11,7 @@ import {
 import { memo, useMemo } from "react";
 import { PurchaseScheduleListType, PurchaseScheduleType } from "../../../types";
 import { useFirestoreQuery } from "../../../utilities/firebaseUtilities";
+import PurchaseScheduleRow from "./PurchaseScheduleRow/PurchaseScheduleRow";
 
 type PlainPurchaseSchedulesProps = {
   purchaseScheduleList: PurchaseScheduleListType[];
@@ -25,6 +26,7 @@ const PlainPurchaseSchedules = memo(
           <TableHead>
             <TableRow>
               <TableCell sx={{ paddingX: 0.5 }}>周期</TableCell>
+              <TableCell sx={{ paddingX: 0.5 }}>期日</TableCell>
               <TableCell sx={{ paddingX: 0.5 }}>品目</TableCell>
               <TableCell sx={{ paddingX: 0.5 }}>金額</TableCell>
               <TableCell sx={{ paddingX: 0.5 }}>分類</TableCell>
@@ -35,32 +37,10 @@ const PlainPurchaseSchedules = memo(
           </TableHead>
           <TableBody>
             {purchaseScheduleList.map((purchaseSchedule) => (
-              <TableRow key={purchaseSchedule.id}>
-                <TableCell sx={{ paddingX: 0.5 }}>
-                  {purchaseSchedule.cycle +
-                    (purchaseSchedule.date
-                      ? purchaseSchedule.date + "日"
-                      : purchaseSchedule.day)}
-                </TableCell>
-                <TableCell sx={{ paddingX: 0.5 }}>
-                  {purchaseSchedule.title}
-                </TableCell>
-                <TableCell sx={{ paddingX: 0.5 }}>
-                  {purchaseSchedule.price + "円"}
-                </TableCell>
-                <TableCell sx={{ paddingX: 0.5 }}>
-                  {purchaseSchedule.category}
-                </TableCell>
-                <TableCell sx={{ paddingX: 0.5 }}>
-                  {purchaseSchedule.method.label}
-                </TableCell>
-                <TableCell sx={{ paddingX: 0.5 }}>
-                  {purchaseSchedule.income ? "収入" : "支出"}
-                </TableCell>
-                <TableCell sx={{ paddingX: 0.5 }}>
-                  {purchaseSchedule.description}
-                </TableCell>
-              </TableRow>
+              <PurchaseScheduleRow
+                purchaseSchedule={purchaseSchedule}
+                key={purchaseSchedule.id}
+              />
             ))}
           </TableBody>
         </Table>

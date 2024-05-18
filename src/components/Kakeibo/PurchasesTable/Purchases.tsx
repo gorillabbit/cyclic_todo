@@ -14,7 +14,7 @@ import { PurchaseListType } from "../../../types";
 import { usePurchase } from "../../Context/PurchaseContext";
 import PurchaseHeader from "./PurchaseHeader";
 import PurchaseSchedules from "./PurchaseSchedules";
-import PurchasesRow from "./PurchasesRow";
+import PurchasesRow from "./PurchaseRow/PurchasesRow";
 import AssetsList from "../Asset/AssetsList";
 import { addMonths } from "date-fns";
 import { useIsSmall } from "../../../hooks/useWindowSize";

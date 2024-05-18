@@ -27,6 +27,7 @@ import {
   LogsCompleteLogsInputType,
   InputAssetType,
   InputTransferType,
+  InputPurchaseScheduleRowType,
 } from "./types";
 
 // Firebase configuration
@@ -134,11 +135,18 @@ export const updateDocPurchase = (
   id: string,
   updates: Partial<InputPurchaseRowType>
 ) => updateDocOperation(dbNames.purchase, id, updates);
-export const batchAddDocPurchase = (purchaseList: InputPurchaseType[]) => {
+export const batchAddDocPurchase = (
+  purchaseList: (InputPurchaseType & { id?: string })[]
+) => {
   const batch = writeBatch(db);
   purchaseList.forEach((obj) => {
-    const docRef = doc(collection(db, dbNames.purchase));
-    batch.set(docRef, obj);
+    if (obj.id) {
+      const docRef = doc(collection(db, dbNames.purchase), obj.id);
+      batch.set(docRef, obj);
+    } else {
+      const docRef = doc(collection(db, dbNames.purchase));
+      batch.set(docRef, obj);
+    }
   });
   batch.commit().catch((error) => console.error("バッチ書き込み失敗:", error));
 };
@@ -157,9 +165,14 @@ export const updateDocAsset = (id: string, updates: Partial<AssetType>) =>
 export const deleteDocAsset = (id: string) =>
   deleteDocOperation(dbNames.asset, id);
 
-export const addDocPurchaseSchedule = (
-  PurchaseSchedule: InputPurchaseScheduleType
-) => addDocOperation(dbNames.purchaseSchedule, PurchaseSchedule);
+export const addDocPurchaseSchedule = (v: InputPurchaseScheduleType) =>
+  addDocOperation(dbNames.purchaseSchedule, v);
+export const updateDocPurchaseSchedule = (
+  id: string,
+  updates: Partial<InputPurchaseScheduleRowType>
+) => updateDocOperation(dbNames.purchaseSchedule, id, updates);
+export const deleteDocPurchaseSchedule = (id: string) =>
+  deleteDocOperation(dbNames.purchaseSchedule, id);
 
 export const addDocMethod = (v: MethodType) =>
   addDocOperation(dbNames.method, v);

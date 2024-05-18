@@ -10,33 +10,18 @@ import {
 } from "@mui/material";
 import StyledCheckbox from "../../StyledCheckbox";
 import { useState, useCallback } from "react";
-import {
-  addDocPurchaseSchedule,
-  batchAddDocPurchase,
-  db,
-  dbNames,
-} from "../../../firebase";
+import { addDocPurchaseSchedule } from "../../../firebase";
 import { getAuth } from "firebase/auth";
-import {
-  InputPurchaseScheduleType,
-  InputPurchaseType,
-  WeekDay,
-  defaultMethodList,
-} from "../../../types";
-import { addDays, addMonths, addYears, nextDay } from "date-fns";
+import { InputPurchaseScheduleType, defaultMethodList } from "../../../types";
+import { addYears } from "date-fns";
 import { DatePicker } from "@mui/x-date-pickers";
 import {
+  addScheduledPurchase,
   isValidatedNum,
   numericProps,
+  weekDaysString,
 } from "../../../utilities/purchaseUtilities";
-import {
-  DocumentData,
-  DocumentReference,
-  collection,
-  doc,
-} from "firebase/firestore";
 import { useMethod } from "../../Context/MethodContext";
-import { getPayLaterDate } from "../../../utilities/dateUtilities";
 
 const auth = getAuth();
 
@@ -53,26 +38,6 @@ const defaultNewPurchase: InputPurchaseScheduleType = {
   description: "",
   endDate: addYears(new Date(), 1),
 };
-
-const weekDays: Record<WeekDay, Day> = {
-  日曜日: 0,
-  月曜日: 1,
-  火曜日: 2,
-  水曜日: 3,
-  木曜日: 4,
-  金曜日: 5,
-  土曜日: 6,
-};
-
-const weekDaysString: WeekDay[] = [
-  "日曜日",
-  "月曜日",
-  "火曜日",
-  "水曜日",
-  "木曜日",
-  "金曜日",
-  "土曜日",
-];
 
 const PurchaseScheduleInput = () => {
   const { methodList } = useMethod();
@@ -98,90 +63,6 @@ const PurchaseScheduleInput = () => {
     []
   );
 
-  const listMonthlyDaysUntil = (dayOfMonth: number, endDate: Date) => {
-    const today = new Date();
-    let startMonth = today.getMonth();
-
-    // 現在の日付が指定された日より後の場合、最初の日付を次の月に設定
-    if (today.getDate() > dayOfMonth) {
-      startMonth += 1;
-    }
-
-    // 指定された日と月から最初の日付を設定
-    let currentDate = new Date(today.getFullYear(), startMonth, dayOfMonth);
-
-    const dates = [];
-
-    while (currentDate <= endDate) {
-      dates.push(currentDate);
-      currentDate = addMonths(currentDate, 1);
-    }
-    return dates;
-  };
-
-  const listWeeklyDaysUntil = (weekDayName: WeekDay, endDate: Date): Date[] => {
-    const today = new Date();
-    const dayOfWeek = weekDays[weekDayName];
-
-    // 今日の日付から次の指定曜日を求める
-    let currentDate = nextDay(today, dayOfWeek);
-    const dates = [];
-
-    // 指定された終了日まで繰り返し
-    while (currentDate <= endDate) {
-      dates.push(currentDate);
-      currentDate = addDays(currentDate, 7);
-    }
-    return dates;
-  };
-
-  const addPurchase = useCallback(
-    (docRef: DocumentReference<DocumentData>) => {
-      if (auth.currentUser) {
-        const userId = auth.currentUser.uid;
-        let daysList: Date[] = [];
-        if (newPurchaseSchedule.cycle === "毎月" && newPurchaseSchedule.date) {
-          daysList = listMonthlyDaysUntil(
-            newPurchaseSchedule.date,
-            newPurchaseSchedule.endDate
-          );
-        }
-        if (newPurchaseSchedule.cycle === "毎週" && newPurchaseSchedule.day) {
-          daysList = listWeeklyDaysUntil(
-            newPurchaseSchedule.day,
-            newPurchaseSchedule.endDate
-          );
-        }
-        const batchPurchaseList: InputPurchaseType[][] = daysList.map((day) => {
-          const docId = doc(collection(db, dbNames.purchase)).id;
-          const newPurchase = {
-            ...newPurchaseSchedule,
-            userId,
-            parentScheduleId: docRef.id,
-          };
-          const createdPurchase: (InputPurchaseType & { id?: string })[] = [
-            {
-              ...newPurchase,
-              id: docId,
-              date: day,
-              childPurchaseId: "",
-            },
-          ];
-          if (newPurchaseSchedule.method.timing === "翌月") {
-            createdPurchase.push({
-              ...newPurchase,
-              date: getPayLaterDate(day, newPurchaseSchedule.method.timingDate),
-              childPurchaseId: docId,
-            });
-          }
-          return createdPurchase;
-        });
-        batchAddDocPurchase(batchPurchaseList.flat());
-      }
-    },
-    [newPurchaseSchedule]
-  );
-
   const addPurchaseSchedule = useCallback(() => {
     if (!newPurchaseSchedule.title) {
       alert("品目名を入力してください");
@@ -190,11 +71,11 @@ const PurchaseScheduleInput = () => {
     if (auth.currentUser) {
       const userId = auth.currentUser.uid;
       addDocPurchaseSchedule({ ...newPurchaseSchedule, userId }).then(
-        (docRef) => addPurchase(docRef)
+        (docRef) => addScheduledPurchase(docRef.id, newPurchaseSchedule)
       );
       setNewPurchaseSchedule(defaultNewPurchase);
     }
-  }, [addPurchase, newPurchaseSchedule]);
+  }, [newPurchaseSchedule]);
 
   return (
     <Box display="flex">
@@ -222,7 +103,6 @@ const PurchaseScheduleInput = () => {
         >
           <MenuItem value="毎月">毎月</MenuItem>
           <MenuItem value="毎週">毎週</MenuItem>
-          <MenuItem value="毎日">毎日</MenuItem>
         </Select>
         {newPurchaseSchedule.cycle === "毎月" && (
           <TextField

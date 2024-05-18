@@ -8,15 +8,15 @@ import {
 import { DatePicker } from "@mui/x-date-pickers";
 import { memo, useCallback } from "react";
 import DoneIcon from "@mui/icons-material/Done";
-import { InputPurchaseRowType, MethodListType } from "../../../types";
-import { useMethod } from "../../Context/MethodContext";
-import { usePurchase } from "../../Context/PurchaseContext";
+import { InputPurchaseRowType, MethodListType } from "../../../../types";
+import { useMethod } from "../../../Context/MethodContext";
+import { usePurchase } from "../../../Context/PurchaseContext";
 import {
   updateDocPurchase,
   deleteDocPurchase,
   addDocPurchase,
-} from "../../../firebase";
-import { getPayLaterDate } from "../../../utilities/dateUtilities";
+} from "../../../../firebase";
+import { getPayLaterDate } from "../../../../utilities/dateUtilities";
 
 type PlainEditPurchaseRowProps = {
   editFormData: InputPurchaseRowType;
@@ -48,36 +48,85 @@ const PlainEditPurchaseRow = memo(
     handleSaveClick,
   }: PlainEditPurchaseRowProps): JSX.Element => (
     <>
-      {isSmall ? (
+      <TableRow>
+        <TableCell sx={{ paddingX: 0.5 }} />
+        <TableCell sx={{ paddingX: 0.5 }}>
+          <DatePicker
+            name="date"
+            value={editFormData.date}
+            onChange={handleDateFormChange}
+            slotProps={{ textField: { size: "small" } }}
+            sx={{ maxWidth: 190 }}
+          />
+        </TableCell>
+        <TableCell sx={{ paddingX: 0.5 }}>
+          <TextField
+            name="title"
+            value={editFormData.title}
+            onChange={handleEditFormChange}
+            size="small"
+          />
+        </TableCell>
+        <TableCell sx={{ paddingX: 0.5 }}>
+          <TextField
+            name="price"
+            value={editFormData.price}
+            onChange={handleEditFormChange}
+            size="small"
+          />
+        </TableCell>
+        {!isSmall && (
+          <>
+            <TableCell sx={{ paddingX: 0.5 }}>
+              <Autocomplete
+                value={editFormData.category}
+                sx={{ minWidth: 150 }}
+                options={categorySet}
+                freeSolo
+                onChange={(_e, v) => handleAutocompleteChange("category", v)}
+                renderInput={(params) => (
+                  <TextField {...params} label="分類" size="small" />
+                )}
+              />
+            </TableCell>
+            <TableCell sx={{ paddingX: 0.5 }}>
+              <Autocomplete
+                value={editFormData.method}
+                sx={{ minWidth: 150 }}
+                options={methodList}
+                freeSolo
+                onChange={(_e, v) => handleMethodChange(v)}
+                renderInput={(params) => (
+                  <TextField {...params} label="支払い方法" size="small" />
+                )}
+              />
+            </TableCell>
+            <TableCell sx={{ paddingX: 0.5 }}>
+              <TextField
+                name="income"
+                value={editFormData.income ? "収入" : "支出"}
+                onChange={handleEditFormChange}
+                size="small"
+              />
+            </TableCell>
+            <TableCell sx={{ paddingX: 0.5 }}>
+              <TextField
+                name="description"
+                value={editFormData.description}
+                onChange={handleEditFormChange}
+                size="small"
+              />
+            </TableCell>
+            <TableCell padding="none">
+              <IconButton onClick={handleSaveClick} color="success">
+                <DoneIcon />
+              </IconButton>
+            </TableCell>
+          </>
+        )}
+      </TableRow>
+      {isSmall && (
         <>
-          <TableRow>
-            <TableCell />
-            <TableCell sx={{ paddingX: 0.5 }}>
-              <DatePicker
-                name="date"
-                value={editFormData.date}
-                onChange={handleDateFormChange}
-                slotProps={{ textField: { size: "small" } }}
-                sx={{ maxWidth: 190 }}
-              />
-            </TableCell>
-            <TableCell sx={{ paddingX: 0.5 }}>
-              <TextField
-                name="title"
-                value={editFormData.title}
-                onChange={handleEditFormChange}
-                size="small"
-              />
-            </TableCell>
-            <TableCell sx={{ paddingX: 0.5 }}>
-              <TextField
-                name="price"
-                value={editFormData.price}
-                onChange={handleEditFormChange}
-                size="small"
-              />
-            </TableCell>
-          </TableRow>
           <TableRow>
             <TableCell sx={{ paddingX: 0.5 }} />
             <TableCell sx={{ paddingX: 0.5 }}>
@@ -112,84 +161,6 @@ const PlainEditPurchaseRow = memo(
                 size="small"
               />
             </TableCell>
-            {!isSmall && (
-              <TableCell sx={{ paddingX: 0.5 }}>
-                <TextField
-                  name="description"
-                  value={editFormData.description}
-                  onChange={handleEditFormChange}
-                  size="small"
-                />
-              </TableCell>
-            )}
-            <TableCell padding="none">
-              <IconButton onClick={handleSaveClick} color="success">
-                <DoneIcon />
-              </IconButton>
-            </TableCell>
-          </TableRow>
-        </>
-      ) : (
-        <TableRow>
-          <TableCell />
-          <TableCell sx={{ paddingX: 0.5 }}>
-            <DatePicker
-              name="date"
-              value={editFormData.date}
-              onChange={handleDateFormChange}
-              slotProps={{ textField: { size: "small" } }}
-              sx={{ maxWidth: 190 }}
-            />
-          </TableCell>
-          <TableCell sx={{ paddingX: 0.5 }}>
-            <TextField
-              name="title"
-              value={editFormData.title}
-              onChange={handleEditFormChange}
-              size="small"
-            />
-          </TableCell>
-          <TableCell sx={{ paddingX: 0.5 }}>
-            <TextField
-              name="price"
-              value={editFormData.price}
-              onChange={handleEditFormChange}
-              size="small"
-            />
-          </TableCell>
-          <TableCell sx={{ paddingX: 0.5 }}>
-            <Autocomplete
-              value={editFormData.category}
-              sx={{ minWidth: 150 }}
-              options={categorySet}
-              freeSolo
-              onChange={(e, v) => handleAutocompleteChange("category", v)}
-              renderInput={(params) => (
-                <TextField {...params} label="分類" size="small" />
-              )}
-            />
-          </TableCell>
-          <TableCell sx={{ paddingX: 0.5 }}>
-            <Autocomplete
-              value={editFormData.method}
-              sx={{ minWidth: 150 }}
-              options={methodList}
-              freeSolo
-              onChange={(_e, v) => handleMethodChange(v)}
-              renderInput={(params) => (
-                <TextField {...params} label="支払い方法" size="small" />
-              )}
-            />
-          </TableCell>
-          <TableCell sx={{ paddingX: 0.5 }}>
-            <TextField
-              name="income"
-              value={editFormData.income ? "収入" : "支出"}
-              onChange={handleEditFormChange}
-              size="small"
-            />
-          </TableCell>
-          {!isSmall && (
             <TableCell sx={{ paddingX: 0.5 }}>
               <TextField
                 name="description"
@@ -198,13 +169,13 @@ const PlainEditPurchaseRow = memo(
                 size="small"
               />
             </TableCell>
-          )}
-          <TableCell padding="none">
-            <IconButton onClick={handleSaveClick} color="success">
-              <DoneIcon />
-            </IconButton>
-          </TableCell>
-        </TableRow>
+            <TableCell padding="none">
+              <IconButton onClick={handleSaveClick} color="success">
+                <DoneIcon />
+              </IconButton>
+            </TableCell>
+          </TableRow>
+        </>
       )}
     </>
   )

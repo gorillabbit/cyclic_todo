@@ -1,10 +1,10 @@
 import { TableCell, IconButton, Chip, TableRow } from "@mui/material";
 import { memo, useCallback } from "react";
 import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
-import DeleteIcon from "@mui/icons-material/Delete";
-import { InputPurchaseRowType } from "../../../types";
+import { InputPurchaseRowType } from "../../../../types";
 import PaymentsIcon from "@mui/icons-material/Payments";
 
 type PlainNormalPurchaseRowProps = {
@@ -65,34 +65,34 @@ const PlainNormalPurchaseRow = memo(
               <PaymentsIcon color={editFormData.income ? "success" : "error"} />
             </TableCell>
             <TableCell>{editFormData.description}</TableCell>
+            <TableCell sx={{ display: "flex", paddingX: 0.5 }}>
+              {!isGroup && (
+                <>
+                  <IconButton
+                    onClick={handleEditClick}
+                    sx={{
+                      "&:hover": {
+                        color: "#1976d2",
+                      },
+                    }}
+                  >
+                    <EditIcon />
+                  </IconButton>
+                  <IconButton
+                    onClick={handleDeleteButton}
+                    sx={{
+                      "&:hover": {
+                        color: "#d32f2f",
+                      },
+                    }}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                </>
+              )}
+            </TableCell>
           </>
         )}
-        <TableCell padding="none" sx={{ display: "flex" }}>
-          {!isGroup && (
-            <>
-              <IconButton
-                onClick={handleEditClick}
-                sx={{
-                  "&:hover": {
-                    color: "#1976d2",
-                  },
-                }}
-              >
-                <EditIcon />
-              </IconButton>
-              <IconButton
-                onClick={handleDeleteButton}
-                sx={{
-                  "&:hover": {
-                    color: "#d32f2f",
-                  },
-                }}
-              >
-                <DeleteIcon />
-              </IconButton>
-            </>
-          )}
-        </TableCell>
       </TableRow>
       {isSmall && (
         <TableRow>
@@ -103,6 +103,32 @@ const PlainNormalPurchaseRow = memo(
           </TableCell>
           <TableCell sx={{ paddingX: 0.5 }}>
             <PaymentsIcon color={editFormData.income ? "success" : "error"} />
+          </TableCell>
+          <TableCell sx={{ display: "flex", paddingX: 0.5 }}>
+            {!isGroup && (
+              <>
+                <IconButton
+                  onClick={handleEditClick}
+                  sx={{
+                    "&:hover": {
+                      color: "#1976d2",
+                    },
+                  }}
+                >
+                  <EditIcon />
+                </IconButton>
+                <IconButton
+                  onClick={handleDeleteButton}
+                  sx={{
+                    "&:hover": {
+                      color: "#d32f2f",
+                    },
+                  }}
+                >
+                  <DeleteIcon />
+                </IconButton>
+              </>
+            )}
           </TableCell>
         </TableRow>
       )}

@@ -7,9 +7,9 @@ import {
   TableHead,
 } from "@mui/material";
 import { memo, useCallback, useState } from "react";
-import { deleteDocPurchase } from "../../../firebase";
-import { InputPurchaseRowType, PurchaseListType } from "../../../types";
-import DeleteConfirmDialog from "../DeleteConfirmDialog";
+import { deleteDocPurchase } from "../../../../firebase";
+import { InputPurchaseRowType, PurchaseListType } from "../../../../types";
+import DeleteConfirmDialog from "../../DeleteConfirmDialog";
 import EditPurchaseRow from "./EditPurchaseRow";
 import NormalPurchaseRow from "./NormalPurchaseRow";
 
