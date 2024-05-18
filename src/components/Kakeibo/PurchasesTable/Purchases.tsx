@@ -164,9 +164,21 @@ const Purchases = (): JSX.Element => {
     }, {} as { [key: string]: PurchaseListType });
   }, [monthlyPurchases]);
 
-  const groupedPayLaterPurchase = useMemo(
+  const groupedPayLaterPurchases = useMemo(
     () => Object.values(groupedPurchasesDoc),
     [groupedPurchasesDoc]
+  );
+
+  const neutralizedGroupedPayLaterPurchase = useMemo(
+    () =>
+      groupedPayLaterPurchases.map((groupedPayLaterPurchase) => ({
+        ...groupedPayLaterPurchase,
+        title: groupedPayLaterPurchase.method.label + "引き落し",
+        category: "後支払い",
+        isUncertain: false,
+        description: "",
+      })),
+    [groupedPayLaterPurchases]
   );
 
   // 後払いは合計したので、除外する
@@ -174,9 +186,9 @@ const Purchases = (): JSX.Element => {
     () =>
       [
         ...monthlyPurchases.filter((purchase) => !isLaterPayment(purchase)),
-        ...groupedPayLaterPurchase,
+        ...neutralizedGroupedPayLaterPurchase,
       ].sort((a, b) => a.date.toMillis() - b.date.toMillis()),
-    [monthlyPurchases, groupedPayLaterPurchase]
+    [monthlyPurchases, neutralizedGroupedPayLaterPurchase]
   );
 
   const handleNextMonthButton = useCallback(() => {

@@ -45,11 +45,7 @@ const PlainNormalPurchaseRow = memo(
         <TableCell sx={{ paddingX: 0.5 }}>
           {editFormData.date.toLocaleString().split(" ")[0]}
         </TableCell>
-        <TableCell sx={{ paddingX: 0.5 }}>
-          {isGroup
-            ? `${editFormData.method.label} 引き落し`
-            : editFormData.title}
-        </TableCell>
+        <TableCell sx={{ paddingX: 0.5 }}>{editFormData.title}</TableCell>
         <TableCell sx={{ paddingX: 0.5 }}>
           {editFormData.price + "円"}
           {editFormData.method.timing === "翌月" &&
