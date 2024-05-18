@@ -19,12 +19,14 @@ import AssetsList from "../Asset/AssetsList";
 import { addMonths } from "date-fns";
 import { useIsSmall } from "../../../hooks/useWindowSize";
 import {
-  getFilteredPurchase,
-  isGroupPurchase,
-  sumPrice,
+  filterPurchasesByIncomeType,
+  isLaterPayment,
+  sumSpentAndIncome,
 } from "../../../utilities/purchaseUtilities";
+import DoughnutContainer from "./DoughnutContainer";
 
 type PlainPurchaseProps = {
+  monthlyPurchases: PurchaseListType[];
   purchasesWithoutGroupFlag: PurchaseListType[];
   getGroupPurchases: (groupedPurchase: PurchaseListType) => PurchaseListType[];
   month: Date;
@@ -37,6 +39,7 @@ type PlainPurchaseProps = {
 
 const PlainPurchases = memo(
   ({
+    monthlyPurchases,
     purchasesWithoutGroupFlag,
     getGroupPurchases,
     month,
@@ -49,8 +52,8 @@ const PlainPurchases = memo(
     <>
       <AssetsList />
       <PurchaseHeader purchaseList={purchasesWithoutGroupFlag} />
+      <DoughnutContainer monthlyPurchases={monthlyPurchases} />
       <PurchaseSchedules />
-
       <Box display="flex" justifyContent="center">
         <Button onClick={handlePastMonthButton}>前の月</Button>
         <Box fontSize={20}>
@@ -143,9 +146,10 @@ const Purchases = (): JSX.Element => {
     [month, purchaseList]
   );
 
+  // 後払いを合計する(収入に後払いはないので考慮しない)
   const groupedPurchasesDoc = useMemo(() => {
     return monthlyPurchases.reduce((acc, purchase) => {
-      if (isGroupPurchase(purchase)) {
+      if (isLaterPayment(purchase)) {
         const keyString = purchase.method.label + purchase.date.toMillis();
         if (!acc[keyString]) {
           acc[keyString] = {
@@ -160,18 +164,19 @@ const Purchases = (): JSX.Element => {
     }, {} as { [key: string]: PurchaseListType });
   }, [monthlyPurchases]);
 
-  const groupedPurchases = useMemo(
+  const groupedPayLaterPurchase = useMemo(
     () => Object.values(groupedPurchasesDoc),
     [groupedPurchasesDoc]
   );
 
+  // 後払いは合計したので、除外する
   const purchasesWithoutGroupFlag = useMemo(
     () =>
       [
-        ...monthlyPurchases.filter((purchase) => !isGroupPurchase(purchase)),
-        ...groupedPurchases,
+        ...monthlyPurchases.filter((purchase) => !isLaterPayment(purchase)),
+        ...groupedPayLaterPurchase,
       ].sort((a, b) => a.date.toMillis() - b.date.toMillis()),
-    [monthlyPurchases, groupedPurchases]
+    [monthlyPurchases, groupedPayLaterPurchase]
   );
 
   const handleNextMonthButton = useCallback(() => {
@@ -186,7 +191,7 @@ const Purchases = (): JSX.Element => {
     (groupedPurchase: PurchaseListType) =>
       monthlyPurchases.filter(
         (purchase) =>
-          isGroupPurchase(purchase) &&
+          isLaterPayment(purchase) &&
           purchase.method.id === groupedPurchase.method.id
       ),
     [monthlyPurchases]
@@ -194,16 +199,24 @@ const Purchases = (): JSX.Element => {
 
   const isSmall = useIsSmall();
 
+  // 支出を正の数字で表現する
   const spentSum = useMemo(
-    () => sumPrice(getFilteredPurchase(purchasesWithoutGroupFlag, "spent")),
+    () =>
+      -sumSpentAndIncome(
+        filterPurchasesByIncomeType(purchasesWithoutGroupFlag, "spent")
+      ),
     [purchasesWithoutGroupFlag]
   );
   const incomeSum = useMemo(
-    () => sumPrice(getFilteredPurchase(purchasesWithoutGroupFlag, "income")),
+    () =>
+      sumSpentAndIncome(
+        filterPurchasesByIncomeType(purchasesWithoutGroupFlag, "income")
+      ),
     [purchasesWithoutGroupFlag]
   );
 
   const plainProps = {
+    monthlyPurchases,
     purchasesWithoutGroupFlag,
     getGroupPurchases,
     month,

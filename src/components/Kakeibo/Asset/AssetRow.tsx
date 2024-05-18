@@ -33,7 +33,7 @@ import { getAuth } from "firebase/auth";
 import MethodList from "./MethodList";
 import { useMethod } from "../../Context/MethodContext";
 import {
-  calculateSpentAndIncomeResult,
+  sumSpentAndIncome,
   numericProps,
 } from "../../../utilities/purchaseUtilities";
 import { usePurchase } from "../../Context/PurchaseContext";
@@ -341,7 +341,7 @@ const AssetRow = ({ asset }: { asset: AssetListType }) => {
   }, [asset.id, auth.currentUser]);
 
   const { purchaseList } = usePurchase();
-  const relatedPurchases = calculateSpentAndIncomeResult(
+  const relatedPurchases = sumSpentAndIncome(
     purchaseList.filter(
       (purchase) =>
         purchase.method?.assetId === asset.id &&
