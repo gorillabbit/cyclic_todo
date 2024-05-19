@@ -66,7 +66,6 @@ const PlainPurchases = memo(
         </Box>
         <Button onClick={handleNextMonthButton}>次の月</Button>
       </Box>
-
       <TableContainer component={Paper} sx={{ mb: 2 }}>
         <Table size="small">
           <TableHead>
@@ -87,40 +86,35 @@ const PlainPurchases = memo(
       <TableContainer component={Paper}>
         <Table size="small">
           <TableHead>
-            {isSmall ? (
-              <>
-                <TableRow>
-                  <TableCell padding="none" />
-                  <TableCell sx={{ px: 0.5 }}>日付</TableCell>
-                  <TableCell sx={{ px: 0.5 }}>品目</TableCell>
-                  <TableCell sx={{ px: 0.5 }}>金額</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell padding="none" />
+            <TableRow>
+              <TableCell padding="none" />
+              <TableCell sx={{ px: 0.5 }}>日付</TableCell>
+              <TableCell sx={{ px: 0.5 }}>品目</TableCell>
+              <TableCell sx={{ px: 0.5 }}>金額</TableCell>
+              {!isSmall && (
+                <>
                   <TableCell sx={{ px: 0.5 }}>分類</TableCell>
                   <TableCell sx={{ px: 0.5 }}>支払い方法</TableCell>
                   <TableCell sx={{ px: 0.5 }}>収入</TableCell>
-                </TableRow>
-              </>
-            ) : (
+                  <TableCell sx={{ px: 0.5 }}>備考</TableCell>
+                  <TableCell padding="none" />
+                </>
+              )}
+            </TableRow>
+            {isSmall && (
               <TableRow>
                 <TableCell padding="none" />
-                <TableCell sx={{ px: 0.5 }}>日付</TableCell>
-                <TableCell sx={{ px: 0.5 }}>品目</TableCell>
-                <TableCell sx={{ px: 0.5 }}>金額</TableCell>
                 <TableCell sx={{ px: 0.5 }}>分類</TableCell>
                 <TableCell sx={{ px: 0.5 }}>支払い方法</TableCell>
                 <TableCell sx={{ px: 0.5 }}>収入</TableCell>
-                <TableCell sx={{ px: 0.5 }}>備考</TableCell>
-                <TableCell padding="none" />
               </TableRow>
             )}
           </TableHead>
           <TableBody>
             {purchasesWithoutGroupFlag.map((purchase) => (
               <PurchasesRow
-                purchase={purchase}
                 key={purchase.id}
+                purchase={purchase}
                 groupPurchases={getGroupPurchases(purchase)}
                 isSmall={isSmall}
               />
