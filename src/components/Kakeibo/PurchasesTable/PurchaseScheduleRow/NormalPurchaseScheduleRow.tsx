@@ -36,7 +36,7 @@ const PlainNormalPurchaseScheduleRow = memo(
         {editFormData.isUncertain && <Chip label="未確定" />}
       </TableCell>
       <TableCell sx={{ px: 0.5 }}>{editFormData.description}</TableCell>
-      <TableCell padding="none" sx={{ display: "flex" }}>
+      <TableCell padding="none" sx={{ px: 0.5 }}>
         <>
           <IconButton
             onClick={handleEditClick}
