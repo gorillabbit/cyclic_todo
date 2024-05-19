@@ -34,6 +34,7 @@ const PlainPurchaseSchedules = memo(
               <TableCell sx={{ px: 0.5 }}>収入</TableCell>
               <TableCell sx={{ px: 0.5 }}>未確定</TableCell>
               <TableCell sx={{ px: 0.5 }}>備考</TableCell>
+              <TableCell sx={{ px: 0.5 }}></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>

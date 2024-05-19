@@ -60,7 +60,7 @@ const PlainNormalPurchaseRow = memo(
               <PaymentsIcon color={editFormData.income ? "success" : "error"} />
             </TableCell>
             <TableCell>{editFormData.description}</TableCell>
-            <TableCell sx={{ display: "flex", px: 0.5 }}>
+            <TableCell sx={{ px: 0.5 }}>
               {!isGroup && (
                 <>
                   <IconButton
