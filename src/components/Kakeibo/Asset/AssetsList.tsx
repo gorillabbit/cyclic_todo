@@ -31,6 +31,7 @@ const PlainAssetsList = memo(
             <TableCell sx={{ px: 0.5 }}></TableCell>
             <TableCell sx={{ px: 0.5 }}>名前</TableCell>
             <TableCell sx={{ px: 0.5 }}>残高</TableCell>
+            <TableCell sx={{ px: 0.5 }}>最終更新</TableCell>
             <TableCell sx={{ px: 0.5 }} />
           </TableRow>
         </TableHead>

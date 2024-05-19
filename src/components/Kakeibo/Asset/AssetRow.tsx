@@ -67,6 +67,7 @@ type PlainAssetRowProps = {
   setOpenDialog: React.Dispatch<React.SetStateAction<boolean>>;
   deleteAction: () => void;
   isSmall: boolean;
+  latestLog: BalanceLog;
 };
 
 const PlainAssetRow = memo(
@@ -91,6 +92,7 @@ const PlainAssetRow = memo(
     setOpenDialog,
     deleteAction,
     isSmall,
+    latestLog,
   }: PlainAssetRowProps): JSX.Element => (
     <>
       <TableRow>
@@ -131,7 +133,10 @@ const PlainAssetRow = memo(
         </TableCell>
         {!isSmall && (
           <>
-            <TableCell>
+            <TableCell sx={{ px: 0.5 }}>
+              {latestLog.timestamp.toDate().toLocaleDateString()}
+            </TableCell>
+            <TableCell sx={{ px: 0.5 }}>
               <Button
                 sx={{ mx: 0.5 }}
                 variant={isAddedPurchases ? "contained" : "text"}
@@ -348,6 +353,7 @@ const AssetRow = ({ asset }: { asset: AssetListType }) => {
     setOpenDialog,
     deleteAction,
     isSmall,
+    latestLog,
   };
 
   return <PlainAssetRow {...plainProps} />;
