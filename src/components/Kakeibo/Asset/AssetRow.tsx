@@ -42,16 +42,56 @@ import { getUnixTime } from "date-fns";
 import DeleteConfirmDialog from "../DeleteConfirmDialog";
 import { useIsSmall } from "../../../hooks/useWindowSize";
 
-type PlainAssetRowProps = {
-  assetInput: AssetType;
-  handleAssetInput: (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => void;
+type UnderHalfRowProps = {
   isNameChanged: boolean;
   isBalanceChanged: boolean;
   removeAsset: () => void;
   saveChanges: () => void;
   updateLog: () => void;
+  isAddedPurchases: boolean;
+};
+
+const UnderHalfRow = memo(
+  ({
+    isAddedPurchases,
+    updateLog,
+    isNameChanged,
+    isBalanceChanged,
+    saveChanges,
+    removeAsset,
+  }: UnderHalfRowProps) => (
+    <>
+      <TableCell sx={{ px: 0.5 }}>
+        <Button
+          sx={{ mx: 0.5 }}
+          variant={isAddedPurchases ? "contained" : "text"}
+          color="primary"
+          disabled={!isAddedPurchases}
+          onClick={updateLog}
+        >
+          更新
+        </Button>
+        <Button
+          variant={isNameChanged || isBalanceChanged ? "contained" : "text"}
+          color="primary"
+          disabled={!isNameChanged && !isBalanceChanged}
+          onClick={saveChanges}
+        >
+          変更
+        </Button>
+        <IconButton onClick={removeAsset} color="error">
+          <DeleteIcon />
+        </IconButton>
+      </TableCell>
+    </>
+  )
+);
+
+type PlainAssetRowProps = UnderHalfRowProps & {
+  assetInput: AssetType;
+  handleAssetInput: (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => void;
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   filteredMethodList: MethodListType[];
@@ -60,7 +100,6 @@ type PlainAssetRowProps = {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => void;
   balanceInput: number;
-  isAddedPurchases: boolean;
   currentBalance: number;
   displayBalance: number;
   openDialog: boolean;
@@ -131,63 +170,37 @@ const PlainAssetRow = memo(
             </Box>
           )}
         </TableCell>
+        <TableCell sx={{ px: 0.5 }}>
+          {latestLog.timestamp.toDate().toLocaleDateString()}
+        </TableCell>
         {!isSmall && (
-          <>
-            <TableCell sx={{ px: 0.5 }}>
-              {latestLog.timestamp.toDate().toLocaleDateString()}
-            </TableCell>
-            <TableCell sx={{ px: 0.5 }}>
-              <Button
-                sx={{ mx: 0.5 }}
-                variant={isAddedPurchases ? "contained" : "text"}
-                color="primary"
-                disabled={!isAddedPurchases}
-                onClick={updateLog}
-              >
-                更新
-              </Button>
-              <Button
-                variant={
-                  isNameChanged || isBalanceChanged ? "contained" : "text"
-                }
-                color="primary"
-                disabled={!isNameChanged && !isBalanceChanged}
-                onClick={saveChanges}
-              >
-                変更
-              </Button>
-              <IconButton onClick={removeAsset} color="error">
-                <DeleteIcon />
-              </IconButton>
-            </TableCell>
-          </>
+          <UnderHalfRow
+            {...{
+              latestLog,
+              isAddedPurchases,
+              updateLog,
+              isNameChanged,
+              isBalanceChanged,
+              saveChanges,
+              removeAsset,
+            }}
+          />
         )}
       </TableRow>
       {isSmall && (
         <TableRow>
           <TableCell sx={{ px: 0.5 }} colSpan={2} />
-          <TableCell sx={{ px: 0.5 }}>
-            <Button
-              sx={{ mx: 0.5 }}
-              variant={isAddedPurchases ? "contained" : "text"}
-              color="primary"
-              disabled={!isAddedPurchases}
-              onClick={updateLog}
-            >
-              更新
-            </Button>
-            <Button
-              variant={isNameChanged || isBalanceChanged ? "contained" : "text"}
-              color="primary"
-              disabled={!isNameChanged && !isBalanceChanged}
-              onClick={saveChanges}
-            >
-              変更
-            </Button>
-            <IconButton onClick={removeAsset} color="error">
-              <DeleteIcon />
-            </IconButton>
-          </TableCell>
+          <UnderHalfRow
+            {...{
+              latestLog,
+              isAddedPurchases,
+              updateLog,
+              isNameChanged,
+              isBalanceChanged,
+              saveChanges,
+              removeAsset,
+            }}
+          />
         </TableRow>
       )}
 
