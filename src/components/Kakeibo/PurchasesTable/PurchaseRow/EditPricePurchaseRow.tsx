@@ -6,8 +6,30 @@ import { InputPurchaseRowType } from "../../../../types";
 import { updateDocPurchase } from "../../../../firebase";
 import { numericProps } from "../../../../utilities/purchaseUtilities";
 
-type PlainEditPricePurchaseRowProps = {
+type UnderHalfRowProps = {
   editFormData: InputPurchaseRowType;
+  handleSaveClick: () => void;
+};
+
+const UnderHalfRow = memo(
+  ({ editFormData, handleSaveClick }: UnderHalfRowProps) => (
+    <>
+      <TableCell sx={{ px: 0.5 }}>{editFormData.category}</TableCell>
+      <TableCell sx={{ px: 0.5 }}>{editFormData.method.label}</TableCell>
+      <TableCell sx={{ px: 0.5 }}>
+        <PaymentsIcon color={editFormData.income ? "success" : "error"} />
+      </TableCell>
+      <TableCell>{editFormData.description}</TableCell>
+      <TableCell padding="none">
+        <IconButton onClick={handleSaveClick} color="success">
+          <DoneIcon />
+        </IconButton>
+      </TableCell>
+    </>
+  )
+);
+
+type PlainEditPricePurchaseRowProps = UnderHalfRowProps & {
   handleEditFormChange: (event: {
     target: {
       name: string;
@@ -15,7 +37,6 @@ type PlainEditPricePurchaseRowProps = {
     };
   }) => void;
   isSmall: boolean;
-  handleSaveClick: () => void;
 };
 
 const PlainEditPricePurchaseRow = memo(
@@ -42,37 +63,19 @@ const PlainEditPricePurchaseRow = memo(
           />
         </TableCell>
         {!isSmall && (
-          <>
-            <TableCell sx={{ px: 0.5 }}>{editFormData.category}</TableCell>
-            <TableCell sx={{ px: 0.5 }}>{editFormData.method.label}</TableCell>
-            <TableCell sx={{ px: 0.5 }}>
-              <PaymentsIcon color={editFormData.income ? "success" : "error"} />
-            </TableCell>
-            <TableCell>{editFormData.description}</TableCell>
-            <TableCell padding="none">
-              <IconButton onClick={handleSaveClick} color="success">
-                <DoneIcon />
-              </IconButton>
-            </TableCell>
-          </>
+          <UnderHalfRow
+            editFormData={editFormData}
+            handleSaveClick={handleSaveClick}
+          />
         )}
       </TableRow>
       {isSmall && (
-        <>
-          <TableRow>
-            <TableCell sx={{ px: 0.5 }} />
-            <TableCell sx={{ px: 0.5 }}>{editFormData.category}</TableCell>
-            <TableCell sx={{ px: 0.5 }}>{editFormData.method.label}</TableCell>
-            <TableCell sx={{ px: 0.5 }}>
-              <PaymentsIcon color={editFormData.income ? "success" : "error"} />
-            </TableCell>
-            <TableCell padding="none">
-              <IconButton onClick={handleSaveClick} color="success">
-                <DoneIcon />
-              </IconButton>
-            </TableCell>
-          </TableRow>
-        </>
+        <TableRow>
+          <UnderHalfRow
+            editFormData={editFormData}
+            handleSaveClick={handleSaveClick}
+          />
+        </TableRow>
       )}
     </>
   )

@@ -18,21 +18,84 @@ import {
 } from "../../../../firebase";
 import { getPayLaterDate } from "../../../../utilities/dateUtilities";
 
-type PlainEditPurchaseRowProps = {
+type UnderHalfRowProps = {
   editFormData: InputPurchaseRowType;
-  handleDateFormChange: (value: Date | null | undefined) => void;
+  categorySet: string[];
+  methodList: MethodListType[];
+  handleAutocompleteChange: (name: string, value: any) => void;
+  handleMethodChange: (value: string | MethodListType | null) => void;
   handleEditFormChange: (event: {
     target: {
       name: string;
       value: any;
     };
   }) => void;
-  categorySet: string[];
-  handleAutocompleteChange: (name: string, value: any) => void;
-  methodList: MethodListType[];
-  handleMethodChange: (value: string | MethodListType | null) => void;
-  isSmall: boolean;
   handleSaveClick: () => void;
+};
+
+const UnderHalfRow = memo(
+  ({
+    editFormData,
+    categorySet,
+    methodList,
+    handleAutocompleteChange,
+    handleMethodChange,
+    handleEditFormChange,
+    handleSaveClick,
+  }: UnderHalfRowProps) => (
+    <>
+      <TableCell sx={{ px: 0.5 }}>
+        <Autocomplete
+          value={editFormData.category}
+          sx={{ minWidth: 150 }}
+          options={categorySet}
+          freeSolo
+          onChange={(_e, v) => handleAutocompleteChange("category", v)}
+          renderInput={(params) => (
+            <TextField {...params} label="分類" size="small" />
+          )}
+        />
+      </TableCell>
+      <TableCell sx={{ px: 0.5 }}>
+        <Autocomplete
+          value={editFormData.method}
+          sx={{ minWidth: 150 }}
+          options={methodList}
+          freeSolo
+          onChange={(_e, v) => handleMethodChange(v)}
+          renderInput={(params) => (
+            <TextField {...params} label="支払い方法" size="small" />
+          )}
+        />
+      </TableCell>
+      <TableCell sx={{ px: 0.5 }}>
+        <TextField
+          name="income"
+          value={editFormData.income ? "収入" : "支出"}
+          onChange={handleEditFormChange}
+          size="small"
+        />
+      </TableCell>
+      <TableCell sx={{ px: 0.5 }}>
+        <TextField
+          name="description"
+          value={editFormData.description}
+          onChange={handleEditFormChange}
+          size="small"
+        />
+      </TableCell>
+      <TableCell padding="none">
+        <IconButton onClick={handleSaveClick} color="success">
+          <DoneIcon />
+        </IconButton>
+      </TableCell>
+    </>
+  )
+);
+
+type PlainEditPurchaseRowProps = UnderHalfRowProps & {
+  handleDateFormChange: (value: Date | null | undefined) => void;
+  isSmall: boolean;
 };
 
 const PlainEditPurchaseRow = memo(
@@ -76,104 +139,30 @@ const PlainEditPurchaseRow = memo(
           />
         </TableCell>
         {!isSmall && (
-          <>
-            <TableCell sx={{ px: 0.5 }}>
-              <Autocomplete
-                value={editFormData.category}
-                sx={{ minWidth: 150 }}
-                options={categorySet}
-                freeSolo
-                onChange={(_e, v) => handleAutocompleteChange("category", v)}
-                renderInput={(params) => (
-                  <TextField {...params} label="分類" size="small" />
-                )}
-              />
-            </TableCell>
-            <TableCell sx={{ px: 0.5 }}>
-              <Autocomplete
-                value={editFormData.method}
-                sx={{ minWidth: 150 }}
-                options={methodList}
-                freeSolo
-                onChange={(_e, v) => handleMethodChange(v)}
-                renderInput={(params) => (
-                  <TextField {...params} label="支払い方法" size="small" />
-                )}
-              />
-            </TableCell>
-            <TableCell sx={{ px: 0.5 }}>
-              <TextField
-                name="income"
-                value={editFormData.income ? "収入" : "支出"}
-                onChange={handleEditFormChange}
-                size="small"
-              />
-            </TableCell>
-            <TableCell sx={{ px: 0.5 }}>
-              <TextField
-                name="description"
-                value={editFormData.description}
-                onChange={handleEditFormChange}
-                size="small"
-              />
-            </TableCell>
-            <TableCell padding="none">
-              <IconButton onClick={handleSaveClick} color="success">
-                <DoneIcon />
-              </IconButton>
-            </TableCell>
-          </>
+          <UnderHalfRow
+            editFormData={editFormData}
+            categorySet={categorySet}
+            methodList={methodList}
+            handleAutocompleteChange={handleAutocompleteChange}
+            handleMethodChange={handleMethodChange}
+            handleEditFormChange={handleEditFormChange}
+            handleSaveClick={handleSaveClick}
+          />
         )}
       </TableRow>
       {isSmall && (
         <>
           <TableRow>
             <TableCell sx={{ px: 0.5 }} />
-            <TableCell sx={{ px: 0.5 }}>
-              <Autocomplete
-                value={editFormData.category}
-                sx={{ minWidth: 150 }}
-                options={categorySet}
-                freeSolo
-                onChange={(e, v) => handleAutocompleteChange("category", v)}
-                renderInput={(params) => (
-                  <TextField {...params} label="分類" size="small" />
-                )}
-              />
-            </TableCell>
-            <TableCell sx={{ px: 0.5 }}>
-              <Autocomplete
-                value={editFormData.method}
-                sx={{ minWidth: 150 }}
-                options={methodList}
-                freeSolo
-                onChange={(_e, v) => handleMethodChange(v)}
-                renderInput={(params) => (
-                  <TextField {...params} label="支払い方法" size="small" />
-                )}
-              />
-            </TableCell>
-            <TableCell sx={{ px: 0.5 }}>
-              <TextField
-                name="income"
-                value={editFormData.income ? "収入" : "支出"}
-                onChange={handleEditFormChange}
-                size="small"
-              />
-            </TableCell>
-            <TableCell sx={{ px: 0.5 }}>
-              <TextField
-                name="description"
-                value={editFormData.description}
-                onChange={handleEditFormChange}
-                size="small"
-              />
-            </TableCell>
-            <TableCell padding="none">
-              <IconButton onClick={handleSaveClick} color="success">
-                <DoneIcon />
-              </IconButton>
-            </TableCell>
+            <UnderHalfRow
+              editFormData={editFormData}
+              categorySet={categorySet}
+              methodList={methodList}
+              handleAutocompleteChange={handleAutocompleteChange}
+              handleMethodChange={handleMethodChange}
+              handleEditFormChange={handleEditFormChange}
+              handleSaveClick={handleSaveClick}
+            />
           </TableRow>
         </>
       )}

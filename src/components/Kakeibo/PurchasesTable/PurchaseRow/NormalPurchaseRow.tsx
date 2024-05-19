@@ -1,21 +1,52 @@
-import { TableCell, IconButton, Chip, TableRow, Button } from "@mui/material";
-import { memo, useCallback } from "react";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
+import { TableCell, IconButton, Chip, TableRow } from "@mui/material";
+import { memo } from "react";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
-import { InputPurchaseRowType } from "../../../../types";
 import PaymentsIcon from "@mui/icons-material/Payments";
+import { InputPurchaseRowType } from "../../../../types";
+import PurchaseRowButtons from "./PurchaseRowButtons";
 
-type PlainNormalPurchaseRowProps = {
+type UnderHalfRowProps = {
   isGroup: boolean;
+  editFormData: InputPurchaseRowType;
+  setIsEdit: (value: React.SetStateAction<boolean>) => void;
+  setIsEditPrice: React.Dispatch<React.SetStateAction<boolean>>;
+  setOpenDialog: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
+const UnderHalfRow = memo(
+  ({
+    editFormData,
+    isGroup,
+    setIsEdit,
+    setIsEditPrice,
+    setOpenDialog,
+  }: UnderHalfRowProps) => (
+    <>
+      <TableCell sx={{ px: 0.5 }}>{editFormData.category}</TableCell>
+      <TableCell sx={{ px: 0.5 }}>{editFormData.method.label}</TableCell>
+      <TableCell sx={{ px: 0.5 }}>
+        <PaymentsIcon color={editFormData.income ? "success" : "error"} />
+      </TableCell>
+      <TableCell>{editFormData.description}</TableCell>
+      <TableCell sx={{ px: 0.5 }}>
+        {!isGroup && (
+          <PurchaseRowButtons
+            setIsEdit={setIsEdit}
+            setIsEditPrice={setIsEditPrice}
+            setOpenDialog={setOpenDialog}
+            isUncertain={editFormData.isUncertain}
+          />
+        )}
+      </TableCell>
+    </>
+  )
+);
+
+type PlainNormalPurchaseRowProps = UnderHalfRowProps & {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   open: boolean;
-  editFormData: InputPurchaseRowType;
   isSmall: boolean;
-  handleEditClick: () => void;
-  handleEditPriceButtonClick: () => void;
-  handleDeleteButton: () => void;
 };
 
 const PlainNormalPurchaseRow = memo(
@@ -25,9 +56,9 @@ const PlainNormalPurchaseRow = memo(
     open,
     editFormData,
     isSmall,
-    handleEditClick,
-    handleEditPriceButtonClick,
-    handleDeleteButton,
+    setIsEdit,
+    setOpenDialog,
+    setIsEditPrice,
   }: PlainNormalPurchaseRowProps): JSX.Element => (
     <>
       <TableRow sx={{ pb: 0.5 }}>
@@ -53,130 +84,33 @@ const PlainNormalPurchaseRow = memo(
           {editFormData.isUncertain && <Chip label="未確定" />}
         </TableCell>
         {!isSmall && (
-          <>
-            <TableCell sx={{ px: 0.5 }}>{editFormData.category}</TableCell>
-            <TableCell sx={{ px: 0.5 }}>{editFormData.method.label}</TableCell>
-            <TableCell sx={{ px: 0.5 }}>
-              <PaymentsIcon color={editFormData.income ? "success" : "error"} />
-            </TableCell>
-            <TableCell>{editFormData.description}</TableCell>
-            <TableCell sx={{ px: 0.5 }}>
-              {!isGroup && (
-                <>
-                  <IconButton
-                    onClick={handleEditClick}
-                    sx={{
-                      "&:hover": {
-                        color: "#1976d2",
-                      },
-                    }}
-                  >
-                    <EditIcon />
-                  </IconButton>
-                  <IconButton
-                    onClick={handleDeleteButton}
-                    sx={{
-                      "&:hover": {
-                        color: "#d32f2f",
-                      },
-                    }}
-                  >
-                    <DeleteIcon />
-                  </IconButton>
-                  {editFormData.isUncertain && (
-                    <Button onClick={handleEditPriceButtonClick}>
-                      金額確定
-                    </Button>
-                  )}
-                </>
-              )}
-            </TableCell>
-          </>
+          <UnderHalfRow
+            setIsEdit={setIsEdit}
+            setIsEditPrice={setIsEditPrice}
+            setOpenDialog={setOpenDialog}
+            editFormData={editFormData}
+            isGroup={isGroup}
+          />
         )}
       </TableRow>
       {isSmall && (
         <TableRow>
           <TableCell sx={{ px: 0.5 }} />
-          <TableCell sx={{ px: 0.5 }}>{editFormData.category}</TableCell>
-          <TableCell sx={{ px: 0.5 }}>{editFormData.method.label}</TableCell>
-          <TableCell sx={{ px: 0.5 }}>
-            <PaymentsIcon color={editFormData.income ? "success" : "error"} />
-          </TableCell>
-          <TableCell sx={{ display: "flex", px: 0.5 }}>
-            {!isGroup && (
-              <>
-                <IconButton
-                  onClick={handleEditClick}
-                  sx={{
-                    "&:hover": {
-                      color: "#1976d2",
-                    },
-                  }}
-                >
-                  <EditIcon />
-                </IconButton>
-                <IconButton
-                  onClick={handleDeleteButton}
-                  sx={{
-                    "&:hover": {
-                      color: "#d32f2f",
-                    },
-                  }}
-                >
-                  <DeleteIcon />
-                </IconButton>
-              </>
-            )}
-          </TableCell>
+          <UnderHalfRow
+            setIsEdit={setIsEdit}
+            setIsEditPrice={setIsEditPrice}
+            setOpenDialog={setOpenDialog}
+            editFormData={editFormData}
+            isGroup={isGroup}
+          />
         </TableRow>
       )}
     </>
   )
 );
 
-const NormalPurchaseRow = ({
-  isGroup,
-  setOpen,
-  open,
-  editFormData,
-  isSmall,
-  setIsEdit,
-  setIsEditPrice,
-  setOpenDialog,
-}: {
-  isGroup: boolean;
-  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  open: boolean;
-  editFormData: InputPurchaseRowType;
-  isSmall: boolean;
-  setIsEdit: (value: React.SetStateAction<boolean>) => void;
-  setIsEditPrice: React.Dispatch<React.SetStateAction<boolean>>;
-  setOpenDialog: React.Dispatch<React.SetStateAction<boolean>>;
-}) => {
-  const handleEditClick = useCallback(() => {
-    setIsEdit(true);
-  }, [setIsEdit]);
-
-  const handleDeleteButton = useCallback(() => {
-    setOpenDialog(true);
-  }, [setOpenDialog]);
-
-  const handleEditPriceButtonClick = useCallback(
-    () => setIsEditPrice(true),
-    [setIsEditPrice]
-  );
-
-  const plainProps = {
-    isGroup,
-    setOpen,
-    open,
-    editFormData,
-    isSmall,
-    handleEditClick,
-    handleEditPriceButtonClick,
-    handleDeleteButton,
-  };
-  return <PlainNormalPurchaseRow {...plainProps} />;
+const NormalPurchaseRow = (props: PlainNormalPurchaseRowProps) => {
+  return <PlainNormalPurchaseRow {...props} />;
 };
 
 export default NormalPurchaseRow;
