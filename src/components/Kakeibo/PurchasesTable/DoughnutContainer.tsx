@@ -8,19 +8,25 @@ import {
 } from "../../../utilities/purchaseUtilities";
 
 type PlainDoughnutContainerProps = {
-  currentMonthSpentList: PurchaseListType[];
   currentMonthIncomeList: PurchaseListType[];
+  currentMonthNetSpentList: PurchaseListType[];
+  currentMonthPaymentList: PurchaseListType[];
 };
 
 const PlainDoughnutContainer = memo(
   ({
-    currentMonthSpentList,
     currentMonthIncomeList,
+    currentMonthNetSpentList,
+    currentMonthPaymentList,
   }: PlainDoughnutContainerProps) => (
     <Box display="flex" flexWrap="wrap">
       <DoughnutChart
-        purchaseList={currentMonthSpentList}
+        purchaseList={currentMonthNetSpentList}
         title="今月の使用金額"
+      />
+      <DoughnutChart
+        purchaseList={currentMonthPaymentList}
+        title="今月の支払い金額"
       />
       <DoughnutChart
         purchaseList={currentMonthIncomeList}
@@ -47,14 +53,25 @@ const DoughnutContainer = ({
     [PayLaterCategoryPurchase]
   );
 
+  // 今月使った金額を示す。カードの支払は含まない
+  const currentMonthNetSpentList = currentMonthSpentList.filter(
+    (spent) => !isLaterPayment(spent)
+  );
+
+  // 今月の支払金額
+  const currentMonthPaymentList = currentMonthSpentList.filter(
+    (spent) => !spent.childPurchaseId
+  );
+
   const currentMonthIncomeList = useMemo(
     () => filterPurchasesByIncomeType(PayLaterCategoryPurchase, "income"),
     [PayLaterCategoryPurchase]
   );
 
   const plainProps = {
-    currentMonthSpentList,
     currentMonthIncomeList,
+    currentMonthNetSpentList,
+    currentMonthPaymentList,
   };
 
   return <PlainDoughnutContainer {...plainProps} />;
