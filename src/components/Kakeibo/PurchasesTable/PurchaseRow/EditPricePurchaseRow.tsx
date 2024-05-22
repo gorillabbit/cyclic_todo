@@ -7,15 +7,32 @@ import { updateDocPurchase } from "../../../../firebase";
 import { numericProps } from "../../../../utilities/purchaseUtilities";
 
 type UnderHalfRowProps = {
+  handleEditFormChange: (event: {
+    target: {
+      name: string;
+      value: any;
+    };
+  }) => void;
   editFormData: InputPurchaseRowType;
   handleSaveClick: () => void;
 };
 
 const UnderHalfRow = memo(
-  ({ editFormData, handleSaveClick }: UnderHalfRowProps) => (
+  ({
+    editFormData,
+    handleSaveClick,
+    handleEditFormChange,
+  }: UnderHalfRowProps) => (
     <>
-      <TableCell sx={{ px: 0.5 }}>{editFormData.category}</TableCell>
-      <TableCell sx={{ px: 0.5 }}>{editFormData.method.label}</TableCell>
+      <TableCell sx={{ px: 0.5 }}>
+        <TextField
+          name="price"
+          value={editFormData.price}
+          onChange={handleEditFormChange}
+          size="small"
+          inputProps={numericProps}
+        />
+      </TableCell>
       <TableCell sx={{ px: 0.5 }}>
         <PaymentsIcon color={editFormData.income ? "success" : "error"} />
       </TableCell>
@@ -30,12 +47,6 @@ const UnderHalfRow = memo(
 );
 
 type PlainEditPricePurchaseRowProps = UnderHalfRowProps & {
-  handleEditFormChange: (event: {
-    target: {
-      name: string;
-      value: any;
-    };
-  }) => void;
   isSmall: boolean;
 };
 
@@ -53,19 +64,14 @@ const PlainEditPricePurchaseRow = memo(
           {editFormData.date.toLocaleString().split(" ")[0]}
         </TableCell>
         <TableCell sx={{ px: 0.5 }}>{editFormData.title}</TableCell>
-        <TableCell sx={{ px: 0.5 }}>
-          <TextField
-            name="price"
-            value={editFormData.price}
-            onChange={handleEditFormChange}
-            size="small"
-            inputProps={numericProps}
-          />
-        </TableCell>
+
+        <TableCell sx={{ px: 0.5 }}>{editFormData.category}</TableCell>
+        <TableCell sx={{ px: 0.5 }}>{editFormData.method.label}</TableCell>
         {!isSmall && (
           <UnderHalfRow
             editFormData={editFormData}
             handleSaveClick={handleSaveClick}
+            handleEditFormChange={handleEditFormChange}
           />
         )}
       </TableRow>
@@ -75,6 +81,7 @@ const PlainEditPricePurchaseRow = memo(
           <UnderHalfRow
             editFormData={editFormData}
             handleSaveClick={handleSaveClick}
+            handleEditFormChange={handleEditFormChange}
           />
         </TableRow>
       )}

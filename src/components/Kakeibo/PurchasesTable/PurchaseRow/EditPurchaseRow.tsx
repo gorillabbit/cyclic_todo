@@ -20,10 +20,6 @@ import { getPayLaterDate } from "../../../../utilities/dateUtilities";
 
 type UnderHalfRowProps = {
   editFormData: InputPurchaseRowType;
-  categorySet: string[];
-  methodList: MethodListType[];
-  handleAutocompleteChange: (name: string, value: any) => void;
-  handleMethodChange: (value: string | MethodListType | null) => void;
   handleEditFormChange: (event: {
     target: {
       name: string;
@@ -36,36 +32,16 @@ type UnderHalfRowProps = {
 const UnderHalfRow = memo(
   ({
     editFormData,
-    categorySet,
-    methodList,
-    handleAutocompleteChange,
-    handleMethodChange,
     handleEditFormChange,
     handleSaveClick,
   }: UnderHalfRowProps) => (
     <>
       <TableCell sx={{ px: 0.5 }}>
-        <Autocomplete
-          value={editFormData.category}
-          sx={{ minWidth: 150 }}
-          options={categorySet}
-          freeSolo
-          onChange={(_e, v) => handleAutocompleteChange("category", v)}
-          renderInput={(params) => (
-            <TextField {...params} label="分類" size="small" />
-          )}
-        />
-      </TableCell>
-      <TableCell sx={{ px: 0.5 }}>
-        <Autocomplete
-          value={editFormData.method}
-          sx={{ minWidth: 150 }}
-          options={methodList}
-          freeSolo
-          onChange={(_e, v) => handleMethodChange(v)}
-          renderInput={(params) => (
-            <TextField {...params} label="支払い方法" size="small" />
-          )}
+        <TextField
+          name="price"
+          value={editFormData.price}
+          onChange={handleEditFormChange}
+          size="small"
         />
       </TableCell>
       <TableCell sx={{ px: 0.5 }}>
@@ -96,6 +72,10 @@ const UnderHalfRow = memo(
 type PlainEditPurchaseRowProps = UnderHalfRowProps & {
   handleDateFormChange: (value: Date | null | undefined) => void;
   isSmall: boolean;
+  categorySet: string[];
+  methodList: MethodListType[];
+  handleAutocompleteChange: (name: string, value: any) => void;
+  handleMethodChange: (value: string | MethodListType | null) => void;
 };
 
 const PlainEditPurchaseRow = memo(
@@ -130,21 +110,34 @@ const PlainEditPurchaseRow = memo(
             size="small"
           />
         </TableCell>
+
         <TableCell sx={{ px: 0.5 }}>
-          <TextField
-            name="price"
-            value={editFormData.price}
-            onChange={handleEditFormChange}
-            size="small"
+          <Autocomplete
+            value={editFormData.category}
+            sx={{ minWidth: 150 }}
+            options={categorySet}
+            freeSolo
+            onChange={(_e, v) => handleAutocompleteChange("category", v)}
+            renderInput={(params) => (
+              <TextField {...params} label="分類" size="small" />
+            )}
+          />
+        </TableCell>
+        <TableCell sx={{ px: 0.5 }}>
+          <Autocomplete
+            value={editFormData.method}
+            sx={{ minWidth: 150 }}
+            options={methodList}
+            freeSolo
+            onChange={(_e, v) => handleMethodChange(v)}
+            renderInput={(params) => (
+              <TextField {...params} label="支払い方法" size="small" />
+            )}
           />
         </TableCell>
         {!isSmall && (
           <UnderHalfRow
             editFormData={editFormData}
-            categorySet={categorySet}
-            methodList={methodList}
-            handleAutocompleteChange={handleAutocompleteChange}
-            handleMethodChange={handleMethodChange}
             handleEditFormChange={handleEditFormChange}
             handleSaveClick={handleSaveClick}
           />
@@ -156,10 +149,6 @@ const PlainEditPurchaseRow = memo(
             <TableCell sx={{ px: 0.5 }} />
             <UnderHalfRow
               editFormData={editFormData}
-              categorySet={categorySet}
-              methodList={methodList}
-              handleAutocompleteChange={handleAutocompleteChange}
-              handleMethodChange={handleMethodChange}
               handleEditFormChange={handleEditFormChange}
               handleSaveClick={handleSaveClick}
             />
