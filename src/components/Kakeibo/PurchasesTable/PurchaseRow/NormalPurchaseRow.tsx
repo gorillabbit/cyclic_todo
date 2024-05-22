@@ -23,12 +23,16 @@ const UnderHalfRow = memo(
     setOpenDialog,
   }: UnderHalfRowProps) => (
     <>
-      <TableCell sx={{ px: 0.5 }}>{editFormData.category}</TableCell>
-      <TableCell sx={{ px: 0.5 }}>{editFormData.method.label}</TableCell>
+      <TableCell sx={{ px: 0.5 }}>
+        {editFormData.price + "円"}
+        {editFormData.method.timing === "翌月" &&
+          editFormData.childPurchaseId && <Chip label="翌月" />}
+        {editFormData.isUncertain && <Chip label="未確定" />}
+      </TableCell>
+      <TableCell>{editFormData.description}</TableCell>
       <TableCell sx={{ px: 0.5 }}>
         <PaymentsIcon color={editFormData.income ? "success" : "error"} />
       </TableCell>
-      <TableCell>{editFormData.description}</TableCell>
       <TableCell sx={{ px: 0.5 }}>
         {!isGroup && (
           <PurchaseRowButtons
@@ -79,12 +83,8 @@ const PlainNormalPurchaseRow = memo(
           {editFormData.date.toLocaleString().split(" ")[0]}
         </TableCell>
         <TableCell sx={{ px: 0.5 }}>{editFormData.title}</TableCell>
-        <TableCell sx={{ px: 0.5 }} colSpan={isSmall ? 3 : 1}>
-          {editFormData.price + "円"}
-          {editFormData.method.timing === "翌月" &&
-            editFormData.childPurchaseId && <Chip label="翌月" />}
-          {editFormData.isUncertain && <Chip label="未確定" />}
-        </TableCell>
+        <TableCell sx={{ px: 0.5 }}>{editFormData.category}</TableCell>
+        <TableCell sx={{ px: 0.5 }}>{editFormData.method.label}</TableCell>
         {!isSmall && (
           <UnderHalfRow
             setIsEdit={setIsEdit}

@@ -61,7 +61,7 @@ const UnderHalfRow = memo(
     removeAsset,
   }: UnderHalfRowProps) => (
     <>
-      <TableCell sx={{ px: 0.5 }} colSpan={2}>
+      <TableCell sx={{ px: 0.5 }} align="right" colSpan={2}>
         <Button
           sx={{ mx: 0.5 }}
           variant={isAddedPurchases ? "contained" : "text"}
