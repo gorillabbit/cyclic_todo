@@ -1,4 +1,4 @@
-import { Box, Tab, Tabs } from "@mui/material";
+import { Box } from "@mui/material";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
@@ -18,6 +18,8 @@ import { AssetProvider } from "./components/Context/AssetContext";
 import PurchaseInputs from "./components/Kakeibo/Input/InputsContainer";
 import { PurchaseProvider } from "./components/Context/PurchaseContext";
 import { MethodProvider } from "./components/Context/MethodContext";
+import HeaderTabs from "./components/Tabs";
+import { useCookies } from "react-cookie";
 
 const App = (): JSX.Element => {
   const theme = createTheme({
@@ -33,7 +35,9 @@ const App = (): JSX.Element => {
   });
   const [user, setUser] = useState<User>();
   const [isGapiMounted, setIsGapiMounted] = useState<boolean>(false);
-  const [tabValue, setTabValue] = useState<number>(0);
+  const [pinnedTab, setPinnedTab] = useCookies(["pinnedTab"]);
+  const pinnedTabNum = Number(pinnedTab.pinnedTab) ?? 0;
+  const [tabValue, setTabValue] = useState<number>(pinnedTabNum);
 
   useEffect(() => {
     const auth = getAuth();
@@ -48,10 +52,12 @@ const App = (): JSX.Element => {
     <LocalizationProvider dateAdapter={AdapterDateFns}>
       <ThemeProvider theme={theme}>
         <Header setUser={setUser} setIsGapiMounted={setIsGapiMounted} />
-        <Tabs value={tabValue} onChange={(e, v) => setTabValue(v)}>
-          <Tab label="タスク/ログ" />
-          <Tab label="家計簿" />
-        </Tabs>
+        <HeaderTabs
+          tabValue={tabValue}
+          setTabValue={setTabValue}
+          pinnedTabNum={pinnedTabNum}
+          setPinnedTab={setPinnedTab}
+        />
         {user && (
           <AccountProvider>
             <Box m={2} textAlign="center">
