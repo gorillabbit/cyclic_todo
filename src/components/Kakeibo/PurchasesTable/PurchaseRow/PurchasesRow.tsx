@@ -30,6 +30,7 @@ type PlainPurchasesRowProps = {
   setOpenDialog: React.Dispatch<React.SetStateAction<boolean>>;
   isEditPrice: boolean;
   setIsEditPrice: React.Dispatch<React.SetStateAction<boolean>>;
+  index: number;
 };
 
 const PlainPurchasesRow = memo(
@@ -49,6 +50,7 @@ const PlainPurchasesRow = memo(
     setOpenDialog,
     isEditPrice,
     setIsEditPrice,
+    index,
   }: PlainPurchasesRowProps): JSX.Element => (
     <>
       {isEdit ? (
@@ -75,6 +77,7 @@ const PlainPurchasesRow = memo(
           setIsEdit={setIsEdit}
           setIsEditPrice={setIsEditPrice}
           setOpenDialog={setOpenDialog}
+          index={index}
         />
       )}
       {isGroup && (
@@ -132,10 +135,12 @@ const PurchasesRow = ({
   purchase,
   groupPurchases,
   isSmall,
+  index,
 }: {
   purchase: PurchaseListType;
   groupPurchases: PurchaseListType[];
   isSmall: boolean;
+  index: number;
 }) => {
   const [isEdit, setIsEdit] = useState<boolean>(false);
   const [isEditPrice, setIsEditPrice] = useState<boolean>(false);
@@ -170,6 +175,7 @@ const PurchasesRow = ({
     setOpenDialog,
     isEditPrice,
     setIsEditPrice,
+    index,
   };
   return <PlainPurchasesRow {...plainProps} />;
 };

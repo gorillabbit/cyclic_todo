@@ -111,9 +111,10 @@ const PlainPurchases = memo(
             )}
           </TableHead>
           <TableBody>
-            {purchasesWithoutGroupFlag.map((purchase) => (
+            {purchasesWithoutGroupFlag.map((purchase, index) => (
               <PurchasesRow
                 key={purchase.id}
+                index={index}
                 purchase={purchase}
                 groupPurchases={getGroupPurchases(purchase)}
                 isSmall={isSmall}

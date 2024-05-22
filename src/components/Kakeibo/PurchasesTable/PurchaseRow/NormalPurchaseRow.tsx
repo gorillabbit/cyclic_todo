@@ -1,5 +1,5 @@
 import { TableCell, IconButton, Chip, TableRow } from "@mui/material";
-import { memo } from "react";
+import { memo, useMemo } from "react";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import PaymentsIcon from "@mui/icons-material/Payments";
@@ -47,6 +47,7 @@ type PlainNormalPurchaseRowProps = UnderHalfRowProps & {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   open: boolean;
   isSmall: boolean;
+  rowColor: string;
 };
 
 const PlainNormalPurchaseRow = memo(
@@ -59,9 +60,10 @@ const PlainNormalPurchaseRow = memo(
     setIsEdit,
     setOpenDialog,
     setIsEditPrice,
+    rowColor,
   }: PlainNormalPurchaseRowProps): JSX.Element => (
     <>
-      <TableRow sx={{ pb: 0.5 }}>
+      <TableRow sx={{ pb: 0.5, bgcolor: rowColor }}>
         <TableCell sx={{ px: 0.5 }}>
           {isGroup && (
             <IconButton
@@ -77,7 +79,7 @@ const PlainNormalPurchaseRow = memo(
           {editFormData.date.toLocaleString().split(" ")[0]}
         </TableCell>
         <TableCell sx={{ px: 0.5 }}>{editFormData.title}</TableCell>
-        <TableCell sx={{ px: 0.5 }}>
+        <TableCell sx={{ px: 0.5 }} colSpan={isSmall ? 3 : 1}>
           {editFormData.price + "円"}
           {editFormData.method.timing === "翌月" &&
             editFormData.childPurchaseId && <Chip label="翌月" />}
@@ -94,7 +96,7 @@ const PlainNormalPurchaseRow = memo(
         )}
       </TableRow>
       {isSmall && (
-        <TableRow>
+        <TableRow sx={{ bgcolor: rowColor }}>
           <TableCell sx={{ px: 0.5 }} />
           <UnderHalfRow
             setIsEdit={setIsEdit}
@@ -109,8 +111,20 @@ const PlainNormalPurchaseRow = memo(
   )
 );
 
-const NormalPurchaseRow = (props: PlainNormalPurchaseRowProps) => {
-  return <PlainNormalPurchaseRow {...props} />;
+const NormalPurchaseRow = (
+  props: UnderHalfRowProps & {
+    setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+    open: boolean;
+    isSmall: boolean;
+    index: number;
+  }
+) => {
+  const rowColor = useMemo(
+    () => (props.index % 2 === 0 ? "#f0f0f0" : "white"),
+    [props.index]
+  );
+  const plainProps = { ...props, rowColor };
+  return <PlainNormalPurchaseRow {...plainProps} />;
 };
 
 export default NormalPurchaseRow;
