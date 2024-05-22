@@ -95,8 +95,8 @@ const PlainPurchases = memo(
 
               {!isSmall && (
                 <>
-                  <TableCell sx={{ px: 0.5 }}>金額</TableCell>
-                  <TableCell sx={{ px: 0.5 }}>備考</TableCell>
+                  <TableCell sx={{ px: 0.5 }}>分類</TableCell>
+                  <TableCell sx={{ px: 0.5 }}>支払い方法</TableCell>
                   <TableCell sx={{ px: 0.5 }}>収入</TableCell>
                   <TableCell padding="none" />
                 </>
