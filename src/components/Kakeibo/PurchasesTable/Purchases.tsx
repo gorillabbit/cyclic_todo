@@ -174,10 +174,10 @@ const Purchases = (): JSX.Element => {
     [groupedPayLaterPurchases]
   );
 
-  // 後払いは合計したので、除外する
   const purchasesWithoutGroupFlag = useMemo(
     () =>
       [
+        // 後払いは合計したので、除外する
         ...monthlyPurchases.filter((purchase) => !isLaterPayment(purchase)),
         ...neutralizedGroupedPayLaterPurchase,
       ].sort((a, b) => a.date.toMillis() - b.date.toMillis()),
