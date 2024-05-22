@@ -20,6 +20,7 @@ import { PurchaseProvider } from "./components/Context/PurchaseContext";
 import { MethodProvider } from "./components/Context/MethodContext";
 import HeaderTabs from "./components/Tabs";
 import { useCookies } from "react-cookie";
+import { useIsSmall } from "./hooks/useWindowSize";
 
 const App = (): JSX.Element => {
   const theme = createTheme({
@@ -38,6 +39,7 @@ const App = (): JSX.Element => {
   const [pinnedTab, setPinnedTab] = useCookies(["pinnedTab"]);
   const pinnedTabNum = Number(pinnedTab.pinnedTab) ?? 0;
   const [tabValue, setTabValue] = useState<number>(pinnedTabNum);
+  const isSmall = useIsSmall();
 
   useEffect(() => {
     const auth = getAuth();
@@ -60,14 +62,18 @@ const App = (): JSX.Element => {
         />
         {user && (
           <AccountProvider>
-            <Box m={2} textAlign="center">
+            <Box textAlign="center">
               {tabValue === 0 && (
                 <TaskProvider>
                   <LogProvider>
-                    <InputForms />
-                    <LogList />
-                    <TaskList />
-                    <Calendar isGapiMounted={isGapiMounted} />
+                    <Box m={2}>
+                      <InputForms />
+                    </Box>
+                    <Box m={isSmall ? 0 : 2}>
+                      <LogList />
+                      <TaskList />
+                      <Calendar isGapiMounted={isGapiMounted} />
+                    </Box>
                   </LogProvider>
                 </TaskProvider>
               )}
@@ -75,8 +81,12 @@ const App = (): JSX.Element => {
                 <MethodProvider>
                   <PurchaseProvider>
                     <AssetProvider>
-                      <PurchaseInputs />
-                      <Purchases />
+                      <Box m={2}>
+                        <PurchaseInputs />
+                      </Box>
+                      <Box m={isSmall ? 0 : 2}>
+                        <Purchases />
+                      </Box>
                     </AssetProvider>
                   </PurchaseProvider>
                 </MethodProvider>
