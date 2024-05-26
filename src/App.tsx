@@ -37,7 +37,7 @@ const App = (): JSX.Element => {
   const [user, setUser] = useState<User>();
   const [isGapiMounted, setIsGapiMounted] = useState<boolean>(false);
   const [pinnedTab, setPinnedTab] = useCookies(["pinnedTab"]);
-  const pinnedTabNum = Number(pinnedTab.pinnedTab) ?? 0;
+  const pinnedTabNum = pinnedTab.pinnedTab ? Number(pinnedTab.pinnedTab) : 0;
   const [tabValue, setTabValue] = useState<number>(pinnedTabNum);
   const isSmall = useIsSmall();
 
