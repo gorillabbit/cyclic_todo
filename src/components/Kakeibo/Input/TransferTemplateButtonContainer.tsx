@@ -20,8 +20,7 @@ const PlainTemplateButtonsContainer = memo(
       <Box m={0.5}>
         {transfers.map((transfer) => (
           <TransferTemplateButton
-            transfer={transfer}
-            setNewTransfer={setNewTransfer}
+            {...{ transfer, setNewTransfer }}
             key={transfer.id}
           />
         ))}

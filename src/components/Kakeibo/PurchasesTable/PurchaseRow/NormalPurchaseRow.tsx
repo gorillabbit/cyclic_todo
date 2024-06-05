@@ -87,11 +87,13 @@ const PlainNormalPurchaseRow = memo(
         <TableCell sx={{ px: 0.5 }}>{editFormData.method.label}</TableCell>
         {!isSmall && (
           <UnderHalfRow
-            setIsEdit={setIsEdit}
-            setIsEditPrice={setIsEditPrice}
-            setOpenDialog={setOpenDialog}
-            editFormData={editFormData}
-            isGroup={isGroup}
+            {...{
+              setIsEdit,
+              setIsEditPrice,
+              setOpenDialog,
+              editFormData,
+              isGroup,
+            }}
           />
         )}
       </TableRow>
@@ -99,11 +101,13 @@ const PlainNormalPurchaseRow = memo(
         <TableRow sx={{ bgcolor: rowColor }}>
           <TableCell sx={{ px: 0.5 }} />
           <UnderHalfRow
-            setIsEdit={setIsEdit}
-            setIsEditPrice={setIsEditPrice}
-            setOpenDialog={setOpenDialog}
-            editFormData={editFormData}
-            isGroup={isGroup}
+            {...{
+              setIsEdit,
+              setIsEditPrice,
+              setOpenDialog,
+              editFormData,
+              isGroup,
+            }}
           />
         </TableRow>
       )}

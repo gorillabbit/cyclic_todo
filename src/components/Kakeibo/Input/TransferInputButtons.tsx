@@ -1,11 +1,13 @@
 import { Box, Button } from "@mui/material";
 import { memo } from "react";
 
-type PlainTransferInputButtonsProps = {
+type TransferInputButtonsProps = {
   methodError: string | undefined;
   addTransfer: () => void;
   addTemplate: () => void;
 };
+
+type PlainTransferInputButtonsProps = TransferInputButtonsProps;
 
 const PlainTransferInputButtons = memo(
   ({
@@ -34,16 +36,7 @@ const PlainTransferInputButtons = memo(
   )
 );
 
-const TransferInputButtons = ({
-  methodError,
-  addTransfer,
-  addTemplate,
-}: {
-  methodError: string | undefined;
-  addTransfer: () => void;
-  addTemplate: () => void;
-}) => {
-  const plainProps = { methodError, addTransfer, addTemplate };
-  return <PlainTransferInputButtons {...plainProps} />;
+const TransferInputButtons = (props: TransferInputButtonsProps) => {
+  return <PlainTransferInputButtons {...props} />;
 };
 export default TransferInputButtons;

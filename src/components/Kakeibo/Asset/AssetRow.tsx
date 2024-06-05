@@ -229,9 +229,7 @@ const PlainAssetRow = memo(
       </TableRow>
       <DeleteConfirmDialog
         target={assetInput.name}
-        openDialog={openDialog}
-        setOpenDialog={setOpenDialog}
-        deleteAction={deleteAction}
+        {...{ openDialog, setOpenDialog, deleteAction }}
       />
     </>
   )

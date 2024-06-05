@@ -22,11 +22,7 @@ const PlainTemplateButtonsContainer = memo(
   }: PlainTemplateButtonsContainerProps): JSX.Element => (
     <Box m={0.5}>
       {templates.map((template) => (
-        <TemplateButton
-          template={template}
-          setNewPurchase={setNewPurchase}
-          key={template.id}
-        />
+        <TemplateButton {...{ template, setNewPurchase }} key={template.id} />
       ))}
     </Box>
   )

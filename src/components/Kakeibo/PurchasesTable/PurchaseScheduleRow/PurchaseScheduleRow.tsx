@@ -40,24 +40,16 @@ const PlainPurchaseScheduleRow = memo(
     <>
       {isEdit ? (
         <EditPurchaseScheduleRow
-          setIsEdit={setIsEdit}
-          editFormData={editFormData}
-          setEditFormData={setEditFormData}
-          isSmall={isSmall}
+          {...{ setIsEdit, editFormData, setEditFormData, isSmall }}
         />
       ) : (
         <NormalPurchaseScheduleRow
-          editFormData={editFormData}
-          setIsEdit={setIsEdit}
-          setOpenDialog={setOpenDialog}
-          isSmall={isSmall}
+          {...{ editFormData, setIsEdit, setOpenDialog, isSmall }}
         />
       )}
       <DeleteConfirmDialog
         target={purchaseSchedule.title}
-        openDialog={openDialog}
-        setOpenDialog={setOpenDialog}
-        deleteAction={deleteAction}
+        {...{ openDialog, setOpenDialog, deleteAction }}
       />
     </>
   )

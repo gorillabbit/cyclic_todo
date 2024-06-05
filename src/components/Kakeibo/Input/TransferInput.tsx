@@ -96,17 +96,13 @@ const PlainTransferInput = memo(
           <Tooltip title={methodError}>
             <>
               <TransferInputButtons
-                methodError={methodError}
-                addTransfer={addTransfer}
-                addTemplate={addTemplate}
+                {...{ methodError, addTransfer, addTemplate }}
               />
             </>
           </Tooltip>
         ) : (
           <TransferInputButtons
-            methodError={methodError}
-            addTransfer={addTransfer}
-            addTemplate={addTemplate}
+            {...{ methodError, addTransfer, addTemplate }}
           />
         )}
       </Box>

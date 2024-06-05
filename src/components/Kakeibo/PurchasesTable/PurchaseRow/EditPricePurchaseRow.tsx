@@ -69,9 +69,7 @@ const PlainEditPricePurchaseRow = memo(
         <TableCell sx={{ px: 0.5 }}>{editFormData.method.label}</TableCell>
         {!isSmall && (
           <UnderHalfRow
-            editFormData={editFormData}
-            handleSaveClick={handleSaveClick}
-            handleEditFormChange={handleEditFormChange}
+            {...{ editFormData, handleSaveClick, handleEditFormChange }}
           />
         )}
       </TableRow>
@@ -79,9 +77,7 @@ const PlainEditPricePurchaseRow = memo(
         <TableRow>
           <TableCell sx={{ px: 0.5 }} />
           <UnderHalfRow
-            editFormData={editFormData}
-            handleSaveClick={handleSaveClick}
-            handleEditFormChange={handleEditFormChange}
+            {...{ editFormData, handleSaveClick, handleEditFormChange }}
           />
         </TableRow>
       )}

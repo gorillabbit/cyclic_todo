@@ -31,9 +31,7 @@ const PlainTransferTemplateButton = memo(
       />
       <DeleteConfirmDialog
         target={<Chip sx={{ m: 0.5 }} label={chipTitle} />}
-        openDialog={openDialog}
-        setOpenDialog={setOpenDialog}
-        deleteAction={deleteAction}
+        {...{ openDialog, setOpenDialog, deleteAction }}
       />
     </>
   )

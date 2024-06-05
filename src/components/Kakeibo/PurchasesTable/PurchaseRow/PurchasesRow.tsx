@@ -55,29 +55,25 @@ const PlainPurchasesRow = memo(
     <>
       {isEdit ? (
         <EditPurchaseRow
-          setIsEdit={setIsEdit}
-          editFormData={editFormData}
-          setEditFormData={setEditFormData}
-          isSmall={isSmall}
+          {...{ setIsEdit, editFormData, setEditFormData, isSmall }}
         />
       ) : isEditPrice ? (
         <EditPricePurchaseRow
-          setIsEditPrice={setIsEditPrice}
-          editFormData={editFormData}
-          setEditFormData={setEditFormData}
-          isSmall={isSmall}
+          {...{ setIsEditPrice, editFormData, setEditFormData, isSmall }}
         />
       ) : (
         <NormalPurchaseRow
-          isGroup={isGroup}
-          setOpen={setOpen}
-          open={open}
-          editFormData={editFormData}
-          isSmall={isSmall}
-          setIsEdit={setIsEdit}
-          setIsEditPrice={setIsEditPrice}
-          setOpenDialog={setOpenDialog}
-          index={index}
+          {...{
+            isGroup,
+            setOpen,
+            open,
+            editFormData,
+            isSmall,
+            setIsEdit,
+            setIsEditPrice,
+            setOpenDialog,
+            index,
+          }}
         />
       )}
       {isGroup && (
@@ -123,9 +119,7 @@ const PlainPurchasesRow = memo(
       )}
       <DeleteConfirmDialog
         target={purchase.title}
-        openDialog={openDialog}
-        setOpenDialog={setOpenDialog}
-        deleteAction={deleteAction}
+        {...{ openDialog, setOpenDialog, deleteAction }}
       />
     </>
   )
