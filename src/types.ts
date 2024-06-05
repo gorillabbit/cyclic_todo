@@ -97,7 +97,7 @@ export interface InputPurchaseType {
   method: MethodListType;
   category: string;
   income: boolean;
-  description?: string;
+  description: string;
   parentScheduleId?: string;
   childPurchaseId: string;
   isUncertain?: boolean;
@@ -149,7 +149,7 @@ export interface InputPurchaseScheduleType {
   method: MethodListType;
   category: string;
   income: boolean;
-  description?: string;
+  description: string;
   endDate: Date;
   isUncertain: boolean;
 }

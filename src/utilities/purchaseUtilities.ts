@@ -209,3 +209,31 @@ export const addScheduledPurchase = (
     batchAddDocPurchase(batchPurchaseList.flat());
   }
 };
+
+/**
+ * オブジェクトの配列を指定されたパラメータで並び替えます。
+ * @param {PurchaseListType[]} objects - 並び替えるオブジェクトの配列
+ * @param {keyof PurchaseListType} parameter - 並び替えに使用するパラメータ
+ * @param {boolean} [ascending=true] - 昇順に並び替えるかどうかを指定する値。デフォルトはtrue（昇順）
+ * @returns {PurchaseListType[]} 並び替えられたオブジェクトの配列
+ */
+export const sortObjectsByParameter = (
+  objects: PurchaseListType[],
+  parameter: keyof PurchaseListType,
+  ascending: boolean = true
+): PurchaseListType[] => {
+  return objects.sort((a, b) => {
+    if (parameter === "method") {
+      if (a.method.label < b.method.label) return ascending ? -1 : 1;
+      if (a.method.label > b.method.label) return ascending ? 1 : -1;
+      return 0;
+    }
+    const aVal = a[parameter]; // このように代入しないと、型のチェックは行われない。Typescriptの型は変数に対して行われる式に対しては行われない
+    const bVal = b[parameter];
+    if (aVal && bVal) {
+      if (aVal < bVal) return ascending ? -1 : 1;
+      if (aVal > bVal) return ascending ? 1 : -1;
+    }
+    return 0;
+  });
+};

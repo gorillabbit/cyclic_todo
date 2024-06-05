@@ -21,13 +21,16 @@ import { useIsSmall } from "../../../hooks/useWindowSize";
 import {
   filterPurchasesByIncomeType,
   isLaterPayment,
+  sortObjectsByParameter,
   sumSpentAndIncome,
 } from "../../../utilities/purchaseUtilities";
 import DoughnutContainer from "./DoughnutContainer";
+import TableHeadCell from "./TableHeadCell";
 
 type PlainPurchaseProps = {
   monthlyPurchases: PurchaseListType[];
   purchasesWithoutGroupFlag: PurchaseListType[];
+  orderedPurchase: PurchaseListType[];
   getGroupPurchases: (groupedPurchase: PurchaseListType) => PurchaseListType[];
   month: Date;
   handleNextMonthButton: () => void;
@@ -35,12 +38,20 @@ type PlainPurchaseProps = {
   isSmall: boolean;
   spentSum: number;
   incomeSum: number;
+  HeaderCellWrapper: ({
+    label,
+    value,
+  }: {
+    label: string;
+    value: keyof PurchaseListType;
+  }) => JSX.Element;
 };
 
 const PlainPurchases = memo(
   ({
     monthlyPurchases,
     purchasesWithoutGroupFlag,
+    orderedPurchase,
     getGroupPurchases,
     month,
     handleNextMonthButton,
@@ -48,6 +59,7 @@ const PlainPurchases = memo(
     isSmall,
     spentSum,
     incomeSum,
+    HeaderCellWrapper,
   }: PlainPurchaseProps): JSX.Element => (
     <>
       <AssetsList />
@@ -88,16 +100,16 @@ const PlainPurchases = memo(
           <TableHead>
             <TableRow>
               <TableCell padding="none" />
-              <TableCell sx={{ px: 0.5 }}>日付</TableCell>
-              <TableCell sx={{ px: 0.5 }}>品目</TableCell>
-              <TableCell sx={{ px: 0.5 }}>分類</TableCell>
-              <TableCell sx={{ px: 0.5 }}>支払い方法</TableCell>
+              <HeaderCellWrapper label="日付" value="date" />
+              <HeaderCellWrapper label="品目" value="title" />
+              <HeaderCellWrapper label="分類" value="category" />
+              <HeaderCellWrapper label="支払い" value="method" />
 
               {!isSmall && (
                 <>
-                  <TableCell sx={{ px: 0.5 }}>分類</TableCell>
-                  <TableCell sx={{ px: 0.5 }}>支払い方法</TableCell>
-                  <TableCell sx={{ px: 0.5 }}>収入</TableCell>
+                  <HeaderCellWrapper label="金額" value="price" />
+                  <HeaderCellWrapper label="備考" value="description" />
+                  <HeaderCellWrapper label="収入" value="income" />
                   <TableCell padding="none" />
                 </>
               )}
@@ -105,20 +117,18 @@ const PlainPurchases = memo(
             {isSmall && (
               <TableRow>
                 <TableCell padding="none" />
-                <TableCell sx={{ px: 0.5 }}>金額</TableCell>
-                <TableCell sx={{ px: 0.5 }}>備考</TableCell>
-                <TableCell sx={{ px: 0.5 }}>収入</TableCell>
+                <HeaderCellWrapper label="金額" value="price" />
+                <HeaderCellWrapper label="備考" value="description" />
+                <HeaderCellWrapper label="収入" value="income" />
               </TableRow>
             )}
           </TableHead>
           <TableBody>
-            {purchasesWithoutGroupFlag.map((purchase, index) => (
+            {orderedPurchase.map((purchase, index) => (
               <PurchasesRow
                 key={purchase.id}
-                index={index}
-                purchase={purchase}
                 groupPurchases={getGroupPurchases(purchase)}
-                isSmall={isSmall}
+                {...{ index, purchase, isSmall }}
               />
             ))}
           </TableBody>
@@ -222,9 +232,29 @@ const Purchases = (): JSX.Element => {
     [purchasesWithoutGroupFlag]
   );
 
+  const [orderBy, setOrderBy] = useState<keyof PurchaseListType>("date");
+  const [isAsc, setIsAsc] = useState<boolean>(true);
+  const orderedPurchase = useMemo(
+    () => sortObjectsByParameter(purchasesWithoutGroupFlag, orderBy, isAsc),
+    [isAsc, orderBy, purchasesWithoutGroupFlag]
+  );
+
+  const HeaderCellWrapper = ({
+    label,
+    value,
+  }: {
+    label: string;
+    value: keyof PurchaseListType;
+  }) => (
+    <TableHeadCell
+      {...{ label, value, orderBy, setOrderBy, isAsc, setIsAsc }}
+    />
+  );
+
   const plainProps = {
     monthlyPurchases,
     purchasesWithoutGroupFlag,
+    orderedPurchase,
     getGroupPurchases,
     month,
     handleNextMonthButton,
@@ -232,6 +262,11 @@ const Purchases = (): JSX.Element => {
     isSmall,
     spentSum,
     incomeSum,
+    orderBy,
+    setOrderBy,
+    isAsc,
+    setIsAsc,
+    HeaderCellWrapper,
   };
   return <PlainPurchases {...plainProps} />;
 };
