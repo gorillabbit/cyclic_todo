@@ -8,6 +8,34 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: index出力
+        uses: w9jds/firebase-action@master
+        with:
+          args: firestore:indexes --project "todolist-37a07" > firestore.indexes.json
+        env:
+          PROJECT_ID: todolist-37a07
+          GCP_SA_KEY: ${{ secrets.GCP_SA_DEV }}
+          PROJECT_PATH: ./firestore
+      - name: Deploy Firestore rules and index
+
+        uses: w9jds/firebase-action@master
+        with:
+          args: deploy --only firestore --force
+        env:
+          PROJECT_ID: cyclictodo
+          GCP_SA_KEY: ${{ secrets.GCP_SA }}
+          PROJECT_PATH: ./firestore
+      - run: npm ci
+      - name: Make the script executable
+        run: chmod +x scripts/export-import-indexes.sh
+      - name: Install Firebase CLI
+        run: npm install -g firebase-tools
+      - name: Write Firebase Service Account Key
+        run: echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT_CYCLICTODO }}" > /tmp/service-account.json
+      - name: Export and Import Firestore Indexes
+        run: ./scripts/export-import-indexes.sh
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GCP_SA }}
       - run: npm ci
       - name: Build
         env:
@@ -25,14 +53,7 @@ jobs:
           REACT_APP_GOOGLE_CALENDER_scope: ${{ secrets.REACT_APP_GOOGLE_CALENDER_scope }}
           REACT_APP_GOOGLE_CALENDER_discoveryDocs: ${{ secrets.REACT_APP_GOOGLE_CALENDER_discoveryDocs }}
         run: npm run build
-      - name: Install Firebase CLI
-        run: npm install -g firebase-tools
-      - name: Write Firebase Service Account Key
-        run: echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT_CYCLICTODO }}" > /tmp/service-account.json
-      - name: Export and Import Firestore Indexes
-        run: ./scripts/export-import-indexes.sh
-        env:
-          GOOGLE_APPLICATION_CREDENTIALS: /tmp/service-account.json
+
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: "${{ secrets.GITHUB_TOKEN }}"
