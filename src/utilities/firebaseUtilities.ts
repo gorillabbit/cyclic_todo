@@ -20,9 +20,10 @@ export const useFirestoreQuery = <T extends DocumentData, U = T>(
   const auth = useMemo(() => getAuth(), []);
 
   useEffect(() => {
+    if (!auth.currentUser) return;
     const firestoreQuery = query(
       collection(db, collectionName),
-      ...(noUserId ? [] : [where("userId", "==", auth.currentUser?.uid)]),
+      ...(noUserId ? [] : [where("userId", "==", auth.currentUser.uid)]),
       ...queryConstraints
     );
     const unsubscribe = onSnapshot(firestoreQuery, (querySnapshot) => {
@@ -36,6 +37,12 @@ export const useFirestoreQuery = <T extends DocumentData, U = T>(
     return () => {
       unsubscribe();
     };
-  }, [auth.currentUser?.uid, collectionName, noUserId, queryConstraints]);
+  }, [
+    auth.currentUser,
+    auth.currentUser?.uid,
+    collectionName,
+    noUserId,
+    queryConstraints,
+  ]);
   return { documents, setDocuments };
 };
