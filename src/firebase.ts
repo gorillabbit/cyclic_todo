@@ -28,6 +28,7 @@ import {
   InputAssetType,
   InputTransferType,
   InputPurchaseScheduleRowType,
+  InputTabType,
 } from "./types";
 
 // Firebase configuration
@@ -93,6 +94,7 @@ export const dbNames = {
   purchaseSchedule: "PurchaseSchedules",
   method: "Methods",
   transferTemplate: "TransferTemplates",
+  tab: "Tabs",
 };
 
 export const addDocTask = (task: TaskInputType) =>
@@ -185,3 +187,6 @@ export const addDocTransferTemplate = (v: InputTransferType) =>
   addDocOperation(dbNames.transferTemplate, v);
 export const deleteDocTransferTemplate = (id: string) =>
   deleteDocOperation(dbNames.transferTemplate, id);
+
+export const addDocTab = (tab: InputTabType) =>
+  addDocOperation(dbNames.tab, tab);
