@@ -27,12 +27,8 @@ jobs:
         run: npm run build
       - name: Install Firebase CLI
         run: npm install -g firebase-tools
-      - name: Authenticate to Firebase with Service Account
-        env:
-          GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_CYCLICTODO }}
-        run: echo ${{ secrets.FIREBASE_SERVICE_ACCOUNT_CYCLICTODO }} > /tmp/service-account.json
-      - name: Make the script executable
-        run: chmod +x scripts/export-import-indexes.sh
+      - name: Write Firebase Service Account Key
+        run: echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT_CYCLICTODO }}" > /tmp/service-account.json
       - name: Export and Import Firestore Indexes
         run: ./scripts/export-import-indexes.sh
         env:
