@@ -5,8 +5,7 @@ TEST_PROJECT_ID="todolist-37a07"
 # 本番プロジェクトID
 PROD_PROJECT_ID="cyclictodo"
 
-# インデックスのエクスポート
-firebase firestore:indexes --project $TEST_PROJECT_ID > firestore.indexes.json
-
-# 本番環境にインポート
-firebase firestore:indexes --project $PROD_PROJECT_ID firestore.indexes.json
+firebase use todolist-37a07
+firebase firestore:indexes > firestore.indexes.json
+firebase use cyclictodo
+firebase firestore:indexes firestore.indexes.json
