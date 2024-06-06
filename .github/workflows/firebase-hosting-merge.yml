@@ -25,6 +25,8 @@ jobs:
           REACT_APP_GOOGLE_CALENDER_scope: ${{ secrets.REACT_APP_GOOGLE_CALENDER_scope }}
           REACT_APP_GOOGLE_CALENDER_discoveryDocs: ${{ secrets.REACT_APP_GOOGLE_CALENDER_discoveryDocs }}
         run: npm run build
+      - name: Make the script executable
+        run: chmod +x scripts/export-import-indexes.sh
       - name: Install Firebase CLI
         run: npm install -g firebase-tools
       - name: Write Firebase Service Account Key
