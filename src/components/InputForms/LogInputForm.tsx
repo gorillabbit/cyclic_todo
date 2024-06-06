@@ -15,6 +15,7 @@ import { InputLogType, LogType } from "../../types.js";
 import StyledCheckbox from "../StyledCheckbox";
 import { getAuth } from "firebase/auth";
 import { useAccount } from "../Context/AccountContext";
+import { useTab } from "../Context/TabContext";
 
 interface LogInputFormProp {
   propLog?: LogType;
@@ -30,6 +31,7 @@ const LogInputForm: React.FC<LogInputFormProp> = ({
   setIsOpenEditDialog,
 }) => {
   const { Account } = useAccount();
+  const { tabId } = useTab();
   const defaultNewLog: InputLogType = {
     userId: "",
     text: "",
@@ -45,6 +47,7 @@ const LogInputForm: React.FC<LogInputFormProp> = ({
     displayFeature: [],
     description: "",
     archived: false,
+    tabId,
     accessibleAccounts: [
       {
         name: Account?.name ?? "",

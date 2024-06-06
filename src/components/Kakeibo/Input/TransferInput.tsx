@@ -27,6 +27,7 @@ import { useMethod } from "../../Context/MethodContext";
 import { getPayLaterDate } from "../../../utilities/dateUtilities";
 import TransferInputButtons from "./TransferInputButtons";
 import TransferTemplateButtonsContainer from "./TransferTemplateButtonContainer";
+import { useTab } from "../../Context/TabContext";
 
 const auth = getAuth();
 
@@ -112,8 +113,11 @@ const PlainTransferInput = memo(
 
 const TransferInput = () => {
   const { methodList } = useMethod();
-  const [newTransfer, setNewTransfer] =
-    useState<InputTransferType>(defaultTransferInput);
+  const { tabId } = useTab();
+  const [newTransfer, setNewTransfer] = useState<InputTransferType>({
+    ...defaultTransferInput,
+    tabId,
+  });
 
   const handleNewTransferInput = useCallback((name: string, value: any) => {
     if (name === "price") {
@@ -149,6 +153,7 @@ const TransferInput = () => {
         childPurchaseId: "",
         date: newTransfer.date,
         description: newTransfer.description,
+        tabId,
       };
       let childId = "";
       if (newTransfer.from.timing === "翌月" && newTransfer.from.timingDate) {
@@ -180,7 +185,7 @@ const TransferInput = () => {
       batchAddDocPurchase(transferPurchases);
     }
     setNewTransfer(defaultTransferInput);
-  }, [newTransfer]);
+  }, [newTransfer, tabId]);
 
   const addTemplate = useCallback(() => {
     if (auth.currentUser) {

@@ -23,9 +23,9 @@ import {
 } from "../../../utilities/purchaseUtilities";
 import { useMethod } from "../../Context/MethodContext";
 import { usePurchase } from "../../Context/PurchaseContext";
+import { useTab } from "../../Context/TabContext";
 
 const auth = getAuth();
-
 const defaultNewPurchase: InputPurchaseScheduleType = {
   userId: "",
   title: "",
@@ -39,13 +39,18 @@ const defaultNewPurchase: InputPurchaseScheduleType = {
   description: "",
   endDate: addYears(new Date(), 1),
   isUncertain: false,
+  tabId: "",
 };
 
 const PurchaseScheduleInput = () => {
   const { categorySet } = usePurchase();
   const { methodList } = useMethod();
+  const { tabId } = useTab();
   const [newPurchaseSchedule, setNewPurchaseSchedule] =
-    useState<InputPurchaseScheduleType>(defaultNewPurchase);
+    useState<InputPurchaseScheduleType>({
+      ...defaultNewPurchase,
+      tabId,
+    });
 
   const handleNewPurchaseScheduleInput = useCallback(
     (name: string, value: any) => {

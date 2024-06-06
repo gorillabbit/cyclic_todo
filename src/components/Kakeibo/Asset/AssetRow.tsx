@@ -41,6 +41,7 @@ import { Timestamp } from "firebase/firestore";
 import { getUnixTime } from "date-fns";
 import DeleteConfirmDialog from "../DeleteConfirmDialog";
 import { useIsSmall } from "../../../hooks/useWindowSize";
+import { useTab } from "../../Context/TabContext";
 
 type UnderHalfRowProps = {
   isNameChanged: boolean;
@@ -309,6 +310,7 @@ const AssetRow = ({ asset }: { asset: AssetListType }) => {
   }, [asset.id, filteredMethodList]);
 
   const auth = getAuth();
+  const { tabId } = useTab();
   const addMethod = useCallback(() => {
     if (auth.currentUser) {
       const userId = auth.currentUser.uid;
@@ -316,10 +318,11 @@ const AssetRow = ({ asset }: { asset: AssetListType }) => {
         ...defaultMethod,
         userId,
         assetId: asset.id,
+        tabId,
       };
       addDocMethod(newMethod);
     }
-  }, [asset.id, auth.currentUser]);
+  }, [asset.id, auth.currentUser, tabId]);
 
   const { purchaseList } = usePurchase();
   const relatedPurchases = sumSpentAndIncome(

@@ -17,6 +17,7 @@ import TemplateButtons from "./TemplateButtonsContainer";
 import { usePurchase } from "../../Context/PurchaseContext";
 import { useMethod } from "../../Context/MethodContext";
 import { getPayLaterDate } from "../../../utilities/dateUtilities";
+import { useTab } from "../../Context/TabContext";
 
 const auth = getAuth();
 
@@ -119,8 +120,11 @@ const PlainPurchaseInput = memo(
 );
 
 const PurchaseInput = () => {
-  const [newPurchase, setNewPurchase] =
-    useState<InputPurchaseType>(defaultPurchaseInput);
+  const { tabId } = useTab();
+  const [newPurchase, setNewPurchase] = useState<InputPurchaseType>({
+    ...defaultPurchaseInput,
+    tabId,
+  });
 
   const handleNewPurchaseInput = useCallback((name: string, value: any) => {
     if (name === "price") {

@@ -1,7 +1,8 @@
 import { ReactNode, createContext, memo, useContext, useMemo } from "react";
-import { orderBy } from "firebase/firestore";
+import { orderBy, where } from "firebase/firestore";
 import { PurchaseListType, PurchaseType } from "../../types.js";
 import { useFirestoreQuery } from "../../utilities/firebaseUtilities";
+import { useTab } from "./TabContext";
 
 type PurchaseContextType = {
   purchaseList: PurchaseListType[];
@@ -16,7 +17,11 @@ export const PurchaseContext = createContext<PurchaseContextType>({
 
 export const PurchaseProvider = memo(
   ({ children }: { children: ReactNode }): JSX.Element => {
-    const purchaseQueryConstraints = useMemo(() => [orderBy("date")], []);
+    const { tabId } = useTab();
+    const purchaseQueryConstraints = useMemo(
+      () => [orderBy("date"), where("tabId", "==", tabId)],
+      [tabId]
+    );
     const { documents: purchaseList } = useFirestoreQuery<
       PurchaseType,
       PurchaseListType

@@ -12,6 +12,8 @@ import { memo, useMemo } from "react";
 import { PurchaseScheduleListType, PurchaseScheduleType } from "../../../types";
 import { useFirestoreQuery } from "../../../utilities/firebaseUtilities";
 import PurchaseScheduleRow from "./PurchaseScheduleRow/PurchaseScheduleRow";
+import { useTab } from "../../Context/TabContext";
+import { where } from "firebase/firestore";
 
 type PlainPurchaseSchedulesProps = {
   purchaseScheduleList: PurchaseScheduleListType[];
@@ -52,7 +54,11 @@ const PlainPurchaseSchedules = memo(
 );
 
 const PurchaseSchedules = () => {
-  const purchaseScheduleQueryConstraints = useMemo(() => [], []);
+  const { tabId } = useTab();
+  const purchaseScheduleQueryConstraints = useMemo(
+    () => [where("tabId", "==", tabId)],
+    [tabId]
+  );
   const { documents: purchaseScheduleList } = useFirestoreQuery<
     PurchaseScheduleType,
     PurchaseScheduleListType
