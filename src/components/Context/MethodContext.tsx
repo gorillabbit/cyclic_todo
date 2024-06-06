@@ -1,7 +1,8 @@
 import { ReactNode, createContext, memo, useContext, useMemo } from "react";
-import { orderBy } from "firebase/firestore";
+import { orderBy, where } from "firebase/firestore";
 import { MethodListType, MethodType } from "../../types.js";
 import { useFirestoreQuery } from "../../utilities/firebaseUtilities";
+import { useTab } from "./TabContext";
 
 type MethodContextType = {
   methodList: MethodListType[];
@@ -14,7 +15,11 @@ export const MethodContext = createContext<MethodContextType>({
 
 export const MethodProvider = memo(
   ({ children }: { children: ReactNode }): JSX.Element => {
-    const methodQueryConstraints = useMemo(() => [orderBy("timestamp")], []);
+    const { tabId } = useTab();
+    const methodQueryConstraints = useMemo(
+      () => [orderBy("timestamp"), where("tabId", "==", tabId)],
+      [tabId]
+    );
     const { documents: methodList } = useFirestoreQuery<
       MethodType,
       MethodListType

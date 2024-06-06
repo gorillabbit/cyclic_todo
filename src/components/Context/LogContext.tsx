@@ -3,6 +3,7 @@ import { orderBy, where } from "firebase/firestore";
 import { InputLogType, LogType, LogsCompleteLogsType } from "../../types.js";
 import { useAccount } from "./AccountContext";
 import { useFirestoreQuery } from "../../utilities/firebaseUtilities";
+import { useTab } from "./TabContext";
 
 type LogContextType = {
   logList: LogType[];
@@ -20,16 +21,20 @@ export const LogContext = createContext<LogContextType>({
 export const LogProvider = memo(
   ({ children }: { children: ReactNode }): JSX.Element => {
     const { Account } = useAccount();
+    const { tabId } = useTab();
 
-    const logQueryConstraints = useMemo(() => [], []);
+    const logQueryConstraints = useMemo(
+      () => [where("tabId", "==", tabId)],
+      [tabId]
+    );
     const { documents: logList } = useFirestoreQuery<LogType>(
       "logs",
       logQueryConstraints
     );
 
     const logsCompleteLogsQueryConstraints = useMemo(
-      () => [orderBy("timestamp", "desc")],
-      []
+      () => [orderBy("timestamp", "desc"), where("tabId", "==", tabId)],
+      [tabId]
     );
     const { documents: logsCompleteLogsList } =
       useFirestoreQuery<LogsCompleteLogsType>(
@@ -45,13 +50,15 @@ export const LogProvider = memo(
           "array-contains",
           Account?.email ?? ""
         ),
+        where("tabId", "==", tabId),
+        where("userId", "!=", Account?.uid ?? ""),
       ],
-      [Account?.email]
+      [Account?.email, tabId, Account?.uid]
     );
     const { documents: sharedLogList } = useFirestoreQuery<
       InputLogType,
       LogType
-    >("logs", sharedLogsQueryConstraints);
+    >("logs", sharedLogsQueryConstraints, true);
 
     const context = useMemo(() => {
       return { logList, logsCompleteLogsList, sharedLogList };

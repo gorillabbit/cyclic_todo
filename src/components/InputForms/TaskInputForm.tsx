@@ -13,6 +13,7 @@ import { format } from "date-fns";
 import { TaskInputType, TaskType } from "../../types.js";
 import { getAuth } from "firebase/auth";
 import StyledCheckbox from "../StyledCheckbox";
+import { useTab } from "../Context/TabContext";
 
 interface TaskInputFormProp {
   date?: Date;
@@ -31,6 +32,7 @@ const TaskInputForm: React.FC<TaskInputFormProp> = ({
   propTask,
   setIsOpenEditDialog,
 }) => {
+  const { tabId } = useTab();
   const defaultNewTask: TaskInputType = propTask ?? {
     userId: "",
     text: "",
@@ -44,6 +46,7 @@ const TaskInputForm: React.FC<TaskInputFormProp> = ({
     completed: false,
     icon: "",
     description: "",
+    tabId,
   };
 
   const [newTask, setNewTask] = useState<TaskInputType>(defaultNewTask);

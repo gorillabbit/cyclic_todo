@@ -1,10 +1,11 @@
 import { Box } from "@mui/material";
 import { memo, useMemo } from "react";
 import { InputTransferType, TransferType } from "../../../types";
-import { orderBy } from "firebase/firestore";
+import { orderBy, where } from "firebase/firestore";
 import { useFirestoreQuery } from "../../../utilities/firebaseUtilities";
 import { dbNames } from "../../../firebase";
 import TransferTemplateButton from "./TransferTemplateButton";
+import { useTab } from "../../Context/TabContext";
 
 type PlainTemplateButtonsContainerProps = {
   transfers: TransferType[];
@@ -34,9 +35,10 @@ const TransferTemplateButtonsContainer = ({
 }: {
   setNewTransfer: React.Dispatch<React.SetStateAction<InputTransferType>>;
 }) => {
+  const { tabId } = useTab();
   const purchaseTemplatesQueryConstraints = useMemo(
-    () => [orderBy("timestamp", "desc")],
-    []
+    () => [orderBy("timestamp", "desc"), where("tabId", "==", tabId)],
+    [tabId]
   );
   const { documents: transfers } = useFirestoreQuery<
     InputTransferType,

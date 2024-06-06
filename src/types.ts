@@ -25,6 +25,7 @@ export interface TaskInputType {
   toggleCompletionTimestamp?: Timestamp;
   icon: string;
   description: string;
+  tabId: string;
 }
 
 export interface TaskType extends TaskInputType {
@@ -35,6 +36,7 @@ export interface LogsCompleteLogsInputType {
   timestamp?: Timestamp;
   type?: string;
   memo: string;
+  tabId: string;
 }
 
 export interface LogsCompleteLogsType extends LogsCompleteLogsInputType {
@@ -61,6 +63,7 @@ export interface InputLogType {
   archived: boolean;
   accessibleAccounts: Pick<AccountType, "email" | "name" | "icon">[];
   accessibleAccountsEmails: string[];
+  tabId: string;
 }
 
 export interface LogType extends InputLogType {
@@ -89,6 +92,32 @@ export interface AccountLinkType extends AccountLinkInputType {
   id: string;
 }
 
+export interface MethodType {
+  userId: string;
+  label: string;
+  assetId: string;
+  timing: "即時" | "翌月";
+  timingDate: number;
+  tabId: string;
+}
+
+export const defaultMethod: MethodType = {
+  userId: "",
+  label: "",
+  assetId: "",
+  timing: "即時",
+  timingDate: 0,
+  tabId: "",
+};
+
+export interface MethodListType extends MethodType {
+  id: string;
+}
+export const defaultMethodList: MethodListType = {
+  ...defaultMethod,
+  id: "",
+};
+
 export interface InputPurchaseType {
   userId: string;
   title: string;
@@ -101,25 +130,39 @@ export interface InputPurchaseType {
   parentScheduleId?: string;
   childPurchaseId: string;
   isUncertain?: boolean;
+  tabId: string;
 }
-
+export const defaultPurchaseInput: InputPurchaseType = {
+  userId: "",
+  title: "",
+  date: new Date(),
+  category: "",
+  method: defaultMethodList,
+  price: 0,
+  income: false,
+  description: "",
+  childPurchaseId: "",
+  tabId: "",
+};
 export interface InputPurchaseRowType extends InputPurchaseType {
   id: string;
 }
-
 export interface PurchaseType extends Omit<InputPurchaseType, "date"> {
   date: Timestamp;
 }
-
 export interface PurchaseListType extends PurchaseType {
   id: string;
 }
+export const defaultPurchase: PurchaseListType = {
+  ...defaultPurchaseInput,
+  id: "",
+  date: new Timestamp(0, 0),
+};
 
 export interface InputBalanceLog {
   timestamp: Date;
   balance: number;
 }
-
 export interface BalanceLog {
   timestamp: Timestamp;
   balance: number;
@@ -129,12 +172,11 @@ export interface InputAssetType {
   userId: string;
   name: string;
   balanceLog: InputBalanceLog[];
+  tabId: string;
 }
-
 export interface AssetType extends Omit<InputAssetType, "balanceLog"> {
   balanceLog: BalanceLog[];
 }
-
 export interface AssetListType extends AssetType {
   id: string;
 }
@@ -152,31 +194,17 @@ export interface InputPurchaseScheduleType {
   description: string;
   endDate: Date;
   isUncertain: boolean;
+  tabId: string;
 }
-
 export interface InputPurchaseScheduleRowType
   extends InputPurchaseScheduleType {
   id: string;
 }
-
 export interface PurchaseScheduleType
   extends Omit<InputPurchaseScheduleType, "endDate"> {
   endDate: Timestamp;
 }
-
 export interface PurchaseScheduleListType extends PurchaseScheduleType {
-  id: string;
-}
-
-export interface MethodType {
-  userId: string;
-  label: string;
-  assetId: string;
-  timing: "即時" | "翌月";
-  timingDate: number;
-}
-
-export interface MethodListType extends MethodType {
   id: string;
 }
 
@@ -187,44 +215,8 @@ export interface InputTransferType {
   from: MethodListType;
   to: MethodListType;
   description: string;
+  tabId: string;
 }
-
-export interface TransferType extends Omit<InputTransferType, "date"> {
-  id: string;
-  date: Timestamp;
-}
-
-export const defaultMethod: MethodType = {
-  userId: "",
-  label: "",
-  assetId: "",
-  timing: "即時",
-  timingDate: 0,
-};
-
-export const defaultMethodList: MethodListType = {
-  ...defaultMethod,
-  id: "",
-};
-
-export const defaultPurchaseInput: InputPurchaseType = {
-  userId: "",
-  title: "",
-  date: new Date(),
-  category: "",
-  method: defaultMethodList,
-  price: 0,
-  income: false,
-  description: "",
-  childPurchaseId: "",
-};
-
-export const defaultPurchase: PurchaseListType = {
-  ...defaultPurchaseInput,
-  id: "",
-  date: new Timestamp(0, 0),
-};
-
 export const defaultTransferInput: InputTransferType = {
   userId: "",
   price: 0,
@@ -232,4 +224,19 @@ export const defaultTransferInput: InputTransferType = {
   from: defaultMethodList,
   to: defaultMethodList,
   description: "",
+  tabId: "",
 };
+export interface TransferType extends Omit<InputTransferType, "date"> {
+  id: string;
+  date: Timestamp;
+}
+
+export interface InputTabType {
+  name: string;
+  userId: string;
+  type: "task" | "purchase";
+  sharedAccountsId: string[];
+}
+export interface TabType extends InputTabType {
+  id: string;
+}

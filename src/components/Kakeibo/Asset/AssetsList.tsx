@@ -15,6 +15,7 @@ import { useAsset } from "../../Context/AssetContext";
 import { memo, useCallback } from "react";
 import { AssetListType } from "../../../types";
 import AssetRow from "./AssetRow";
+import { useTab } from "../../Context/TabContext";
 
 type PlainAssetsListProps = {
   assetList: AssetListType[];
@@ -59,6 +60,7 @@ const PlainAssetsList = memo(
 const AssetTable = () => {
   const { assetList, sumAssets } = useAsset();
   const auth = getAuth();
+  const { tabId } = useTab();
 
   const addAsset = useCallback(() => {
     if (auth.currentUser) {
@@ -67,10 +69,11 @@ const AssetTable = () => {
         userId: userId,
         name: "",
         balanceLog: [{ timestamp: new Date(), balance: 0 }],
+        tabId,
       };
       addDocAsset(newAsset);
     }
-  }, [auth.currentUser]);
+  }, [auth.currentUser, tabId]);
 
   const plainProps = {
     assetList,

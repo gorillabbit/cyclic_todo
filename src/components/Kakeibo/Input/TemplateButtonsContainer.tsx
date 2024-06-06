@@ -5,10 +5,11 @@ import {
   PurchaseListType,
   PurchaseType,
 } from "../../../types";
-import { orderBy } from "firebase/firestore";
+import { orderBy, where } from "firebase/firestore";
 import { useFirestoreQuery } from "../../../utilities/firebaseUtilities";
 import TemplateButton from "./TemplateButton";
 import { dbNames } from "../../../firebase";
+import { useTab } from "../../Context/TabContext";
 
 type PlainTemplateButtonsContainerProps = {
   templates: PurchaseListType[];
@@ -33,9 +34,10 @@ const TemplateButtonsContainer = ({
 }: {
   setNewPurchase: (value: React.SetStateAction<InputPurchaseType>) => void;
 }) => {
+  const { tabId } = useTab();
   const purchaseTemplatesQueryConstraints = useMemo(
-    () => [orderBy("timestamp", "desc")],
-    []
+    () => [orderBy("timestamp", "desc"), where("tabId", "==", tabId)],
+    [tabId]
   );
   const { documents: templates } = useFirestoreQuery<
     PurchaseType,

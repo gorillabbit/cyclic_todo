@@ -55,6 +55,7 @@ const toggleCompletion = (task: TaskType) => {
       hasDueTime: false,
       icon: "",
       description: "",
+      tabId: task.tabId,
     };
     addDocTask(newTask);
   }
