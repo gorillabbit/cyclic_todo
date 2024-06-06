@@ -9,4 +9,4 @@ PROD_PROJECT_ID="cyclictodo"
 firebase firestore:indexes --project $TEST_PROJECT_ID > firestore.indexes.json
 
 # 本番環境にインポート
-firebase firestore:indexes:deploy --project $PROD_PROJECT_ID firestore.indexes.json
+firebase firestore:indexes --project $PROD_PROJECT_ID firestore.indexes.json
