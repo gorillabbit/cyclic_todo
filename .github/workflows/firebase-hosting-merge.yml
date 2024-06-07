@@ -8,6 +8,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: export firestore index
+        run: firebase firestore:indexes --project todolist-37a07 > firestore/firestore.indexes.json
       - name: Deploy Firestore rules and index
         uses: w9jds/firebase-action@master
         with:
