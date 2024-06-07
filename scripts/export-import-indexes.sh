@@ -9,7 +9,7 @@ PROD_PROJECT_ID="your-prod-project-id"
 firebase firestore:indexes --project $TEST_PROJECT_ID > firestore.indexes.utf16.json
 
 # UTF-16からUTF-8への変換
-iconv -f UTF-16 -t UTF-8 firestore.indexes.utf16.json -o firestore.indexes.json
+python3 scripts/convert_to_utf8.py firestore.indexes.utf16.json firestore.indexes.json
 
 # 本番環境にインポート
-firebase firestore:indexes --project $PROD_PROJECT_ID firestore.indexes.json
+firebase firestore:indexes:deploy --project $PROD_PROJECT_ID --only firestore.indexes.json
