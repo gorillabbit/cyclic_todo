@@ -10,7 +10,7 @@ firebase firestore:indexes --project $TEST_PROJECT_ID > firestore.indexes.utf16.
 
 # UTF-16からUTF-8への変換
 
-iconv -f UTF-16LE -t utf8 firestore.indexes.utf16.json > firestore.indexes.json
+iconv -f UTF-16LE -t UTF-8 firestore.indexes.utf16.json > firestore.indexes.json
 cat firestore.indexes.json
 
 # 本番環境にインポート
