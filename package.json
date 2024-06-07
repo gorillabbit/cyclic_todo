@@ -4,7 +4,6 @@
   "private": true,
   "homepage": "https://cyclictodo.web.app/",
   "dependencies": {
-    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@fullcalendar/bootstrap5": "^6.1.10",
     "@fullcalendar/core": "^6.1.10",
     "@fullcalendar/daygrid": "^6.1.10",
