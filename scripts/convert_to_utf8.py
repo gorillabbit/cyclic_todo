@@ -1,7 +1,14 @@
 import sys
+import chardet
 
 def convert_to_utf8(input_file, output_file):
-    with open(input_file, 'r', encoding='utf-16') as f:
+    with open(input_file, 'rb') as f:
+        raw_data = f.read()
+    
+    result = chardet.detect(raw_data)
+    encoding = result['encoding']
+    
+    with open(input_file, 'r', encoding=encoding) as f:
         content = f.read()
     
     with open(output_file, 'w', encoding='utf-8') as f:

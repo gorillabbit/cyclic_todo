@@ -12,4 +12,4 @@ firebase firestore:indexes --project $TEST_PROJECT_ID > firestore.indexes.utf16.
 python3 scripts/convert_to_utf8.py firestore.indexes.utf16.json firestore.indexes.json
 
 # 本番環境にインポート
-firebase firestore:indexes:deploy --project $PROD_PROJECT_ID --only firestore.indexes.json
+firebase firestore:indexes --project $PROD_PROJECT_ID < firestore.indexes.json
