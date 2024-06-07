@@ -17,7 +17,7 @@ jobs:
       - name: Export and Import Firestore Indexes
         run: ./scripts/export-import-indexes.sh
         env:
-          GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_CYCLICTODO }}
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GCP_SA }}
       - run: npm ci
       - name: Build
         env:
