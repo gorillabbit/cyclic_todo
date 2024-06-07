@@ -11,7 +11,7 @@ jobs:
       - name: Deploy Firestore rules and index
         uses: w9jds/firebase-action@master
         with:
-          args: deploy --only firestore
+          args: deploy --only firestore --force
         env:
           PROJECT_ID: cyclictodo
           GCP_SA_KEY: ${{ secrets.GCP_SA }}
