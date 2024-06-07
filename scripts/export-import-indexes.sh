@@ -1,11 +1,15 @@
 #!/bin/bash
 
 # テストプロジェクトID
-TEST_PROJECT_ID="todolist-37a07"
+TEST_PROJECT_ID="your-test-project-id"
 # 本番プロジェクトID
-PROD_PROJECT_ID="cyclictodo"
+PROD_PROJECT_ID="your-prod-project-id"
 
-firebase use todolist-37a07
-firebase firestore:indexes > firestore.indexes.json
-firebase use cyclictodo
-firebase firestore:indexes firestore.indexes.json
+# インデックスのエクスポート
+firebase firestore:indexes --project $TEST_PROJECT_ID > firestore.indexes.utf16.json
+
+# UTF-16からUTF-8への変換
+iconv -f UTF-16 -t UTF-8 firestore.indexes.utf16.json -o firestore.indexes.json
+
+# 本番環境にインポート
+firebase firestore:indexes --project $PROD_PROJECT_ID firestore.indexes.json
