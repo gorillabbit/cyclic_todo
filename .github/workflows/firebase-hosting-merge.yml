@@ -13,7 +13,7 @@ jobs:
         with:
           args: deploy --only firestore
         env:
-          PROJECT_ID: your-pj-id
+          PROJECT_ID: cyclictodo
           GCP_SA_KEY: ${{ secrets.GCP_SA }}
           PROJECT_PATH: ./firestore
       - run: npm ci
