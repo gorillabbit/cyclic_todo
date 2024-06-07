@@ -9,8 +9,9 @@ PROD_PROJECT_ID="cyclictodo"
 firebase firestore:indexes --project $TEST_PROJECT_ID > firestore.indexes.utf16.json
 
 # UTF-16からUTF-8への変換
-iconv -l
-iconv -f UTF-16LE -t utf8 firestore.indexes.utf16.json > firestore.indexes.json
+
+iconv -f UTF-16LE -t utf8 firestore.indexes.utf16.json > firestore.indexes.json -c
+cat firestore.indexes.json
 
 # 本番環境にインポート
 firebase firestore:indexes --project $PROD_PROJECT_ID firestore.indexes.json
