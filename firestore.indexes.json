@@ -5,6 +5,10 @@
       "queryScope": "COLLECTION",
       "fields": [
         {
+          "fieldPath": "tabId",
+          "order": "ASCENDING"
+        },
+        {
           "fieldPath": "userId",
           "order": "ASCENDING"
         },
@@ -23,8 +27,26 @@
           "arrayConfig": "CONTAINS"
         },
         {
+          "fieldPath": "tabId",
+          "order": "ASCENDING"
+        },
+        {
           "fieldPath": "userId",
           "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "logsCompleteLogs",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "tabId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "timestamp",
+          "order": "DESCENDING"
         }
       ]
     },
@@ -32,6 +54,10 @@
       "collectionGroup": "Methods",
       "queryScope": "COLLECTION",
       "fields": [
+        {
+          "fieldPath": "tabId",
+          "order": "ASCENDING"
+        },
         {
           "fieldPath": "userId",
           "order": "ASCENDING"
@@ -47,6 +73,10 @@
       "queryScope": "COLLECTION",
       "fields": [
         {
+          "fieldPath": "tabId",
+          "order": "ASCENDING"
+        },
+        {
           "fieldPath": "userId",
           "order": "ASCENDING"
         },
@@ -61,6 +91,10 @@
       "queryScope": "COLLECTION",
       "fields": [
         {
+          "fieldPath": "tabId",
+          "order": "ASCENDING"
+        },
+        {
           "fieldPath": "userId",
           "order": "ASCENDING"
         },
@@ -71,9 +105,27 @@
       ]
     },
     {
+      "collectionGroup": "Tabs",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "userId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "timestamp",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
       "collectionGroup": "tasks",
       "queryScope": "COLLECTION",
       "fields": [
+        {
+          "fieldPath": "tabId",
+          "order": "ASCENDING"
+        },
         {
           "fieldPath": "userId",
           "order": "ASCENDING"
@@ -92,6 +144,10 @@
       "collectionGroup": "TransferTemplates",
       "queryScope": "COLLECTION",
       "fields": [
+        {
+          "fieldPath": "tabId",
+          "order": "ASCENDING"
+        },
         {
           "fieldPath": "userId",
           "order": "ASCENDING"
