@@ -8,7 +8,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: npm ci
       - name: Make the script executable
         run: chmod +x scripts/export-import-indexes.sh
       - name: Install Firebase CLI
@@ -18,7 +17,8 @@ jobs:
       - name: Export and Import Firestore Indexes
         run: ./scripts/export-import-indexes.sh
         env:
-          GOOGLE_APPLICATION_CREDENTIALS: /tmp/service-account.json
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_CYCLICTODO }}
+      - run: npm ci
       - name: Build
         env:
           REACT_APP_FIREBASE_PROJECT_ID: ${{ secrets.REACT_APP_FIREBASE_PROJECT_ID }}
