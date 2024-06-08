@@ -13,7 +13,7 @@ jobs:
       - name: export firestore index
         run: firebase firestore:indexes --project todolist-37a07 > firestore/firestore.indexes.json
         env:
-          GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GCP_SA }}
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_CYCLICTODO }}
       - name: Deploy Firestore rules and index
         uses: w9jds/firebase-action@master
         with:
