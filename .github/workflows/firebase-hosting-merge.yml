@@ -11,7 +11,7 @@ jobs:
       - name: index出力
         uses: w9jds/firebase-action@master
         with:
-          args: firestore:indexes --project "todolist-37a07" > firestore.indexes.json
+          args: firestore:indexes --project "todolist-37a07" > ./firestore/firestore.indexes.json
         env:
           PROJECT_ID: todolist-37a07
           GCP_SA_KEY: ${{ secrets.GCP_SA_DEV }}
