@@ -1,10 +1,8 @@
-import { createContext, useState, useContext, useEffect } from "react";
-import { db } from "../../firebase";
-import { collection, onSnapshot, query, where } from "firebase/firestore";
-import { AccountInputType, AccountType } from "../../types.js";
-import { getAuth } from "firebase/auth";
+import { createContext, useContext } from "react";
+import { AccountType } from "../../types";
 
 interface AccountContextProp {
+  Account: AccountType | undefined;
   children: any;
 }
 
@@ -12,7 +10,6 @@ type AccountContextType = {
   Account: AccountType | undefined;
 };
 
-// Contextを作成（初期値は空のAccountListとダミーのsetAccountList関数）
 export const AccountContext = createContext<AccountContextType>({
   Account: {
     id: "",
@@ -24,37 +21,10 @@ export const AccountContext = createContext<AccountContextType>({
   },
 });
 
-export const AccountProvider: React.FC<AccountContextProp> = ({ children }) => {
-  const [Account, setAccount] = useState<AccountType>();
-  const auth = getAuth();
-
-  useEffect(() => {
-    if (!auth.currentUser) {
-      return;
-    }
-    //Accountの取得
-    const fetchAccounts = () => {
-      const AccountQuery = query(
-        collection(db, "Accounts"),
-        where("uid", "==", auth.currentUser?.uid)
-      );
-      return onSnapshot(AccountQuery, (querySnapshot) => {
-        const AccountsData = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...(doc.data() as AccountInputType),
-        }));
-        setAccount(AccountsData[0]);
-      });
-    };
-
-    const unsubscribeAccount = fetchAccounts();
-
-    // コンポーネントがアンマウントされるときに購読を解除
-    return () => {
-      unsubscribeAccount();
-    };
-  }, [auth.currentUser]);
-
+export const AccountProvider: React.FC<AccountContextProp> = ({
+  Account,
+  children,
+}) => {
   return (
     <AccountContext.Provider
       value={{

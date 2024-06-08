@@ -1,13 +1,10 @@
 import { Box } from "@mui/material";
-import SignInForm from "./SignInForm";
+import AccountChip from "./AccountChip";
 import CalendarSignInButton from "./CalendarSignInButton";
-import { User } from "firebase/auth";
 
 const Header = ({
-  setUser,
   setIsGapiMounted,
 }: {
-  setUser: React.Dispatch<React.SetStateAction<User | undefined>>;
   setIsGapiMounted: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   return (
@@ -20,7 +17,7 @@ const Header = ({
       color="white"
       bgcolor="#d8f2d5"
     >
-      <SignInForm setUser={setUser} />
+      <AccountChip />
       <CalendarSignInButton setIsGapiMounted={setIsGapiMounted} />
     </Box>
   );
