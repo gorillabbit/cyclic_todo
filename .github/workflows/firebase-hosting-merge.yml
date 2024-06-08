@@ -13,7 +13,7 @@ jobs:
       - name: Make the script executable
         run: chmod +x scripts/export-import-indexes.sh
       - name: Export and Import Firestore Indexes
-        run: ./scripts/export-import-indexes.sh
+        run: firebase firestore:indexes --project "todolist-37a07" > firestore.indexes.json
         env:
           GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_CYCLICTODO }}
       - name: Deploy Firestore rules and index
