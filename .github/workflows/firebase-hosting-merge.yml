@@ -15,7 +15,7 @@ jobs:
         env:
           PROJECT_ID: cyclictodo
           GCP_SA_KEY: ${{ secrets.GCP_SA }}
-          PROJECT_PATH: ./firestore
+          PROJECT_PATH: ./
       - run: npm ci
       - name: Build
         env:
