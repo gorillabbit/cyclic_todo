@@ -8,16 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: index出力
-        uses: w9jds/firebase-action@master
-        with:
-          args: firestore:indexes --project "todolist-37a07" > ./firestore/firestore.indexes.json
-        env:
-          PROJECT_ID: todolist-37a07
-          GCP_SA_KEY: ${{ secrets.GCP_SA_DEV }}
-          PROJECT_PATH: ./firestore
       - name: Deploy Firestore rules and index
-
         uses: w9jds/firebase-action@master
         with:
           args: deploy --only firestore --force
