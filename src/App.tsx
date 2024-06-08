@@ -8,7 +8,7 @@ import TaskList from "./components/Task/TaskList";
 import LogList from "./components/Log/LogList";
 import InputForms from "./components/InputForms/InputForms";
 import { useEffect, useMemo, useState } from "react";
-import { User, getAuth, onAuthStateChanged } from "firebase/auth";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { LogProvider } from "./components/Context/LogContext";
 import Calendar from "./components/Calendar/Calendar";
 import { TaskProvider } from "./components/Context/TaskContext";
@@ -20,11 +20,14 @@ import { PurchaseProvider } from "./components/Context/PurchaseContext";
 import HeaderTabs from "./components/Tabs";
 import { useCookies } from "react-cookie";
 import { useIsSmall } from "./hooks/useWindowSize";
-import { orderBy } from "firebase/firestore";
-import { TabType } from "./types";
+import { collection, getDocs, orderBy, query, where } from "firebase/firestore";
+import { AccountType, TabType } from "./types";
 import { useFirestoreQuery } from "./utilities/firebaseUtilities";
 import { TabProvider } from "./components/Context/TabContext";
 import { MethodProvider } from "./components/Context/MethodContext";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import LoginPage from "./pages/LoginPage";
+import { db } from "./firebase";
 
 const App = (): JSX.Element => {
   const theme = createTheme({
@@ -38,7 +41,7 @@ const App = (): JSX.Element => {
       ].join(","),
     },
   });
-  const [user, setUser] = useState<User>();
+  const [Account, setAccount] = useState<AccountType>();
   const [isGapiMounted, setIsGapiMounted] = useState<boolean>(false);
   const [pinnedTab, setPinnedTab] = useCookies(["pinnedTab"]);
   const pinnedTabNum = pinnedTab.pinnedTab ? Number(pinnedTab.pinnedTab) : 0;
@@ -61,72 +64,84 @@ const App = (): JSX.Element => {
     })),
   ];
 
+  const auth = getAuth();
   useEffect(() => {
-    const auth = getAuth();
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      if (currentUser) {
-        setUser(currentUser);
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const usersRef = collection(db, "Accounts");
+        const q = query(usersRef, where("uid", "==", user.uid));
+        const userDocs = await getDocs(q);
+        setAccount(userDocs.docs[0].data() as AccountType);
+      } else {
+        setAccount(undefined);
       }
     });
     return () => unsubscribe();
-  }, []);
+  }, [auth, setAccount]);
   return (
-    <LocalizationProvider dateAdapter={AdapterDateFns}>
-      <ThemeProvider theme={theme}>
-        <Header setUser={setUser} setIsGapiMounted={setIsGapiMounted} />
-        {user && (
-          <AccountProvider>
-            <HeaderTabs
-              {...{
-                tabValue,
-                setTabValue,
-                pinnedTabNum,
-                setPinnedTab,
-                tabs,
-              }}
-            />
-            <Box textAlign="center">
-              {tabs.map((tab) => (
-                <TabProvider key={tab.id} tabId={tab.id}>
-                  {tabValue === tab.num && (
-                    <>
-                      {tab.type === "task" && (
-                        <TaskProvider>
-                          <LogProvider>
-                            <Box m={2}>
-                              <InputForms />
-                            </Box>
-                            <Box m={isSmall ? 0 : 2}>
-                              <LogList />
-                              <TaskList />
-                              <Calendar isGapiMounted={isGapiMounted} />
-                            </Box>
-                          </LogProvider>
-                        </TaskProvider>
+    <BrowserRouter>
+      <LocalizationProvider dateAdapter={AdapterDateFns}>
+        <ThemeProvider theme={theme}>
+          <AccountProvider {...{ Account }}>
+            <Header {...{ setIsGapiMounted }} />
+            {Account && (
+              <>
+                <HeaderTabs
+                  {...{
+                    tabValue,
+                    setTabValue,
+                    pinnedTabNum,
+                    setPinnedTab,
+                    tabs,
+                  }}
+                />
+                <Box textAlign="center">
+                  {tabs.map((tab) => (
+                    <TabProvider key={tab.id} tabId={tab.id}>
+                      {tabValue === tab.num && (
+                        <>
+                          {tab.type === "task" && (
+                            <TaskProvider>
+                              <LogProvider>
+                                <Box m={2}>
+                                  <InputForms />
+                                </Box>
+                                <Box m={isSmall ? 0 : 2}>
+                                  <LogList />
+                                  <TaskList />
+                                  <Calendar isGapiMounted={isGapiMounted} />
+                                </Box>
+                              </LogProvider>
+                            </TaskProvider>
+                          )}
+                          {tab.type === "purchase" && (
+                            <MethodProvider>
+                              <PurchaseProvider>
+                                <AssetProvider>
+                                  <Box m={2}>
+                                    <PurchaseInputs />
+                                  </Box>
+                                  <Box m={isSmall ? 0 : 2}>
+                                    <Purchases />
+                                  </Box>
+                                </AssetProvider>
+                              </PurchaseProvider>
+                            </MethodProvider>
+                          )}
+                        </>
                       )}
-                      {tab.type === "purchase" && (
-                        <MethodProvider>
-                          <PurchaseProvider>
-                            <AssetProvider>
-                              <Box m={2}>
-                                <PurchaseInputs />
-                              </Box>
-                              <Box m={isSmall ? 0 : 2}>
-                                <Purchases />
-                              </Box>
-                            </AssetProvider>
-                          </PurchaseProvider>
-                        </MethodProvider>
-                      )}
-                    </>
-                  )}
-                </TabProvider>
-              ))}
-            </Box>
+                    </TabProvider>
+                  ))}
+                </Box>
+              </>
+            )}
           </AccountProvider>
-        )}
-      </ThemeProvider>
-    </LocalizationProvider>
+        </ThemeProvider>
+      </LocalizationProvider>
+      <Routes>
+        <Route path="/Login" Component={LoginPage} />
+      </Routes>
+    </BrowserRouter>
   );
 };
 
