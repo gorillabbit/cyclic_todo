@@ -15,7 +15,7 @@ jobs:
         env:
           PROJECT_ID: todolist-37a07
           GCP_SA_KEY: ${{ secrets.GCP_SA_DEV }}
-          PROJECT_PATH: ./firestore
+          PROJECT_PATH: ./
       - name: Deploy Firestore rules and index
         uses: w9jds/firebase-action@master
         with:
@@ -23,7 +23,7 @@ jobs:
         env:
           PROJECT_ID: cyclictodo
           GCP_SA_KEY: ${{ secrets.GCP_SA }}
-          PROJECT_PATH: ./firestore
+          PROJECT_PATH: ./
       - run: npm ci
       - name: Build
         env:
