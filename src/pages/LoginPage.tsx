@@ -13,10 +13,11 @@ import {
   signInWithPopup,
 } from "firebase/auth";
 import { memo, useCallback, useState } from "react";
-import { app, db } from "../firebase";
+import { addDocTab, app, db, updateDocAccount } from "../firebase";
 import { collection, doc, getDoc, setDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
-import { defaultAccountInput } from "../types";
+import { AccountType, defaultAccountInput } from "../types";
+import { AccountToLink } from "../utilities/tabUtilities";
 
 type PlainLoginPageProps = {
   Fields: {
@@ -141,6 +142,28 @@ const LoginPage = () => {
       });
   }, [Fields.email, Fields.password, auth, successLogin]);
 
+  const createDefaultTabs = useCallback(async (account: AccountType) => {
+    const tabIds: string[] = [];
+
+    const taskTabDoc = await addDocTab({
+      createUserUid: account.id,
+      name: "タスク/ログ",
+      type: "task",
+      sharedAccounts: [AccountToLink(account)],
+    });
+    tabIds.push(taskTabDoc.id);
+
+    const purchaseTabDoc = await addDocTab({
+      createUserUid: account.id,
+      name: "家計簿",
+      type: "purchase",
+      sharedAccounts: [AccountToLink(account)],
+    });
+    tabIds.push(purchaseTabDoc.id);
+
+    await updateDocAccount(account.id, { useTabIds: tabIds });
+  }, []);
+
   const accountRef = collection(db, "Accounts");
   const handleSignin = useCallback(() => {
     if (!Fields.email || !Fields.password) {
@@ -149,24 +172,22 @@ const LoginPage = () => {
     }
     createUserWithEmailAndPassword(auth, Fields.email, Fields.password)
       .then(async (userCredential) => {
-        await setDoc(doc(accountRef, userCredential.user.uid), {
+        const newAccount = {
           ...defaultAccountInput,
           email: Fields.email,
           name: Fields.name,
+        };
+        await setDoc(doc(accountRef, userCredential.user.uid), newAccount);
+        createDefaultTabs({
+          ...newAccount,
+          id: userCredential.user.uid,
         });
         successLogin();
       })
       .catch((error) => {
         setError("登録に失敗しました:" + error.code + error.message);
       });
-  }, [
-    Fields.email,
-    Fields.name,
-    Fields.password,
-    accountRef,
-    auth,
-    successLogin,
-  ]);
+  }, [Fields, accountRef, auth, createDefaultTabs, successLogin]);
 
   const handleGoogleLogin = useCallback(() => {
     const provider = new GoogleAuthProvider();
@@ -174,11 +195,16 @@ const LoginPage = () => {
       .then(async (result) => {
         const accountDoc = await getDoc(doc(accountRef, result.user.uid));
         if (!accountDoc.exists()) {
-          await setDoc(doc(accountRef, result.user.uid), {
+          const newAccount = {
             ...defaultAccountInput,
             email: result.user.email ?? "",
             name: result.user.displayName ?? "",
             icon: result.user.photoURL ?? "",
+          };
+          await setDoc(doc(accountRef, result.user.uid), newAccount);
+          createDefaultTabs({
+            id: result.user.uid,
+            ...newAccount,
           });
         }
         successLogin();
@@ -186,7 +212,7 @@ const LoginPage = () => {
       .catch((error) => {
         setError("Googleログインに失敗しました:" + error.code + error.message);
       });
-  }, [accountRef, auth, successLogin]);
+  }, [accountRef, auth, createDefaultTabs, successLogin]);
 
   const plainProps = {
     Fields,

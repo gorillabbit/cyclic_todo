@@ -3,6 +3,7 @@ import { Box, ToggleButton, ToggleButtonGroup } from "@mui/material";
 import PurchaseInput from "./PurchaseInput";
 import PurchaseScheduleInput from "./PurchaseScheduleInput";
 import TransferInput from "./TransferInput";
+import ShareTabDialog from "../../ShareTabDialog";
 
 const InputForms = () => {
   const [isSchedule, setIsSchedule] = useState<string>("記録");
@@ -19,6 +20,7 @@ const InputForms = () => {
         <ToggleButton value="予定">予定</ToggleButton>
         <ToggleButton value="送金">送金</ToggleButton>
       </ToggleButtonGroup>
+      <ShareTabDialog />
       <Box display={isSchedule === "記録" ? "block" : "none"}>
         <PurchaseInput />
       </Box>

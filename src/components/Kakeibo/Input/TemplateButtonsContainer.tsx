@@ -42,7 +42,7 @@ const TemplateButtonsContainer = ({
   const { documents: templates } = useFirestoreQuery<
     PurchaseType,
     PurchaseListType
-  >(dbNames.purchaseTemplate, purchaseTemplatesQueryConstraints);
+  >(dbNames.purchaseTemplate, purchaseTemplatesQueryConstraints, true);
 
   const plainProps = {
     templates,

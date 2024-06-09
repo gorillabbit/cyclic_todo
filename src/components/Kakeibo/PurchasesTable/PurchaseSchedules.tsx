@@ -62,7 +62,7 @@ const PurchaseSchedules = () => {
   const { documents: purchaseScheduleList } = useFirestoreQuery<
     PurchaseScheduleType,
     PurchaseScheduleListType
-  >("PurchaseSchedules", purchaseScheduleQueryConstraints);
+  >("PurchaseSchedules", purchaseScheduleQueryConstraints, true);
 
   const plainProps = {
     purchaseScheduleList,

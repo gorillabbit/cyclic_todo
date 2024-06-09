@@ -22,6 +22,7 @@ import {
 import { AccountLinkType, AccountType } from "../types";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import CancelIcon from "@mui/icons-material/Cancel";
+import { AccountToLink } from "../utilities/tabUtilities";
 
 const validateEmail = (email: string, account: AccountType): string => {
   const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -51,13 +52,6 @@ const AccountShareButton = () => {
     setError(validateEmail(value, Account));
   };
 
-  const PickedAccount = {
-    id: Account.id,
-    email: Account.email,
-    name: Account.name,
-    icon: Account.icon,
-  };
-
   const AccountCollection = collection(db, "Accounts");
   const getAccountDoc = async (id: string) => {
     const accountDoc = await getDoc(doc(AccountCollection, id));
@@ -78,7 +72,10 @@ const AccountShareButton = () => {
     });
     const targetDoc = targetAccountDoc.docs[0];
     updateDocAccount(targetDoc.id, {
-      receiveRequest: [...targetDoc.data().receiveRequest, PickedAccount],
+      receiveRequest: [
+        ...targetDoc.data().receiveRequest,
+        AccountToLink(Account),
+      ],
     });
     setEmail("");
   };
@@ -106,7 +103,7 @@ const AccountShareButton = () => {
     });
     getAccountDoc(receiveRequest.id).then((doc) => {
       updateDocAccount(doc.id, {
-        linkedAccounts: [...doc.linkedAccounts, PickedAccount],
+        linkedAccounts: [...doc.linkedAccounts, AccountToLink(Account)],
         sendRequest: doc.sendRequest.filter((r) => r !== Account.email),
       });
     });

@@ -1,18 +1,22 @@
 import { ReactNode, createContext, memo, useContext, useMemo } from "react";
+import { TabType } from "../../types";
 
-const TabContext = createContext<{ tabId: string }>({ tabId: "" });
+const TabContext = createContext<{ tabId: string; tab: TabType }>({
+  tabId: "",
+  tab: {
+    id: "",
+    name: "",
+    createUserUid: "",
+    type: "task",
+    sharedAccounts: [],
+  },
+});
 
 export const TabProvider = memo(
-  ({
-    children,
-    tabId,
-  }: {
-    children: ReactNode;
-    tabId: string;
-  }): JSX.Element => {
+  ({ children, tab }: { children: ReactNode; tab: TabType }): JSX.Element => {
     const context = useMemo(() => {
-      return { tabId };
-    }, [tabId]);
+      return { tabId: tab.id, tab };
+    }, [tab]);
     return (
       <TabContext.Provider value={context}>{children}</TabContext.Provider>
     );

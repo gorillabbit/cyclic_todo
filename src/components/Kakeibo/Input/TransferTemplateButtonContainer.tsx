@@ -43,7 +43,7 @@ const TransferTemplateButtonsContainer = ({
   const { documents: transfers } = useFirestoreQuery<
     InputTransferType,
     TransferType
-  >(dbNames.transferTemplate, purchaseTemplatesQueryConstraints);
+  >(dbNames.transferTemplate, purchaseTemplatesQueryConstraints, true);
 
   const plainProps = {
     transfers,
