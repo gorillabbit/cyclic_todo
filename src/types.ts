@@ -82,15 +82,19 @@ export interface AccountType extends AccountInputType {
   id: string;
 }
 
-export interface AccountLinkInputType {
-  requester: Pick<AccountType, "email" | "name" | "icon">;
-  receiver: Pick<AccountType, "email" | "name" | "icon">;
-  status: "pending" | "rejected" | "accepted";
-}
+export const defaultAccountInput: AccountInputType = {
+  email: "",
+  name: "",
+  icon: "",
+  linkedAccounts: [],
+  sendRequest: [],
+  receiveRequest: [],
+};
 
-export interface AccountLinkType extends AccountLinkInputType {
-  id: string;
-}
+export const defaultAccount: AccountType = {
+  ...defaultAccountInput,
+  id: "",
+};
 
 export interface MethodType {
   userId: string;
