@@ -9,6 +9,20 @@
           "order": "ASCENDING"
         },
         {
+          "fieldPath": "timestamp",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "Assets",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "tabId",
+          "order": "ASCENDING"
+        },
+        {
           "fieldPath": "userId",
           "order": "ASCENDING"
         },
@@ -59,11 +73,39 @@
           "order": "ASCENDING"
         },
         {
+          "fieldPath": "timestamp",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "Methods",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "tabId",
+          "order": "ASCENDING"
+        },
+        {
           "fieldPath": "userId",
           "order": "ASCENDING"
         },
         {
           "fieldPath": "timestamp",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "Purchases",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "tabId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "date",
           "order": "ASCENDING"
         }
       ]
@@ -83,6 +125,20 @@
         {
           "fieldPath": "date",
           "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "PurchaseTemplates",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "tabId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "timestamp",
+          "order": "DESCENDING"
         }
       ]
     },
@@ -119,6 +175,20 @@
       ]
     },
     {
+      "collectionGroup": "Task",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "tabId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "name",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
       "collectionGroup": "tasks",
       "queryScope": "COLLECTION",
       "fields": [
@@ -137,6 +207,20 @@
         {
           "fieldPath": "dueTime",
           "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "TransferTemplates",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "tabId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "timestamp",
+          "order": "DESCENDING"
         }
       ]
     },
