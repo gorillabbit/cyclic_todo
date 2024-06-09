@@ -71,16 +71,20 @@ export interface LogType extends InputLogType {
 }
 
 export interface AccountInputType {
-  uid: string;
   email: string;
   name: string;
   icon: string;
-  linkedAccounts: Pick<AccountType, "email" | "name" | "icon">[];
+  linkedAccounts: AccountLinkType[];
+  sendRequest: string[];
+  receiveRequest: AccountLinkType[];
 }
 
 export interface AccountType extends AccountInputType {
   id: string;
 }
+
+export interface AccountLinkType
+  extends Pick<AccountType, "id" | "email" | "name" | "icon"> {}
 
 export const defaultAccountInput: AccountInputType = {
   email: "",

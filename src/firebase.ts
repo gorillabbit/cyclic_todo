@@ -17,13 +17,11 @@ import {
   TaskType,
   InputLogType,
   LogType,
-  AccountLinkType,
   InputPurchaseType,
   InputPurchaseScheduleType,
   AssetType,
   TaskInputType,
   AccountInputType,
-  AccountLinkInputType,
   LogsCompleteLogsInputType,
   InputAssetType,
   InputTransferType,
@@ -65,10 +63,10 @@ const updateDocOperation = async (
   id: string,
   feature: any
 ) => {
+  console.log("updateDocOperation", collectionName, id, feature);
   try {
     return await updateDoc(doc(db, collectionName, id), feature);
   } catch (e) {
-    console.error(`updateDoc error: `, e, collectionName, id, feature);
     throw new Error(`updateDoc error: ${e} ${collectionName} ${id} ${feature}`);
   }
 };
@@ -87,7 +85,6 @@ export const dbNames = {
   log: "logs",
   logsCompleteLog: "logsCompleteLogs",
   account: "Accounts",
-  accountLink: "AccountLinks",
   purchase: "Purchases",
   purchaseTemplate: "PurchaseTemplates",
   asset: "Assets",
@@ -121,15 +118,6 @@ export const updateDocAccount = (id: string, updates: Partial<AccountType>) =>
   updateDocOperation(dbNames.account, id, updates);
 export const deleteDocAccount = (id: string) =>
   deleteDocOperation(dbNames.account, id);
-
-export const addDocAccountLink = (link: AccountLinkInputType) =>
-  addDocOperation(dbNames.accountLink, link);
-export const updateDocAccountLink = (
-  id: string,
-  updates: Partial<AccountLinkType>
-) => updateDocOperation(dbNames.accountLink, id, updates);
-export const deleteDocAccountLink = (id: string) =>
-  deleteDocOperation(dbNames.accountLink, id);
 
 export const addDocPurchase = (v: InputPurchaseType) =>
   addDocOperation(dbNames.purchase, v);

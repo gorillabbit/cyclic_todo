@@ -51,9 +51,9 @@ export const LogProvider = memo(
           Account?.email ?? ""
         ),
         where("tabId", "==", tabId),
-        where("userId", "!=", Account?.uid ?? ""),
+        where("userId", "!=", Account?.id ?? ""),
       ],
-      [Account?.email, tabId, Account?.uid]
+      [Account?.email, Account?.id, tabId]
     );
     const { documents: sharedLogList } = useFirestoreQuery<
       InputLogType,
