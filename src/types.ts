@@ -71,26 +71,34 @@ export interface LogType extends InputLogType {
 }
 
 export interface AccountInputType {
-  uid: string;
   email: string;
   name: string;
   icon: string;
-  linkedAccounts: Pick<AccountType, "email" | "name" | "icon">[];
+  linkedAccounts: AccountLinkType[];
+  sendRequest: string[];
+  receiveRequest: AccountLinkType[];
 }
 
 export interface AccountType extends AccountInputType {
   id: string;
 }
 
-export interface AccountLinkInputType {
-  requester: Pick<AccountType, "email" | "name" | "icon">;
-  receiver: Pick<AccountType, "email" | "name" | "icon">;
-  status: "pending" | "rejected" | "accepted";
-}
+export interface AccountLinkType
+  extends Pick<AccountType, "id" | "email" | "name" | "icon"> {}
 
-export interface AccountLinkType extends AccountLinkInputType {
-  id: string;
-}
+export const defaultAccountInput: AccountInputType = {
+  email: "",
+  name: "",
+  icon: "",
+  linkedAccounts: [],
+  sendRequest: [],
+  receiveRequest: [],
+};
+
+export const defaultAccount: AccountType = {
+  ...defaultAccountInput,
+  id: "",
+};
 
 export interface MethodType {
   userId: string;

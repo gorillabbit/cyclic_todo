@@ -5,163 +5,180 @@ import {
   Chip,
   Dialog,
   DialogContent,
-  FormGroup,
   TextField,
   Tooltip,
 } from "@mui/material";
-import { getAuth } from "firebase/auth";
-import { ChangeEvent, useEffect, useMemo, useState } from "react";
-import {
-  addDocAccountLink,
-  addDocAccount,
-  deleteDocAccountLink,
-  updateDocAccountLink,
-  updateDocAccount,
-} from "../../firebase";
+import { ChangeEvent, memo, useState } from "react";
+import { updateDocAccount, db } from "../../firebase";
 import { useAccount } from "../Context/AccountContext";
-import { where } from "firebase/firestore";
-import { AccountLinkType } from "../../types";
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  where,
+} from "firebase/firestore";
+import { AccountLinkType, AccountType } from "../../types";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import CancelIcon from "@mui/icons-material/Cancel";
-import { useFirestoreQuery } from "../../utilities/firebaseUtilities";
 
-const auth = getAuth();
+const validateEmail = (email: string, account: AccountType): string => {
+  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!regex.test(email)) return "無効なメールアドレスです";
+  if (email === account.email) return "自分のメールアドレスです";
+  if (account.linkedAccounts.some((l) => l.email === email))
+    return "すでにリンクされています";
+  if (account.sendRequest.includes(email))
+    return "すでにリンク依頼を出しています";
+  if (account.receiveRequest.some((r) => r.email === email))
+    return "すでにリンク依頼を受けています";
+  return "";
+};
 
 const AccountShareButton = () => {
   const [open, setOpen] = useState<boolean>(false);
   const [email, setEmail] = useState<string>("");
   const { Account } = useAccount();
-
-  const requestsAccountQueryConstraints = useMemo(
-    () => [where("requester.email", "==", auth.currentUser?.email)],
-    []
-  );
-  const { documents: requests } = useFirestoreQuery<AccountLinkType>(
-    "AccountLinks",
-    requestsAccountQueryConstraints,
-    true
-  );
-
-  const receiversAccountQueryConstraints = useMemo(
-    () => [where("receiver.email", "==", auth.currentUser?.email)],
-    []
-  );
-  const { documents: receivers } = useFirestoreQuery<AccountLinkType>(
-    "AccountLinks",
-    receiversAccountQueryConstraints,
-    true
-  );
-
-  //リクエスト送信側のAccountsは受信側から操作しないので、Acceptされたら加える。リンクが解除されたら削除する
-  useEffect(() => {
-    const acceptedRequests = requests
-      ?.filter((request) => request.status === "accepted")
-      .map((request) => request.receiver);
-    if (acceptedRequests && acceptedRequests?.length > 0) {
-      const linkedAccounts = requests
-        ?.filter((request) => request.status === "accepted")
-        .map((request) => request.receiver);
-      if (Account) {
-        updateDocAccount(Account.id, {
-          linkedAccounts: linkedAccounts,
-        });
-      } else {
-        addDocAccount({
-          uid: auth.currentUser?.uid ?? "",
-          email: auth.currentUser?.email ?? "",
-          name: auth.currentUser?.displayName ?? "",
-          icon: auth.currentUser?.photoURL ?? "",
-          linkedAccounts: linkedAccounts,
-        });
-      }
-    }
-  }, [Account, requests]);
-
   const [error, setError] = useState<string>();
-  const validateEmail = (email: string) => {
-    if (email === auth.currentUser?.email) {
-      return setError("自分のメールアドレスです");
-    }
-    const alreadyRequestedEmails = requests?.filter(
-      (request) => request.receiver.email === email
-    );
-    if (alreadyRequestedEmails && alreadyRequestedEmails.length > 0) {
-      return setError("すでに共有依頼を出しています");
-    }
-    const alreadyReceivedEmails = receivers?.filter(
-      (receiver) => receiver.requester.email === email
-    );
-    if (alreadyReceivedEmails && alreadyReceivedEmails.length > 0) {
-      return setError("すでに共有依頼を受けています");
-    }
-    // 単純なメールアドレスの正規表現パターン
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!regex.test(email)) {
-      return setError("無効なメールアドレスです");
-    }
-    return setError("");
-  };
+  if (!Account) return null;
 
   const handleChange = (
-    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    const { value } = event.target;
+    const { value } = e.target;
     setEmail(value);
-    validateEmail(value);
+    setError(validateEmail(value, Account));
   };
 
-  const saveAccounts = () => {
-    if (email) {
-      addDocAccountLink({
-        requester: {
-          email: auth.currentUser?.email ?? "",
-          name: auth.currentUser?.displayName ?? "",
-          icon: auth.currentUser?.photoURL ?? "",
-        },
-        receiver: {
-          email: email,
-          name: "",
-          icon: "",
-        },
-        status: "pending",
-      });
-      setEmail("");
-    } else {
-      setError("メールアドレスが入力されていません");
-    }
+  const PickedAccount = {
+    id: Account.id,
+    email: Account.email,
+    name: Account.name,
+    icon: Account.icon,
+  };
+
+  const AccountCollection = collection(db, "Accounts");
+  const getAccountDoc = async (id: string) => {
+    const accountDoc = await getDoc(doc(AccountCollection, id));
+    if (!accountDoc.exists()) throw new Error("Document not found");
+    return { ...accountDoc.data(), id: accountDoc.id } as AccountType;
+  };
+
+  const sendLinkRequests = async () => {
+    if (!email) return setError("メールアドレスが入力されていません");
+
+    const q = query(AccountCollection, where("email", "==", email));
+    const targetAccountDoc = await getDocs(q);
+    if (targetAccountDoc.empty)
+      return setError("入力対象はアカウントを持っていません");
+
+    updateDocAccount(Account.id, {
+      sendRequest: [...Account.sendRequest, email],
+    });
+    const targetDoc = targetAccountDoc.docs[0];
+    updateDocAccount(targetDoc.id, {
+      receiveRequest: [...targetDoc.data().receiveRequest, PickedAccount],
+    });
+    setEmail("");
   };
 
   const refuseRequest = (receivedRequest: AccountLinkType) => {
-    updateDocAccountLink(receivedRequest.id, { status: "rejected" });
-  };
-
-  const acceptRequest = (receivedRequest: AccountLinkType) => {
-    updateDocAccountLink(receivedRequest.id, {
-      receiver: {
-        email: auth.currentUser?.email ?? "",
-        name: auth.currentUser?.displayName ?? "",
-        icon: auth.currentUser?.photoURL ?? "",
-      },
-      status: "accepted",
+    updateDocAccount(Account.id, {
+      receiveRequest: Account.receiveRequest.filter(
+        (r) => r.id !== receivedRequest.id
+      ),
     });
-    if (Account) {
-      updateDocAccount(Account.id, {
-        linkedAccounts: [...Account.linkedAccounts, receivedRequest.requester],
+    getAccountDoc(receivedRequest.id).then((doc) => {
+      updateDocAccount(doc.id, {
+        sendRequest: doc.sendRequest.filter((r) => r !== Account.email),
       });
-    } else {
-      addDocAccount({
-        uid: auth.currentUser?.uid ?? "",
-        email: auth.currentUser?.email ?? "",
-        name: auth.currentUser?.displayName ?? "",
-        icon: auth.currentUser?.photoURL ?? "",
-        linkedAccounts: [receivedRequest.requester],
-      });
-    }
+    });
   };
 
-  const cancelRequest = (request: AccountLinkType) => {
-    deleteDocAccountLink(request.id);
+  const acceptRequest = async (receiveRequest: AccountLinkType) => {
+    // 自分の方で受け取ったリクエストをリンクに加える、リクエストを削除する
+    updateDocAccount(Account.id, {
+      linkedAccounts: [...Account.linkedAccounts, receiveRequest],
+      receiveRequest: Account.receiveRequest.filter(
+        (r) => r.id !== receiveRequest.id
+      ),
+    });
+    getAccountDoc(receiveRequest.id).then((doc) => {
+      updateDocAccount(doc.id, {
+        linkedAccounts: [...doc.linkedAccounts, PickedAccount],
+        sendRequest: doc.sendRequest.filter((r) => r !== Account.email),
+      });
+    });
   };
+
+  const cancelRequest = (request: string) => {
+    updateDocAccount(Account.id, {
+      sendRequest: Account.sendRequest.filter((r) => r !== request),
+    });
+    const q = query(AccountCollection, where("email", "==", request));
+    getDocs(q).then((docs) => {
+      if (docs.empty) return;
+      const targetDoc = docs.docs[0];
+      updateDocAccount(targetDoc.id, {
+        receiveRequest: targetDoc
+          .data()
+          .receiveRequest.filter(
+            (r: AccountLinkType) => r.email !== Account.email
+          ),
+      });
+    });
+  };
+
+  const unlinkAccount = (linkedAccount: AccountLinkType) => {
+    updateDocAccount(Account.id, {
+      linkedAccounts: Account.linkedAccounts.filter(
+        (a) => a.id !== linkedAccount.id
+      ),
+    });
+    getAccountDoc(linkedAccount.id).then((doc) => {
+      updateDocAccount(doc.id, {
+        linkedAccounts: doc.linkedAccounts.filter(
+          (a) => a.email !== Account.email
+        ),
+      });
+    });
+  };
+
+  const ChipWrapper = memo(
+    ({
+      tooltipTitle,
+      label,
+      avatar,
+      icon,
+      cancelTooltipTitle,
+      deleteAction,
+    }: {
+      tooltipTitle: string;
+      label: string;
+      avatar?: JSX.Element;
+      icon?: JSX.Element;
+      cancelTooltipTitle: string;
+      deleteAction: () => void;
+    }) => (
+      <Box m={1}>
+        <Tooltip title={tooltipTitle} placement="top">
+          <Chip
+            variant="outlined"
+            label={label}
+            {...(icon ? { icon } : {})}
+            {...(avatar ? { avatar } : {})}
+            deleteIcon={
+              <Tooltip title={cancelTooltipTitle}>
+                <CancelIcon />
+              </Tooltip>
+            }
+            onDelete={deleteAction}
+          />
+        </Tooltip>
+      </Box>
+    )
+  );
 
   return (
     <>
@@ -170,124 +187,65 @@ const AccountShareButton = () => {
       </Button>
       <Dialog open={open} onClose={() => setOpen(false)}>
         <DialogContent>
-          {receivers?.map((receivedRequest) =>
-            receivedRequest.status === "pending" ? (
-              <Box m={1} key={receivedRequest.id}>
-                <Tooltip
-                  title={receivedRequest.requester.email}
-                  placement="top"
-                >
-                  <Chip
-                    variant="outlined"
-                    label={receivedRequest.requester.name}
-                    icon={
-                      <Tooltip title="承認する">
-                        <Box
-                          sx={{ cursor: "pointer" }}
-                          onClick={() => acceptRequest(receivedRequest)}
-                        >
-                          <CheckCircleOutlineIcon />
-                        </Box>
-                      </Tooltip>
-                    }
-                    deleteIcon={
-                      <Tooltip title="拒否する">
-                        <CancelIcon />
-                      </Tooltip>
-                    }
-                    onDelete={() => refuseRequest(receivedRequest)}
-                  />
+          {Account.linkedAccounts.map((linkedAccount) => (
+            <ChipWrapper
+              key={linkedAccount.id}
+              tooltipTitle={linkedAccount.email}
+              label={linkedAccount.name}
+              avatar={<Avatar src={linkedAccount.icon} />}
+              cancelTooltipTitle="解除"
+              deleteAction={() => unlinkAccount(linkedAccount)}
+            />
+          ))}
+
+          {Account.receiveRequest.map((receiveRequest) => (
+            <ChipWrapper
+              key={receiveRequest.id}
+              tooltipTitle={receiveRequest.email}
+              label={receiveRequest.name}
+              icon={
+                <Tooltip title="承認する">
+                  <Box
+                    sx={{ cursor: "pointer" }}
+                    onClick={() => acceptRequest(receiveRequest)}
+                  >
+                    <CheckCircleOutlineIcon />
+                  </Box>
                 </Tooltip>
-              </Box>
-            ) : receivedRequest.status === "accepted" ? (
-              <Box m={1} key={receivedRequest.id}>
-                <Tooltip
-                  title={receivedRequest.requester.email}
-                  placement="top"
-                >
-                  <Chip
-                    variant="outlined"
-                    color="success"
-                    label={receivedRequest.requester.name}
-                    avatar={<Avatar src={receivedRequest.requester.icon} />}
-                    deleteIcon={
-                      <Tooltip title="解除">
-                        <CancelIcon />
-                      </Tooltip>
-                    }
-                    onDelete={() => cancelRequest(receivedRequest)}
-                  />
-                </Tooltip>
-              </Box>
-            ) : (
-              <></>
-            )
-          )}
-          {requests?.map((request) =>
-            request.status === "pending" ? (
-              <Box m={1} key={request.id}>
-                <Tooltip title={request.receiver.email} placement="top">
-                  <Chip
-                    variant="outlined"
-                    label={request.receiver.email}
-                    icon={<Box>送信済み</Box>}
-                    deleteIcon={
-                      <Tooltip title="キャンセル">
-                        <CancelIcon />
-                      </Tooltip>
-                    }
-                    onDelete={() => cancelRequest(request)}
-                  />
-                </Tooltip>
-              </Box>
-            ) : request.status === "accepted" ? (
-              <Box m={1} key={request.id}>
-                <Tooltip title={request.receiver.email} placement="top">
-                  <Chip
-                    variant="outlined"
-                    color="success"
-                    label={request.receiver.name}
-                    avatar={
-                      <Avatar
-                        alt={request.receiver.name}
-                        src={request.receiver.icon}
-                      />
-                    }
-                    deleteIcon={
-                      <Tooltip title="解除">
-                        <CancelIcon />
-                      </Tooltip>
-                    }
-                    onDelete={() => cancelRequest(request)}
-                  />
-                </Tooltip>
-              </Box>
-            ) : (
-              <></>
-            )
-          )}
-          <FormGroup row={true} sx={{ gap: 1, m: 1 }}>
+              }
+              cancelTooltipTitle="拒否する"
+              deleteAction={() => refuseRequest(receiveRequest)}
+            />
+          ))}
+
+          {Account.sendRequest.map((sendRequest) => (
+            <ChipWrapper
+              key={sendRequest}
+              tooltipTitle=""
+              label={sendRequest}
+              icon={<Box>送信済み</Box>}
+              cancelTooltipTitle="キャンセル"
+              deleteAction={() => cancelRequest(sendRequest)}
+            />
+          ))}
+          <Box display="flex" flexDirection="column" gap={1}>
             <TextField
               label="共有するアカウントのメールアドレス"
               fullWidth
               value={email}
-              multiline
-              onChange={(e) => handleChange(e)}
-              placeholder="説明を入力"
+              onChange={handleChange}
               error={!!error}
               helperText={error}
             />
-            <Button
-              variant="contained"
-              disabled={!!error}
-              onClick={saveAccounts}
-            >
-              リンク申請
-            </Button>
-            <Button variant="outlined" onClick={() => setOpen(false)}>
-              閉じる
-            </Button>
-          </FormGroup>
+            <Box>
+              <Button color="error" onClick={() => setOpen(false)}>
+                閉じる
+              </Button>
+              <Button disabled={!!error} onClick={sendLinkRequests}>
+                リンク申請
+              </Button>
+            </Box>
+          </Box>
         </DialogContent>
       </Dialog>
     </>
