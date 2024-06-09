@@ -20,7 +20,7 @@ import { PurchaseProvider } from "./components/Context/PurchaseContext";
 import HeaderTabs from "./components/Tabs";
 import { useCookies } from "react-cookie";
 import { useIsSmall } from "./hooks/useWindowSize";
-import { collection, getDocs, orderBy, query, where } from "firebase/firestore";
+import { doc, onSnapshot, orderBy } from "firebase/firestore";
 import { AccountType, TabType } from "./types";
 import { useFirestoreQuery } from "./utilities/firebaseUtilities";
 import { TabProvider } from "./components/Context/TabContext";
@@ -66,17 +66,31 @@ const App = (): JSX.Element => {
 
   const auth = getAuth();
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    const unsubscribeFromAuth = onAuthStateChanged(auth, (user) => {
       if (user) {
-        const usersRef = collection(db, "Accounts");
-        const q = query(usersRef, where("uid", "==", user.uid));
-        const userDocs = await getDocs(q);
-        setAccount(userDocs.docs[0].data() as AccountType);
+        const accountRef = doc(db, "Accounts", user.uid);
+
+        // リアルタイムでドキュメントのスナップショットを取得
+        const unsubscribeFromDoc = onSnapshot(accountRef, (docSnapshot) => {
+          if (docSnapshot.exists()) {
+            setAccount({
+              id: docSnapshot.id,
+              ...docSnapshot.data(),
+            } as AccountType);
+          } else {
+            setAccount(undefined);
+          }
+        });
+
+        // クリーンアップ: アカウントドキュメントのスナップショットのリスナーを解除
+        return () => unsubscribeFromDoc();
       } else {
         setAccount(undefined);
       }
     });
-    return () => unsubscribe();
+
+    // クリーンアップ: 認証状態のリスナーを解除
+    return () => unsubscribeFromAuth();
   }, [auth, setAccount]);
   return (
     <BrowserRouter>
