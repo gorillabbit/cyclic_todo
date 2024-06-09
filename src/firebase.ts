@@ -63,7 +63,6 @@ const updateDocOperation = async (
   id: string,
   feature: any
 ) => {
-  console.log("updateDocOperation", collectionName, id, feature);
   try {
     return await updateDoc(doc(db, collectionName, id), feature);
   } catch (e) {
