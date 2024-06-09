@@ -23,7 +23,7 @@ export const MethodProvider = memo(
     const { documents: methodList } = useFirestoreQuery<
       MethodType,
       MethodListType
-    >("Methods", methodQueryConstraints);
+    >("Methods", methodQueryConstraints, true);
 
     const context = useMemo(() => {
       return { methodList };

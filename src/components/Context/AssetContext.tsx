@@ -26,7 +26,7 @@ export const AssetProvider = memo(
     const { documents: assetList } = useFirestoreQuery<
       AssetType,
       AssetListType
-    >("Assets", assetQueryConstraints);
+    >("Assets", assetQueryConstraints, true);
     const sumAssets = useMemo(
       () => assetList.reduce((acc, asset) => acc + getLatestBalance(asset), 0),
       [assetList]

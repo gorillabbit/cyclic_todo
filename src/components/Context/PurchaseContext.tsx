@@ -25,7 +25,7 @@ export const PurchaseProvider = memo(
     const { documents: purchaseList } = useFirestoreQuery<
       PurchaseType,
       PurchaseListType
-    >("Purchases", purchaseQueryConstraints);
+    >("Purchases", purchaseQueryConstraints, true);
 
     const categoryList = purchaseList.map((purchase) => purchase.category);
     const categorySet = categoryList.filter(
