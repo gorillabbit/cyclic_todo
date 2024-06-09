@@ -7,7 +7,7 @@ import Header from "./components/Header";
 import TaskList from "./components/Task/TaskList";
 import LogList from "./components/Log/LogList";
 import InputForms from "./components/InputForms/InputForms";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { LogProvider } from "./components/Context/LogContext";
 import Calendar from "./components/Calendar/Calendar";
@@ -20,9 +20,8 @@ import { PurchaseProvider } from "./components/Context/PurchaseContext";
 import HeaderTabs from "./components/Tabs";
 import { useCookies } from "react-cookie";
 import { useIsSmall } from "./hooks/useWindowSize";
-import { doc, onSnapshot, orderBy } from "firebase/firestore";
+import { doc, getDoc, onSnapshot } from "firebase/firestore";
 import { AccountType, TabType } from "./types";
-import { useFirestoreQuery } from "./utilities/firebaseUtilities";
 import { TabProvider } from "./components/Context/TabContext";
 import { MethodProvider } from "./components/Context/MethodContext";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
@@ -47,46 +46,43 @@ const App = (): JSX.Element => {
   const pinnedTabNum = pinnedTab.pinnedTab ? Number(pinnedTab.pinnedTab) : 0;
   const [tabValue, setTabValue] = useState<number>(pinnedTabNum);
   const isSmall = useIsSmall();
+  const [tabs, setTabs] = useState<TabType[]>([]);
 
-  const tabQueryConstraints = useMemo(() => [orderBy("timestamp")], []);
-  const { documents: tabList } = useFirestoreQuery<TabType>(
-    "Tabs",
-    tabQueryConstraints
-  );
-  const tabs = [
-    { name: "タスク/ログ", num: 0, type: "task", id: "task" },
-    { name: "家計簿", num: 1, type: "purchase", id: "purchase" },
-    ...tabList.map((tab, index) => ({
-      name: tab.name,
-      num: index + 2,
-      type: tab.type,
-      id: tab.id,
-    })),
-  ];
+  useEffect(() => {
+    if (!Account) return;
+    const getTabsByAccount = async (account: AccountType) => {
+      const dataPromises = account.useTabIds.map(async (id) => {
+        const docSnap = await getDoc(doc(db, "Tabs", id));
+        return docSnap.exists() ? { id: docSnap.id, ...docSnap.data() } : null;
+      });
+      const data = await Promise.all(dataPromises);
+      return data.filter((tab) => tab !== null) as TabType[];
+    };
+
+    getTabsByAccount(Account).then((result) => setTabs(result));
+  }, [Account]);
 
   const auth = getAuth();
   useEffect(() => {
     const unsubscribeFromAuth = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        const accountRef = doc(db, "Accounts", user.uid);
-
-        // リアルタイムでドキュメントのスナップショットを取得
-        const unsubscribeFromDoc = onSnapshot(accountRef, (docSnapshot) => {
-          if (docSnapshot.exists()) {
-            setAccount({
-              id: docSnapshot.id,
-              ...docSnapshot.data(),
-            } as AccountType);
-          } else {
-            setAccount(undefined);
-          }
-        });
-
-        // クリーンアップ: アカウントドキュメントのスナップショットのリスナーを解除
-        return () => unsubscribeFromDoc();
-      } else {
+      if (!user) {
         setAccount(undefined);
+        return;
       }
+      // リアルタイムでドキュメントのスナップショットを取得
+      const unsubscribeFromDoc = onSnapshot(
+        doc(db, "Accounts", user.uid),
+        (accountDoc) => {
+          setAccount(
+            accountDoc.exists()
+              ? ({ id: accountDoc.id, ...accountDoc.data() } as AccountType)
+              : undefined
+          );
+        }
+      );
+
+      // クリーンアップ: アカウントドキュメントのスナップショットのリスナーを解除
+      return () => unsubscribeFromDoc();
     });
 
     // クリーンアップ: 認証状態のリスナーを解除
@@ -110,9 +106,9 @@ const App = (): JSX.Element => {
                   }}
                 />
                 <Box textAlign="center">
-                  {tabs.map((tab) => (
+                  {tabs.map((tab, index) => (
                     <TabProvider key={tab.id} tabId={tab.id}>
-                      {tabValue === tab.num && (
+                      {tabValue === index && (
                         <>
                           {tab.type === "task" && (
                             <TaskProvider>
