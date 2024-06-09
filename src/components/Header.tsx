@@ -1,6 +1,7 @@
 import { Box } from "@mui/material";
 import AccountChip from "./AccountChip";
 import CalendarSignInButton from "./CalendarSignInButton";
+import AccountShareButton from "./AccountShareButton";
 
 const Header = ({
   setIsGapiMounted,
@@ -19,6 +20,7 @@ const Header = ({
     >
       <AccountChip />
       <CalendarSignInButton setIsGapiMounted={setIsGapiMounted} />
+      <AccountShareButton />
     </Box>
   );
 };

@@ -9,8 +9,8 @@ import {
   Tooltip,
 } from "@mui/material";
 import { ChangeEvent, memo, useState } from "react";
-import { updateDocAccount, db } from "../../firebase";
-import { useAccount } from "../Context/AccountContext";
+import { updateDocAccount, db } from "../firebase";
+import { useAccount } from "./Context/AccountContext";
 import {
   collection,
   doc,
@@ -19,7 +19,7 @@ import {
   query,
   where,
 } from "firebase/firestore";
-import { AccountLinkType, AccountType } from "../../types";
+import { AccountLinkType, AccountType } from "../types";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import CancelIcon from "@mui/icons-material/Cancel";
 
