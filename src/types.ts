@@ -77,6 +77,7 @@ export interface AccountInputType {
   linkedAccounts: AccountLinkType[];
   sendRequest: string[];
   receiveRequest: AccountLinkType[];
+  useTabIds: string[];
 }
 
 export interface AccountType extends AccountInputType {
@@ -93,6 +94,7 @@ export const defaultAccountInput: AccountInputType = {
   linkedAccounts: [],
   sendRequest: [],
   receiveRequest: [],
+  useTabIds: [],
 };
 
 export const defaultAccount: AccountType = {
@@ -240,10 +242,10 @@ export interface TransferType extends Omit<InputTransferType, "date"> {
 }
 
 export interface InputTabType {
+  createUserUid: string;
   name: string;
-  userId: string;
   type: "task" | "purchase";
-  sharedAccountsId: string[];
+  sharedAccounts: AccountLinkType[];
 }
 export interface TabType extends InputTabType {
   id: string;
