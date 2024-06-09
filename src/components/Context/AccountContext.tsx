@@ -1,5 +1,5 @@
 import { createContext, useContext } from "react";
-import { AccountType } from "../../types";
+import { AccountType, defaultAccount } from "../../types";
 
 interface AccountContextProp {
   Account: AccountType | undefined;
@@ -11,14 +11,7 @@ type AccountContextType = {
 };
 
 export const AccountContext = createContext<AccountContextType>({
-  Account: {
-    id: "",
-    uid: "",
-    email: "",
-    name: "",
-    icon: "",
-    linkedAccounts: [],
-  },
+  Account: defaultAccount,
 });
 
 export const AccountProvider: React.FC<AccountContextProp> = ({
