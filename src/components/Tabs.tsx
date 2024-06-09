@@ -13,29 +13,25 @@ import { memo, useCallback, useState } from "react";
 import PushPinRoundedIcon from "@mui/icons-material/PushPinRounded";
 import PushPinOutlinedIcon from "@mui/icons-material/PushPinOutlined";
 import AddIcon from "@mui/icons-material/Add";
-import { addDocTab } from "../firebase";
-import { getAuth } from "firebase/auth";
+import { addDocTab, updateDocAccount } from "../firebase";
+import { useAccount } from "./Context/AccountContext";
+import { TabType } from "../types";
+import { AccountToLink } from "../utilities/tabUtilities";
 
 type HeaderTabsProps = {
   tabValue: number;
   setTabValue: React.Dispatch<React.SetStateAction<number>>;
   pinnedTabNum: any;
   setPinnedTab: (name: "pinnedTab", value: any) => void;
-  tabs: {
-    name: string;
-    num: number;
-    type: string;
-  }[];
+  tabs: TabType[];
 };
 
 type PlainHeaderTabsProps = Omit<
   HeaderTabsProps,
-  "setPinnedTab" | "tabList"
+  "setPinnedTab" | "tabList" | "tabValue"
 > & {
-  tabs: {
-    name: string;
-    num: number;
-  }[];
+  tabs: TabType[];
+  defaultTabValue: number;
   handlePinClick: (tabNumber: number) => void;
   pinnedTabNum: any;
   openDialog: boolean;
@@ -50,7 +46,7 @@ type PlainHeaderTabsProps = Omit<
 const PlainHeaderTabs = memo(
   ({
     tabs,
-    tabValue,
+    defaultTabValue,
     setTabValue,
     handlePinClick,
     pinnedTabNum,
@@ -63,18 +59,18 @@ const PlainHeaderTabs = memo(
     setAddTabName,
   }: PlainHeaderTabsProps): JSX.Element => (
     <Box display="flex">
-      <Tabs value={tabValue} onChange={(e, v) => setTabValue(v)}>
-        {tabs.map((tab) => (
+      <Tabs value={defaultTabValue} onChange={(e, v) => setTabValue(v)}>
+        {tabs.map((tab, index) => (
           <Tab
-            key={tab.name}
+            key={tab.id}
             icon={
               <Box
                 onClick={(e) => {
                   e.stopPropagation();
-                  handlePinClick(tab.num);
+                  handlePinClick(index);
                 }}
               >
-                {pinnedTabNum === tab.num ? (
+                {pinnedTabNum === index ? (
                   <PushPinRoundedIcon />
                 ) : (
                   <PushPinOutlinedIcon />
@@ -131,7 +127,8 @@ const HeaderTabs = ({
   setTabValue,
   tabs,
 }: HeaderTabsProps) => {
-  const auth = getAuth();
+  const { Account } = useAccount();
+  const defaultTabValue = tabValue > tabs.length - 1 ? 0 : tabValue;
   const handlePinClick = useCallback(
     (tabNumber: number) => {
       setPinnedTab("pinnedTab", tabNumber);
@@ -143,20 +140,23 @@ const HeaderTabs = ({
   const [addTabType, setAddTabType] = useState<"task" | "purchase">("task");
   const [addTabName, setAddTabName] = useState("");
   const onSaveButtonClick = () => {
-    setOpenDialog(false);
-    if (auth.currentUser && addTabName) {
-      addDocTab({
-        name: addTabName,
-        type: addTabType,
-        sharedAccountsId: [],
-        userId: auth.currentUser?.uid,
+    if (!Account || !addTabName) return;
+    addDocTab({
+      name: addTabName,
+      type: addTabType,
+      createUserUid: Account.id,
+      sharedAccounts: [AccountToLink(Account)],
+    }).then((result) => {
+      updateDocAccount(Account.id, {
+        useTabIds: [...Account.useTabIds, result.id],
       });
-    }
+    });
+    setOpenDialog(false);
   };
 
   const plainProps = {
     tabs,
-    tabValue,
+    defaultTabValue,
     setTabValue,
     handlePinClick,
     pinnedTabNum,

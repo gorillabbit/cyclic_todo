@@ -107,7 +107,7 @@ const App = (): JSX.Element => {
                 />
                 <Box textAlign="center">
                   {tabs.map((tab, index) => (
-                    <TabProvider key={tab.id} tabId={tab.id}>
+                    <TabProvider key={tab.id} tab={tab}>
                       {tabValue === index && (
                         <>
                           {tab.type === "task" && (

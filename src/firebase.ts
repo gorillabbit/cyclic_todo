@@ -177,3 +177,6 @@ export const deleteDocTransferTemplate = (id: string) =>
 
 export const addDocTab = (tab: InputTabType) =>
   addDocOperation(dbNames.tab, tab);
+export const updateDocTab = (id: string, updates: Partial<InputTabType>) =>
+  updateDocOperation(dbNames.tab, id, updates);
+export const deleteDocTab = (id: string) => deleteDocOperation(dbNames.tab, id);
