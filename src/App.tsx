@@ -41,7 +41,6 @@ const App = (): JSX.Element => {
     },
   });
   const [Account, setAccount] = useState<AccountType>();
-  const [isGapiMounted, setIsGapiMounted] = useState<boolean>(false);
   const [pinnedTab, setPinnedTab] = useCookies(["pinnedTab"]);
   const pinnedTabNum = pinnedTab.pinnedTab ? Number(pinnedTab.pinnedTab) : 0;
   const [tabValue, setTabValue] = useState<number>(pinnedTabNum);
@@ -93,7 +92,7 @@ const App = (): JSX.Element => {
       <LocalizationProvider dateAdapter={AdapterDateFns}>
         <ThemeProvider theme={theme}>
           <AccountProvider {...{ Account }}>
-            <Header {...{ setIsGapiMounted }} />
+            <Header />
             {Account && (
               <>
                 <HeaderTabs
@@ -119,7 +118,7 @@ const App = (): JSX.Element => {
                                 <Box m={isSmall ? 0 : 2}>
                                   <LogList />
                                   <TaskList />
-                                  <Calendar isGapiMounted={isGapiMounted} />
+                                  <Calendar />
                                 </Box>
                               </LogProvider>
                             </TaskProvider>

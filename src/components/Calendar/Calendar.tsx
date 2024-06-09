@@ -18,11 +18,7 @@ import TaskInputForm from "../InputForms/TaskInputForm";
 import Task from "../Task/Task";
 import Log from "../Log/Log";
 
-interface CalendarProp {
-  isGapiMounted: boolean;
-}
-
-const Calendar: React.FC<CalendarProp> = ({ isGapiMounted }) => {
+const Calendar = () => {
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [googleCalendarEvents, setGoogleCalendarEvents] = useState([]);
   const { logList, logsCompleteLogsList } = useLog();
@@ -95,11 +91,11 @@ const Calendar: React.FC<CalendarProp> = ({ isGapiMounted }) => {
   useEffect(() => {
     gapi.auth2.getAuthInstance().isSignedIn.listen((isSignedIn: boolean) => {
       setIsSignedIn(isSignedIn);
+      if (isSignedIn) {
+        listUpcomingEvents();
+      }
     });
-    if (isGapiMounted) {
-      listUpcomingEvents();
-    }
-  }, [isGapiMounted, isSignedIn]);
+  }, [isSignedIn]);
 
   const { width } = useWindowSize();
   const isSmallScreen = width < 768; // 768px以下を小さい画面と定義

@@ -10,30 +10,19 @@ const config = {
   discoveryDocs: [process.env.REACT_APP_GOOGLE_CALENDER_discoveryDocs],
 };
 
-interface CalendarSignInButtonProp {
-  setIsGapiMounted: React.Dispatch<React.SetStateAction<boolean>>;
-}
-
-const CalendarSignInButton: React.FC<CalendarSignInButtonProp> = ({
-  setIsGapiMounted,
-}) => {
+const CalendarSignInButton = () => {
   const [isSignedIn, setIsSignedIn] = useState(false);
   useEffect(() => {
     const initClient = async () => {
       await gapi.client.init(config);
       await gapi.client.load("calendar", "v3");
       const isSignedIn = gapi.auth2.getAuthInstance().isSignedIn;
-      isSignedIn.listen(setSigninStatus);
-      setSigninStatus(isSignedIn.get());
+      isSignedIn.listen(setIsSignedIn);
+      setIsSignedIn(isSignedIn.get());
     };
     gapi.load("client:auth2", initClient);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const setSigninStatus = (isSignedIn: boolean) => {
-    setIsSignedIn(isSignedIn);
-    setIsGapiMounted(isSignedIn);
-  };
 
   const handleSignInClick = () => {
     gapi.auth2.getAuthInstance().signIn();
@@ -47,7 +36,12 @@ const CalendarSignInButton: React.FC<CalendarSignInButtonProp> = ({
       variant="contained"
       onClick={isSignedIn ? handleSignOutClick : handleSignInClick}
     >
-      <img src={googleCalendarIcon} alt="googleCalendarアイコン" width={30} />
+      <img
+        src={googleCalendarIcon}
+        alt="googleCalendarアイコン"
+        width={25}
+        style={{ marginRight: 4 }}
+      />
       {isSignedIn ? "解除" : "連携"}
     </Button>
   );

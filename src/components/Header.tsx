@@ -3,11 +3,7 @@ import AccountChip from "./AccountChip";
 import CalendarSignInButton from "./CalendarSignInButton";
 import AccountShareButton from "./AccountShareButton";
 
-const Header = ({
-  setIsGapiMounted,
-}: {
-  setIsGapiMounted: React.Dispatch<React.SetStateAction<boolean>>;
-}) => {
+const Header = () => {
   return (
     <Box
       gap={1}
@@ -19,7 +15,7 @@ const Header = ({
       bgcolor="#d8f2d5"
     >
       <AccountChip />
-      <CalendarSignInButton setIsGapiMounted={setIsGapiMounted} />
+      <CalendarSignInButton />
       <AccountShareButton />
     </Box>
   );
