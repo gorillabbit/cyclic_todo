@@ -48,11 +48,11 @@ const DoughnutContainer = ({
 }: {
   monthlyPurchases: PurchaseListType[];
 }) => {
-  const PurchasesWitoutTransfer = useMemo(
+  const PurchasesWithoutTransfer = useMemo(
     () => monthlyPurchases.filter((purchase) => purchase.category !== "送受金"),
     [monthlyPurchases]
   );
-  const PayLaterCategoryPurchase = PurchasesWitoutTransfer.map((purchase) => ({
+  const PayLaterCategoryPurchase = PurchasesWithoutTransfer.map((purchase) => ({
     ...purchase,
     category: isLaterPayment(purchase)
       ? purchase.method.label + "支払い"
