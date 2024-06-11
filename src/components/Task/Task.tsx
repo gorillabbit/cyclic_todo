@@ -19,7 +19,7 @@ import { getAuth } from "firebase/auth";
 import { BodyTypography } from "../TypographyWrapper";
 import EditIcon from "@mui/icons-material/Edit";
 import TaskInputForm from "../InputForms/TaskInputForm";
-import { getUnixTime, parse } from "date-fns";
+import { getUnixTime } from "date-fns";
 
 interface TaskProps {
   task: TaskType;
@@ -61,7 +61,7 @@ const toggleCompletion = (task: TaskType) => {
   }
 };
 
-const Task: React.FC<TaskProps> = ({ task, setTaskList, tasklist }) => {
+const Task = ({ task, setTaskList, tasklist }: TaskProps) => {
   const backgroundColor = getBackgroundColor(
     task.hasDue
       ? task.hasDueTime
@@ -91,7 +91,6 @@ const Task: React.FC<TaskProps> = ({ task, setTaskList, tasklist }) => {
             alignItems="center"
             gap={1}
           >
-            {task.icon && <></>}
             <Typography
               variant="h5"
               textAlign="center"
@@ -163,16 +162,8 @@ const Task: React.FC<TaskProps> = ({ task, setTaskList, tasklist }) => {
       >
         <DialogContent>
           <TaskInputForm
-            openDialog={true}
-            propTask={{
-              ...task,
-              dueDate: parse(
-                task.dueDate as string,
-                "yyyy年MM月dd日",
-                new Date()
-              ),
-              dueTime: parse(task.dueTime as string, "HH時mm分", new Date()),
-            }}
+            openDialog
+            propTask={task}
             setIsOpenEditDialog={setIsOpenEditDialog}
           />
         </DialogContent>

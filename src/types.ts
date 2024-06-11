@@ -14,9 +14,9 @@ export interface TaskInputType {
   userId: string;
   text: string;
   hasDue: boolean;
-  dueDate: string | Date;
+  dueDate: string;
   hasDueTime: boolean;
-  dueTime: string | Date;
+  dueTime: string;
   completed: boolean;
   is周期的: string;
   周期日数: string;

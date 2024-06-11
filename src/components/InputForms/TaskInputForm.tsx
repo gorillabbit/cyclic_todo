@@ -9,37 +9,37 @@ import {
 import { DatePicker, TimePicker } from "@mui/x-date-pickers";
 import { useState } from "react";
 import { addDocTask, updateDocTask } from "../../firebase";
-import { format } from "date-fns";
+import { format, parse } from "date-fns";
 import { TaskInputType, TaskType } from "../../types.js";
 import { getAuth } from "firebase/auth";
 import StyledCheckbox from "../StyledCheckbox";
 import { useTab } from "../../hooks/useData.js";
 
 interface TaskInputFormProp {
-  date?: Date;
+  date?: Date; // カレンダーからの日付指定
   openDialog?: boolean;
   buttonAction?: () => void;
-  propTask?: TaskType;
+  propTask?: TaskType; // 編集時のタスク情報
   setIsOpenEditDialog?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const auth = getAuth();
 
-const TaskInputForm: React.FC<TaskInputFormProp> = ({
+const TaskInputForm = ({
   date,
   openDialog,
   buttonAction,
   propTask,
   setIsOpenEditDialog,
-}) => {
+}: TaskInputFormProp) => {
   const { tabId } = useTab();
   const defaultNewTask: TaskInputType = propTask ?? {
     userId: "",
     text: "",
     hasDue: date ? true : false,
-    dueDate: date ?? new Date(),
+    dueDate: "",
     hasDueTime: date ? true : false,
-    dueTime: date ?? new Date(new Date().setHours(0, 0, 0, 0)),
+    dueTime: "",
     is周期的: "周期なし",
     周期日数: "1",
     周期単位: "日",
@@ -49,28 +49,49 @@ const TaskInputForm: React.FC<TaskInputFormProp> = ({
     tabId,
   };
 
+  const [newDueDate, setNewDueDate] = useState<Date>(
+    date ??
+      (propTask?.dueDate
+        ? parse(propTask?.dueDate, "yyyy年MM月dd日", new Date())
+        : new Date())
+  );
+  const [newDueTime, setNewDueTime] = useState<Date>(
+    date ??
+      (propTask?.dueTime
+        ? parse(propTask?.dueTime, "HH時mm分", new Date())
+        : new Date(new Date().setHours(0, 0, 0, 0)))
+  );
+
   const [newTask, setNewTask] = useState<TaskInputType>(defaultNewTask);
-  const handleNewTaskInput = (name: string, value: any) => {
-    if (name === "周期日数" && parseInt(value, 10) <= 0) {
+  const handleNewTaskInput = (name: string, value: string | boolean) => {
+    if (
+      name === "周期日数" &&
+      typeof value === "string" &&
+      parseInt(value, 10) <= 0
+    ) {
       alert("0以下は入力できません。");
       return;
     }
     setNewTask((prev) => ({ ...prev, [name]: value }));
   };
 
-  const validateTask = (task: TaskInputType) => {
-    return {
-      ...task,
-      dueDate: format(task.dueDate as unknown as number, "yyyy年MM月dd日"),
-      dueTime: task.dueTime
-        ? format(task.dueTime as unknown as number, "HH時mm分")
-        : "",
-    };
+  const handleDateChange = (name: string, value: Date | null) => {
+    if (value) {
+      if (name === "dueDate") setNewDueDate(value);
+      if (name === "dueTime") setNewDueTime(value);
+    }
   };
+
+  const validateTask = (task: TaskInputType) => ({
+    ...task,
+    dueDate: format(newDueDate, "yyyy年MM月dd日"),
+    dueTime: newDueTime ? format(newDueTime, "HH時mm分") : "",
+  });
 
   // タスクの追加
   const addTask = () => {
-    if (newTask && auth.currentUser) {
+    if (newTask.text === "") return alert("タスクを入力してください。");
+    if (auth.currentUser) {
       const validatedTask = validateTask(newTask);
       const userId = auth.currentUser.uid;
       addDocTask({ ...validatedTask, userId });
@@ -80,14 +101,8 @@ const TaskInputForm: React.FC<TaskInputFormProp> = ({
   };
 
   const editTask = () => {
-    if (newTask && auth.currentUser) {
-      const validatedTask = validateTask(newTask) as TaskType;
-      const userId = auth.currentUser.uid;
-      updateDocTask(validatedTask.id, {
-        ...validatedTask,
-        userId,
-      });
-    }
+    const validatedTask = validateTask(newTask) as TaskType;
+    updateDocTask(validatedTask.id, validatedTask);
     setIsOpenEditDialog?.(false);
   };
 
@@ -97,7 +112,6 @@ const TaskInputForm: React.FC<TaskInputFormProp> = ({
         <TextField
           autoFocus
           fullWidth
-          required
           label="タスク"
           value={newTask.text}
           onChange={(e) => handleNewTaskInput("text", e.target.value)}
@@ -121,17 +135,16 @@ const TaskInputForm: React.FC<TaskInputFormProp> = ({
             >
               期日
             </StyledCheckbox>
-
             {newTask.hasDue && (
               <DatePicker
                 label="期日-年月日"
-                value={newTask.dueDate}
-                onChange={(value) => handleNewTaskInput("dueDate", value)}
+                value={newDueDate}
+                onChange={(value) => handleDateChange("dueDate", value)}
                 sx={{ maxWidth: 150 }}
               />
             )}
 
-            {newTask.hasDue && newTask.dueDate && (
+            {newTask.hasDue && newDueDate && (
               <>
                 <StyledCheckbox
                   value={newTask.hasDueTime}
@@ -145,8 +158,8 @@ const TaskInputForm: React.FC<TaskInputFormProp> = ({
                   <TimePicker
                     ampm={false}
                     label="期日-時刻"
-                    value={newTask.dueTime}
-                    onChange={(value) => handleNewTaskInput("dueTime", value)}
+                    value={newDueTime}
+                    onChange={(value) => handleDateChange("dueTime", value)}
                     sx={{ maxWidth: 120 }}
                   />
                 )}
