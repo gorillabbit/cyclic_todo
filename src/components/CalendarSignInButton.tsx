@@ -4,10 +4,10 @@ import { useEffect, useState } from "react";
 import googleCalendarIcon from "../icons/googleCalendarIcon.svg";
 
 const config = {
-  clientId: process.env.REACT_APP_GOOGLE_CALENDER_CLIENT_ID,
-  apiKey: process.env.REACT_APP_GOOGLE_CALENDER_apiKey,
-  scope: process.env.REACT_APP_GOOGLE_CALENDER_scope,
-  discoveryDocs: [process.env.REACT_APP_GOOGLE_CALENDER_discoveryDocs],
+  clientId: import.meta.env.VITE_GOOGLE_CALENDER_CLIENT_ID,
+  apiKey: import.meta.env.VITE_GOOGLE_CALENDER_apiKey,
+  scope: import.meta.env.VITE_GOOGLE_CALENDER_scope,
+  discoveryDocs: [import.meta.env.VITE_GOOGLE_CALENDER_discoveryDocs],
 };
 
 const CalendarSignInButton = () => {
