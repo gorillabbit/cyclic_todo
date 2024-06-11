@@ -13,8 +13,8 @@ import { useAccount } from "../hooks/useData";
 type PlainHomePageProps = {
   tabValue: number;
   setTabValue: React.Dispatch<React.SetStateAction<number>>;
-  pinnedTabNum: any;
-  setPinnedTab: (name: "pinnedTab", value: any) => void;
+  pinnedTabNum: number;
+  setPinnedTab: (name: "pinnedTab", value: number) => void;
   tabs: TabType[];
 };
 

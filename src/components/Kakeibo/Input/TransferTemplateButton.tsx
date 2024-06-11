@@ -48,6 +48,7 @@ const TransferTemplateButton = ({
 
   const onClickTransferTemplateButton = useCallback(() => {
     // idが残ると、idが同じDocが複数作成され、削除できなくなる
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { id, ...templateTransferWithoutId } = transfer;
     setNewTransfer({
       ...templateTransferWithoutId,

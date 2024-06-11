@@ -22,7 +22,7 @@ type UnderHalfRowProps = {
   handleEditFormChange: (event: {
     target: {
       name: string;
-      value: any;
+      value: unknown;
     };
   }) => void;
   handleSaveClick: () => void;
@@ -73,7 +73,7 @@ type PlainEditPurchaseRowProps = UnderHalfRowProps & {
   isSmall: boolean;
   categorySet: string[];
   methodList: MethodListType[];
-  handleAutocompleteChange: (name: string, value: any) => void;
+  handleAutocompleteChange: (name: string, value: unknown) => void;
   handleMethodChange: (value: string | MethodListType | null) => void;
 };
 
@@ -179,6 +179,7 @@ const EditPurchaseRow = ({
       setIsEdit(false);
     };
     // 決済Purchaseも変更する
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { id, ...childPurchaseWithoutId } = editFormData;
     // 日付の変更にも対応できるようにする
     const childPurchase = {
@@ -209,7 +210,7 @@ const EditPurchaseRow = ({
   }, [editFormData, setIsEdit]);
 
   const handleEditFormChange = useCallback(
-    (event: { target: { name: string; value: any } }) => {
+    (event: { target: { name: string; value: unknown } }) => {
       const { name, value } = event.target;
       setEditFormData((prev) => ({ ...prev, [name]: value }));
     },
@@ -239,7 +240,7 @@ const EditPurchaseRow = ({
   );
 
   const handleAutocompleteChange = useCallback(
-    (name: string, value: any) => {
+    (name: string, value: unknown) => {
       setEditFormData((prev) => ({ ...prev, [name]: value }));
     },
     [setEditFormData]

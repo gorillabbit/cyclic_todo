@@ -12,7 +12,11 @@ import StyledCheckbox from "../../StyledCheckbox";
 import { useState, useCallback } from "react";
 import { addDocPurchaseSchedule } from "../../../firebase";
 import { getAuth } from "firebase/auth";
-import { InputPurchaseScheduleType, defaultMethodList } from "../../../types";
+import {
+  InputPurchaseScheduleType,
+  MethodListType,
+  defaultMethodList,
+} from "../../../types";
 import { addYears } from "date-fns";
 import { DatePicker } from "@mui/x-date-pickers";
 import {
@@ -51,8 +55,8 @@ const PurchaseScheduleInput = () => {
     });
 
   const handleNewPurchaseScheduleInput = useCallback(
-    (name: string, value: any) => {
-      if (name === "price" || name === "date") {
+    (name: string, value: string | Date | boolean | MethodListType | null) => {
+      if (typeof value === "string" && (name === "price" || name === "date")) {
         const numValue = Number(value);
         if (isValidatedNum(value)) {
           if (name === "date" && numValue > 31) {
@@ -148,7 +152,7 @@ const PurchaseScheduleInput = () => {
         />
         <Autocomplete
           value={newPurchaseSchedule.category}
-          onChange={(e, v) => handleNewPurchaseScheduleInput("category", v)}
+          onChange={(_e, v) => handleNewPurchaseScheduleInput("category", v)}
           sx={{ minWidth: 150 }}
           options={categorySet}
           freeSolo

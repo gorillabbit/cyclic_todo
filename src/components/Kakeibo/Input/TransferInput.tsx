@@ -31,7 +31,10 @@ import { useMethod, useTab } from "../../../hooks/useData";
 const auth = getAuth();
 
 type PlainTransferInputProps = {
-  handleNewTransferInput: (name: string, value: any) => void;
+  handleNewTransferInput: (
+    name: string,
+    value: string | Date | MethodListType | null
+  ) => void;
   newTransfer: InputTransferType;
   addTransfer: () => void;
   addTemplate: () => void;
@@ -118,15 +121,18 @@ const TransferInput = () => {
     tabId,
   });
 
-  const handleNewTransferInput = useCallback((name: string, value: any) => {
-    if (name === "price") {
-      if (isValidatedNum(value)) {
-        setNewTransfer((prev) => ({ ...prev, [name]: Number(value) }));
+  const handleNewTransferInput = useCallback(
+    (name: string, value: string | Date | MethodListType | null) => {
+      if (name === "price" && typeof value === "string") {
+        if (isValidatedNum(value)) {
+          setNewTransfer((prev) => ({ ...prev, [name]: Number(value) }));
+        }
+        return;
       }
-      return;
-    }
-    setNewTransfer((prev) => ({ ...prev, [name]: value }));
-  }, []);
+      setNewTransfer((prev) => ({ ...prev, [name]: value }));
+    },
+    []
+  );
 
   const methodError = useMemo(() => {
     if (!newTransfer.to.assetId || !newTransfer.from.assetId) {
