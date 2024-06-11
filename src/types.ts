@@ -61,8 +61,7 @@ export interface InputLogType {
   displayFeature: string[];
   description: string;
   archived: boolean;
-  accessibleAccounts: Pick<AccountType, "email" | "name" | "icon">[];
-  accessibleAccountsEmails: string[];
+  accessibleAccounts: AccountLinkType[];
   tabId: string;
 }
 
