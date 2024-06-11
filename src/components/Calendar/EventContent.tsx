@@ -1,6 +1,10 @@
 import { Box, Tooltip } from "@mui/material";
 
-const EventContent = (eventInfo: any) => {
+const EventContent = (eventInfo: {
+  timeText: string;
+  event: { _def: { title: string } };
+  backgroundColor?: string;
+}) => {
   return (
     <Tooltip
       title={eventInfo.timeText + " " + eventInfo.event._def.title}
