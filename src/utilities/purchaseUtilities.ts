@@ -180,6 +180,7 @@ export const addScheduledPurchase = (
     const userId = auth.currentUser.uid;
     const batchPurchaseList: InputPurchaseType[][] = daysList.map((dateDay) => {
       const docId = doc(collection(db, dbNames.purchase)).id;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { cycle, day, endDate, ...purchaseScheduleWithoutForSchedule } =
         purchaseSchedule;
       const basePurchase = {

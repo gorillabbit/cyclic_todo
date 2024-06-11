@@ -8,14 +8,12 @@ import {
   FormControl,
   InputLabel,
 } from "@mui/material";
-
 import { useState } from "react";
 import { addDocLog, updateDocLog } from "../../firebase";
 import { InputLogType, LogType } from "../../types.js";
 import StyledCheckbox from "../StyledCheckbox";
 import { getAuth } from "firebase/auth";
-import { useAccount } from "../Context/AccountContext";
-import { useTab } from "../Context/TabContext";
+import { useAccount, useTab } from "../../hooks/useData.js";
 
 interface LogInputFormProp {
   propLog?: LogType;
@@ -50,55 +48,61 @@ const LogInputForm: React.FC<LogInputFormProp> = ({
     tabId,
     accessibleAccounts: [
       {
-        name: Account?.name ?? "",
-        email: Account?.email ?? "",
-        icon: Account?.icon ?? "",
+        id: "",
+        name: "",
+        email: "",
+        icon: "",
       },
     ],
-    accessibleAccountsEmails: [Account?.email ?? ""],
   };
 
   const [newLog, setNewLog] = useState<InputLogType | LogType>(
     propLog ?? defaultNewLog
   );
+  const [newAccessibleAccountIds, setNewAccessibleAccountIds] = useState<
+    string[]
+  >(propLog?.accessibleAccounts?.map((account) => account.id) ?? []);
 
-  const handleNewLogInput = (name: string, value: any) => {
-    if (name === "intervalNum" && parseInt(value, 10) <= 0) {
+  const handleNewLogInput = (name: string, value: unknown) => {
+    if (
+      name === "intervalNum" &&
+      typeof value === "string" &&
+      parseInt(value, 10) <= 0
+    ) {
       alert("0以下は入力できません。");
       return;
-    }
-
-    if (name === "accessibleAccounts" && value.length !== 0) {
-      value = value.map((account: string) => {
-        const values = account.split(",");
-        return {
-          name: values[0],
-          email: values[1],
-          icon: values[2],
-        };
-      });
-      setNewLog((prev) => ({
-        ...prev,
-        accessibleAccountsEmails: value.map(
-          (account: { email: string }) => account.email
-        ),
-      }));
     }
     setNewLog((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleMultipleSelect = (value: string[] | string) => {
+    if (Array.isArray(value)) {
+      setNewAccessibleAccountIds(value);
+    }
+  };
+
+  const newAccessibleAccounts = Account?.linkedAccounts.filter((account) =>
+    newAccessibleAccountIds.includes(account.id)
+  );
+
   const addLog = () => {
     if (newLog && auth.currentUser) {
       const userId = auth.currentUser.uid;
-      addDocLog({ ...newLog, userId });
+      addDocLog({
+        ...newLog,
+        userId,
+        accessibleAccounts: newAccessibleAccounts ?? [],
+      });
       setNewLog(defaultNewLog);
     }
   };
 
   const editLog = () => {
-    if (newLog && auth.currentUser) {
-      const userId = auth.currentUser.uid;
-      updateDocLog((newLog as LogType).id, { ...newLog, userId });
+    if (newLog) {
+      updateDocLog((newLog as LogType).id, {
+        ...newLog,
+        accessibleAccounts: newAccessibleAccounts ?? [],
+      });
     }
     setIsOpenEditDialog?.(false);
   };
@@ -218,31 +222,25 @@ const LogInputForm: React.FC<LogInputFormProp> = ({
             >
               完了時メモ
             </StyledCheckbox>
-            <FormControl sx={{ minWidth: 300 }}>
-              <InputLabel>共有アカウント</InputLabel>
-              <Select
-                multiple
-                value={newLog.accessibleAccounts.map(
-                  (account) =>
-                    account.name + "," + account.email + "," + account.icon
-                )}
-                label="共有アカウント"
-                onChange={(e) =>
-                  handleNewLogInput("accessibleAccounts", e.target.value)
-                }
-              >
-                {Account?.linkedAccounts.map((account) => (
-                  <MenuItem
-                    key={account.name}
-                    value={
-                      account.name + "," + account.email + "," + account.icon
-                    }
+            {Account &&
+              Account.linkedAccounts.length > 0 &&
+              newLog.accessibleAccounts && (
+                <FormControl sx={{ minWidth: 300 }}>
+                  <InputLabel>共有アカウント</InputLabel>
+                  <Select
+                    multiple
+                    value={newAccessibleAccountIds}
+                    label="共有アカウント"
+                    onChange={(e) => handleMultipleSelect(e.target.value)}
                   >
-                    {account.name}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+                    {Account.linkedAccounts.map((account) => (
+                      <MenuItem key={account.id} value={account.id}>
+                        {account.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              )}
           </>
         )}
       </FormGroup>

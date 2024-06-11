@@ -10,7 +10,6 @@ import {
 } from "@mui/material";
 import { ChangeEvent, memo, useState } from "react";
 import { updateDocAccount, db } from "../firebase";
-import { useAccount } from "./Context/AccountContext";
 import {
   collection,
   doc,
@@ -23,6 +22,7 @@ import { AccountLinkType, AccountType } from "../types";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { AccountToLink } from "../utilities/tabUtilities";
+import { useAccount } from "../hooks/useData";
 
 const validateEmail = (email: string, account: AccountType): string => {
   const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

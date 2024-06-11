@@ -1,67 +1,49 @@
 {
   "name": "cyclic_todo",
-  "version": "0.1.0",
   "private": true,
-  "homepage": "https://cyclictodo.web.app/",
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview"
+  },
   "dependencies": {
-    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
-    "@fullcalendar/bootstrap5": "^6.1.10",
-    "@fullcalendar/core": "^6.1.10",
-    "@fullcalendar/daygrid": "^6.1.10",
-    "@fullcalendar/interaction": "^6.1.10",
-    "@fullcalendar/list": "^6.1.10",
-    "@fullcalendar/react": "^6.1.10",
-    "@fullcalendar/timegrid": "^6.1.10",
-    "@mui/icons-material": "^5.15.7",
-    "@mui/lab": "^5.0.0-alpha.163",
-    "@mui/material": "^5.15.7",
-    "@mui/x-date-pickers": "^6.19.2",
-    "@testing-library/jest-dom": "^5.17.0",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^13.5.0",
-    "@types/jest": "^27.5.2",
-    "@types/node": "^16.18.78",
-    "@types/react": "^18.2.51",
-    "@types/react-dom": "^18.2.18",
-    "bootstrap": "^5.3.2",
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.5",
+    "@fullcalendar/bootstrap5": "^6.1.14",
+    "@fullcalendar/daygrid": "^6.1.14",
+    "@fullcalendar/interaction": "^6.1.14",
+    "@fullcalendar/react": "^6.1.14",
+    "@fullcalendar/timegrid": "^6.1.14",
+    "@mui/icons-material": "^5.15.19",
+    "@mui/lab": "^5.0.0-alpha.170",
+    "@mui/material": "^5.15.19",
+    "@mui/x-date-pickers": "^7.6.2",
+    "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.11.3",
-    "chart.js": "^4.4.2",
+    "chart.js": "^4.4.3",
     "date-fns": "^2.30.0",
-    "firebase": "^10.7.2",
+    "firebase": "^10.12.2",
     "firebase-admin": "^12.1.1",
     "gapi-script": "^1.2.0",
     "react": "^18.2.0",
     "react-chartjs-2": "^5.2.0",
     "react-cookie": "^7.1.4",
     "react-dom": "^18.2.0",
-    "react-google-calendar-api": "^2.3.0",
-    "react-router-dom": "^6.23.1",
-    "react-scripts": "5.0.1",
-    "typescript": "^4.9.5",
-    "web-vitals": "^2.1.4"
+    "react-router-dom": "^6.23.1"
   },
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+  "devDependencies": {
+    "@types/react": "^18.2.66",
+    "@types/react-dom": "^18.2.22",
+    "@typescript-eslint/eslint-plugin": "^7.2.0",
+    "@typescript-eslint/parser": "^7.2.0",
+    "@vitejs/plugin-react-swc": "^3.5.0",
+    "eslint": "^8.57.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.6",
+    "typescript": "^5.2.2",
+    "vite": "^5.2.0"
   }
 }

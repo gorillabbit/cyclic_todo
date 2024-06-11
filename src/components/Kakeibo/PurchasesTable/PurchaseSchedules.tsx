@@ -12,8 +12,8 @@ import { memo, useMemo } from "react";
 import { PurchaseScheduleListType, PurchaseScheduleType } from "../../../types";
 import { useFirestoreQuery } from "../../../utilities/firebaseUtilities";
 import PurchaseScheduleRow from "./PurchaseScheduleRow/PurchaseScheduleRow";
-import { useTab } from "../../Context/TabContext";
 import { where } from "firebase/firestore";
+import { useTab } from "../../../hooks/useData";
 
 type PlainPurchaseSchedulesProps = {
   purchaseScheduleList: PurchaseScheduleListType[];

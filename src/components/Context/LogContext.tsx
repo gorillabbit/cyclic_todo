@@ -1,9 +1,8 @@
-import { ReactNode, createContext, memo, useContext, useMemo } from "react";
+import { ReactNode, createContext, memo, useMemo } from "react";
 import { orderBy, where } from "firebase/firestore";
 import { InputLogType, LogType, LogsCompleteLogsType } from "../../types.js";
-import { useAccount } from "./AccountContext";
 import { useFirestoreQuery } from "../../utilities/firebaseUtilities";
-import { useTab } from "./TabContext";
+import { useAccount, useTab } from "../../hooks/useData.js";
 
 type LogContextType = {
   logList: LogType[];
@@ -69,5 +68,3 @@ export const LogProvider = memo(
     );
   }
 );
-
-export const useLog = () => useContext(LogContext);

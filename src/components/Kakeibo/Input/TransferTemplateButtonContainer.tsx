@@ -5,7 +5,7 @@ import { orderBy, where } from "firebase/firestore";
 import { useFirestoreQuery } from "../../../utilities/firebaseUtilities";
 import { dbNames } from "../../../firebase";
 import TransferTemplateButton from "./TransferTemplateButton";
-import { useTab } from "../../Context/TabContext";
+import { useTab } from "../../../hooks/useData";
 
 type PlainTemplateButtonsContainerProps = {
   transfers: TransferType[];

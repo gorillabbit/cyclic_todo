@@ -14,15 +14,15 @@ import PushPinRoundedIcon from "@mui/icons-material/PushPinRounded";
 import PushPinOutlinedIcon from "@mui/icons-material/PushPinOutlined";
 import AddIcon from "@mui/icons-material/Add";
 import { addDocTab, updateDocAccount } from "../firebase";
-import { useAccount } from "./Context/AccountContext";
 import { TabType } from "../types";
 import { AccountToLink } from "../utilities/tabUtilities";
+import { useAccount } from "../hooks/useData";
 
 type HeaderTabsProps = {
   tabValue: number;
   setTabValue: React.Dispatch<React.SetStateAction<number>>;
-  pinnedTabNum: any;
-  setPinnedTab: (name: "pinnedTab", value: any) => void;
+  pinnedTabNum: number;
+  setPinnedTab: (name: "pinnedTab", value: number) => void;
   tabs: TabType[];
 };
 
@@ -33,7 +33,6 @@ type PlainHeaderTabsProps = Omit<
   tabs: TabType[];
   defaultTabValue: number;
   handlePinClick: (tabNumber: number) => void;
-  pinnedTabNum: any;
   openDialog: boolean;
   setOpenDialog: React.Dispatch<React.SetStateAction<boolean>>;
   addTabType: "task" | "purchase";
@@ -59,7 +58,7 @@ const PlainHeaderTabs = memo(
     setAddTabName,
   }: PlainHeaderTabsProps): JSX.Element => (
     <Box display="flex">
-      <Tabs value={defaultTabValue} onChange={(e, v) => setTabValue(v)}>
+      <Tabs value={defaultTabValue} onChange={(_e, v) => setTabValue(v)}>
         {tabs.map((tab, index) => (
           <Tab
             key={tab.id}

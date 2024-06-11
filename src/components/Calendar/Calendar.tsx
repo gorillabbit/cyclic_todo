@@ -5,28 +5,35 @@ import { useEffect, useState } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
-import interactionPlugin from "@fullcalendar/interaction";
+import interactionPlugin, { DateClickArg } from "@fullcalendar/interaction";
 import { gapi } from "gapi-script";
-import { useLog } from "../Context/LogContext";
-import { useWindowSize } from "../../hooks/useWindowSize";
+import { useIsSmall } from "../../hooks/useWindowSize";
 import EventContent from "./EventContent";
 import bootstrap5Plugin from "@fullcalendar/bootstrap5";
-import { useTask } from "../Context/TaskContext";
 import { parse } from "date-fns";
 import { Button, Dialog, DialogContent, DialogTitle } from "@mui/material";
 import TaskInputForm from "../InputForms/TaskInputForm";
 import Task from "../Task/Task";
 import Log from "../Log/Log";
+import { EventClickArg } from "@fullcalendar/core/index.js";
+import { useLog, useTask } from "../../hooks/useData";
 
 const Calendar = () => {
   const [isSignedIn, setIsSignedIn] = useState(false);
-  const [googleCalendarEvents, setGoogleCalendarEvents] = useState([]);
+  const [googleCalendarEvents, setGoogleCalendarEvents] = useState<
+    {
+      title: string;
+      start: Date;
+      end: Date;
+      extendedProps: { source: string };
+    }[]
+  >([]);
   const { logList, logsCompleteLogsList } = useLog();
   const logEvents = logList.map((log) => {
     const completeLogs = logsCompleteLogsList.filter(
       (completeLog) => completeLog.logId === log.id
     );
-    const events: any[] = [];
+    const events = [];
     while (completeLogs.length > 0) {
       events.push({
         title: log.text,
@@ -42,6 +49,7 @@ const Calendar = () => {
 
   const { taskList } = useTask();
   const taskEvents = taskList.map((task) => {
+    const extendedProps = { source: "taskList", id: task.id };
     return [
       {
         title: task.text + " 期日",
@@ -54,13 +62,13 @@ const Calendar = () => {
           : "",
         color: "#c43b31",
         allDay: task.hasDue && !task.hasDueTime,
-        extendedProps: { source: "taskList", id: task.id },
+        extendedProps,
       },
       {
         title: task.text + " 完了",
         start: task.completed ? task.toggleCompletionTimestamp?.toDate() : "",
         color: "#c43b31",
-        extendedProps: { source: "taskList", id: task.id },
+        extendedProps,
       },
     ];
   });
@@ -75,17 +83,33 @@ const Calendar = () => {
         maxResults: 100,
         orderBy: "startTime",
       })
-      .then((response: { result: { items: any } }) => {
-        const resultEvents = response.result.items.map((item: any) => {
-          return {
-            title: item.summary,
-            start: item.start.dateTime ?? item.start.date,
-            end: item.end.dateTime ?? item.end.date,
-            extendedProps: { source: "googleCalendar" },
+      .then(
+        (response: {
+          result: {
+            items: {
+              summary: string;
+              start: { dateTime: Date; date: Date };
+              end: { dateTime: Date; date: Date };
+            }[];
           };
-        });
-        setGoogleCalendarEvents(resultEvents);
-      });
+        }) => {
+          const resultEvents = response.result.items.map(
+            (item: {
+              summary: string;
+              start: { dateTime: Date; date: Date };
+              end: { dateTime: Date; date: Date };
+            }) => {
+              return {
+                title: item.summary,
+                start: item.start.dateTime ?? item.start.date,
+                end: item.end.dateTime ?? item.end.date,
+                extendedProps: { source: "googleCalendar" },
+              };
+            }
+          );
+          setGoogleCalendarEvents(resultEvents);
+        }
+      );
   };
 
   useEffect(() => {
@@ -97,16 +121,15 @@ const Calendar = () => {
     });
   }, [isSignedIn]);
 
-  const { width } = useWindowSize();
-  const isSmallScreen = width < 768; // 768px以下を小さい画面と定義
+  const isSmall = useIsSmall();
 
   const [calendarView, setCalendarView] = useState("");
 
   const [openInputDialog, setOpenInputDialog] = useState(false); // ダイアログの開閉状態
-  const [selectedDate, setSelectedDate] = useState(null); // 選択された日付
+  const [selectedDate, setSelectedDate] = useState<Date>(); // 選択された日付
 
   // カレンダーの日付がクリックされたときの処理
-  const handleDateClick = (arg: any) => {
+  const handleDateClick = (arg: DateClickArg) => {
     setSelectedDate(arg.date); // 選択された日付を設定
     setOpenInputDialog(true); // ダイアログを開く
   };
@@ -118,7 +141,7 @@ const Calendar = () => {
 
   const [openEventDialog, setOpenEventDialog] = useState(false);
   const [clickedEvent, setClickedEvent] = useState({ source: "", id: "" });
-  const handleEventClick = (arg: any) => {
+  const handleEventClick = (arg: EventClickArg) => {
     if (arg.event._def.extendedProps.source !== "googleCalendar") {
       setClickedEvent({
         source: arg.event._def.extendedProps.source,
@@ -147,7 +170,7 @@ const Calendar = () => {
         titleFormat={{ year: "numeric", month: "2-digit", day: "2-digit" }}
         headerToolbar={{
           left: "prev,next",
-          center: isSmallScreen ? "" : "title",
+          center: isSmall ? "" : "title",
           right: "dayGridMonth,week,timeGridDay",
         }}
         events={[
@@ -155,7 +178,7 @@ const Calendar = () => {
           ...logEvents.flat(),
           ...taskEvents.flat(),
         ]}
-        {...(isSmallScreen && calendarView === "dayGridMonth"
+        {...(isSmall && calendarView === "dayGridMonth"
           ? { eventContent: EventContent }
           : {})}
         viewDidMount={(e) => setCalendarView(e.view.type)}
@@ -163,11 +186,11 @@ const Calendar = () => {
           dayGridMonth: {
             titleFormat: { year: "numeric", month: "2-digit" },
           },
-          week: { type: "timeGrid", duration: { days: isSmallScreen ? 4 : 7 } },
+          week: { type: "timeGrid", duration: { days: isSmall ? 4 : 7 } },
         }}
         locale="ja"
-        dateClick={(arg) => handleDateClick(arg)}
-        eventClick={(arg) => handleEventClick(arg)}
+        dateClick={handleDateClick}
+        eventClick={handleEventClick}
       />
       <Dialog open={openInputDialog} onClose={handleClose}>
         <DialogTitle>タスク追加</DialogTitle>
@@ -187,14 +210,14 @@ const Calendar = () => {
           {clickedEvent.source === "taskList" && (
             <Task
               task={taskList.filter((task) => task.id === clickedEvent.id)[0]}
-            ></Task>
+            />
           )}
           {clickedEvent.source === "logList" && (
             <Log
               log={logList.filter((log) => log.id === clickedEvent.id)[0]}
               logsCompleteLogs={logsCompleteLogsList}
-              openDialog={true}
-            ></Log>
+              openDialog
+            />
           )}
 
           <Button onClick={handleCloseEventDialog}>閉じる</Button>

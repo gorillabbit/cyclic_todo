@@ -29,7 +29,7 @@ type PlainLoginPageProps = {
     e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
   ) => void;
   handleLogin: () => void;
-  handleSignin: () => void;
+  handleSignIn: () => void;
   handleGoogleLogin: () => void;
   toggleButton: string;
   handleToggleButton: (value: string) => void;
@@ -41,7 +41,7 @@ const PlainLoginPage = memo(
     Fields,
     handleInputChange,
     handleLogin,
-    handleSignin,
+    handleSignIn,
     handleGoogleLogin,
     toggleButton,
     handleToggleButton,
@@ -90,7 +90,7 @@ const PlainLoginPage = memo(
           <Button onClick={handleLogin}>ログイン</Button>
         )}
         {toggleButton === "signIn" && (
-          <Button onClick={handleSignin}>新規登録</Button>
+          <Button onClick={handleSignIn}>新規登録</Button>
         )}
         <Button onClick={handleGoogleLogin}>Googleでログイン</Button>
       </Box>
@@ -165,7 +165,7 @@ const LoginPage = () => {
   }, []);
 
   const accountRef = collection(db, "Accounts");
-  const handleSignin = useCallback(() => {
+  const handleSignIn = useCallback(() => {
     if (!Fields.email || !Fields.password) {
       alert("メールアドレスとパスワードを入力してください");
       return;
@@ -218,7 +218,7 @@ const LoginPage = () => {
     Fields,
     handleInputChange,
     handleLogin,
-    handleSignin,
+    handleSignIn,
     handleGoogleLogin,
     toggleButton,
     handleToggleButton,

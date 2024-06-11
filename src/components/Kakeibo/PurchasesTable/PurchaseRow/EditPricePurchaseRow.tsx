@@ -10,7 +10,7 @@ type UnderHalfRowProps = {
   handleEditFormChange: (event: {
     target: {
       name: string;
-      value: any;
+      value: unknown;
     };
   }) => void;
   editFormData: InputPurchaseRowType;
@@ -102,6 +102,7 @@ const EditPricePurchaseRow = ({
     updateDocPurchase(editFormData.id, certainPurchase);
     // 決済Purchaseもあるなら変更する
     if (editFormData.childPurchaseId) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { id, date, ...childPurchaseWithoutId } = certainPurchase;
       updateDocPurchase(editFormData.childPurchaseId, {
         ...childPurchaseWithoutId,
@@ -113,7 +114,7 @@ const EditPricePurchaseRow = ({
   }, [editFormData, setEditFormData, setIsEditPrice]);
 
   const handleEditFormChange = useCallback(
-    (event: { target: { name: string; value: any } }) => {
+    (event: { target: { name: string; value: unknown } }) => {
       const { name, value } = event.target;
       setEditFormData((prev) => ({ ...prev, [name]: value }));
     },

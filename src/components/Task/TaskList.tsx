@@ -2,7 +2,7 @@ import { Masonry } from "@mui/lab";
 import { Box, Typography, Button } from "@mui/material";
 import Task from "./Task";
 import { useMemo, useState } from "react";
-import { useTask } from "../Context/TaskContext";
+import { useTask } from "../../hooks/useData";
 
 const TaskList = () => {
   const { taskList } = useTask();

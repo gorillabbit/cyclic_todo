@@ -49,7 +49,7 @@ const TemplateButton = ({
   const [openDialog, setOpenDialog] = useState<boolean>(false);
 
   const onClickTemplateButton = useCallback(() => {
-    // idが残ると、idが同じDocが複数作成され、削除できなくなる
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { id, ...templatePurchaseWithoutId } = template;
     setNewPurchase({
       ...templatePurchaseWithoutId,

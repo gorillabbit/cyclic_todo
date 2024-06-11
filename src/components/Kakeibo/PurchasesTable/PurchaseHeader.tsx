@@ -12,7 +12,7 @@ import { memo, useMemo } from "react";
 import { PurchaseListType } from "../../../types";
 import { lastDayOfMonth } from "date-fns";
 import { sumSpentAndIncome } from "../../../utilities/purchaseUtilities";
-import { useAsset } from "../../Context/AssetContext";
+import { useAsset } from "../../../hooks/useData";
 
 type PlainPurchaseHeaderProps = {
   currentMoney: number;

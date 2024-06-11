@@ -17,7 +17,7 @@ import {
   isValidatedNum,
   numericProps,
 } from "../../../utilities/purchaseUtilities";
-import { useMethod } from "../../Context/MethodContext";
+import { useMethod } from "../../../hooks/useData";
 
 type PlainMethodListProps = {
   method: MethodListType;

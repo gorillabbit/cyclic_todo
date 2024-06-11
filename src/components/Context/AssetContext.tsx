@@ -1,9 +1,9 @@
-import { ReactNode, createContext, memo, useContext, useMemo } from "react";
+import { ReactNode, createContext, memo, useMemo } from "react";
 import { orderBy, where } from "firebase/firestore";
 import { AssetListType, AssetType } from "../../types.js";
 import { useFirestoreQuery } from "../../utilities/firebaseUtilities";
 import { getLatestBalance } from "../../utilities/purchaseUtilities";
-import { useTab } from "./TabContext";
+import { useTab } from "../../hooks/useData.js";
 
 type AssetContextType = {
   assetList: AssetListType[];
@@ -41,5 +41,3 @@ export const AssetProvider = memo(
     );
   }
 );
-
-export const useAsset = () => useContext(AssetContext);

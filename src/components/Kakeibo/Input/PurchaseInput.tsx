@@ -14,15 +14,16 @@ import {
   numericProps,
 } from "../../../utilities/purchaseUtilities";
 import TemplateButtons from "./TemplateButtonsContainer";
-import { usePurchase } from "../../Context/PurchaseContext";
-import { useMethod } from "../../Context/MethodContext";
 import { getPayLaterDate } from "../../../utilities/dateUtilities";
-import { useTab } from "../../Context/TabContext";
+import { useTab, usePurchase, useMethod } from "../../../hooks/useData";
 
 const auth = getAuth();
 
 type PlainPurchaseInputProps = {
-  handleNewPurchaseInput: (name: string, value: any) => void;
+  handleNewPurchaseInput: (
+    name: string,
+    value: string | Date | boolean | MethodListType | null
+  ) => void;
   newPurchase: InputPurchaseType;
   addPurchase: () => void;
   addTemplate: () => void;
@@ -64,7 +65,7 @@ const PlainPurchaseInput = memo(
           />
           <Autocomplete
             value={newPurchase.category}
-            onChange={(e, v) => handleNewPurchaseInput("category", v)}
+            onChange={(_e, v) => handleNewPurchaseInput("category", v)}
             sx={{ minWidth: 150 }}
             options={categorySet}
             freeSolo
@@ -76,7 +77,7 @@ const PlainPurchaseInput = memo(
             value={newPurchase.method.label ? newPurchase.method : null}
             sx={{ minWidth: 150 }}
             options={methodList}
-            onChange={(e, v) => handleNewPurchaseInput("method", v)}
+            onChange={(_e, v) => handleNewPurchaseInput("method", v)}
             renderInput={(params) => (
               <TextField {...params} label="支払い方法" />
             )}
@@ -126,15 +127,18 @@ const PurchaseInput = () => {
     tabId,
   });
 
-  const handleNewPurchaseInput = useCallback((name: string, value: any) => {
-    if (name === "price") {
-      if (isValidatedNum(value)) {
-        setNewPurchase((prev) => ({ ...prev, [name]: Number(value) }));
+  const handleNewPurchaseInput = useCallback(
+    (name: string, value: string | Date | boolean | MethodListType | null) => {
+      if (name === "price" && typeof value === "string") {
+        if (isValidatedNum(value)) {
+          setNewPurchase((prev) => ({ ...prev, [name]: Number(value) }));
+        }
+        return;
       }
-      return;
-    }
-    setNewPurchase((prev) => ({ ...prev, [name]: value }));
-  }, []);
+      setNewPurchase((prev) => ({ ...prev, [name]: value }));
+    },
+    []
+  );
 
   const addPurchase = useCallback(() => {
     if (!newPurchase.title) {

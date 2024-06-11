@@ -1,21 +1,8 @@
-import React, { memo, useMemo } from "react";
+import { memo, useMemo } from "react";
 import { Doughnut } from "react-chartjs-2";
-import {
-  Chart,
-  ArcElement,
-  Tooltip,
-  Legend,
-  Title,
-  ChartData,
-  CoreChartOptions,
-  DatasetChartOptions,
-  ElementChartOptions,
-  PluginChartOptions,
-  DoughnutControllerChartOptions,
-} from "chart.js";
+import { Chart, ArcElement, Tooltip, Legend, Title, ChartData } from "chart.js";
 import { Box } from "@mui/material";
 import { PurchaseListType } from "../../../types";
-import { _DeepPartialObject } from "chart.js/dist/types/utils";
 
 Chart.register(ArcElement, Tooltip, Legend, Title);
 
@@ -40,18 +27,10 @@ interface DoughnutChartProps {
   title: string;
 }
 
-type PlainDoughnutChartProps = {
+interface PlainDoughnutChartProps {
   data: ChartData<"doughnut", number[], unknown>;
-  options:
-    | _DeepPartialObject<
-        CoreChartOptions<"doughnut"> &
-          ElementChartOptions<"doughnut"> &
-          PluginChartOptions<"doughnut"> &
-          DatasetChartOptions<"doughnut"> &
-          DoughnutControllerChartOptions
-      >
-    | undefined;
-};
+  options: any;
+}
 
 const PlainDoughnutChart = memo(
   ({ data, options }: PlainDoughnutChartProps): JSX.Element => (
@@ -117,7 +96,11 @@ const DoughnutChart = memo(
         plugins: {
           tooltip: {
             callbacks: {
-              label: (tooltipItem: any) =>
+              label: (tooltipItem: {
+                dataset: { labels: { [x: string]: any } };
+                dataIndex: string | number;
+                formattedValue: any;
+              }) =>
                 `${tooltipItem.dataset.labels[tooltipItem.dataIndex]}: ${
                   tooltipItem.formattedValue
                 }`,

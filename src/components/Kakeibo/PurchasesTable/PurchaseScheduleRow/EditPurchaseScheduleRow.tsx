@@ -15,8 +15,6 @@ import {
   InputPurchaseScheduleRowType,
   MethodListType,
 } from "../../../../types";
-import { useMethod } from "../../../Context/MethodContext";
-import { usePurchase } from "../../../Context/PurchaseContext";
 import { updateDocPurchaseSchedule } from "../../../../firebase";
 import {
   addScheduledPurchase,
@@ -24,6 +22,7 @@ import {
   numericProps,
   weekDaysString,
 } from "../../../../utilities/purchaseUtilities";
+import { useMethod, usePurchase } from "../../../../hooks/useData";
 
 type PlainEditPurchaseScheduleRowProps = {
   editFormData: InputPurchaseScheduleRowType;
@@ -31,11 +30,11 @@ type PlainEditPurchaseScheduleRowProps = {
   handleEditFormChange: (event: {
     target: {
       name: string;
-      value: any;
+      value: unknown;
     };
   }) => void;
   categorySet: string[];
-  handleAutocompleteChange: (name: string, value: any) => void;
+  handleAutocompleteChange: (name: string, value: unknown) => void;
   methodList: MethodListType[];
   handleMethodChange: (value: string | MethodListType | null) => void;
   isSmall: boolean;
@@ -181,7 +180,7 @@ const PlainEditPurchaseScheduleRow = memo(
                 sx={{ minWidth: 150 }}
                 options={categorySet}
                 freeSolo
-                onChange={(e, v) => handleAutocompleteChange("category", v)}
+                onChange={(_e, v) => handleAutocompleteChange("category", v)}
                 renderInput={(params) => (
                   <TextField {...params} label="分類" size="small" />
                 )}
@@ -245,8 +244,7 @@ const EditPurchaseScheduleRow = ({
   isSmall: boolean;
 }) => {
   const { methodList } = useMethod();
-  const { categorySet } = usePurchase();
-  const { purchaseList } = usePurchase();
+  const { categorySet, purchaseList } = usePurchase();
 
   // 編集内容を保存する関数
   const handleSaveClick = useCallback(() => {
@@ -269,7 +267,7 @@ const EditPurchaseScheduleRow = ({
   }, [editFormData, purchaseList, setIsEdit]);
 
   const handleEditFormChange = useCallback(
-    (event: { target: { name: string; value: any } }) => {
+    (event: { target: { name: string; value: unknown } }) => {
       const { name, value } = event.target;
       setEditFormData((prev) => ({ ...prev, [name]: value }));
     },
@@ -299,7 +297,7 @@ const EditPurchaseScheduleRow = ({
   );
 
   const handleAutocompleteChange = useCallback(
-    (name: string, value: any) => {
+    (name: string, value: unknown) => {
       setEditFormData((prev) => ({ ...prev, [name]: value }));
     },
     [setEditFormData]

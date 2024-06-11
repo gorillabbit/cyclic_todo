@@ -11,11 +11,10 @@ import {
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { addDocAsset } from "../../../firebase";
 import { getAuth } from "firebase/auth";
-import { useAsset } from "../../Context/AssetContext";
 import { memo, useCallback } from "react";
 import { AssetListType } from "../../../types";
 import AssetRow from "./AssetRow";
-import { useTab } from "../../Context/TabContext";
+import { useAsset, useTab } from "../../../hooks/useData";
 
 type PlainAssetsListProps = {
   assetList: AssetListType[];
