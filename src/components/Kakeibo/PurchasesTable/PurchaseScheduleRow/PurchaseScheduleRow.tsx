@@ -4,12 +4,12 @@ import {
   PurchaseScheduleListType,
 } from "../../../../types";
 import DeleteConfirmDialog from "../../DeleteConfirmDialog";
-import { usePurchase } from "../../../Context/PurchaseContext";
 import { deleteDocPurchaseSchedule } from "../../../../firebase";
 import EditPurchaseScheduleRow from "./EditPurchaseScheduleRow";
 import { useIsSmall } from "../../../../hooks/useWindowSize";
 import NormalPurchaseScheduleRow from "./NormalPurchaseScheduleRow";
 import { deleteScheduledPurchases } from "../../../../utilities/purchaseUtilities";
+import { usePurchase } from "../../../../hooks/useData";
 
 type PlainPurchaseScheduleRowProps = {
   purchaseSchedule: PurchaseScheduleListType;

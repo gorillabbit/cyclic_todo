@@ -10,11 +10,10 @@ import {
   FormControlLabel,
 } from "@mui/material";
 import { memo, useCallback, useState } from "react";
-import { useAccount } from "./Context/AccountContext";
 import { AccountLinkType } from "../types";
-import { useTab } from "./Context/TabContext";
 import { db, updateDocAccount, updateDocTab } from "../firebase";
 import { doc, getDoc } from "firebase/firestore";
+import { useAccount, useTab } from "../hooks/useData";
 
 type PlainShareTabDialogProps = {
   open: boolean;

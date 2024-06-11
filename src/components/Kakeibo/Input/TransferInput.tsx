@@ -23,11 +23,10 @@ import {
   isValidatedNum,
   numericProps,
 } from "../../../utilities/purchaseUtilities";
-import { useMethod } from "../../Context/MethodContext";
 import { getPayLaterDate } from "../../../utilities/dateUtilities";
 import TransferInputButtons from "./TransferInputButtons";
 import TransferTemplateButtonsContainer from "./TransferTemplateButtonContainer";
-import { useTab } from "../../Context/TabContext";
+import { useMethod, useTab } from "../../../hooks/useData";
 
 const auth = getAuth();
 

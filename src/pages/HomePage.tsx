@@ -8,7 +8,7 @@ import { useCookies } from "react-cookie";
 import { AccountType, TabType } from "../types";
 import { getDoc, doc } from "firebase/firestore";
 import { db } from "../firebase";
-import { useAccount } from "../components/Context/AccountContext";
+import { useAccount } from "../hooks/useData";
 
 type PlainHomePageProps = {
   tabValue: number;

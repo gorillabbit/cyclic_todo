@@ -14,10 +14,8 @@ import {
   numericProps,
 } from "../../../utilities/purchaseUtilities";
 import TemplateButtons from "./TemplateButtonsContainer";
-import { usePurchase } from "../../Context/PurchaseContext";
-import { useMethod } from "../../Context/MethodContext";
 import { getPayLaterDate } from "../../../utilities/dateUtilities";
-import { useTab } from "../../Context/TabContext";
+import { useTab, usePurchase, useMethod } from "../../../hooks/useData";
 
 const auth = getAuth();
 

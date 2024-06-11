@@ -14,9 +14,9 @@ import PushPinRoundedIcon from "@mui/icons-material/PushPinRounded";
 import PushPinOutlinedIcon from "@mui/icons-material/PushPinOutlined";
 import AddIcon from "@mui/icons-material/Add";
 import { addDocTab, updateDocAccount } from "../firebase";
-import { useAccount } from "./Context/AccountContext";
 import { TabType } from "../types";
 import { AccountToLink } from "../utilities/tabUtilities";
+import { useAccount } from "../hooks/useData";
 
 type HeaderTabsProps = {
   tabValue: number;

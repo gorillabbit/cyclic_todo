@@ -1,8 +1,8 @@
-import { ReactNode, createContext, memo, useContext, useMemo } from "react";
+import { ReactNode, createContext, memo, useMemo } from "react";
 import { orderBy, where } from "firebase/firestore";
 import { TaskType } from "../../types.js";
 import { useFirestoreQuery } from "../../utilities/firebaseUtilities";
-import { useTab } from "./TabContext";
+import { useTab } from "../../hooks/useData.js";
 
 type TaskContextType = {
   taskList: TaskType[];
@@ -41,5 +41,3 @@ export const TaskProvider = memo(
     );
   }
 );
-
-export const useTask = () => useContext(TaskContext);

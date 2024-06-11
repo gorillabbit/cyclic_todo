@@ -1,7 +1,7 @@
-import { ReactNode, createContext, memo, useContext, useMemo } from "react";
+import { ReactNode, createContext, memo, useMemo } from "react";
 import { TabType } from "../../types";
 
-const TabContext = createContext<{ tabId: string; tab: TabType }>({
+export const TabContext = createContext<{ tabId: string; tab: TabType }>({
   tabId: "",
   tab: {
     id: "",
@@ -22,5 +22,3 @@ export const TabProvider = memo(
     );
   }
 );
-
-export const useTab = () => useContext(TabContext);

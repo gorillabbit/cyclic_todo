@@ -1,8 +1,8 @@
-import { ReactNode, createContext, memo, useContext, useMemo } from "react";
+import { ReactNode, createContext, memo, useMemo } from "react";
 import { orderBy, where } from "firebase/firestore";
 import { MethodListType, MethodType } from "../../types.js";
 import { useFirestoreQuery } from "../../utilities/firebaseUtilities";
-import { useTab } from "./TabContext";
+import { useTab } from "../../hooks/useData.js";
 
 type MethodContextType = {
   methodList: MethodListType[];
@@ -36,5 +36,3 @@ export const MethodProvider = memo(
     );
   }
 );
-
-export const useMethod = () => useContext(MethodContext);

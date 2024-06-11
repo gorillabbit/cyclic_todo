@@ -31,17 +31,15 @@ import {
 } from "../../../firebase";
 import { getAuth } from "firebase/auth";
 import MethodList from "./MethodList";
-import { useMethod } from "../../Context/MethodContext";
 import {
   sumSpentAndIncome,
   numericProps,
 } from "../../../utilities/purchaseUtilities";
-import { usePurchase } from "../../Context/PurchaseContext";
 import { Timestamp } from "firebase/firestore";
 import { getUnixTime } from "date-fns";
 import DeleteConfirmDialog from "../DeleteConfirmDialog";
 import { useIsSmall } from "../../../hooks/useWindowSize";
-import { useTab } from "../../Context/TabContext";
+import { useMethod, useTab, usePurchase } from "../../../hooks/useData";
 
 type UnderHalfRowProps = {
   isNameChanged: boolean;

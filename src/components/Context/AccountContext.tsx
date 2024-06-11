@@ -1,9 +1,9 @@
-import { createContext, useContext } from "react";
+import { createContext } from "react";
 import { AccountType, defaultAccount } from "../../types";
 
 interface AccountContextProp {
   Account: AccountType | undefined;
-  children: any;
+  children: React.ReactNode;
 }
 
 type AccountContextType = {
@@ -28,5 +28,3 @@ export const AccountProvider: React.FC<AccountContextProp> = ({
     </AccountContext.Provider>
   );
 };
-
-export const useAccount = () => useContext(AccountContext);

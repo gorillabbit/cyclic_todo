@@ -21,9 +21,7 @@ import {
   numericProps,
   weekDaysString,
 } from "../../../utilities/purchaseUtilities";
-import { useMethod } from "../../Context/MethodContext";
-import { usePurchase } from "../../Context/PurchaseContext";
-import { useTab } from "../../Context/TabContext";
+import { usePurchase, useMethod, useTab } from "../../../hooks/useData";
 
 const auth = getAuth();
 const defaultNewPurchase: InputPurchaseScheduleType = {

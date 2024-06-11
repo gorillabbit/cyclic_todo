@@ -9,14 +9,13 @@ import { DatePicker } from "@mui/x-date-pickers";
 import { memo, useCallback } from "react";
 import DoneIcon from "@mui/icons-material/Done";
 import { InputPurchaseRowType, MethodListType } from "../../../../types";
-import { useMethod } from "../../../Context/MethodContext";
-import { usePurchase } from "../../../Context/PurchaseContext";
 import {
   updateDocPurchase,
   deleteDocPurchase,
   addDocPurchase,
 } from "../../../../firebase";
 import { getPayLaterDate } from "../../../../utilities/dateUtilities";
+import { useMethod, usePurchase } from "../../../../hooks/useData";
 
 type UnderHalfRowProps = {
   editFormData: InputPurchaseRowType;

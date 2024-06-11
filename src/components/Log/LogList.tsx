@@ -1,8 +1,8 @@
 import { Masonry } from "@mui/lab";
 import { Button } from "@mui/material"; // MUIのButtonをインポート
 import Log from "./Log";
-import { useLog } from "../Context/LogContext";
 import { useState } from "react";
+import { useLog } from "../../hooks/useData";
 
 const LogList = () => {
   const { logList, logsCompleteLogsList, sharedLogList } = useLog();

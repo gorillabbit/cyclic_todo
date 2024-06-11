@@ -11,7 +11,6 @@ import {
 } from "@mui/material";
 import { memo, useCallback, useMemo, useState } from "react";
 import { PurchaseListType } from "../../../types";
-import { usePurchase } from "../../Context/PurchaseContext";
 import PurchaseHeader from "./PurchaseHeader";
 import PurchaseSchedules from "./PurchaseSchedules";
 import PurchasesRow from "./PurchaseRow/PurchasesRow";
@@ -26,6 +25,7 @@ import {
 } from "../../../utilities/purchaseUtilities";
 import DoughnutContainer from "./DoughnutContainer";
 import TableHeadCell from "./TableHeadCell";
+import { usePurchase } from "../../../hooks/useData";
 
 type PlainPurchaseProps = {
   monthlyPurchases: PurchaseListType[];

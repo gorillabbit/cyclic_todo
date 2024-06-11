@@ -9,7 +9,7 @@ import { orderBy, where } from "firebase/firestore";
 import { useFirestoreQuery } from "../../../utilities/firebaseUtilities";
 import TemplateButton from "./TemplateButton";
 import { dbNames } from "../../../firebase";
-import { useTab } from "../../Context/TabContext";
+import { useTab } from "../../../hooks/useData";
 
 type PlainTemplateButtonsContainerProps = {
   templates: PurchaseListType[];

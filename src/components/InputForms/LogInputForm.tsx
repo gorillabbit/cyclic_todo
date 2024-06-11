@@ -8,14 +8,12 @@ import {
   FormControl,
   InputLabel,
 } from "@mui/material";
-
 import { useState } from "react";
 import { addDocLog, updateDocLog } from "../../firebase";
 import { InputLogType, LogType } from "../../types.js";
 import StyledCheckbox from "../StyledCheckbox";
 import { getAuth } from "firebase/auth";
-import { useAccount } from "../Context/AccountContext";
-import { useTab } from "../Context/TabContext";
+import { useAccount, useTab } from "../../hooks/useData.js";
 
 interface LogInputFormProp {
   propLog?: LogType;

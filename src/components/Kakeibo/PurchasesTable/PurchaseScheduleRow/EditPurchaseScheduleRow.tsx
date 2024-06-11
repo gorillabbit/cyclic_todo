@@ -15,8 +15,6 @@ import {
   InputPurchaseScheduleRowType,
   MethodListType,
 } from "../../../../types";
-import { useMethod } from "../../../Context/MethodContext";
-import { usePurchase } from "../../../Context/PurchaseContext";
 import { updateDocPurchaseSchedule } from "../../../../firebase";
 import {
   addScheduledPurchase,
@@ -24,6 +22,7 @@ import {
   numericProps,
   weekDaysString,
 } from "../../../../utilities/purchaseUtilities";
+import { useMethod, usePurchase } from "../../../../hooks/useData";
 
 type PlainEditPurchaseScheduleRowProps = {
   editFormData: InputPurchaseScheduleRowType;
@@ -245,8 +244,7 @@ const EditPurchaseScheduleRow = ({
   isSmall: boolean;
 }) => {
   const { methodList } = useMethod();
-  const { categorySet } = usePurchase();
-  const { purchaseList } = usePurchase();
+  const { categorySet, purchaseList } = usePurchase();
 
   // 編集内容を保存する関数
   const handleSaveClick = useCallback(() => {
