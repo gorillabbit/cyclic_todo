@@ -80,7 +80,7 @@ app.use("/getMethods", async (_req: Request, res: Response) => {
     const methods = querySnapshot.docs.map(
       (doc) => doc.data() as MethodListType
     );
-    res.status(200).json(methods);
+    res.status(200).json(methods.filter((method) => method.timing == "即時"));
   } catch (error) {
     res.status(500).json({ error: error });
   }
