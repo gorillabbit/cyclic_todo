@@ -41,8 +41,10 @@ jobs:
           VITE_GOOGLE_CALENDER_scope: ${{ secrets.VITE_GOOGLE_CALENDER_scope }}
           VITE_GOOGLE_CALENDER_discoveryDocs: ${{ secrets.VITE_GOOGLE_CALENDER_discoveryDocs }}
         run: npm run build
-      - name: build function
-        run: npm --prefix functions ci & npm --prefix functions run build
+      - name: ci function
+        run: npm --prefix functions ci
+      - name: build functions
+        run: npm --prefix functions run build
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: "${{ secrets.GITHUB_TOKEN }}"
