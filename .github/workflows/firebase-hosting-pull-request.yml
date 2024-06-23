@@ -4,8 +4,7 @@
 name: Deploy to Firebase Hosting on PR
 "on": pull_request
 jobs:
-  build_and_preview:
-    if: "${{ github.event.pull_request.head.repo.full_name == github.repository }}"
+  build_and_deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -26,8 +25,7 @@ jobs:
           VITE_GOOGLE_CALENDER_scope: ${{ secrets.VITE_GOOGLE_CALENDER_scope }}
           VITE_GOOGLE_CALENDER_discoveryDocs: ${{ secrets.VITE_GOOGLE_CALENDER_discoveryDocs }}
         run: npm run build
-      - uses: FirebaseExtended/action-hosting-deploy@v0
-        with:
-          repoToken: "${{ secrets.GITHUB_TOKEN }}"
-          firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT_CYCLICTODO }}"
-          projectId: cyclictodo
+      - name: ci function
+        run: npm --prefix functions ci
+      - name: build functions
+        run: npm --prefix functions run build
