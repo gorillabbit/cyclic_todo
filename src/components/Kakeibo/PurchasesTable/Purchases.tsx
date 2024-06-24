@@ -62,7 +62,7 @@ const PlainPurchases = memo(
     HeaderCellWrapper,
   }: PlainPurchaseProps): JSX.Element => (
     <>
-      <AssetsList />
+      <AssetsList orderedPurchase={orderedPurchase} />
       <PurchaseHeader purchaseList={purchasesWithoutGroupFlag} />
       <DoughnutContainer monthlyPurchases={monthlyPurchases} />
       <PurchaseSchedules />

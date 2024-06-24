@@ -106,6 +106,7 @@ type PlainAssetRowProps = UnderHalfRowProps & {
   deleteAction: () => void;
   isSmall: boolean;
   latestLog: BalanceLog;
+  methodSpent: number;
 };
 
 const PlainAssetRow = memo(
@@ -131,6 +132,7 @@ const PlainAssetRow = memo(
     deleteAction,
     isSmall,
     latestLog,
+    methodSpent,
   }: PlainAssetRowProps): JSX.Element => (
     <>
       <TableRow>
@@ -168,6 +170,9 @@ const PlainAssetRow = memo(
               {"→ " + currentBalance}
             </Box>
           )}
+        </TableCell>
+        <TableCell sx={{ px: 0.5 }}>
+          {(isBalanceChanged ? balanceInput : displayBalance) - methodSpent}
         </TableCell>
         <TableCell sx={{ px: 0.5 }}>
           {latestLog.timestamp.toDate().toLocaleDateString()}
@@ -234,7 +239,13 @@ const PlainAssetRow = memo(
   )
 );
 
-const AssetRow = ({ asset }: { asset: AssetListType }) => {
+const AssetRow = ({
+  asset,
+  methodSpent,
+}: {
+  asset: AssetListType;
+  methodSpent: number;
+}) => {
   const [open, setOpen] = useState(false);
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const [assetInput, setAssetInput] = useState<AssetListType>(asset);
@@ -366,6 +377,7 @@ const AssetRow = ({ asset }: { asset: AssetListType }) => {
     deleteAction,
     isSmall,
     latestLog,
+    methodSpent,
   };
 
   return <PlainAssetRow {...plainProps} />;
