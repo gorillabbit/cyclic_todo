@@ -15,12 +15,14 @@ import { AssetListType, PurchaseListType } from "../../../types";
 import AssetRow from "./AssetRow";
 import { useAccount, useAsset, useTab } from "../../../hooks/useData";
 import { lastDayOfMonth } from "date-fns";
+import { sumSpentAndIncome } from "../../../utilities/purchaseUtilities";
 
 type PlainAssetsListProps = {
   assetList: AssetListType[];
   sumAssets: number;
   addAsset: () => void;
   methodSpent: { [key: string]: number };
+  purchaseSum: number;
 };
 
 const PlainAssetsList = memo(
@@ -50,6 +52,9 @@ const PlainAssetsList = memo(
               合計
             </TableCell>
             <TableCell sx={{ px: 0.5 }}>{props.sumAssets}円</TableCell>
+            <TableCell sx={{ px: 0.5 }}>
+              {props.sumAssets - props.purchaseSum}円
+            </TableCell>
           </TableRow>
         </TableBody>
       </Table>
@@ -96,12 +101,14 @@ const AssetTable = ({
       methodSpent[purchase.method.assetId] = Number(purchase.price);
     }
   });
+  const purchaseSum = sumSpentAndIncome(filteredPurchases);
 
   const plainProps = {
     assetList,
     sumAssets,
     addAsset,
     methodSpent,
+    purchaseSum,
   };
 
   return <PlainAssetsList {...plainProps} />;
