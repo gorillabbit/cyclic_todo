@@ -1,6 +1,6 @@
 import { ReactNode, createContext, memo, useMemo } from "react";
 import { orderBy, where } from "firebase/firestore";
-import { InputLogType, LogType, LogsCompleteLogsType } from "../../types.js";
+import { LogType, LogsCompleteLogsType } from "../../types.js";
 import { useFirestoreQuery } from "../../utilities/firebaseUtilities";
 import { useAccount, useTab } from "../../hooks/useData.js";
 
@@ -54,10 +54,11 @@ export const LogProvider = memo(
       ],
       [Account?.email, Account?.id, tabId]
     );
-    const { documents: sharedLogList } = useFirestoreQuery<
-      InputLogType,
-      LogType
-    >("logs", sharedLogsQueryConstraints, true);
+    const { documents: sharedLogList } = useFirestoreQuery<LogType>(
+      "logs",
+      sharedLogsQueryConstraints,
+      true
+    );
 
     const context = useMemo(() => {
       return { logList, logsCompleteLogsList, sharedLogList };

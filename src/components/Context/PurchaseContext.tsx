@@ -1,6 +1,6 @@
 import { ReactNode, createContext, memo, useMemo } from "react";
 import { orderBy, where } from "firebase/firestore";
-import { PurchaseListType, PurchaseType } from "../../types.js";
+import { PurchaseListType } from "../../types.js";
 import { useFirestoreQuery } from "../../utilities/firebaseUtilities";
 import { useTab } from "../../hooks/useData.js";
 
@@ -22,10 +22,11 @@ export const PurchaseProvider = memo(
       () => [orderBy("date"), where("tabId", "==", tabId)],
       [tabId]
     );
-    const { documents: purchaseList } = useFirestoreQuery<
-      PurchaseType,
-      PurchaseListType
-    >("Purchases", purchaseQueryConstraints, true);
+    const { documents: purchaseList } = useFirestoreQuery<PurchaseListType>(
+      "Purchases",
+      purchaseQueryConstraints,
+      true
+    );
 
     const categoryList = purchaseList.map((purchase) => purchase.category);
     const categorySet = categoryList.filter(

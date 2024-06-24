@@ -1,6 +1,6 @@
 import { ReactNode, createContext, memo, useMemo } from "react";
 import { orderBy, where } from "firebase/firestore";
-import { AssetListType, AssetType } from "../../types.js";
+import { AssetListType } from "../../types.js";
 import { useFirestoreQuery } from "../../utilities/firebaseUtilities";
 import { getLatestBalance } from "../../utilities/purchaseUtilities";
 import { useTab } from "../../hooks/useData.js";
@@ -23,10 +23,11 @@ export const AssetProvider = memo(
       () => [orderBy("timestamp"), where("tabId", "==", tabId)],
       [tabId]
     );
-    const { documents: assetList } = useFirestoreQuery<
-      AssetType,
-      AssetListType
-    >("Assets", assetQueryConstraints, true);
+    const { documents: assetList } = useFirestoreQuery<AssetListType>(
+      "Assets",
+      assetQueryConstraints,
+      true
+    );
     const sumAssets = useMemo(
       () => assetList.reduce((acc, asset) => acc + getLatestBalance(asset), 0),
       [assetList]

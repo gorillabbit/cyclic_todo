@@ -9,7 +9,7 @@ import {
   TableBody,
 } from "@mui/material";
 import { memo, useMemo } from "react";
-import { PurchaseScheduleListType, PurchaseScheduleType } from "../../../types";
+import { PurchaseScheduleListType } from "../../../types";
 import { useFirestoreQuery } from "../../../utilities/firebaseUtilities";
 import PurchaseScheduleRow from "./PurchaseScheduleRow/PurchaseScheduleRow";
 import { where } from "firebase/firestore";
@@ -59,10 +59,12 @@ const PurchaseSchedules = () => {
     () => [where("tabId", "==", tabId)],
     [tabId]
   );
-  const { documents: purchaseScheduleList } = useFirestoreQuery<
-    PurchaseScheduleType,
-    PurchaseScheduleListType
-  >("PurchaseSchedules", purchaseScheduleQueryConstraints, true);
+  const { documents: purchaseScheduleList } =
+    useFirestoreQuery<PurchaseScheduleListType>(
+      "PurchaseSchedules",
+      purchaseScheduleQueryConstraints,
+      true
+    );
 
   const plainProps = {
     purchaseScheduleList,

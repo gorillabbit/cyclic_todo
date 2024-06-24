@@ -62,6 +62,12 @@ export const isValidatedNum = (value: string): boolean => {
   }
 };
 
+/**
+ * 収入か支出かでフィルターする
+ * @param purchasesList
+ * @param income
+ * @returns フィルタリングされたpurchasesList
+ */
 export const filterPurchasesByIncomeType = (
   purchasesList: PurchaseListType[],
   income: "income" | "spent"
@@ -120,7 +126,12 @@ export const weekDaysString: WeekDay[] = [
 ];
 
 const today = new Date();
-// 指定日まで毎月の予定日を取得する
+/**
+ * 指定日まで毎月の予定日を取得する
+ * @param dayOfMonth
+ * @param endDate
+ * @returns
+ */
 const listMonthlyDaysUntil = (dayOfMonth: number, endDate: Date) => {
   // 現在の日付が指定された日より後の場合、最初の日付を次の月に設定
   let startMonth = today.getMonth();
@@ -139,6 +150,12 @@ const listMonthlyDaysUntil = (dayOfMonth: number, endDate: Date) => {
   return dates;
 };
 
+/**
+ * 指定曜日まで毎週の予定日を取得する
+ * @param weekDayName
+ * @param endDate
+ * @returns
+ */
 const listWeeklyDaysUntil = (weekDayName: WeekDay, endDate: Date): Date[] => {
   // 今日の日付から次の指定曜日を求める
   const dayOfWeek = weekDays[weekDayName];

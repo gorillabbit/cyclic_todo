@@ -1,10 +1,6 @@
 import { Box } from "@mui/material";
 import { memo, useMemo } from "react";
-import {
-  InputPurchaseType,
-  PurchaseListType,
-  PurchaseType,
-} from "../../../types";
+import { InputPurchaseType, PurchaseListType } from "../../../types";
 import { orderBy, where } from "firebase/firestore";
 import { useFirestoreQuery } from "../../../utilities/firebaseUtilities";
 import TemplateButton from "./TemplateButton";
@@ -39,10 +35,11 @@ const TemplateButtonsContainer = ({
     () => [orderBy("timestamp", "desc"), where("tabId", "==", tabId)],
     [tabId]
   );
-  const { documents: templates } = useFirestoreQuery<
-    PurchaseType,
-    PurchaseListType
-  >(dbNames.purchaseTemplate, purchaseTemplatesQueryConstraints, true);
+  const { documents: templates } = useFirestoreQuery<PurchaseListType>(
+    dbNames.purchaseTemplate,
+    purchaseTemplatesQueryConstraints,
+    true
+  );
 
   const plainProps = {
     templates,

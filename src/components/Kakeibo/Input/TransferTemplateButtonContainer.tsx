@@ -40,10 +40,11 @@ const TransferTemplateButtonsContainer = ({
     () => [orderBy("timestamp", "desc"), where("tabId", "==", tabId)],
     [tabId]
   );
-  const { documents: transfers } = useFirestoreQuery<
-    InputTransferType,
-    TransferType
-  >(dbNames.transferTemplate, purchaseTemplatesQueryConstraints, true);
+  const { documents: transfers } = useFirestoreQuery<TransferType>(
+    dbNames.transferTemplate,
+    purchaseTemplatesQueryConstraints,
+    true
+  );
 
   const plainProps = {
     transfers,
