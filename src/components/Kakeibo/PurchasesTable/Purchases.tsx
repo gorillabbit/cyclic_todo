@@ -11,7 +11,6 @@ import {
 } from "@mui/material";
 import { memo, useCallback, useMemo, useState } from "react";
 import { PurchaseListType } from "../../../types";
-import PurchaseHeader from "./PurchaseHeader";
 import PurchaseSchedules from "./PurchaseSchedules";
 import PurchasesRow from "./PurchaseRow/PurchasesRow";
 import AssetsList from "../Asset/AssetsList";
@@ -29,7 +28,6 @@ import { usePurchase } from "../../../hooks/useData";
 
 type PlainPurchaseProps = {
   monthlyPurchases: PurchaseListType[];
-  purchasesWithoutGroupFlag: PurchaseListType[];
   orderedPurchase: PurchaseListType[];
   getGroupPurchases: (groupedPurchase: PurchaseListType) => PurchaseListType[];
   month: Date;
@@ -50,7 +48,6 @@ type PlainPurchaseProps = {
 const PlainPurchases = memo(
   ({
     monthlyPurchases,
-    purchasesWithoutGroupFlag,
     orderedPurchase,
     getGroupPurchases,
     month,
@@ -63,7 +60,6 @@ const PlainPurchases = memo(
   }: PlainPurchaseProps): JSX.Element => (
     <>
       <AssetsList orderedPurchase={orderedPurchase} />
-      <PurchaseHeader purchaseList={purchasesWithoutGroupFlag} />
       <DoughnutContainer monthlyPurchases={monthlyPurchases} />
       <PurchaseSchedules />
       <Box display="flex" justifyContent="center">
@@ -253,7 +249,6 @@ const Purchases = (): JSX.Element => {
 
   const plainProps = {
     monthlyPurchases,
-    purchasesWithoutGroupFlag,
     orderedPurchase,
     getGroupPurchases,
     month,
