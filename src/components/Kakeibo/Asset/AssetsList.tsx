@@ -10,16 +10,19 @@ import {
 } from "@mui/material";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { addDocAsset } from "../../../firebase";
-import { getAuth } from "firebase/auth";
 import { memo, useCallback } from "react";
-import { AssetListType } from "../../../types";
+import { AssetListType, PurchaseListType } from "../../../types";
 import AssetRow from "./AssetRow";
-import { useAsset, useTab } from "../../../hooks/useData";
+import { useAccount, useAsset, useTab } from "../../../hooks/useData";
+import { lastDayOfMonth } from "date-fns";
+import { sumSpentAndIncome } from "../../../utilities/purchaseUtilities";
 
 type PlainAssetsListProps = {
   assetList: AssetListType[];
   sumAssets: number;
   addAsset: () => void;
+  methodSpent: { [key: string]: number };
+  purchaseSum: number;
 };
 
 const PlainAssetsList = memo(
@@ -28,20 +31,30 @@ const PlainAssetsList = memo(
       <Table>
         <TableHead>
           <TableRow>
-            <TableCell sx={{ px: 0.5 }}></TableCell>
+            <TableCell sx={{ px: 0.5 }} />
             <TableCell sx={{ px: 0.5 }}>名前</TableCell>
             <TableCell sx={{ px: 0.5 }}>残高</TableCell>
+            <TableCell sx={{ px: 0.5 }}>月末残高</TableCell>
             <TableCell sx={{ px: 0.5 }}>最終更新</TableCell>
             <TableCell sx={{ px: 0.5 }} />
           </TableRow>
         </TableHead>
         <TableBody>
           {props.assetList.map((asset) => (
-            <AssetRow asset={asset} key={asset.id} />
+            <AssetRow
+              asset={asset}
+              key={asset.id}
+              methodSpent={props.methodSpent[asset.id] ?? 0}
+            />
           ))}
           <TableRow>
-            <TableCell sx={{ px: 0.5 }}>合計</TableCell>
+            <TableCell sx={{ px: 0.5 }} colSpan={2}>
+              合計
+            </TableCell>
             <TableCell sx={{ px: 0.5 }}>{props.sumAssets}円</TableCell>
+            <TableCell sx={{ px: 0.5 }}>
+              {props.sumAssets - props.purchaseSum}円
+            </TableCell>
           </TableRow>
         </TableBody>
       </Table>
@@ -56,14 +69,18 @@ const PlainAssetsList = memo(
   )
 );
 
-const AssetTable = () => {
+const AssetTable = ({
+  orderedPurchase,
+}: {
+  orderedPurchase: PurchaseListType[];
+}) => {
   const { assetList, sumAssets } = useAsset();
-  const auth = getAuth();
   const { tabId } = useTab();
+  const { Account } = useAccount();
 
   const addAsset = useCallback(() => {
-    if (auth.currentUser) {
-      const userId = auth.currentUser.uid;
+    if (Account) {
+      const userId = Account.id;
       const newAsset = {
         userId: userId,
         name: "",
@@ -72,12 +89,26 @@ const AssetTable = () => {
       };
       addDocAsset(newAsset);
     }
-  }, [auth.currentUser, tabId]);
+  }, [Account, tabId]);
+  const methodSpent: { [key: string]: number } = {};
+  const filteredPurchases = orderedPurchase.filter(
+    (purchase) => purchase.date.toDate() < lastDayOfMonth(new Date())
+  );
+  filteredPurchases.forEach((purchase) => {
+    if (methodSpent[purchase.method.assetId]) {
+      methodSpent[purchase.method.assetId] += Number(purchase.price);
+    } else {
+      methodSpent[purchase.method.assetId] = Number(purchase.price);
+    }
+  });
+  const purchaseSum = sumSpentAndIncome(filteredPurchases);
 
   const plainProps = {
     assetList,
     sumAssets,
     addAsset,
+    methodSpent,
+    purchaseSum,
   };
 
   return <PlainAssetsList {...plainProps} />;
