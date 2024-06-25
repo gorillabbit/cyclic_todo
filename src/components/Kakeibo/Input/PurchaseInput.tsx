@@ -126,6 +126,7 @@ const PurchaseInput = () => {
     ...defaultPurchaseInput,
     tabId,
   });
+  console.log(newPurchase);
 
   const handleNewPurchaseInput = useCallback(
     (name: string, value: string | Date | boolean | MethodListType | null) => {
@@ -164,9 +165,9 @@ const PurchaseInput = () => {
           }
         );
       }
-      setNewPurchase(defaultPurchaseInput);
+      setNewPurchase({ ...defaultPurchaseInput, tabId });
     }
-  }, [newPurchase]);
+  }, [newPurchase, tabId]);
 
   const addTemplate = useCallback(() => {
     if (newPurchase && auth.currentUser) {

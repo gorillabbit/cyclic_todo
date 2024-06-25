@@ -172,7 +172,7 @@ const PlainAssetRow = memo(
           )}
         </TableCell>
         <TableCell sx={{ px: 0.5 }}>
-          {(isBalanceChanged ? balanceInput : displayBalance) - methodSpent}
+          {(isBalanceChanged ? balanceInput : displayBalance) + methodSpent}
         </TableCell>
         <TableCell sx={{ px: 0.5 }}>
           {latestLog.timestamp.toDate().toLocaleDateString()}
@@ -246,6 +246,7 @@ const AssetRow = ({
   asset: AssetListType;
   methodSpent: number;
 }) => {
+  console.log(methodSpent);
   const [open, setOpen] = useState(false);
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const [assetInput, setAssetInput] = useState<AssetListType>(asset);
