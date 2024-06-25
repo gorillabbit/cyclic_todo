@@ -53,7 +53,7 @@ const PlainAssetsList = memo(
             </TableCell>
             <TableCell sx={{ px: 0.5 }}>{props.sumAssets}円</TableCell>
             <TableCell sx={{ px: 0.5 }}>
-              {props.sumAssets - props.purchaseSum}円
+              {props.sumAssets + props.purchaseSum}円
             </TableCell>
           </TableRow>
         </TableBody>
@@ -90,15 +90,21 @@ const AssetTable = ({
       addDocAsset(newAsset);
     }
   }, [Account, tabId]);
+
+  // 月末までの支払い方法別支払い合計
   const methodSpent: { [key: string]: number } = {};
   const filteredPurchases = orderedPurchase.filter(
     (purchase) => purchase.date.toDate() < lastDayOfMonth(new Date())
   );
   filteredPurchases.forEach((purchase) => {
-    if (methodSpent[purchase.method.assetId]) {
-      methodSpent[purchase.method.assetId] += Number(purchase.price);
+    const assetId = purchase.method.assetId;
+    const purchasePrice = purchase.income
+      ? Number(purchase.price)
+      : -Number(purchase.price);
+    if (methodSpent[assetId]) {
+      methodSpent[assetId] += purchasePrice;
     } else {
-      methodSpent[purchase.method.assetId] = Number(purchase.price);
+      methodSpent[assetId] = purchasePrice;
     }
   });
   const purchaseSum = sumSpentAndIncome(filteredPurchases);
