@@ -1,7 +1,7 @@
 import { Autocomplete, Box, Button, FormGroup, TextField } from "@mui/material";
 import StyledCheckbox from "../../StyledCheckbox";
 import { DatePicker } from "@mui/x-date-pickers";
-import { memo, useCallback, useState } from "react";
+import { memo, useCallback, useMemo, useState } from "react";
 import { addDocPurchase, addDocPurchaseTemplate } from "../../../firebase";
 import { getAuth } from "firebase/auth";
 import {
@@ -122,11 +122,13 @@ const PlainPurchaseInput = memo(
 
 const PurchaseInput = () => {
   const { tabId } = useTab();
-  const [newPurchase, setNewPurchase] = useState<InputPurchaseType>({
-    ...defaultPurchaseInput,
-    tabId,
-  });
-  console.log(newPurchase);
+  const defaultPurchaseInputWithTabId = useMemo(
+    () => ({ ...defaultPurchaseInput, tabId }),
+    [tabId]
+  );
+  const [newPurchase, setNewPurchase] = useState<InputPurchaseType>(
+    defaultPurchaseInputWithTabId
+  );
 
   const handleNewPurchaseInput = useCallback(
     (name: string, value: string | Date | boolean | MethodListType | null) => {
@@ -165,9 +167,9 @@ const PurchaseInput = () => {
           }
         );
       }
-      setNewPurchase({ ...defaultPurchaseInput, tabId });
+      setNewPurchase(defaultPurchaseInputWithTabId);
     }
-  }, [newPurchase, tabId]);
+  }, [defaultPurchaseInputWithTabId, newPurchase]);
 
   const addTemplate = useCallback(() => {
     if (newPurchase && auth.currentUser) {
