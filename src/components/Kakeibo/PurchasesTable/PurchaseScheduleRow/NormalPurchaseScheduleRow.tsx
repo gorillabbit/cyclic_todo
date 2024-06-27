@@ -29,14 +29,14 @@ const PlainNormalPurchaseScheduleRow = memo(
         label={editFormData.endDate.toLocaleString().split(" ")[0]}
       />
       <TableCellWrapper label={editFormData.title} />
-      <TableCellWrapper label={editFormData.price + "円"} />
+      <TableCellWrapper label={editFormData.price} />
       <TableCellWrapper label={editFormData.category} />
       <TableCellWrapper label={editFormData.method.label} />
       <TableCellWrapper>
         <PaymentsIcon color={editFormData.income ? "success" : "error"} />
       </TableCellWrapper>
       <TableCellWrapper>
-        {editFormData.isUncertain && <Chip label="未確定" />}
+        {editFormData.isUncertain && <Chip label="未確" />}
       </TableCellWrapper>
       <TableCellWrapper label={editFormData.description} />
       <TableCellWrapper>

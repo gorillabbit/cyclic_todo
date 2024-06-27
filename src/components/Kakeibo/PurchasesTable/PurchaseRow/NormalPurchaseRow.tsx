@@ -25,10 +25,10 @@ const UnderHalfRow = memo(
   }: UnderHalfRowProps) => (
     <>
       <TableCellWrapper>
-        {editFormData.price + "円"}
+        {editFormData.price}
         {editFormData.method.timing === "翌月" &&
           editFormData.childPurchaseId && <Chip label="翌月" />}
-        {editFormData.isUncertain && <Chip label="未確定" />}
+        {editFormData.isUncertain && <Chip label="未確" />}
       </TableCellWrapper>
       <TableCellWrapper label={editFormData.description} />
       <TableCellWrapper>
@@ -80,9 +80,7 @@ const PlainNormalPurchaseRow = memo(
             </IconButton>
           )}
         </TableCellWrapper>
-        <TableCellWrapper
-          label={editFormData.date.toLocaleString().split(" ")[0]}
-        />
+        <TableCellWrapper label={editFormData.date.getDate() + "日"} />
         <TableCellWrapper label={editFormData.title} />
         <TableCellWrapper label={editFormData.category} />
         <TableCellWrapper label={editFormData.method.label} />

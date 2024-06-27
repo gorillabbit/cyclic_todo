@@ -26,7 +26,7 @@ const PlainDoughnutContainer = memo(
     currentMonthIncomeList,
     currentMonthIncome,
   }: PlainDoughnutContainerProps) => (
-    <Box display="flex" flexWrap="wrap">
+    <Box display="flex" flexWrap="wrap" justifyContent="center">
       <DoughnutChart
         purchaseList={currentMonthNetSpentList}
         title={`今月の使用金額 ${-currentMonthNetSpent}円`}

@@ -35,7 +35,7 @@ interface PlainDoughnutChartProps {
 
 const PlainDoughnutChart = memo(
   ({ data, options }: PlainDoughnutChartProps): JSX.Element => (
-    <Box width="100%" maxWidth="500px" my={2}>
+    <Box width="100%" maxWidth="500px">
       <Doughnut data={data} options={options} />
     </Box>
   )
