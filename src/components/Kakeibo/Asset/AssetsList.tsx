@@ -6,10 +6,13 @@ import {
   Paper,
   IconButton,
   TableHead,
+  TableCell,
 } from "@mui/material";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import CloseFullscreenIcon from "@mui/icons-material/CloseFullscreen";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import { addDocAsset } from "../../../firebase";
-import { memo, useCallback } from "react";
+import { memo, useCallback, useState } from "react";
 import { AssetListType, PurchaseListType } from "../../../types";
 import AssetRow from "./AssetRow";
 import { useAccount, useAsset, useTab } from "../../../hooks/useData";
@@ -23,6 +26,8 @@ type PlainAssetsListProps = {
   addAsset: () => void;
   methodSpent: { [key: string]: number };
   purchaseSum: number;
+  isOpen: boolean;
+  setIsOpen: (isOpen: boolean) => void;
 };
 
 const PlainAssetsList = memo(
@@ -31,38 +36,56 @@ const PlainAssetsList = memo(
       <Table>
         <TableHead>
           <TableRow>
-            <TableCellWrapper />
-            <TableCellWrapper label="名前" />
-            <TableCellWrapper label="残高" />
-            <TableCellWrapper label="月末残高" />
-            <TableCellWrapper label="最終更新" />
-            <TableCellWrapper />
+            <TableCell padding="none">
+              <IconButton onClick={() => props.setIsOpen(!props.isOpen)}>
+                {props.isOpen ? (
+                  <CloseFullscreenIcon />
+                ) : (
+                  <KeyboardArrowDownIcon />
+                )}
+              </IconButton>
+            </TableCell>
+            {props.isOpen ? (
+              <>
+                <TableCellWrapper label="名前" />
+                <TableCellWrapper label="残高" />
+                <TableCellWrapper label="月末残高" />
+                <TableCellWrapper label="最終更新" />
+                <TableCellWrapper />
+              </>
+            ) : (
+              <TableCellWrapper label="資産を開く" colSpan={5} />
+            )}
           </TableRow>
         </TableHead>
-        <TableBody>
-          {props.assetList.map((asset) => (
-            <AssetRow
-              asset={asset}
-              key={asset.id}
-              methodSpent={props.methodSpent[asset.id] ?? 0}
-            />
-          ))}
-          <TableRow>
-            <TableCellWrapper label="合計" colSpan={2} />
-            <TableCellWrapper label={props.sumAssets + "円"} />
-            <TableCellWrapper
-              label={props.sumAssets + props.purchaseSum + "円"}
-            />
-          </TableRow>
-        </TableBody>
+        {props.isOpen && (
+          <TableBody>
+            {props.assetList.map((asset) => (
+              <AssetRow
+                asset={asset}
+                key={asset.id}
+                methodSpent={props.methodSpent[asset.id] ?? 0}
+              />
+            ))}
+            <TableRow>
+              <TableCellWrapper label="合計" colSpan={2} />
+              <TableCellWrapper label={props.sumAssets + "円"} />
+              <TableCellWrapper
+                label={props.sumAssets + props.purchaseSum + "円"}
+              />
+            </TableRow>
+          </TableBody>
+        )}
       </Table>
-      <IconButton
-        onClick={props.addAsset}
-        color="primary"
-        aria-label="add asset"
-      >
-        <AddCircleOutlineIcon />
-      </IconButton>
+      {props.isOpen && (
+        <IconButton
+          onClick={props.addAsset}
+          color="primary"
+          aria-label="add asset"
+        >
+          <AddCircleOutlineIcon />
+        </IconButton>
+      )}
     </TableContainer>
   )
 );
@@ -75,6 +98,7 @@ const AssetTable = ({
   const { assetList, sumAssets } = useAsset();
   const { tabId } = useTab();
   const { Account } = useAccount();
+  const [isOpen, setIsOpen] = useState(false);
 
   const addAsset = useCallback(() => {
     if (Account) {
@@ -113,6 +137,8 @@ const AssetTable = ({
     addAsset,
     methodSpent,
     purchaseSum,
+    isOpen,
+    setIsOpen,
   };
 
   return <PlainAssetsList {...plainProps} />;
