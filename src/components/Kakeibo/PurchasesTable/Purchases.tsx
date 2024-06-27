@@ -1,6 +1,6 @@
 import {
   Box,
-  Button,
+  IconButton,
   Paper,
   Table,
   TableBody,
@@ -17,15 +17,14 @@ import AssetsList from "../Asset/AssetsList";
 import { addMonths } from "date-fns";
 import { useIsSmall } from "../../../hooks/useWindowSize";
 import {
-  filterPurchasesByIncomeType,
   isLaterPayment,
   sortObjectsByParameter,
-  sumSpentAndIncome,
 } from "../../../utilities/purchaseUtilities";
 import DoughnutContainer from "./DoughnutContainer";
 import TableHeadCell from "./TableHeadCell";
 import { usePurchase } from "../../../hooks/useData";
-import TableCellWrapper from "../TableCellWrapper";
+import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 
 type PlainPurchaseProps = {
   monthlyPurchases: PurchaseListType[];
@@ -35,8 +34,6 @@ type PlainPurchaseProps = {
   handleNextMonthButton: () => void;
   handlePastMonthButton: () => void;
   isSmall: boolean;
-  spentSum: number;
-  incomeSum: number;
   HeaderCellWrapper: ({
     label,
     value,
@@ -55,44 +52,28 @@ const PlainPurchases = memo(
     handleNextMonthButton,
     handlePastMonthButton,
     isSmall,
-    spentSum,
-    incomeSum,
     HeaderCellWrapper,
   }: PlainPurchaseProps): JSX.Element => (
     <>
       <AssetsList orderedPurchase={orderedPurchase} />
       <DoughnutContainer monthlyPurchases={monthlyPurchases} />
       <PurchaseSchedules />
-      <Box display="flex" justifyContent="center">
-        <Button onClick={handlePastMonthButton}>前の月</Button>
-        <Box fontSize={20}>
-          {"収支リスト " +
-            month.getFullYear() +
-            "年" +
-            //getMonthは1月=0
-            (month.getMonth() + 1) +
-            "月"}
-        </Box>
-        <Button onClick={handleNextMonthButton}>次の月</Button>
-      </Box>
-      <TableContainer component={Paper} sx={{ mb: 2 }}>
-        <Table size="small">
-          <TableHead>
-            <TableRow>
-              <TableCell />
-              <TableCellWrapper label="支出" />
-              <TableCellWrapper label={spentSum} />
-            </TableRow>
-            <TableRow>
-              <TableCell />
-              <TableCellWrapper label="収入" />
-              <TableCellWrapper label={incomeSum} />
-            </TableRow>
-          </TableHead>
-        </Table>
-      </TableContainer>
-
       <TableContainer component={Paper}>
+        <Box display="flex" justifyContent="center">
+          <IconButton onClick={handlePastMonthButton}>
+            <ArrowBackIosNewIcon />
+          </IconButton>
+          <Box fontSize={20}>
+            {month.getFullYear() +
+              "年" +
+              //getMonthは1月=0
+              (month.getMonth() + 1) +
+              "月"}
+          </Box>
+          <IconButton onClick={handleNextMonthButton}>
+            <ArrowForwardIosIcon />
+          </IconButton>
+        </Box>
         <Table size="small">
           <TableHead>
             <TableRow>
@@ -212,23 +193,6 @@ const Purchases = (): JSX.Element => {
   );
 
   const isSmall = useIsSmall();
-
-  // 支出を正の数字で表現する
-  const spentSum = useMemo(
-    () =>
-      -sumSpentAndIncome(
-        filterPurchasesByIncomeType(purchasesWithoutGroupFlag, "spent")
-      ),
-    [purchasesWithoutGroupFlag]
-  );
-  const incomeSum = useMemo(
-    () =>
-      sumSpentAndIncome(
-        filterPurchasesByIncomeType(purchasesWithoutGroupFlag, "income")
-      ),
-    [purchasesWithoutGroupFlag]
-  );
-
   const [orderBy, setOrderBy] = useState<keyof PurchaseListType>("date");
   const [isAsc, setIsAsc] = useState<boolean>(true);
   const orderedPurchase = useMemo(
@@ -256,8 +220,6 @@ const Purchases = (): JSX.Element => {
     handleNextMonthButton,
     handlePastMonthButton,
     isSmall,
-    spentSum,
-    incomeSum,
     orderBy,
     setOrderBy,
     isAsc,
