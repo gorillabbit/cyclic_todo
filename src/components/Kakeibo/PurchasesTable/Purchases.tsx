@@ -25,6 +25,7 @@ import {
 import DoughnutContainer from "./DoughnutContainer";
 import TableHeadCell from "./TableHeadCell";
 import { usePurchase } from "../../../hooks/useData";
+import TableCellWrapper from "../TableCellWrapper";
 
 type PlainPurchaseProps = {
   monthlyPurchases: PurchaseListType[];
@@ -79,13 +80,13 @@ const PlainPurchases = memo(
           <TableHead>
             <TableRow>
               <TableCell />
-              <TableCell sx={{ px: 0.5 }}>支出</TableCell>
-              <TableCell sx={{ px: 0.5 }}>{spentSum}</TableCell>
+              <TableCellWrapper label="支出" />
+              <TableCellWrapper label={spentSum} />
             </TableRow>
             <TableRow>
               <TableCell />
-              <TableCell sx={{ px: 0.5 }}>収入</TableCell>
-              <TableCell sx={{ px: 0.5 }}>{incomeSum}</TableCell>
+              <TableCellWrapper label="収入" />
+              <TableCellWrapper label={incomeSum} />
             </TableRow>
           </TableHead>
         </Table>

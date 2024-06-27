@@ -1,10 +1,11 @@
-import { TableCell, IconButton, Chip, TableRow } from "@mui/material";
+import { IconButton, Chip, TableRow } from "@mui/material";
 import { memo, useMemo } from "react";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import PaymentsIcon from "@mui/icons-material/Payments";
 import { InputPurchaseRowType } from "../../../../types";
 import PurchaseRowButtons from "./PurchaseRowButtons";
+import TableCellWrapper from "../../TableCellWrapper";
 
 type UnderHalfRowProps = {
   isGroup: boolean;
@@ -23,17 +24,17 @@ const UnderHalfRow = memo(
     setOpenDialog,
   }: UnderHalfRowProps) => (
     <>
-      <TableCell sx={{ px: 0.5 }}>
+      <TableCellWrapper>
         {editFormData.price + "円"}
         {editFormData.method.timing === "翌月" &&
           editFormData.childPurchaseId && <Chip label="翌月" />}
         {editFormData.isUncertain && <Chip label="未確定" />}
-      </TableCell>
-      <TableCell>{editFormData.description}</TableCell>
-      <TableCell sx={{ px: 0.5 }}>
+      </TableCellWrapper>
+      <TableCellWrapper label={editFormData.description} />
+      <TableCellWrapper>
         <PaymentsIcon color={editFormData.income ? "success" : "error"} />
-      </TableCell>
-      <TableCell sx={{ px: 0.5 }}>
+      </TableCellWrapper>
+      <TableCellWrapper>
         {!isGroup && (
           <PurchaseRowButtons
             setIsEdit={setIsEdit}
@@ -42,7 +43,7 @@ const UnderHalfRow = memo(
             isUncertain={editFormData.isUncertain}
           />
         )}
-      </TableCell>
+      </TableCellWrapper>
     </>
   )
 );
@@ -68,7 +69,7 @@ const PlainNormalPurchaseRow = memo(
   }: PlainNormalPurchaseRowProps): JSX.Element => (
     <>
       <TableRow sx={{ pb: 0.5, bgcolor: rowColor }}>
-        <TableCell sx={{ px: 0.5 }}>
+        <TableCellWrapper>
           {isGroup && (
             <IconButton
               aria-label="expand row"
@@ -78,13 +79,13 @@ const PlainNormalPurchaseRow = memo(
               {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
             </IconButton>
           )}
-        </TableCell>
-        <TableCell sx={{ px: 0.5 }}>
-          {editFormData.date.toLocaleString().split(" ")[0]}
-        </TableCell>
-        <TableCell sx={{ px: 0.5 }}>{editFormData.title}</TableCell>
-        <TableCell sx={{ px: 0.5 }}>{editFormData.category}</TableCell>
-        <TableCell sx={{ px: 0.5 }}>{editFormData.method.label}</TableCell>
+        </TableCellWrapper>
+        <TableCellWrapper
+          label={editFormData.date.toLocaleString().split(" ")[0]}
+        />
+        <TableCellWrapper label={editFormData.title} />
+        <TableCellWrapper label={editFormData.category} />
+        <TableCellWrapper label={editFormData.method.label} />
         {!isSmall && (
           <UnderHalfRow
             {...{
@@ -99,7 +100,7 @@ const PlainNormalPurchaseRow = memo(
       </TableRow>
       {isSmall && (
         <TableRow sx={{ bgcolor: rowColor }}>
-          <TableCell sx={{ px: 0.5 }} />
+          <TableCellWrapper />
           <UnderHalfRow
             {...{
               setIsEdit,

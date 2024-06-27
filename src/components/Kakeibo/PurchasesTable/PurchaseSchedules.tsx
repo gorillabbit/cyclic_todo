@@ -5,7 +5,6 @@ import {
   Table,
   TableHead,
   TableRow,
-  TableCell,
   TableBody,
 } from "@mui/material";
 import { memo, useMemo } from "react";
@@ -14,6 +13,7 @@ import { useFirestoreQuery } from "../../../utilities/firebaseUtilities";
 import PurchaseScheduleRow from "./PurchaseScheduleRow/PurchaseScheduleRow";
 import { where } from "firebase/firestore";
 import { useTab } from "../../../hooks/useData";
+import TableCellWrapper from "../TableCellWrapper";
 
 type PlainPurchaseSchedulesProps = {
   purchaseScheduleList: PurchaseScheduleListType[];
@@ -27,16 +27,16 @@ const PlainPurchaseSchedules = memo(
         <Table size="small">
           <TableHead>
             <TableRow>
-              <TableCell sx={{ px: 0.5 }}>周期</TableCell>
-              <TableCell sx={{ px: 0.5 }}>期日</TableCell>
-              <TableCell sx={{ px: 0.5 }}>品目</TableCell>
-              <TableCell sx={{ px: 0.5 }}>金額</TableCell>
-              <TableCell sx={{ px: 0.5 }}>分類</TableCell>
-              <TableCell sx={{ px: 0.5 }}>支払い方法</TableCell>
-              <TableCell sx={{ px: 0.5 }}>収入</TableCell>
-              <TableCell sx={{ px: 0.5 }}>未確定</TableCell>
-              <TableCell sx={{ px: 0.5 }}>備考</TableCell>
-              <TableCell sx={{ px: 0.5 }}></TableCell>
+              <TableCellWrapper label="周期" />
+              <TableCellWrapper label="期日" />
+              <TableCellWrapper label="品目" />
+              <TableCellWrapper label="金額" />
+              <TableCellWrapper label="分類" />
+              <TableCellWrapper label="支払い方法" />
+              <TableCellWrapper label="収入" />
+              <TableCellWrapper label="未確定" />
+              <TableCellWrapper label="備考" />
+              <TableCellWrapper />
             </TableRow>
           </TableHead>
           <TableBody>

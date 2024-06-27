@@ -16,6 +16,7 @@ import {
 } from "../../../../firebase";
 import { getPayLaterDate } from "../../../../utilities/dateUtilities";
 import { useMethod, usePurchase } from "../../../../hooks/useData";
+import TableCellWrapper from "../../TableCellWrapper";
 
 type UnderHalfRowProps = {
   editFormData: InputPurchaseRowType;
@@ -35,30 +36,30 @@ const UnderHalfRow = memo(
     handleSaveClick,
   }: UnderHalfRowProps) => (
     <>
-      <TableCell sx={{ px: 0.5 }}>
+      <TableCellWrapper>
         <TextField
           name="price"
           value={editFormData.price}
           onChange={handleEditFormChange}
           size="small"
         />
-      </TableCell>
-      <TableCell sx={{ px: 0.5 }}>
+      </TableCellWrapper>
+      <TableCellWrapper>
         <TextField
           name="income"
           value={editFormData.income ? "収入" : "支出"}
           onChange={handleEditFormChange}
           size="small"
         />
-      </TableCell>
-      <TableCell sx={{ px: 0.5 }}>
+      </TableCellWrapper>
+      <TableCellWrapper>
         <TextField
           name="description"
           value={editFormData.description}
           onChange={handleEditFormChange}
           size="small"
         />
-      </TableCell>
+      </TableCellWrapper>
       <TableCell padding="none">
         <IconButton onClick={handleSaveClick} color="success">
           <DoneIcon />
@@ -91,8 +92,8 @@ const PlainEditPurchaseRow = memo(
   }: PlainEditPurchaseRowProps): JSX.Element => (
     <>
       <TableRow>
-        <TableCell sx={{ px: 0.5 }} />
-        <TableCell sx={{ px: 0.5 }}>
+        <TableCellWrapper />
+        <TableCellWrapper>
           <DatePicker
             name="date"
             value={editFormData.date}
@@ -100,17 +101,17 @@ const PlainEditPurchaseRow = memo(
             slotProps={{ textField: { size: "small" } }}
             sx={{ maxWidth: 190 }}
           />
-        </TableCell>
-        <TableCell sx={{ px: 0.5 }}>
+        </TableCellWrapper>
+        <TableCellWrapper>
           <TextField
             name="title"
             value={editFormData.title}
             onChange={handleEditFormChange}
             size="small"
           />
-        </TableCell>
+        </TableCellWrapper>
 
-        <TableCell sx={{ px: 0.5 }}>
+        <TableCellWrapper>
           <Autocomplete
             value={editFormData.category}
             sx={{ minWidth: 150 }}
@@ -121,8 +122,8 @@ const PlainEditPurchaseRow = memo(
               <TextField {...params} label="分類" size="small" />
             )}
           />
-        </TableCell>
-        <TableCell sx={{ px: 0.5 }}>
+        </TableCellWrapper>
+        <TableCellWrapper>
           <Autocomplete
             value={editFormData.method}
             sx={{ minWidth: 150 }}
@@ -133,7 +134,7 @@ const PlainEditPurchaseRow = memo(
               <TextField {...params} label="支払い方法" size="small" />
             )}
           />
-        </TableCell>
+        </TableCellWrapper>
         {!isSmall && (
           <UnderHalfRow
             {...{ editFormData, handleEditFormChange, handleSaveClick }}
@@ -143,7 +144,7 @@ const PlainEditPurchaseRow = memo(
       {isSmall && (
         <>
           <TableRow>
-            <TableCell sx={{ px: 0.5 }} />
+            <TableCellWrapper />
             <UnderHalfRow
               {...{ editFormData, handleEditFormChange, handleSaveClick }}
             />

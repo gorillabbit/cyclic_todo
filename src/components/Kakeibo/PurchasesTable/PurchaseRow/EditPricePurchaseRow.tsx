@@ -1,10 +1,11 @@
-import { TableCell, TextField, IconButton, TableRow } from "@mui/material";
+import { TextField, IconButton, TableRow, TableCell } from "@mui/material";
 import PaymentsIcon from "@mui/icons-material/Payments";
 import { memo, useCallback } from "react";
 import DoneIcon from "@mui/icons-material/Done";
 import { InputPurchaseRowType } from "../../../../types";
 import { updateDocPurchase } from "../../../../firebase";
 import { numericProps } from "../../../../utilities/purchaseUtilities";
+import TableCellWrapper from "../../TableCellWrapper";
 
 type UnderHalfRowProps = {
   handleEditFormChange: (event: {
@@ -24,7 +25,7 @@ const UnderHalfRow = memo(
     handleEditFormChange,
   }: UnderHalfRowProps) => (
     <>
-      <TableCell sx={{ px: 0.5 }}>
+      <TableCellWrapper>
         <TextField
           name="price"
           value={editFormData.price}
@@ -32,11 +33,11 @@ const UnderHalfRow = memo(
           size="small"
           inputProps={numericProps}
         />
-      </TableCell>
-      <TableCell sx={{ px: 0.5 }}>
+      </TableCellWrapper>
+      <TableCellWrapper>
         <PaymentsIcon color={editFormData.income ? "success" : "error"} />
-      </TableCell>
-      <TableCell>{editFormData.description}</TableCell>
+      </TableCellWrapper>
+      <TableCellWrapper label={editFormData.description} />
       <TableCell padding="none">
         <IconButton onClick={handleSaveClick} color="success">
           <DoneIcon />
@@ -59,14 +60,14 @@ const PlainEditPricePurchaseRow = memo(
   }: PlainEditPricePurchaseRowProps): JSX.Element => (
     <>
       <TableRow>
-        <TableCell sx={{ px: 0.5 }} />
-        <TableCell sx={{ px: 0.5 }}>
-          {editFormData.date.toLocaleString().split(" ")[0]}
-        </TableCell>
-        <TableCell sx={{ px: 0.5 }}>{editFormData.title}</TableCell>
+        <TableCellWrapper />
+        <TableCellWrapper
+          label={editFormData.date.toLocaleString().split(" ")[0]}
+        />
+        <TableCellWrapper label={editFormData.title} />
 
-        <TableCell sx={{ px: 0.5 }}>{editFormData.category}</TableCell>
-        <TableCell sx={{ px: 0.5 }}>{editFormData.method.label}</TableCell>
+        <TableCellWrapper label={editFormData.category} />
+        <TableCellWrapper label={editFormData.method.label} />
         {!isSmall && (
           <UnderHalfRow
             {...{ editFormData, handleSaveClick, handleEditFormChange }}
@@ -75,7 +76,7 @@ const PlainEditPricePurchaseRow = memo(
       </TableRow>
       {isSmall && (
         <TableRow>
-          <TableCell sx={{ px: 0.5 }} />
+          <TableCellWrapper />
           <UnderHalfRow
             {...{ editFormData, handleSaveClick, handleEditFormChange }}
           />

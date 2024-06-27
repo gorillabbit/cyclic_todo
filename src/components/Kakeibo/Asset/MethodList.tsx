@@ -1,6 +1,5 @@
 import {
   TableRow,
-  TableCell,
   TextField,
   Button,
   IconButton,
@@ -18,6 +17,7 @@ import {
   numericProps,
 } from "../../../utilities/purchaseUtilities";
 import { useMethod } from "../../../hooks/useData";
+import TableCellWrapper from "../TableCellWrapper";
 
 type PlainMethodListProps = {
   method: MethodListType;
@@ -35,7 +35,7 @@ type PlainMethodListProps = {
 const PlainMethodList = memo(
   (props: PlainMethodListProps): JSX.Element => (
     <TableRow key={props.method.id}>
-      <TableCell sx={{ px: 0.5 }}>
+      <TableCellWrapper>
         <TextField
           variant="outlined"
           value={props.methodInput.label}
@@ -45,8 +45,8 @@ const PlainMethodList = memo(
           error={!!props.inputError}
           helperText={props.inputError}
         />
-      </TableCell>
-      <TableCell sx={{ px: 0.5 }}>
+      </TableCellWrapper>
+      <TableCellWrapper>
         <Select
           value={props.methodInput.timing}
           name="timing"
@@ -71,8 +71,8 @@ const PlainMethodList = memo(
             size="small"
           />
         )}
-      </TableCell>
-      <TableCell sx={{ px: 0.5 }}>
+      </TableCellWrapper>
+      <TableCellWrapper>
         <Button
           variant="contained"
           color="primary"
@@ -81,12 +81,12 @@ const PlainMethodList = memo(
         >
           変更
         </Button>
-      </TableCell>
-      <TableCell sx={{ px: 0.5 }}>
+      </TableCellWrapper>
+      <TableCellWrapper>
         <IconButton onClick={props.removeMethod} color="error">
           <DeleteIcon />
         </IconButton>
-      </TableCell>
+      </TableCellWrapper>
     </TableRow>
   )
 );
