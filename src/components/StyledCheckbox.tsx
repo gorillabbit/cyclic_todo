@@ -13,7 +13,7 @@ const StyledCheckbox: React.FC<StyledCheckboxProps> = ({
 }) => {
   return (
     <Button
-      sx={{ color: "GrayText", borderColor: "GrayText" }}
+      sx={{ color: "GrayText", borderColor: "GrayText", maxHeight: "56px" }}
       variant="outlined"
       onClick={(e) => {
         e.stopPropagation();
