@@ -23,6 +23,7 @@ import {
   weekDaysString,
 } from "../../../../utilities/purchaseUtilities";
 import { useMethod, usePurchase } from "../../../../hooks/useData";
+import TableCellWrapper from "../../TableCellWrapper";
 
 type PlainEditPurchaseScheduleRowProps = {
   editFormData: InputPurchaseScheduleRowType;
@@ -96,7 +97,7 @@ const PlainEditPurchaseScheduleRow = memo(
             </Select>
           )}
         </TableCell>
-        <TableCell sx={{ px: 0.5 }}>
+        <TableCellWrapper>
           <DatePicker
             name="endDate"
             value={editFormData.endDate}
@@ -104,26 +105,26 @@ const PlainEditPurchaseScheduleRow = memo(
             slotProps={{ textField: { size: "small" } }}
             sx={{ maxWidth: 190 }}
           />
-        </TableCell>
-        <TableCell sx={{ px: 0.5 }}>
+        </TableCellWrapper>
+        <TableCellWrapper>
           <TextField
             name="title"
             value={editFormData.title}
             onChange={handleEditFormChange}
             size="small"
           />
-        </TableCell>
-        <TableCell sx={{ px: 0.5 }}>
+        </TableCellWrapper>
+        <TableCellWrapper>
           <TextField
             name="price"
             value={editFormData.price}
             onChange={handleEditFormChange}
             size="small"
           />
-        </TableCell>
+        </TableCellWrapper>
         {!isSmall && (
           <>
-            <TableCell sx={{ px: 0.5 }}>
+            <TableCellWrapper>
               <Autocomplete
                 value={editFormData.category}
                 sx={{ minWidth: 150 }}
@@ -134,8 +135,8 @@ const PlainEditPurchaseScheduleRow = memo(
                   <TextField {...params} label="分類" size="small" />
                 )}
               />
-            </TableCell>
-            <TableCell sx={{ px: 0.5 }}>
+            </TableCellWrapper>
+            <TableCellWrapper>
               <Autocomplete
                 value={editFormData.method}
                 sx={{ minWidth: 150 }}
@@ -146,23 +147,23 @@ const PlainEditPurchaseScheduleRow = memo(
                   <TextField {...params} label="支払い方法" size="small" />
                 )}
               />
-            </TableCell>
-            <TableCell sx={{ px: 0.5 }}>
+            </TableCellWrapper>
+            <TableCellWrapper>
               <TextField
                 name="income"
                 value={editFormData.income ? "収入" : "支出"}
                 onChange={handleEditFormChange}
                 size="small"
               />
-            </TableCell>
-            <TableCell sx={{ px: 0.5 }}>
+            </TableCellWrapper>
+            <TableCellWrapper>
               <TextField
                 name="description"
                 value={editFormData.description}
                 onChange={handleEditFormChange}
                 size="small"
               />
-            </TableCell>
+            </TableCellWrapper>
           </>
         )}
         <TableCell padding="none">
@@ -174,7 +175,7 @@ const PlainEditPurchaseScheduleRow = memo(
       {isSmall && (
         <>
           <TableRow>
-            <TableCell sx={{ px: 0.5 }}>
+            <TableCellWrapper>
               <Autocomplete
                 value={editFormData.category}
                 sx={{ minWidth: 150 }}
@@ -185,8 +186,8 @@ const PlainEditPurchaseScheduleRow = memo(
                   <TextField {...params} label="分類" size="small" />
                 )}
               />
-            </TableCell>
-            <TableCell sx={{ px: 0.5 }}>
+            </TableCellWrapper>
+            <TableCellWrapper>
               <Autocomplete
                 value={editFormData.method}
                 sx={{ minWidth: 150 }}
@@ -197,26 +198,24 @@ const PlainEditPurchaseScheduleRow = memo(
                   <TextField {...params} label="支払い方法" size="small" />
                 )}
               />
-            </TableCell>
-            <TableCell sx={{ px: 0.5 }}>
+            </TableCellWrapper>
+            <TableCellWrapper>
               <TextField
                 name="income"
                 value={editFormData.income ? "収入" : "支出"}
                 onChange={handleEditFormChange}
                 size="small"
               />
-            </TableCell>
+            </TableCellWrapper>
             {!isSmall && (
-              <>
-                <TableCell sx={{ px: 0.5 }}>
-                  <TextField
-                    name="description"
-                    value={editFormData.description}
-                    onChange={handleEditFormChange}
-                    size="small"
-                  />
-                </TableCell>
-              </>
+              <TableCellWrapper>
+                <TextField
+                  name="description"
+                  value={editFormData.description}
+                  onChange={handleEditFormChange}
+                  size="small"
+                />
+              </TableCellWrapper>
             )}
             <TableCell padding="none">
               <IconButton onClick={handleSaveClick} color="success">

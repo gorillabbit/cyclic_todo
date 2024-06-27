@@ -40,6 +40,7 @@ import { getUnixTime } from "date-fns";
 import DeleteConfirmDialog from "../DeleteConfirmDialog";
 import { useIsSmall } from "../../../hooks/useWindowSize";
 import { useMethod, useTab, usePurchase } from "../../../hooks/useData";
+import TableCellWrapper from "../TableCellWrapper";
 
 type UnderHalfRowProps = {
   isNameChanged: boolean;
@@ -59,30 +60,28 @@ const UnderHalfRow = memo(
     saveChanges,
     removeAsset,
   }: UnderHalfRowProps) => (
-    <>
-      <TableCell sx={{ px: 0.5 }} align="right" colSpan={2}>
-        <Button
-          sx={{ mx: 0.5 }}
-          variant={isAddedPurchases ? "contained" : "text"}
-          color="primary"
-          disabled={!isAddedPurchases}
-          onClick={updateLog}
-        >
-          更新
-        </Button>
-        <Button
-          variant={isNameChanged || isBalanceChanged ? "contained" : "text"}
-          color="primary"
-          disabled={!isNameChanged && !isBalanceChanged}
-          onClick={saveChanges}
-        >
-          変更
-        </Button>
-        <IconButton onClick={removeAsset} color="error">
-          <DeleteIcon />
-        </IconButton>
-      </TableCell>
-    </>
+    <TableCellWrapper align="right" colSpan={2}>
+      <Button
+        sx={{ mx: 0.5 }}
+        variant={isAddedPurchases ? "contained" : "text"}
+        color="primary"
+        disabled={!isAddedPurchases}
+        onClick={updateLog}
+      >
+        更新
+      </Button>
+      <Button
+        variant={isNameChanged || isBalanceChanged ? "contained" : "text"}
+        color="primary"
+        disabled={!isNameChanged && !isBalanceChanged}
+        onClick={saveChanges}
+      >
+        変更
+      </Button>
+      <IconButton onClick={removeAsset} color="error">
+        <DeleteIcon />
+      </IconButton>
+    </TableCellWrapper>
   )
 );
 
@@ -136,7 +135,7 @@ const PlainAssetRow = memo(
   }: PlainAssetRowProps): JSX.Element => (
     <>
       <TableRow>
-        <TableCell sx={{ px: 0.5 }}>
+        <TableCellWrapper>
           <IconButton
             aria-label="expand row"
             size="small"
@@ -144,8 +143,8 @@ const PlainAssetRow = memo(
           >
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
-        </TableCell>
-        <TableCell sx={{ px: 0.5 }}>
+        </TableCellWrapper>
+        <TableCellWrapper>
           <TextField
             variant="outlined"
             value={assetInput.name}
@@ -154,8 +153,8 @@ const PlainAssetRow = memo(
             size="small"
             sx={{ maxWidth: 150 }}
           />
-        </TableCell>
-        <TableCell sx={{ display: "flex", px: 0.5 }}>
+        </TableCellWrapper>
+        <TableCellWrapper sx={{ display: "flex" }}>
           <TextField
             variant="outlined"
             value={isBalanceChanged ? balanceInput : displayBalance}
@@ -170,13 +169,13 @@ const PlainAssetRow = memo(
               {"→ " + currentBalance}
             </Box>
           )}
-        </TableCell>
-        <TableCell sx={{ px: 0.5 }}>
+        </TableCellWrapper>
+        <TableCellWrapper>
           {(isBalanceChanged ? balanceInput : displayBalance) + methodSpent}
-        </TableCell>
-        <TableCell sx={{ px: 0.5 }}>
+        </TableCellWrapper>
+        <TableCellWrapper>
           {latestLog.timestamp.toDate().toLocaleDateString()}
-        </TableCell>
+        </TableCellWrapper>
         {!isSmall && (
           <UnderHalfRow
             {...{
@@ -193,7 +192,7 @@ const PlainAssetRow = memo(
       </TableRow>
       {isSmall && (
         <TableRow>
-          <TableCell sx={{ px: 0.5 }} colSpan={2} />
+          <TableCellWrapper colSpan={2} />
           <UnderHalfRow
             {...{
               latestLog,
@@ -214,9 +213,9 @@ const PlainAssetRow = memo(
             <Table size="small" aria-label="purchases">
               <TableHead>
                 <TableRow>
-                  <TableCell sx={{ px: 0.5 }}>名前</TableCell>
-                  <TableCell sx={{ px: 0.5 }}>決済タイミング</TableCell>
-                  <TableCell sx={{ px: 0.5 }} colSpan={2} />
+                  <TableCellWrapper label="名前" />
+                  <TableCellWrapper label="決済タイミング" />
+                  <TableCellWrapper colSpan={2} />
                 </TableRow>
               </TableHead>
               <TableBody>

@@ -1,7 +1,6 @@
 import {
   Table,
   TableBody,
-  TableCell,
   TableContainer,
   TableRow,
   Paper,
@@ -16,6 +15,7 @@ import AssetRow from "./AssetRow";
 import { useAccount, useAsset, useTab } from "../../../hooks/useData";
 import { lastDayOfMonth } from "date-fns";
 import { sumSpentAndIncome } from "../../../utilities/purchaseUtilities";
+import TableCellWrapper from "../TableCellWrapper";
 
 type PlainAssetsListProps = {
   assetList: AssetListType[];
@@ -31,12 +31,12 @@ const PlainAssetsList = memo(
       <Table>
         <TableHead>
           <TableRow>
-            <TableCell sx={{ px: 0.5 }} />
-            <TableCell sx={{ px: 0.5 }}>名前</TableCell>
-            <TableCell sx={{ px: 0.5 }}>残高</TableCell>
-            <TableCell sx={{ px: 0.5 }}>月末残高</TableCell>
-            <TableCell sx={{ px: 0.5 }}>最終更新</TableCell>
-            <TableCell sx={{ px: 0.5 }} />
+            <TableCellWrapper />
+            <TableCellWrapper label="名前" />
+            <TableCellWrapper label="残高" />
+            <TableCellWrapper label="月末残高" />
+            <TableCellWrapper label="最終更新" />
+            <TableCellWrapper />
           </TableRow>
         </TableHead>
         <TableBody>
@@ -48,13 +48,11 @@ const PlainAssetsList = memo(
             />
           ))}
           <TableRow>
-            <TableCell sx={{ px: 0.5 }} colSpan={2}>
-              合計
-            </TableCell>
-            <TableCell sx={{ px: 0.5 }}>{props.sumAssets}円</TableCell>
-            <TableCell sx={{ px: 0.5 }}>
-              {props.sumAssets + props.purchaseSum}円
-            </TableCell>
+            <TableCellWrapper label="合計" colSpan={2} />
+            <TableCellWrapper label={props.sumAssets + "円"} />
+            <TableCellWrapper
+              label={props.sumAssets + props.purchaseSum + "円"}
+            />
           </TableRow>
         </TableBody>
       </Table>

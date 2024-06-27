@@ -1,9 +1,10 @@
-import { TableCell, IconButton, TableRow, Chip } from "@mui/material";
+import { IconButton, TableRow, Chip } from "@mui/material";
 import { memo, useCallback } from "react";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { InputPurchaseScheduleRowType } from "../../../../types";
 import PaymentsIcon from "@mui/icons-material/Payments";
+import TableCellWrapper from "../../TableCellWrapper";
 
 type PlainNormalPurchaseScheduleRowProps = {
   editFormData: InputPurchaseScheduleRowType;
@@ -18,25 +19,27 @@ const PlainNormalPurchaseScheduleRow = memo(
     handleDeleteButton,
   }: PlainNormalPurchaseScheduleRowProps): JSX.Element => (
     <TableRow key={editFormData.id}>
-      <TableCell sx={{ px: 0.5 }}>
-        {editFormData.cycle +
-          (editFormData.date ? editFormData.date + "日" : editFormData.day)}
-      </TableCell>
-      <TableCell sx={{ px: 0.5 }}>
-        {editFormData.endDate.toLocaleString().split(" ")[0]}
-      </TableCell>
-      <TableCell sx={{ px: 0.5 }}>{editFormData.title}</TableCell>
-      <TableCell sx={{ px: 0.5 }}>{editFormData.price + "円"}</TableCell>
-      <TableCell sx={{ px: 0.5 }}>{editFormData.category}</TableCell>
-      <TableCell sx={{ px: 0.5 }}>{editFormData.method.label}</TableCell>
-      <TableCell sx={{ px: 0.5 }}>
+      <TableCellWrapper
+        label={
+          editFormData.cycle +
+          (editFormData.date ? editFormData.date + "日" : editFormData.day)
+        }
+      />
+      <TableCellWrapper
+        label={editFormData.endDate.toLocaleString().split(" ")[0]}
+      />
+      <TableCellWrapper label={editFormData.title} />
+      <TableCellWrapper label={editFormData.price + "円"} />
+      <TableCellWrapper label={editFormData.category} />
+      <TableCellWrapper label={editFormData.method.label} />
+      <TableCellWrapper>
         <PaymentsIcon color={editFormData.income ? "success" : "error"} />
-      </TableCell>
-      <TableCell sx={{ px: 0.5 }}>
+      </TableCellWrapper>
+      <TableCellWrapper>
         {editFormData.isUncertain && <Chip label="未確定" />}
-      </TableCell>
-      <TableCell sx={{ px: 0.5 }}>{editFormData.description}</TableCell>
-      <TableCell padding="none" sx={{ px: 0.5 }}>
+      </TableCellWrapper>
+      <TableCellWrapper label={editFormData.description} />
+      <TableCellWrapper>
         <>
           <IconButton
             onClick={handleEditClick}
@@ -59,7 +62,7 @@ const PlainNormalPurchaseScheduleRow = memo(
             <DeleteIcon />
           </IconButton>
         </>
-      </TableCell>
+      </TableCellWrapper>
     </TableRow>
   )
 );
