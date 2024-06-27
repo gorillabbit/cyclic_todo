@@ -59,14 +59,13 @@ const App = (): JSX.Element => {
         <ThemeProvider theme={theme}>
           <AccountProvider {...{ Account }}>
             <Header />
-            {Account && <HomePage />}
+            <Routes>
+              <Route path="/Login" Component={LoginPage} />
+              <Route path="/" Component={HomePage} />
+            </Routes>
           </AccountProvider>
         </ThemeProvider>
       </LocalizationProvider>
-      <Routes>
-        <Route path="/Login" Component={LoginPage} />
-        <Route path="/" Component={HomePage} />
-      </Routes>
     </BrowserRouter>
   );
 };

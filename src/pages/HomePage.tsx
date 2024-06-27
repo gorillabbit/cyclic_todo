@@ -16,6 +16,7 @@ type PlainHomePageProps = {
   pinnedTabNum: number;
   setPinnedTab: (name: "pinnedTab", value: number) => void;
   tabs: TabType[];
+  Account: AccountType | undefined;
 };
 
 const PlainHomePage = memo(
@@ -25,30 +26,35 @@ const PlainHomePage = memo(
     pinnedTabNum,
     setPinnedTab,
     tabs,
+    Account,
   }: PlainHomePageProps) => {
     return (
       <>
-        <HeaderTabs
-          {...{
-            tabValue,
-            setTabValue,
-            pinnedTabNum,
-            setPinnedTab,
-            tabs,
-          }}
-        />
-        <Box textAlign="center">
-          {tabs.map((tab, index) => (
-            <TabProvider key={tab.id} tab={tab}>
-              {tabValue === index && (
-                <>
-                  {tab.type === "task" && <TaskPage />}
-                  {tab.type === "purchase" && <PurchasePage />}
-                </>
-              )}
-            </TabProvider>
-          ))}
-        </Box>
+        {Account && (
+          <>
+            <HeaderTabs
+              {...{
+                tabValue,
+                setTabValue,
+                pinnedTabNum,
+                setPinnedTab,
+                tabs,
+              }}
+            />
+            <Box textAlign="center">
+              {tabs.map((tab, index) => (
+                <TabProvider key={tab.id} tab={tab}>
+                  {tabValue === index && (
+                    <>
+                      {tab.type === "task" && <TaskPage />}
+                      {tab.type === "purchase" && <PurchasePage />}
+                    </>
+                  )}
+                </TabProvider>
+              ))}
+            </Box>
+          </>
+        )}
       </>
     );
   }
@@ -81,6 +87,7 @@ const HomePage = () => {
     pinnedTabNum,
     setPinnedTab,
     tabs,
+    Account,
   };
   return <PlainHomePage {...plainProps} />;
 };
