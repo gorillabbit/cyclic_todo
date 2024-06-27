@@ -135,7 +135,7 @@ const PlainAssetRow = memo(
   }: PlainAssetRowProps): JSX.Element => (
     <>
       <TableRow>
-        <TableCellWrapper>
+        <TableCell padding="none">
           <IconButton
             aria-label="expand row"
             size="small"
@@ -143,7 +143,7 @@ const PlainAssetRow = memo(
           >
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
-        </TableCellWrapper>
+        </TableCell>
         <TableCellWrapper>
           <TextField
             variant="outlined"
