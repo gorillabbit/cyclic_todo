@@ -95,20 +95,18 @@ const PlainTransferInput = memo(
             }
           />
         </FormGroup>
-        {methodError ? (
-          <Tooltip title={methodError}>
-            <>
-              <TransferInputButtons
-                {...{ methodError, addTransfer, addTemplate }}
-              />
-            </>
-          </Tooltip>
-        ) : (
-          <TransferInputButtons
-            {...{ methodError, addTransfer, addTemplate }}
-          />
-        )}
       </Box>
+      {methodError ? (
+        <Tooltip title={methodError}>
+          <>
+            <TransferInputButtons
+              {...{ methodError, addTransfer, addTemplate }}
+            />
+          </>
+        </Tooltip>
+      ) : (
+        <TransferInputButtons {...{ methodError, addTransfer, addTemplate }} />
+      )}
     </>
   )
 );

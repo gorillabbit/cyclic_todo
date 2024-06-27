@@ -88,120 +88,132 @@ const PurchaseScheduleInput = () => {
   }, [newPurchaseSchedule]);
 
   return (
-    <Box display="flex">
-      <FormGroup row sx={{ gap: 1, mr: 1, width: "100%" }}>
-        <TextField
-          label="品目"
-          value={newPurchaseSchedule.title}
-          onChange={(e) =>
-            handleNewPurchaseScheduleInput("title", e.target.value)
-          }
-        />
-        <TextField
-          label="金額"
-          value={newPurchaseSchedule.price}
-          onChange={(e) =>
-            handleNewPurchaseScheduleInput("price", e.target.value)
-          }
-          inputProps={numericProps}
-        />
-        <Select
-          value={newPurchaseSchedule.cycle}
-          onChange={(e) =>
-            handleNewPurchaseScheduleInput("cycle", e.target.value)
-          }
-        >
-          <MenuItem value="毎月">毎月</MenuItem>
-          <MenuItem value="毎週">毎週</MenuItem>
-        </Select>
-        {newPurchaseSchedule.cycle === "毎月" && (
+    <>
+      <Box display="flex">
+        <FormGroup row sx={{ gap: 1, mr: 1, width: "100%" }}>
           <TextField
-            label="日付"
-            value={newPurchaseSchedule.date}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="start">日</InputAdornment>
-              ),
-            }}
-            inputProps={numericProps}
-            sx={{ maxWidth: 150 }}
+            label="品目"
+            value={newPurchaseSchedule.title}
             onChange={(e) =>
-              handleNewPurchaseScheduleInput("date", e.target.value)
+              handleNewPurchaseScheduleInput("title", e.target.value)
             }
           />
-        )}
-        {newPurchaseSchedule.cycle === "毎週" && (
-          <Select
-            value={newPurchaseSchedule.day}
+          <TextField
+            label="金額"
+            value={newPurchaseSchedule.price}
             onChange={(e) =>
-              handleNewPurchaseScheduleInput("day", e.target.value)
+              handleNewPurchaseScheduleInput("price", e.target.value)
+            }
+            inputProps={numericProps}
+          />
+          <Select
+            value={newPurchaseSchedule.cycle}
+            onChange={(e) =>
+              handleNewPurchaseScheduleInput("cycle", e.target.value)
             }
           >
-            {weekDaysString.map((day) => (
-              <MenuItem key={day} value={day}>
-                {day}
-              </MenuItem>
-            ))}
+            <MenuItem value="毎月">毎月</MenuItem>
+            <MenuItem value="毎週">毎週</MenuItem>
           </Select>
-        )}
-        <DatePicker
-          label="期日"
-          value={newPurchaseSchedule.endDate}
-          sx={{ maxWidth: 150 }}
-          onChange={(value) => handleNewPurchaseScheduleInput("endDate", value)}
-        />
-        <Autocomplete
-          value={newPurchaseSchedule.category}
-          onChange={(_e, v) => handleNewPurchaseScheduleInput("category", v)}
-          sx={{ minWidth: 150 }}
-          options={categorySet}
-          freeSolo
-          renderInput={(params) => <TextField {...params} label="カテゴリー" />}
-        />
-        <Autocomplete
-          value={
-            newPurchaseSchedule.method?.id ? newPurchaseSchedule.method : null
-          }
-          sx={{ minWidth: 150 }}
-          options={methodList}
-          onChange={(_e, v) => handleNewPurchaseScheduleInput("method", v)}
-          renderInput={(params) => <TextField {...params} label="支払い方法" />}
-        />
-        <StyledCheckbox
-          value={newPurchaseSchedule.income}
-          handleCheckbox={() =>
-            handleNewPurchaseScheduleInput(
-              "income",
-              !newPurchaseSchedule.income
-            )
-          }
-        >
-          収入
-        </StyledCheckbox>
-        <StyledCheckbox
-          value={newPurchaseSchedule.isUncertain}
-          handleCheckbox={() =>
-            handleNewPurchaseScheduleInput(
-              "isUncertain",
-              !newPurchaseSchedule.isUncertain
-            )
-          }
-        >
-          未確定
-        </StyledCheckbox>
-        <TextField
-          label="備考"
-          multiline
-          value={newPurchaseSchedule.description}
-          onChange={(e) =>
-            handleNewPurchaseScheduleInput("description", e.target.value)
-          }
-        />
-      </FormGroup>
-      <Button variant="contained" onClick={addPurchaseSchedule}>
+          {newPurchaseSchedule.cycle === "毎月" && (
+            <TextField
+              label="日付"
+              value={newPurchaseSchedule.date}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="start">日</InputAdornment>
+                ),
+              }}
+              inputProps={numericProps}
+              sx={{ maxWidth: 150 }}
+              onChange={(e) =>
+                handleNewPurchaseScheduleInput("date", e.target.value)
+              }
+            />
+          )}
+          {newPurchaseSchedule.cycle === "毎週" && (
+            <Select
+              value={newPurchaseSchedule.day}
+              onChange={(e) =>
+                handleNewPurchaseScheduleInput("day", e.target.value)
+              }
+            >
+              {weekDaysString.map((day) => (
+                <MenuItem key={day} value={day}>
+                  {day}
+                </MenuItem>
+              ))}
+            </Select>
+          )}
+          <DatePicker
+            label="期日"
+            value={newPurchaseSchedule.endDate}
+            sx={{ maxWidth: 150 }}
+            onChange={(value) =>
+              handleNewPurchaseScheduleInput("endDate", value)
+            }
+          />
+          <Autocomplete
+            value={newPurchaseSchedule.category}
+            onChange={(_e, v) => handleNewPurchaseScheduleInput("category", v)}
+            sx={{ minWidth: 150 }}
+            options={categorySet}
+            freeSolo
+            renderInput={(params) => (
+              <TextField {...params} label="カテゴリー" />
+            )}
+          />
+          <Autocomplete
+            value={
+              newPurchaseSchedule.method?.id ? newPurchaseSchedule.method : null
+            }
+            sx={{ minWidth: 150 }}
+            options={methodList}
+            onChange={(_e, v) => handleNewPurchaseScheduleInput("method", v)}
+            renderInput={(params) => (
+              <TextField {...params} label="支払い方法" />
+            )}
+          />
+          <StyledCheckbox
+            value={newPurchaseSchedule.income}
+            handleCheckbox={() =>
+              handleNewPurchaseScheduleInput(
+                "income",
+                !newPurchaseSchedule.income
+              )
+            }
+          >
+            収入
+          </StyledCheckbox>
+          <StyledCheckbox
+            value={newPurchaseSchedule.isUncertain}
+            handleCheckbox={() =>
+              handleNewPurchaseScheduleInput(
+                "isUncertain",
+                !newPurchaseSchedule.isUncertain
+              )
+            }
+          >
+            未確定
+          </StyledCheckbox>
+          <TextField
+            label="備考"
+            multiline
+            value={newPurchaseSchedule.description}
+            onChange={(e) =>
+              handleNewPurchaseScheduleInput("description", e.target.value)
+            }
+          />
+        </FormGroup>
+      </Box>
+      <Button
+        variant="contained"
+        onClick={addPurchaseSchedule}
+        sx={{ width: "100%", mt: 1 }}
+      >
         追加
       </Button>
-    </Box>
+    </>
   );
 };
 

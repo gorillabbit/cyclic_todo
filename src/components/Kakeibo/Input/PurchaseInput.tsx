@@ -99,22 +99,14 @@ const PlainPurchaseInput = memo(
             }
           />
         </FormGroup>
-        <Box gap={1} display="flex" flexDirection="column">
-          <Button
-            sx={{ height: "50%" }}
-            variant="contained"
-            onClick={addPurchase}
-          >
-            追加
-          </Button>
-          <Button
-            sx={{ height: "50%" }}
-            variant="outlined"
-            onClick={addTemplate}
-          >
-            ボタン化
-          </Button>
-        </Box>
+      </Box>
+      <Box gap={1} display="flex" my={1}>
+        <Button sx={{ width: "50%" }} variant="contained" onClick={addPurchase}>
+          追加
+        </Button>
+        <Button sx={{ width: "50%" }} variant="outlined" onClick={addTemplate}>
+          ボタン化
+        </Button>
       </Box>
     </>
   )
