@@ -245,7 +245,6 @@ const AssetRow = ({
   asset: AssetListType;
   methodSpent: number;
 }) => {
-  console.log(methodSpent);
   const [open, setOpen] = useState(false);
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const [assetInput, setAssetInput] = useState<AssetListType>(asset);
