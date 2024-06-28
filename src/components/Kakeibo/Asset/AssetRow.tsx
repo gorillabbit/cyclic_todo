@@ -18,6 +18,7 @@ import {
   MethodType,
   BalanceLog,
   defaultMethod,
+  PurchaseListType,
 } from "../../../types";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
@@ -106,6 +107,7 @@ type PlainAssetRowProps = UnderHalfRowProps & {
   isSmall: boolean;
   latestLog: BalanceLog;
   methodSpent: number;
+  methodPurchase: (methodId: string) => { income: number; spent: number };
 };
 
 const PlainAssetRow = memo(
@@ -132,6 +134,7 @@ const PlainAssetRow = memo(
     isSmall,
     latestLog,
     methodSpent,
+    methodPurchase,
   }: PlainAssetRowProps): JSX.Element => (
     <>
       <TableRow>
@@ -214,13 +217,19 @@ const PlainAssetRow = memo(
               <TableHead>
                 <TableRow>
                   <TableCellWrapper label="名前" />
+                  <TableCellWrapper label="今月の収入" />
+                  <TableCellWrapper label="今月の支出" />
                   <TableCellWrapper label="決済タイミング" />
                   <TableCellWrapper colSpan={2} />
                 </TableRow>
               </TableHead>
               <TableBody>
                 {filteredMethodList.map((method) => (
-                  <MethodList method={method} key={method.id} />
+                  <MethodList
+                    method={method}
+                    key={method.id}
+                    methodPurchaseSum={methodPurchase(method.id)}
+                  />
                 ))}
               </TableBody>
             </Table>
@@ -241,9 +250,11 @@ const PlainAssetRow = memo(
 const AssetRow = ({
   asset,
   methodSpent,
+  filteredPurchases,
 }: {
   asset: AssetListType;
   methodSpent: number;
+  filteredPurchases: PurchaseListType[];
 }) => {
   const [open, setOpen] = useState(false);
   const [openDialog, setOpenDialog] = useState<boolean>(false);
@@ -354,6 +365,23 @@ const AssetRow = ({
     setBalanceInput(currentBalance);
   }, [asset.id, assetInput.balanceLog, currentBalance, getNewLog]);
 
+  const methodPurchase = useCallback(
+    (methodId: string) => {
+      const methodPurchaseList = filteredPurchases.filter(
+        (purchase) => purchase.method?.id === methodId
+      );
+      return {
+        income: sumSpentAndIncome(
+          methodPurchaseList.filter((purchase) => purchase.income)
+        ),
+        spent: sumSpentAndIncome(
+          methodPurchaseList.filter((purchase) => !purchase.income)
+        ),
+      };
+    },
+    [filteredPurchases]
+  );
+
   const plainProps = {
     open,
     setOpen,
@@ -377,6 +405,7 @@ const AssetRow = ({
     isSmall,
     latestLog,
     methodSpent,
+    methodPurchase,
   };
 
   return <PlainAssetRow {...plainProps} />;

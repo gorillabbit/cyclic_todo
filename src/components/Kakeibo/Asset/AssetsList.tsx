@@ -28,6 +28,7 @@ type PlainAssetsListProps = {
   purchaseSum: number;
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
+  filteredPurchases: PurchaseListType[];
 };
 
 const PlainAssetsList = memo(
@@ -65,6 +66,7 @@ const PlainAssetsList = memo(
                 asset={asset}
                 key={asset.id}
                 methodSpent={props.methodSpent[asset.id] ?? 0}
+                filteredPurchases={props.filteredPurchases}
               />
             ))}
             <TableRow>
@@ -139,6 +141,7 @@ const AssetTable = ({
     purchaseSum,
     isOpen,
     setIsOpen,
+    filteredPurchases,
   };
 
   return <PlainAssetsList {...plainProps} />;

@@ -30,6 +30,10 @@ type PlainMethodListProps = {
   removeMethod: () => void;
   saveChanges: () => void;
   inputError: string;
+  methodPurchaseSum: {
+    income: number;
+    spent: number;
+  };
 };
 
 const PlainMethodList = memo(
@@ -46,6 +50,8 @@ const PlainMethodList = memo(
           helperText={props.inputError}
         />
       </TableCellWrapper>
+      <TableCellWrapper label={props.methodPurchaseSum.income} />
+      <TableCellWrapper label={-props.methodPurchaseSum.spent} />
       <TableCellWrapper>
         <Select
           value={props.methodInput.timing}
@@ -91,7 +97,16 @@ const PlainMethodList = memo(
   )
 );
 
-const MethodList = ({ method }: { method: MethodListType }) => {
+const MethodList = ({
+  method,
+  methodPurchaseSum,
+}: {
+  method: MethodListType;
+  methodPurchaseSum: {
+    income: number;
+    spent: number;
+  };
+}) => {
   const { methodList } = useMethod();
   const [methodInput, setMethodInput] = useState<MethodListType>(method);
 
@@ -156,6 +171,7 @@ const MethodList = ({ method }: { method: MethodListType }) => {
     saveChanges,
     removeMethod,
     inputError,
+    methodPurchaseSum,
   };
 
   return <PlainMethodList {...plainProps} />;
