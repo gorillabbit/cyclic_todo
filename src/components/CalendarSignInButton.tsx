@@ -21,7 +21,6 @@ const CalendarSignInButton = () => {
       setIsSignedIn(isSignedIn.get());
     };
     gapi.load("client:auth2", initClient);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleSignInClick = () => {
