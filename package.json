@@ -34,7 +34,7 @@
     "react-chartjs-2": "5.2.0",
     "react-cookie": "7.1.4",
     "react-dom": "18.3.1",
-    "react-router-dom": "6.23.1",
+    "react-router-dom": "6.24.0",
     "ts-node": "10.9.2"
   },
   "devDependencies": {
