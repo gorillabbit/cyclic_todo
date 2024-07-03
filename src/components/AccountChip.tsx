@@ -10,8 +10,7 @@ const AccountChip = () => {
 
   return Account ? (
     <Chip
-      label={Account.name}
-      avatar={<Avatar src={Account.icon ?? ""} alt="アイコン" />}
+      avatar={<Avatar src={""} alt="アイコン" />}
       onDelete={() => signOut(auth)}
     />
   ) : (
