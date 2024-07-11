@@ -117,9 +117,25 @@ const AssetTable = ({
 
   // 月末までの支払い方法別支払い合計
   const methodSpent: { [key: string]: number } = {};
-  const filteredPurchases = orderedPurchase.filter(
-    (purchase) => purchase.date.toDate() < lastDayOfMonth(new Date())
-  );
+  const filteredPurchases = orderedPurchase.filter((purchase) => {
+    // 最後の資産の更新日付から月末までの購入を抽出
+    const lastAssetBalance = assetList
+      .find((asset) => asset.id == purchase.method.assetId)
+      ?.balanceLog.slice(-1)[0];
+    console.log(
+      assetList,
+      assetList.find((asset) => asset.id == purchase.method.assetId),
+      purchase.method.assetId,
+      lastAssetBalance
+    );
+    if (!lastAssetBalance) {
+      return false;
+    }
+    const lastAssetDate = lastAssetBalance.timestamp.toDate();
+    if (lastAssetDate) {
+      return purchase.date.toDate() < lastDayOfMonth(new Date());
+    }
+  });
   filteredPurchases.forEach((purchase) => {
     const assetId = purchase.method.assetId;
     const purchasePrice = purchase.income

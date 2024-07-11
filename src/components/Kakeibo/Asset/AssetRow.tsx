@@ -347,7 +347,7 @@ const AssetRow = ({
   const relatedPurchases = sumSpentAndIncome(
     purchaseList.filter(
       (purchase) =>
-        purchase.method?.assetId === asset.id &&
+        purchase.method.assetId === asset.id &&
         purchase.date.toDate() < new Date() &&
         latestLog.timestamp.toDate() < purchase.date.toDate() &&
         !purchase.childPurchaseId
