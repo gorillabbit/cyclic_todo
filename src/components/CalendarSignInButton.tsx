@@ -5,9 +5,9 @@ import googleCalendarIcon from "../icons/googleCalendarIcon.svg";
 
 const config = {
   clientId: import.meta.env.VITE_GOOGLE_CALENDER_CLIENT_ID,
-  apiKey: import.meta.env.VITE_GOOGLE_CALENDER_apiKey,
-  scope: import.meta.env.VITE_GOOGLE_CALENDER_scope,
-  discoveryDocs: [import.meta.env.VITE_GOOGLE_CALENDER_discoveryDocs],
+  apiKey: import.meta.env.VITE_GOOGLE_CALENDER_API_KEY,
+  scope: import.meta.env.VITE_GOOGLE_CALENDER_SCOPES,
+  discoveryDocs: [import.meta.env.VITE_GOOGLE_CALENDER_DISCOVERY_DOCS],
 };
 
 const CalendarSignInButton = () => {
