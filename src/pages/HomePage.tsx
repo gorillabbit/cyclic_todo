@@ -60,7 +60,7 @@ const PlainHomePage = memo(
   }
 );
 
-const HomePage = () => {
+const HomePage = memo(() => {
   const [pinnedTab, setPinnedTab] = useCookies(["pinnedTab"]);
   const pinnedTabNum = pinnedTab.pinnedTab ? Number(pinnedTab.pinnedTab) : 0;
   const [tabValue, setTabValue] = useState<number>(pinnedTabNum);
@@ -90,6 +90,5 @@ const HomePage = () => {
     Account,
   };
   return <PlainHomePage {...plainProps} />;
-};
-
+});
 export default HomePage;

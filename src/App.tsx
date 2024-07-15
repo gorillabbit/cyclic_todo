@@ -3,7 +3,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import "./App.css";
 import Header from "./components/Header";
-import { useEffect, useState } from "react";
+import { memo, useEffect, useState } from "react";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { AccountProvider } from "./components/Context/AccountContext";
 import { doc, onSnapshot } from "firebase/firestore";
@@ -13,7 +13,7 @@ import LoginPage from "./pages/LoginPage";
 import { db } from "./firebase";
 import HomePage from "./pages/HomePage";
 
-const App = (): JSX.Element => {
+const App = memo((): JSX.Element => {
   const theme = createTheme({
     typography: {
       fontFamily: [
@@ -68,6 +68,6 @@ const App = (): JSX.Element => {
       </LocalizationProvider>
     </BrowserRouter>
   );
-};
+});
 
 export default App;

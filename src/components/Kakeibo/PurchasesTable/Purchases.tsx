@@ -116,7 +116,7 @@ const PlainPurchases = memo(
   )
 );
 
-const Purchases = (): JSX.Element => {
+const Purchases = memo((): JSX.Element => {
   const { purchaseList } = usePurchase();
   const [month, setMonth] = useState<Date>(new Date());
   const monthlyPurchases = useMemo(
@@ -227,6 +227,6 @@ const Purchases = (): JSX.Element => {
     HeaderCellWrapper,
   };
   return <PlainPurchases {...plainProps} />;
-};
+});
 
 export default Purchases;
