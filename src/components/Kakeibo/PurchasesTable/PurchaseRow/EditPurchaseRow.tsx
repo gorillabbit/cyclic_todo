@@ -171,43 +171,39 @@ const EditPurchaseRow = ({
 
   // 編集内容を保存する関数
   const handleSaveClick = useCallback(() => {
-    // アップデートし、編集を閉じる
-    const updateCurrentPurchase = (feature: Partial<InputPurchaseRowType>) => {
-      updateDocPurchase(editFormData.id, {
+    const method = editFormData.method;
+    const timing = method.timing;
+    const { id, childPurchaseId, ...childPurchaseWithoutIds } = editFormData;
+    // 日付の変更にも対応できるように後払いも更新する
+    const childPurchase = {
+      ...childPurchaseWithoutIds,
+      date: getPayLaterDate(editFormData.date, method.timingDate),
+    };
+
+    const saveEdits = async () => {
+      let update = childPurchaseId;
+      if (childPurchaseId) {
+        if (timing === "即時") {
+          // 後払い → 即時払い = 後払いを消す
+          deleteDocPurchase(childPurchaseId);
+          update = "";
+        } else {
+          // 後払い → 後払い = 後払いを更新する
+          updateDocPurchase(childPurchaseId, childPurchase);
+        }
+      } else if (timing === "翌月") {
+        // 即時払い → 後払い = 後払いを作る
+        const docRef = await addDocPurchase(childPurchase);
+        update = docRef.id;
+      }
+      updateDocPurchase(id, {
         ...editFormData,
-        ...feature,
+        childPurchaseId: update,
       });
       setIsEdit(false);
     };
-    // 決済Purchaseも変更する
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { id, ...childPurchaseWithoutId } = editFormData;
-    // 日付の変更にも対応できるようにする
-    const childPurchase = {
-      ...childPurchaseWithoutId,
-      date: getPayLaterDate(
-        editFormData.date,
-        editFormData.method.timingDate ?? childPurchaseWithoutId.date.getDate()
-      ),
-      childPurchaseId: "",
-    };
-    if (editFormData.childPurchaseId) {
-      if (editFormData.method.timing === "即時") {
-        // 決済を後払いから即時のものにしたとき決済Purchaseを削除する
-        deleteDocPurchase(editFormData.childPurchaseId);
-        // 子タスクを削除したあとで、再び後払いにした場合、存在しない子タスクをupdateしようとしてしまう
-        updateCurrentPurchase({ childPurchaseId: "" });
-        return;
-      }
-      updateDocPurchase(editFormData.childPurchaseId, childPurchase);
-    } else if (editFormData.method.timingDate) {
-      //childPurchaseIdがなく新たにtimingが出てきた場合、子Purchaseを追加し、子PurchaseIdを追加
-      addDocPurchase(childPurchase).then((docRef) =>
-        updateCurrentPurchase({ childPurchaseId: docRef.id })
-      );
-      return;
-    }
-    updateCurrentPurchase({});
+
+    saveEdits();
   }, [editFormData, setIsEdit]);
 
   const handleEditFormChange = useCallback(
