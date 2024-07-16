@@ -6,8 +6,8 @@ import {
   where,
 } from "firebase/firestore";
 import { db } from "../firebase";
-import { useEffect, useMemo, useState } from "react";
-import { getAuth } from "firebase/auth";
+import { useMemo, useState, useCallback, SetStateAction } from "react";
+import { getAuth, onAuthStateChanged, User } from "firebase/auth";
 
 export const useFirestoreQuery = <T>(
   collectionName: string,
@@ -15,16 +15,42 @@ export const useFirestoreQuery = <T>(
   noUserId?: boolean //一部のuserIdが無い情報を取得するときに使う
 ) => {
   const [documents, setDocuments] = useState<T[]>([]);
-  const auth = useMemo(() => getAuth(), []);
+  const [authUser, setAuthUser] = useState(() => getAuth().currentUser);
 
-  useEffect(() => {
-    if (!auth.currentUser) return;
-    const firestoreQuery = query(
+  // Memoize the authUser state update callback
+  const handleAuthStateChanged = useCallback(
+    (user: SetStateAction<User | null>) => {
+      setAuthUser(user);
+    },
+    []
+  );
+
+  // Memoize the Firestore query
+  const firestoreQuery = useMemo(() => {
+    if (!authUser && !noUserId) return null;
+
+    return query(
       collection(db, collectionName),
-      ...(noUserId ? [] : [where("userId", "==", auth.currentUser.uid)]),
+      ...(noUserId ? [] : [where("userId", "==", authUser?.uid)]),
       ...queryConstraints
     );
-    const unsubscribe = onSnapshot(firestoreQuery, (querySnapshot) => {
+  }, [authUser, collectionName, noUserId, queryConstraints]);
+
+  // Subscribe to auth state changes once
+  useMemo(() => {
+    const auth = getAuth();
+    const unsubscribeAuth = onAuthStateChanged(auth, handleAuthStateChanged);
+
+    return () => {
+      unsubscribeAuth();
+    };
+  }, [handleAuthStateChanged]);
+
+  // Subscribe to Firestore query changes
+  useMemo(() => {
+    if (!firestoreQuery) return;
+
+    const unsubscribeFirestore = onSnapshot(firestoreQuery, (querySnapshot) => {
       const purchasesData = querySnapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
@@ -33,8 +59,9 @@ export const useFirestoreQuery = <T>(
     });
 
     return () => {
-      unsubscribe();
+      unsubscribeFirestore();
     };
-  }, [auth, collectionName, noUserId, queryConstraints]);
+  }, [firestoreQuery]);
+
   return { documents, setDocuments };
 };
