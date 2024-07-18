@@ -1,21 +1,36 @@
 import { IconButton, Button, Box } from "@mui/material";
-import { memo, useCallback } from "react";
+import { memo, useCallback, useState } from "react";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import DeleteConfirmDialog from "../../DeleteConfirmDialog";
+import { PurchaseDataType } from "../../../../types/purchaseTypes";
+import {
+  deletePurchaseAndUpdateLater,
+  updateAndAddPurchases,
+} from "../../../../utilities/purchaseUtilities";
+import { usePurchase } from "../../../../hooks/useData";
 
 type PlainPurchaseRowButtonsProps = {
+  purchase: PurchaseDataType;
   handleEditClick: () => void;
   handleDeleteButton: () => void;
   handleEditPriceButtonClick: () => void;
   isUncertain: boolean | undefined;
+  openDialog: boolean;
+  setOpenDialog: React.Dispatch<React.SetStateAction<boolean>>;
+  deleteAction: () => void;
 };
 
 const PlainPurchaseRowButtons = memo(
   ({
+    purchase,
     handleEditClick,
     handleDeleteButton,
     handleEditPriceButtonClick,
     isUncertain,
+    openDialog,
+    setOpenDialog,
+    deleteAction,
   }: PlainPurchaseRowButtonsProps) => (
     <Box display="flex">
       <IconButton
@@ -45,21 +60,29 @@ const PlainPurchaseRowButtons = memo(
           金額確定
         </Button>
       )}
+      <DeleteConfirmDialog
+        target={purchase.title}
+        {...{ openDialog, setOpenDialog, deleteAction }}
+      />
     </Box>
   )
 );
 
 const PurchaseRowButtons = ({
+  purchase,
   setIsEdit,
-  setOpenDialog,
   setIsEditPrice,
   isUncertain,
+  updatePurchases,
 }: {
+  purchase: PurchaseDataType;
   setIsEdit: (value: React.SetStateAction<boolean>) => void;
   setIsEditPrice: React.Dispatch<React.SetStateAction<boolean>>;
-  setOpenDialog: React.Dispatch<React.SetStateAction<boolean>>;
   isUncertain: boolean | undefined;
+  updatePurchases: PurchaseDataType[];
 }) => {
+  const { setPurchaseList } = usePurchase();
+  const [openDialog, setOpenDialog] = useState<boolean>(false);
   const handleEditClick = useCallback(() => {
     setIsEdit(true);
   }, [setIsEdit]);
@@ -72,11 +95,29 @@ const PurchaseRowButtons = ({
     () => setIsEditPrice(true),
     [setIsEditPrice]
   );
+
+  const deleteAction = useCallback(async () => {
+    let updates = updatePurchases;
+    if (purchase.childPurchaseId) {
+      updates = await deletePurchaseAndUpdateLater(
+        purchase.childPurchaseId,
+        updates
+      );
+    }
+    updates = await deletePurchaseAndUpdateLater(purchase.id, updates);
+    updateAndAddPurchases(updates);
+    setPurchaseList(updates);
+  }, [purchase.childPurchaseId, purchase.id, setPurchaseList, updatePurchases]);
+
   const plainProps = {
+    purchase,
     handleEditClick,
     handleDeleteButton,
     isUncertain,
     handleEditPriceButtonClick,
+    openDialog,
+    setOpenDialog,
+    deleteAction,
   };
   return <PlainPurchaseRowButtons {...plainProps} />;
 };

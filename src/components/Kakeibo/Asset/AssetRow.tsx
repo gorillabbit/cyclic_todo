@@ -8,31 +8,33 @@ import {
   TextFieldProps,
 } from "@mui/material";
 import { memo, useCallback, useEffect, useMemo, useState } from "react";
-import {
-  AssetListType,
-  MethodListType,
-  PurchaseListType,
-  AssetLogType,
-} from "../../../types";
+import { AssetListType, MethodListType } from "../../../types";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import DeleteIcon from "@mui/icons-material/Delete";
 import {
-  addDocAssetLog,
   deleteDocAsset,
   deleteDocMethod,
   updateDocAsset,
 } from "../../../firebase";
 import {
+  addPurchaseAndUpdateLater,
+  getLastPurchase,
   numericProps,
-  useLastAssetLog,
+  updateAndAddPurchases,
 } from "../../../utilities/purchaseUtilities";
 import DeleteConfirmDialog from "../DeleteConfirmDialog";
 import { useIsSmall } from "../../../hooks/useWindowSize";
-import { useMethod } from "../../../hooks/useData";
+import {
+  useAccount,
+  useMethod,
+  usePurchase,
+  useTab,
+} from "../../../hooks/useData";
 import TableCellWrapper from "../TableCellWrapper";
 import { useNextMonthFirstDay } from "../../../utilities/dateUtilities";
 import MethodList from "./MethodList";
+import { PurchaseDataType } from "../../../types/purchaseTypes";
 
 const tableInputStyle: {
   sx: TextFieldProps["sx"];
@@ -45,8 +47,8 @@ const tableInputStyle: {
 };
 
 type UnderHalfRowProps = {
-  isNameChanged: boolean;
-  isBalanceChanged: boolean;
+  isNameChanged: boolean | undefined;
+  isBalanceChanged: boolean | undefined;
   removeAsset: () => void;
   saveChanges: () => void;
 };
@@ -91,9 +93,9 @@ type PlainAssetRowProps = UnderHalfRowProps & {
   setOpenDialog: React.Dispatch<React.SetStateAction<boolean>>;
   deleteAction: () => void;
   isSmall: boolean;
-  lastAssetLog: AssetLogType;
-  monthEndAssetLog: AssetLogType;
-  filteredPurchases: PurchaseListType[];
+  lastPurchase: PurchaseDataType | undefined;
+  monthEndBalance: number | undefined;
+  filteredPurchases: PurchaseDataType[];
 };
 
 const PlainAssetRow = memo(
@@ -109,14 +111,14 @@ const PlainAssetRow = memo(
     filteredMethodList,
     handleBalanceInput,
     balanceInput,
-    lastAssetLog,
     openDialog,
     setOpenDialog,
     deleteAction,
     isSmall,
-    monthEndAssetLog,
     assetId,
     filteredPurchases,
+    lastPurchase,
+    monthEndBalance,
   }: PlainAssetRowProps): JSX.Element => (
     <>
       <TableRow>
@@ -140,13 +142,13 @@ const PlainAssetRow = memo(
         <TableCellWrapper>
           <TextField
             {...tableInputStyle}
-            value={isBalanceChanged ? balanceInput : lastAssetLog.balance}
+            value={isBalanceChanged ? balanceInput : lastPurchase?.balance ?? 0}
             name="balance"
             onChange={handleBalanceInput}
             inputProps={numericProps}
           />
         </TableCellWrapper>
-        <TableCellWrapper>{monthEndAssetLog.balance}</TableCellWrapper>
+        <TableCellWrapper>{monthEndBalance}</TableCellWrapper>
         {!isSmall && (
           <UnderHalfRow
             {...{
@@ -173,10 +175,7 @@ const PlainAssetRow = memo(
       )}
 
       <MethodList
-        open={open}
-        assetId={assetId}
-        filteredMethodList={filteredMethodList}
-        filteredPurchases={filteredPurchases}
+        {...{ open, assetId, filteredMethodList, filteredPurchases }}
       />
       <DeleteConfirmDialog
         target={assetNameInput}
@@ -192,23 +191,32 @@ const AssetRow = memo(
     filteredPurchases,
   }: {
     asset: AssetListType;
-    filteredPurchases: PurchaseListType[];
+    filteredPurchases: PurchaseDataType[];
   }) => {
+    const assetId = asset.id;
+    const assetName = asset.name;
+    const { purchaseList, setPurchaseList } = usePurchase();
+    const [updatePurchases, setUpdatePurchases] = useState<PurchaseDataType[]>(
+      []
+    );
+
+    useEffect(() => {
+      setUpdatePurchases(purchaseList.filter((p) => p.assetId === assetId));
+    }, [purchaseList, assetId]);
+
     const [balanceInput, setBalanceInput] = useState<number | undefined>(
       undefined
     );
-    const [today, setToday] = useState(new Date());
     const [open, setOpen] = useState(false);
     const [openDialog, setOpenDialog] = useState<boolean>(false);
-    const [assetNameInput, setAssetNameInput] = useState<string>(asset.name);
-    const lastAssetLog = useLastAssetLog(asset.id, today);
-    const monthEndAssetLog = useLastAssetLog(asset.id, useNextMonthFirstDay());
+    const [assetNameInput, setAssetNameInput] = useState<string>(assetName);
+    const lastPurchase = getLastPurchase(new Date(), updatePurchases);
+    const monthEndPurchase = getLastPurchase(
+      useNextMonthFirstDay(),
+      updatePurchases
+    );
+    const monthEndBalance = monthEndPurchase?.balance;
     const isSmall = useIsSmall();
-
-    // 支払いがあると、必ず月末の残高が更新されるためそれをトリガーに再取得
-    useEffect(() => {
-      setToday(new Date());
-    }, [monthEndAssetLog]);
 
     const handleAssetInput = useCallback(
       (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -216,6 +224,8 @@ const AssetRow = memo(
       },
       []
     );
+
+    const isNameChanged = assetName !== assetNameInput;
 
     const handleBalanceInput = useCallback(
       (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -227,35 +237,66 @@ const AssetRow = memo(
       []
     );
 
-    const isNameChanged = useMemo(
-      () => asset.name !== assetNameInput,
-      [asset.name, assetNameInput]
-    );
-
+    // TODO どういう時に「変更」が活性化するかきちんと考える
     const isBalanceChanged = useMemo(
-      () => balanceInput !== undefined && lastAssetLog.balance !== balanceInput,
-      [balanceInput, lastAssetLog.balance]
+      () =>
+        balanceInput !== undefined && lastPurchase?.balance !== balanceInput,
+      [balanceInput, lastPurchase]
     );
 
-    console.log(isBalanceChanged, lastAssetLog.balance, balanceInput);
+    const { Account } = useAccount();
+    const userId = Account?.id;
+    const { tabId } = useTab();
 
-    // 配列を更新してもreactが更新されないため。stateで更新する必要がある
+    // 編集内容を保存する関数
     const saveChanges = useCallback(() => {
-      if (isBalanceChanged) {
-        addDocAssetLog({
-          assetId: asset.id,
-          methodId: "",
-          balance: balanceInput ?? 0,
-          date: today,
-        });
+      if (isBalanceChanged && balanceInput && userId) {
+        const updatePurchase = addPurchaseAndUpdateLater(
+          {
+            assetId,
+            balance: balanceInput,
+            date: new Date(),
+            difference: balanceInput - (lastPurchase?.balance ?? 0),
+            childPurchaseId: "",
+            userId,
+            tabId,
+            title: `${asset.name}残高調整`,
+            method: {
+              id: "",
+              userId,
+              assetId,
+              tabId,
+              timing: "即時",
+              label: "資産追加",
+              timingDate: 0,
+            },
+            category: "",
+            description: "",
+            id: "",
+          },
+          updatePurchases
+        );
+        updateAndAddPurchases(updatePurchase.purchases);
+        setPurchaseList(updatePurchase.purchases);
       }
-      updateDocAsset(asset.id, { name: assetNameInput });
-    }, [asset.id, assetNameInput, balanceInput, isBalanceChanged, today]);
+      updateDocAsset(assetId, { name: assetNameInput });
+    }, [
+      asset.name,
+      assetId,
+      assetNameInput,
+      balanceInput,
+      isBalanceChanged,
+      lastPurchase?.balance,
+      setPurchaseList,
+      tabId,
+      updatePurchases,
+      userId,
+    ]);
 
     const { methodList } = useMethod();
     const filteredMethodList = useMemo(
-      () => methodList.filter((method) => method.assetId === asset.id),
-      [methodList, asset.id]
+      () => methodList.filter((method) => method.assetId === assetId),
+      [methodList, assetId]
     );
 
     const removeAsset = useCallback(() => {
@@ -263,11 +304,11 @@ const AssetRow = memo(
     }, []);
 
     const deleteAction = useCallback(() => {
-      deleteDocAsset(asset.id);
+      deleteDocAsset(assetId);
       if (filteredMethodList.length > 0) {
         filteredMethodList.forEach((method) => deleteDocMethod(method.id));
       }
-    }, [asset.id, filteredMethodList]);
+    }, [assetId, filteredMethodList]);
 
     const plainProps = {
       open,
@@ -285,9 +326,9 @@ const AssetRow = memo(
       setOpenDialog,
       deleteAction,
       isSmall,
-      lastAssetLog,
-      monthEndAssetLog,
-      assetId: asset.id,
+      lastPurchase,
+      monthEndBalance,
+      assetId,
       filteredPurchases,
     };
 

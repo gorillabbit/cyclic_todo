@@ -9,7 +9,7 @@ import {
   TextField,
 } from "@mui/material";
 import StyledCheckbox from "../../StyledCheckbox";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { addDocPurchaseSchedule } from "../../../firebase";
 import { getAuth } from "firebase/auth";
 import {
@@ -23,9 +23,11 @@ import {
   addScheduledPurchase,
   isValidatedNum,
   numericProps,
+  updateAndAddPurchases,
   weekDaysString,
 } from "../../../utilities/purchaseUtilities";
 import { usePurchase, useMethod, useTab } from "../../../hooks/useData";
+import { PurchaseDataType } from "../../../types/purchaseTypes";
 
 const auth = getAuth();
 const defaultNewPurchase: InputPurchaseScheduleType = {
@@ -48,11 +50,23 @@ const PurchaseScheduleInput = () => {
   const { categorySet } = usePurchase();
   const { methodList } = useMethod();
   const { tabId } = useTab();
+  const { purchaseList, setPurchaseList } = usePurchase();
+  const [updatePurchases, setUpdatePurchases] = useState<PurchaseDataType[]>(
+    []
+  );
   const [newPurchaseSchedule, setNewPurchaseSchedule] =
     useState<InputPurchaseScheduleType>({
       ...defaultNewPurchase,
       tabId,
     });
+
+  useEffect(() => {
+    setUpdatePurchases(
+      purchaseList.filter(
+        (p) => p.assetId === newPurchaseSchedule.method.assetId
+      )
+    );
+  }, [newPurchaseSchedule.method.assetId, purchaseList]);
 
   const handleNewPurchaseScheduleInput = useCallback(
     (name: string, value: string | Date | boolean | MethodListType | null) => {
@@ -81,11 +95,19 @@ const PurchaseScheduleInput = () => {
     if (auth.currentUser) {
       const userId = auth.currentUser.uid;
       addDocPurchaseSchedule({ ...newPurchaseSchedule, userId }).then(
-        (docRef) => addScheduledPurchase(docRef.id, newPurchaseSchedule)
+        (docRef) => {
+          const result = addScheduledPurchase(
+            docRef.id,
+            newPurchaseSchedule,
+            updatePurchases
+          );
+          updateAndAddPurchases(result);
+          setPurchaseList(result);
+        }
       );
       setNewPurchaseSchedule(defaultNewPurchase);
     }
-  }, [newPurchaseSchedule]);
+  }, [newPurchaseSchedule, setPurchaseList, updatePurchases]);
 
   return (
     <>

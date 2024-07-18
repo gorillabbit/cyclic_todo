@@ -1,12 +1,12 @@
 import { TableCell, TableSortLabel } from "@mui/material";
 import { memo } from "react";
-import { PurchaseListType } from "../../../types";
+import { PurchaseDataType } from "../../../types/purchaseTypes";
 
 type TableHeadCellProps = {
   label: string;
-  value: keyof PurchaseListType;
-  orderBy: keyof PurchaseListType;
-  setOrderBy: React.Dispatch<React.SetStateAction<keyof PurchaseListType>>;
+  value: keyof PurchaseDataType;
+  orderBy: keyof PurchaseDataType;
+  setOrderBy: React.Dispatch<React.SetStateAction<keyof PurchaseDataType>>;
   isAsc: boolean;
   setIsAsc: React.Dispatch<React.SetStateAction<boolean>>;
 };

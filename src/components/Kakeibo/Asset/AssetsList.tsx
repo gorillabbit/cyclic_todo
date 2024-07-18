@@ -11,24 +11,24 @@ import {
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import CloseFullscreenIcon from "@mui/icons-material/CloseFullscreen";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import { addDocAsset, addDocAssetLog } from "../../../firebase";
+import { addDocAsset } from "../../../firebase";
 import { memo, useCallback, useState } from "react";
-import { AssetListType, PurchaseListType } from "../../../types";
+import { AssetListType } from "../../../types";
 import AssetRow from "./AssetRow";
 import { useAccount, useAsset, useTab } from "../../../hooks/useData";
 import { lastDayOfMonth } from "date-fns";
 import { sumSpentAndIncome } from "../../../utilities/purchaseUtilities";
 import TableCellWrapper from "../TableCellWrapper";
+import { PurchaseDataType } from "../../../types/purchaseTypes";
 
 type PlainAssetsListProps = {
   assetList: AssetListType[];
-  sumAssets: number;
   addAsset: () => void;
   methodSpent: { [key: string]: number };
   purchaseSum: number;
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
-  filteredPurchases: PurchaseListType[];
+  filteredPurchases: PurchaseDataType[];
 };
 
 const PlainAssetsList = memo(
@@ -69,10 +69,6 @@ const PlainAssetsList = memo(
             ))}
             <TableRow>
               <TableCellWrapper label="合計" colSpan={2} />
-              <TableCellWrapper label={props.sumAssets + "円"} />
-              <TableCellWrapper
-                label={props.sumAssets + props.purchaseSum + "円"}
-              />
             </TableRow>
           </TableBody>
         )}
@@ -91,57 +87,42 @@ const PlainAssetsList = memo(
 );
 
 const AssetTable = memo(
-  ({ orderedPurchase }: { orderedPurchase: PurchaseListType[] }) => {
-    const { assetList, sumAssets } = useAsset();
+  ({ orderedPurchase }: { orderedPurchase: PurchaseDataType[] }) => {
+    const { assetList } = useAsset();
     const { tabId } = useTab();
     const { Account } = useAccount();
     const [isOpen, setIsOpen] = useState(false);
 
+    // TODO 追加時に「残高調整」というメソッドを自動でつくる
     const addAsset = useCallback(() => {
-      if (Account) {
-        const userId = Account.id;
-        const newAssetLog = {
-          userId,
-          tabId,
-          name: "",
-          balanceLog: [
-            {
-              timestamp: new Date(),
-              balance: 0,
-            },
-          ],
-        };
-        addDocAsset(newAssetLog).then((result) => {
-          addDocAssetLog({
-            assetId: result.id,
-            methodId: "",
-            balance: 0,
-            date: new Date(),
-          });
-        });
-      }
+      if (!Account) return;
+      const newAssetLog = {
+        userId: Account.id,
+        tabId,
+        name: "",
+      };
+      addDocAsset(newAssetLog);
     }, [Account, tabId]);
 
     // 月末までの支払い方法別支払い合計
+    // TODO 最も最近の先月の支払いと今月の最後の支払いの残高の差額を見る
     const methodSpent: { [key: string]: number } = {};
     const filteredPurchases = orderedPurchase.filter((purchase) => {
       // 最後の資産の更新日付から月末までの購入を抽出
-      const lastAssetBalance = assetList
-        .find((asset) => asset.id == purchase.method.assetId)
-        ?.balanceLog.slice(-1)[0];
-      if (!lastAssetBalance) {
-        return false;
-      }
+      const lastAssetBalance = assetList.find(
+        (asset) => asset.id == purchase.method.assetId
+      );
+
+      if (!lastAssetBalance) return false;
+
       const lastAssetDate = lastAssetBalance.timestamp.toDate();
       if (lastAssetDate) {
-        return purchase.date.toDate() < lastDayOfMonth(new Date());
+        return purchase.date < lastDayOfMonth(new Date());
       }
     });
     filteredPurchases.forEach((purchase) => {
       const assetId = purchase.method.assetId;
-      const purchasePrice = purchase.income
-        ? Number(purchase.price)
-        : -Number(purchase.price);
+      const purchasePrice = purchase.difference;
       if (methodSpent[assetId]) {
         methodSpent[assetId] += purchasePrice;
       } else {
@@ -152,7 +133,6 @@ const AssetTable = memo(
 
     const plainProps = {
       assetList,
-      sumAssets,
       addAsset,
       methodSpent,
       purchaseSum,

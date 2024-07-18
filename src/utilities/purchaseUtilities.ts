@@ -1,35 +1,25 @@
 import { InputBaseComponentProps } from "@mui/material";
+import { InputPurchaseScheduleType, WeekDay } from "../types";
+import { db, dbNames, deleteDocPurchase } from "../firebase";
+import { addMonths, nextDay, addDays, set } from "date-fns";
 import {
-  AssetListType,
-  InputPurchaseScheduleType,
-  InputPurchaseType,
-  PurchaseListType,
-  WeekDay,
-} from "../types";
-import {
-  batchAddDocPurchase,
-  db,
-  dbNames,
-  deleteDocPurchase,
-} from "../firebase";
-import { addMonths, nextDay, addDays } from "date-fns";
-import { doc, collection } from "firebase/firestore";
+  doc,
+  collection,
+  getDoc,
+  updateDoc,
+  setDoc,
+  addDoc,
+} from "firebase/firestore";
 import { getPayLaterDate } from "./dateUtilities";
-import { getAuth } from "firebase/auth";
+import { PurchaseDataType, PurchaseRawDataType } from "../types/purchaseTypes";
 
 /**
  * 収支を合計する(収入は+、支出は-で表現されるので支出の合計は-になる)
  * @param purchasesList
  * @returns
  */
-export const sumSpentAndIncome = (purchasesList: PurchaseListType[]) =>
-  purchasesList.reduce(
-    (acc, purchase) =>
-      purchase.income
-        ? acc + Number(purchase.price)
-        : acc - Number(purchase.price),
-    0
-  );
+export const sumSpentAndIncome = (purchasesList: PurchaseDataType[]) =>
+  purchasesList.reduce((acc, purchase) => acc + Number(purchase.difference), 0);
 
 export const numericProps: InputBaseComponentProps = {
   inputMode: "numeric",
@@ -41,7 +31,7 @@ export const numericProps: InputBaseComponentProps = {
  * @param purchase
  * @returns boolean
  */
-export const isLaterPayment = (purchase: PurchaseListType): boolean =>
+export const isLaterPayment = (purchase: PurchaseDataType): boolean =>
   purchase.method.timing === "翌月" && !purchase.childPurchaseId;
 
 /**
@@ -69,40 +59,32 @@ export const isValidatedNum = (value: string): boolean => {
  * @returns フィルタリングされたpurchasesList
  */
 export const filterPurchasesByIncomeType = (
-  purchasesList: PurchaseListType[],
+  purchasesList: PurchaseDataType[],
   income: "income" | "spent"
 ) => {
   if (income === "income") {
-    return purchasesList.filter((purchases) => purchases.income === true);
+    return purchasesList.filter((purchases) => purchases.difference < 0);
   } else {
-    return purchasesList.filter((purchases) => purchases.income === false);
+    return purchasesList.filter((purchases) => purchases.difference >= 0);
   }
 };
-
-/**
- * 最新の残高を取得する
- * @param asset
- * @returns
- */
-export const getLatestBalance = (asset: AssetListType) =>
-  Number(asset.balanceLog.slice(-1)[0].balance)
-    ? Number(asset.balanceLog.slice(-1)[0].balance)
-    : 0;
 
 /**
  * 予定スケジュールの子タスクを削除する
  * @param purchaseList
  * @param purchaseSchedule
  */
-export const deleteScheduledPurchases = (
-  purchaseList: PurchaseListType[],
+export const deleteScheduledPurchases = async (
+  purchaseList: PurchaseDataType[],
   purchaseScheduleId: string
 ) => {
-  purchaseList.forEach((purchase) => {
+  let update = purchaseList;
+  for (const purchase of update) {
     if (purchase.parentScheduleId === purchaseScheduleId) {
-      deleteDocPurchase(purchase.id);
+      update = await deletePurchaseAndUpdateLater(purchase.id, purchaseList);
     }
-  });
+  }
+  return update;
 };
 
 const weekDays: Record<WeekDay, Day> = {
@@ -171,75 +153,17 @@ const listWeeklyDaysUntil = (weekDayName: WeekDay, endDate: Date): Date[] => {
 };
 
 /**
- * 未来の予定を追加する
- * @param docRef
- * @param purchaseSchedule
- */
-export const addScheduledPurchase = (
-  purchaseScheduleId: string,
-  purchaseSchedule: InputPurchaseScheduleType
-) => {
-  const auth = getAuth();
-  if (auth.currentUser) {
-    let daysList: Date[] = [];
-    if (purchaseSchedule.cycle === "毎月" && purchaseSchedule.date) {
-      daysList = listMonthlyDaysUntil(
-        purchaseSchedule.date,
-        purchaseSchedule.endDate
-      );
-    }
-    if (purchaseSchedule.cycle === "毎週" && purchaseSchedule.day) {
-      daysList = listWeeklyDaysUntil(
-        purchaseSchedule.day,
-        purchaseSchedule.endDate
-      );
-    }
-    const userId = auth.currentUser.uid;
-    const batchPurchaseList: InputPurchaseType[][] = daysList.map((dateDay) => {
-      const docId = doc(collection(db, dbNames.purchase)).id;
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { cycle, day, endDate, ...purchaseScheduleWithoutForSchedule } =
-        purchaseSchedule;
-      const basePurchase = {
-        ...purchaseScheduleWithoutForSchedule,
-        userId,
-        parentScheduleId: purchaseScheduleId,
-      };
-      const createdPurchase: (InputPurchaseType & { id?: string })[] = [
-        {
-          ...basePurchase,
-          date: dateDay,
-          childPurchaseId:
-            purchaseSchedule.method.timing === "翌月" ? docId : "",
-        },
-      ];
-      // カード払いの場合は後払いの日も追加する
-      if (purchaseSchedule.method.timing === "翌月") {
-        createdPurchase.push({
-          ...basePurchase,
-          id: docId,
-          date: getPayLaterDate(dateDay, purchaseSchedule.method.timingDate),
-          childPurchaseId: "",
-        });
-      }
-      return createdPurchase;
-    });
-    batchAddDocPurchase(batchPurchaseList.flat());
-  }
-};
-
-/**
  * オブジェクトの配列を指定されたパラメータで並び替えます。
- * @param {PurchaseListType[]} objects - 並び替えるオブジェクトの配列
- * @param {keyof PurchaseListType} parameter - 並び替えに使用するパラメータ
+ * @param {PurchaseDataType[]} objects - 並び替えるオブジェクトの配列
+ * @param {keyof PurchaseDataType} parameter - 並び替えに使用するパラメータ
  * @param {boolean} [ascending=true] - 昇順に並び替えるかどうかを指定する値。デフォルトはtrue（昇順）
- * @returns {PurchaseListType[]} 並び替えられたオブジェクトの配列
+ * @returns {PurchaseDataType[]} 並び替えられたオブジェクトの配列
  */
 export const sortObjectsByParameter = (
-  objects: PurchaseListType[],
-  parameter: keyof PurchaseListType,
+  objects: PurchaseDataType[],
+  parameter: keyof PurchaseDataType,
   ascending: boolean = true
-): PurchaseListType[] => {
+): PurchaseDataType[] => {
   return objects.sort((a, b) => {
     if (parameter === "method") {
       if (a.method.label < b.method.label) return ascending ? -1 : 1;
@@ -253,5 +177,171 @@ export const sortObjectsByParameter = (
       if (aVal > bVal) return ascending ? 1 : -1;
     }
     return 0;
+  });
+};
+
+export const getLastPurchase = (
+  date: Date,
+  updatePurchases: PurchaseDataType[]
+): PurchaseDataType | undefined => {
+  return updatePurchases
+    .sort((a, b) => b.date.getTime() - a.date.getTime())
+    .find((purchase) => purchase.date <= date);
+};
+
+// ある時点より後の支払いすべてを更新する
+export const updateAllLaterPurchases = (
+  date: Date,
+  difference: number,
+  updatePurchases: PurchaseDataType[]
+) => {
+  if (difference === 0) return updatePurchases;
+  return updatePurchases.map((purchase) => ({
+    ...purchase,
+    balance:
+      purchase.date > date
+        ? Number(purchase.balance) + Number(difference)
+        : purchase.balance,
+  }));
+};
+
+export const deletePurchaseAndUpdateLater = async (
+  purchaseId: string,
+  updatePurchases: PurchaseDataType[]
+) => {
+  const docSnap = await getDoc(doc(db, dbNames.purchase, purchaseId));
+  const purchase = docSnap.data() as PurchaseRawDataType;
+  deleteDocPurchase(purchaseId);
+  const filteredPurchase = updatePurchases.filter((p) => p.id !== purchaseId);
+  const difference = purchase.childPurchaseId ? 0 : -purchase.difference;
+  return updateAllLaterPurchases(
+    purchase.date.toDate(),
+    difference,
+    filteredPurchase
+  );
+};
+
+export const addPurchaseAndUpdateLater = (
+  purchase: PurchaseDataType,
+  updatePurchases: PurchaseDataType[]
+) => {
+  const difference = purchase.childPurchaseId ? 0 : Number(purchase.difference);
+  const purchases = updateAllLaterPurchases(
+    purchase.date,
+    difference,
+    updatePurchases
+  );
+  const lastPurchase = getLastPurchase(purchase.date, purchases);
+  const lastBalance = lastPurchase?.balance ?? 0;
+  const newDocRef = doc(collection(db, dbNames.purchase));
+  return {
+    purchases: [
+      ...purchases,
+      {
+        ...purchase,
+        id: purchase.id ? purchase.id : newDocRef.id,
+        balance: lastBalance + difference,
+      },
+    ],
+    id: newDocRef.id,
+  };
+};
+
+export const updatePurchaseAndUpdateLater = async (
+  purchaseId: string, // 子供の支払いの場合は下のpurchaseと食い違うので必要
+  purchase: PurchaseDataType,
+  updatePurchases: PurchaseDataType[]
+) => {
+  const currentPurchases = updatePurchases.find((p) => p.id === purchaseId);
+  if (!currentPurchases) return { purchases: updatePurchases };
+  const updatedLaterPurchases = updateAllLaterPurchases(
+    currentPurchases.date,
+    -currentPurchases.difference,
+    updatePurchases.filter((p) => p.id !== purchaseId)
+  );
+  return addPurchaseAndUpdateLater(purchase, updatedLaterPurchases);
+};
+
+/**
+ * 未来の予定を追加する
+ * @param docRef
+ * @param purchaseSchedule
+ */
+export const addScheduledPurchase = (
+  purchaseScheduleId: string,
+  purchaseSchedule: InputPurchaseScheduleType,
+  updatePurchases: PurchaseDataType[]
+) => {
+  const { price, income, method, cycle, date, endDate, day } = purchaseSchedule;
+  const difference = income ? price : -price;
+  const purchaseBase = {
+    userId: purchaseSchedule.userId,
+    title: purchaseSchedule.title,
+    method,
+    category: purchaseSchedule.category,
+    description: purchaseSchedule.description,
+    isUncertain: purchaseSchedule.isUncertain,
+    tabId: purchaseSchedule.tabId,
+    parentScheduleId: purchaseScheduleId,
+    assetId: method.assetId,
+    balance: 0,
+  };
+
+  const purchaseList: PurchaseDataType[] = [];
+  const getDays = () => {
+    if (cycle === "毎月" && date) return listMonthlyDaysUntil(date, endDate);
+    if (cycle === "毎週" && day) return listWeeklyDaysUntil(day, endDate);
+    return [];
+  };
+  getDays().forEach((dateDay, index) => {
+    const docId = doc(collection(db, dbNames.purchase)).id;
+    const hasLaterPayment = method.timing === "翌月";
+
+    purchaseList.push({
+      ...purchaseBase,
+      date: dateDay,
+      childPurchaseId: hasLaterPayment ? docId : "",
+      difference: hasLaterPayment ? 0 : difference,
+      id: "",
+    });
+    // カード払いの場合は後払いの日も追加する
+    if (hasLaterPayment) {
+      purchaseList.push({
+        ...purchaseBase,
+        id: docId,
+        date: getPayLaterDate(
+          set(dateDay, { milliseconds: index }),
+          method.timingDate
+        ),
+        childPurchaseId: "",
+        difference,
+      });
+    }
+  });
+  let newUpdatePurchases = updatePurchases;
+  for (const purchase of purchaseList) {
+    console.log(newUpdatePurchases);
+    newUpdatePurchases = addPurchaseAndUpdateLater(
+      purchase,
+      newUpdatePurchases
+    ).purchases;
+  }
+
+  return newUpdatePurchases;
+};
+
+export const updateAndAddPurchases = (updatePurchases: PurchaseDataType[]) => {
+  updatePurchases.forEach(async (purchase) => {
+    if (purchase.id) {
+      const docRef = doc(db, dbNames.purchase, purchase.id);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        updateDoc(docRef, { ...purchase });
+      } else {
+        setDoc(docRef, purchase);
+      }
+    } else {
+      addDoc(collection(db, dbNames.purchase), purchase);
+    }
   });
 };

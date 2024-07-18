@@ -127,64 +127,13 @@ export const defaultMethodList: MethodListType = {
   id: "",
 };
 
-export interface InputPurchaseType {
-  userId: string;
-  title: string;
-  price: number;
-  date: Date;
-  method: MethodListType;
-  category: string;
-  income: boolean;
-  description: string;
-  parentScheduleId?: string;
-  childPurchaseId: string;
-  isUncertain?: boolean;
-  tabId: string;
-}
-export const defaultPurchaseInput: InputPurchaseType = {
-  userId: "",
-  title: "",
-  date: new Date(),
-  category: "",
-  method: defaultMethodList,
-  price: 0,
-  income: false,
-  description: "",
-  childPurchaseId: "",
-  tabId: "",
-};
-export interface InputPurchaseRowType extends InputPurchaseType {
-  id: string;
-}
-export interface PurchaseType extends Omit<InputPurchaseType, "date"> {
-  date: Timestamp;
-}
-export interface PurchaseListType extends PurchaseType {
-  id: string;
-}
-export const defaultPurchase: PurchaseListType = {
-  ...defaultPurchaseInput,
-  id: "",
-  date: new Timestamp(0, 0),
-};
-
-export interface InputBalanceLog {
-  timestamp: Date;
-  balance: number;
-}
-export interface BalanceLog {
-  timestamp: Timestamp;
-  balance: number;
-}
-
 export interface InputAssetType {
   userId: string;
   name: string;
-  balanceLog: InputBalanceLog[];
   tabId: string;
 }
-export interface AssetType extends Omit<InputAssetType, "balanceLog"> {
-  balanceLog: BalanceLog[];
+export interface AssetType extends InputAssetType {
+  timestamp: Timestamp;
 }
 export interface AssetListType extends AssetType {
   id: string;

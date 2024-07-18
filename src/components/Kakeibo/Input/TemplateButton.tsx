@@ -1,11 +1,14 @@
 import { Chip } from "@mui/material";
 import { memo, useCallback, useState } from "react";
-import { InputPurchaseType, PurchaseListType } from "../../../types";
 import { deleteDocPurchaseTemplate } from "../../../firebase";
 import DeleteConfirmDialog from "../DeleteConfirmDialog";
+import {
+  InputFieldPurchaseType,
+  TemplateButtonType,
+} from "../../../types/purchaseTypes";
 
 type PlainTemplateButtonProps = {
-  template: PurchaseListType;
+  template: InputFieldPurchaseType;
   onClickTemplateButton: () => void;
   handleDeleteButtonClick: () => void;
   openDialog: boolean;
@@ -43,8 +46,8 @@ const TemplateButton = ({
   setNewPurchase,
   template,
 }: {
-  setNewPurchase: (value: React.SetStateAction<InputPurchaseType>) => void;
-  template: PurchaseListType;
+  setNewPurchase: (value: React.SetStateAction<InputFieldPurchaseType>) => void;
+  template: TemplateButtonType;
 }) => {
   const [openDialog, setOpenDialog] = useState<boolean>(false);
 

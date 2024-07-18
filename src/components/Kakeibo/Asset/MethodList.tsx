@@ -10,17 +10,13 @@ import {
 import { memo, useCallback } from "react";
 import TableCellWrapper from "../TableCellWrapper";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-import {
-  defaultMethod,
-  MethodListType,
-  MethodType,
-  PurchaseListType,
-} from "../../../types";
+import { defaultMethod, MethodListType, MethodType } from "../../../types";
 import { getAuth } from "firebase/auth";
 import { addDocMethod } from "../../../firebase";
 import { useTab } from "../../../hooks/useData";
 import { sumSpentAndIncome } from "../../../utilities/purchaseUtilities";
 import MethodRow from "./MethodRow";
+import { PurchaseDataType } from "../../../types/purchaseTypes";
 
 type PlainMethodListProps = {
   open: boolean;
@@ -78,7 +74,7 @@ const MethodList = memo(
     open: boolean;
     assetId: string;
     filteredMethodList: MethodListType[];
-    filteredPurchases: PurchaseListType[];
+    filteredPurchases: PurchaseDataType[];
   }) => {
     const methodPurchase = useCallback(
       (methodId: string) => {
@@ -87,10 +83,10 @@ const MethodList = memo(
         );
         return {
           income: sumSpentAndIncome(
-            methodPurchaseList.filter((purchase) => purchase.income)
+            methodPurchaseList.filter((purchase) => purchase.difference > 0)
           ),
           spent: sumSpentAndIncome(
-            methodPurchaseList.filter((purchase) => !purchase.income)
+            methodPurchaseList.filter((purchase) => purchase.difference <= 0)
           ),
         };
       },

@@ -2,18 +2,15 @@ import { ReactNode, createContext, memo, useMemo } from "react";
 import { orderBy, where } from "firebase/firestore";
 import { AssetListType } from "../../types.js";
 import { useFirestoreQuery } from "../../utilities/firebaseUtilities";
-import { getLatestBalance } from "../../utilities/purchaseUtilities";
 import { useTab } from "../../hooks/useData.js";
 
 type AssetContextType = {
   assetList: AssetListType[];
-  sumAssets: number;
 };
 
 // Contextを作成（初期値は空のassetListとダミーのsetAssetList関数）
 export const AssetContext = createContext<AssetContextType>({
   assetList: [],
-  sumAssets: 0,
 });
 
 export const AssetProvider = memo(
@@ -28,14 +25,10 @@ export const AssetProvider = memo(
       assetQueryConstraints,
       true
     );
-    const sumAssets = useMemo(
-      () => assetList.reduce((acc, asset) => acc + getLatestBalance(asset), 0),
-      [assetList]
-    );
 
     const context = useMemo(() => {
-      return { assetList, sumAssets };
-    }, [assetList, sumAssets]);
+      return { assetList };
+    }, [assetList]);
 
     return (
       <AssetContext.Provider value={context}>{children}</AssetContext.Provider>

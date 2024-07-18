@@ -8,18 +8,20 @@ import {
 import { DatePicker } from "@mui/x-date-pickers";
 import { memo, useCallback } from "react";
 import DoneIcon from "@mui/icons-material/Done";
-import { InputPurchaseRowType, MethodListType } from "../../../../types";
-import {
-  updateDocPurchase,
-  deleteDocPurchase,
-  addDocPurchase,
-} from "../../../../firebase";
+import { MethodListType } from "../../../../types";
 import { getPayLaterDate } from "../../../../utilities/dateUtilities";
 import { useMethod, usePurchase } from "../../../../hooks/useData";
 import TableCellWrapper from "../../TableCellWrapper";
+import { PurchaseDataType } from "../../../../types/purchaseTypes";
+import {
+  addPurchaseAndUpdateLater,
+  deletePurchaseAndUpdateLater,
+  updateAndAddPurchases,
+  updatePurchaseAndUpdateLater,
+} from "../../../../utilities/purchaseUtilities";
 
 type UnderHalfRowProps = {
-  editFormData: InputPurchaseRowType;
+  editFormData: PurchaseDataType;
   handleEditFormChange: (event: {
     target: {
       name: string;
@@ -38,20 +40,13 @@ const UnderHalfRow = memo(
     <>
       <TableCellWrapper>
         <TextField
-          name="price"
-          value={editFormData.price}
+          name="difference"
+          value={editFormData.difference}
           onChange={handleEditFormChange}
           size="small"
         />
       </TableCellWrapper>
-      <TableCellWrapper>
-        <TextField
-          name="income"
-          value={editFormData.income ? "収入" : "支出"}
-          onChange={handleEditFormChange}
-          size="small"
-        />
-      </TableCellWrapper>
+      <TableCellWrapper label={editFormData.balance} />
       <TableCellWrapper>
         <TextField
           name="description"
@@ -60,6 +55,8 @@ const UnderHalfRow = memo(
           size="small"
         />
       </TableCellWrapper>
+      <TableCellWrapper label={editFormData.difference > 0 ? "収入" : "支出"} />
+
       <TableCell padding="none">
         <IconButton onClick={handleSaveClick} color="success">
           <DoneIcon />
@@ -160,51 +157,72 @@ const EditPurchaseRow = ({
   editFormData,
   setEditFormData,
   isSmall,
+  updatePurchases,
 }: {
   setIsEdit: React.Dispatch<React.SetStateAction<boolean>>;
-  editFormData: InputPurchaseRowType;
-  setEditFormData: React.Dispatch<React.SetStateAction<InputPurchaseRowType>>;
+  editFormData: PurchaseDataType;
+  setEditFormData: React.Dispatch<React.SetStateAction<PurchaseDataType>>;
   isSmall: boolean;
+  updatePurchases: PurchaseDataType[];
 }) => {
   const { methodList } = useMethod();
-  const { categorySet } = usePurchase();
+  const { categorySet, setPurchaseList } = usePurchase();
 
   // 編集内容を保存する関数
-  const handleSaveClick = useCallback(() => {
+  const handleSaveClick = useCallback(async () => {
     const method = editFormData.method;
     const timing = method.timing;
-    const { id, childPurchaseId, ...childPurchaseWithoutIds } = editFormData;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { id: _id, childPurchaseId, ...purchaseWithoutIds } = editFormData;
     // 日付の変更にも対応できるように後払いも更新する
     const childPurchase = {
-      ...childPurchaseWithoutIds,
+      ...purchaseWithoutIds,
       date: getPayLaterDate(editFormData.date, method.timingDate),
+      childPurchaseId: "",
+      id: "",
     };
-
-    const saveEdits = async () => {
-      let update = childPurchaseId;
-      if (childPurchaseId) {
-        if (timing === "即時") {
-          // 後払い → 即時払い = 後払いを消す
-          deleteDocPurchase(childPurchaseId);
-          update = "";
-        } else {
-          // 後払い → 後払い = 後払いを更新する
-          updateDocPurchase(childPurchaseId, childPurchase);
-        }
-      } else if (timing === "翌月") {
-        // 即時払い → 後払い = 後払いを作る
-        const docRef = await addDocPurchase(childPurchase);
-        update = docRef.id;
+    // TODO ここらへんのTimestampやらDateやらの変換をどうにかする
+    let update = { childPurchaseId, difference: editFormData.difference };
+    let updatedPurchases = updatePurchases;
+    if (childPurchaseId) {
+      if (timing === "即時") {
+        // 後払い → 即時払い = 後払いを消す
+        updatedPurchases = await deletePurchaseAndUpdateLater(
+          childPurchaseId,
+          updatePurchases
+        );
+        update = { ...update, childPurchaseId: "" };
+      } else {
+        // 後払い → 後払い = 後払いを更新する
+        updatedPurchases = (
+          await updatePurchaseAndUpdateLater(
+            childPurchaseId,
+            childPurchase,
+            updatePurchases
+          )
+        ).purchases;
       }
-      updateDocPurchase(id, {
+    } else if (timing === "翌月") {
+      // 即時払い → 後払い = 後払いを作る
+      const docs = addPurchaseAndUpdateLater(childPurchase, updatePurchases);
+      update = { ...update, childPurchaseId: docs.id, difference: 0 };
+      updatedPurchases = docs.purchases;
+    }
+    const updatedPurchases1 = await updatePurchaseAndUpdateLater(
+      editFormData.id,
+      {
         ...editFormData,
-        childPurchaseId: update,
-      });
-      setIsEdit(false);
-    };
+        ...update,
+        date: editFormData.date,
+      },
+      updatedPurchases
+    );
 
-    saveEdits();
-  }, [editFormData, setIsEdit]);
+    updateAndAddPurchases(updatedPurchases1.purchases);
+    setPurchaseList(updatedPurchases1.purchases);
+
+    setIsEdit(false);
+  }, [editFormData, setIsEdit, setPurchaseList, updatePurchases]);
 
   const handleEditFormChange = useCallback(
     (event: { target: { name: string; value: unknown } }) => {

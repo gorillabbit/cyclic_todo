@@ -7,28 +7,24 @@ import {
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
 import { memo, useCallback, useMemo, useState } from "react";
-import {
-  addDocPurchase,
-  addDocTransferTemplate,
-  batchAddDocPurchase,
-} from "../../../firebase";
+import { addDocTransferTemplate } from "../../../firebase";
 import { getAuth } from "firebase/auth";
 import {
   MethodListType,
   InputTransferType,
   defaultTransferInput,
-  InputPurchaseType,
 } from "../../../types";
 import {
+  addPurchaseAndUpdateLater,
   isValidatedNum,
   numericProps,
+  updateAndAddPurchases,
 } from "../../../utilities/purchaseUtilities";
 import { getPayLaterDate } from "../../../utilities/dateUtilities";
 import TransferInputButtons from "./TransferInputButtons";
 import TransferTemplateButtonsContainer from "./TransferTemplateButtonContainer";
-import { useMethod, useTab } from "../../../hooks/useData";
-
-const auth = getAuth();
+import { useMethod, usePurchase, useTab } from "../../../hooks/useData";
+import { PurchaseDataType } from "../../../types/purchaseTypes";
 
 type PlainTransferInputProps = {
   handleNewTransferInput: (
@@ -112,12 +108,14 @@ const PlainTransferInput = memo(
 );
 
 const TransferInput = () => {
+  const { currentUser } = getAuth();
   const { methodList } = useMethod();
   const { tabId } = useTab();
   const [newTransfer, setNewTransfer] = useState<InputTransferType>({
     ...defaultTransferInput,
     tabId,
   });
+  const { purchaseList, setPurchaseList } = usePurchase();
 
   const handleNewTransferInput = useCallback(
     (name: string, value: string | Date | MethodListType | null) => {
@@ -131,71 +129,86 @@ const TransferInput = () => {
     },
     []
   );
-
+  const { price, date, description, from, to } = newTransfer;
   const methodError = useMemo(() => {
-    if (!newTransfer.to.assetId || !newTransfer.from.assetId) {
-      return "送金元と送金先は必須です";
-    }
-    if (newTransfer.to.assetId === newTransfer.from.assetId) {
-      return "同じ資産には送金できません";
-    }
-    if (newTransfer.to.timing === "翌月") {
-      return "後払いの決済方法に入金はできません";
-    }
-  }, [newTransfer]);
+    if (!to.assetId || !from.assetId) return "送金元と送金先は必須です";
+    if (to.assetId === from.assetId) return "同じ資産には送金できません";
+    if (to.timing === "翌月") return "後払いの決済方法に入金はできません";
+  }, [from.assetId, to.assetId, to.timing]);
 
   const addTransfer = useCallback(async () => {
-    if (auth.currentUser) {
-      const userId = auth.currentUser.uid;
-      const purchaseTitle = `${newTransfer.from.label}から${newTransfer.to.label}`;
+    if (currentUser) {
+      const userId = currentUser.uid;
+      const purchaseTitle = `${from.label}→${to.label}`;
       const basePurchase = {
         userId,
-        price: newTransfer.price,
+        price,
         category: "送受金",
-        income: false,
         childPurchaseId: "",
-        date: newTransfer.date,
-        description: newTransfer.description,
+        date,
+        description,
         tabId,
       };
       let childId = "";
-      if (newTransfer.from.timing === "翌月" && newTransfer.from.timingDate) {
-        const childTransfer: InputPurchaseType = {
+      let update = purchaseList;
+      if (from.timing === "翌月" && from.timingDate) {
+        const childTransfer: PurchaseDataType = {
           ...basePurchase,
-          title: `【送金】${purchaseTitle}`,
-          date: getPayLaterDate(newTransfer.date, newTransfer.from.timingDate),
-          method: newTransfer.from,
+          title: `【送】${purchaseTitle}`,
+          date: getPayLaterDate(date, from.timingDate),
+          method: from,
+          balance: 0,
+          difference: -price,
+          id: "",
+          assetId: from.assetId,
         };
-        // awaitないとfirestoreへの書き込みが完了する前にbatch書き込みが完了してしまうので
-        await addDocPurchase(childTransfer).then((docRef) => {
-          childId = docRef.id;
-        });
+        const newUpdate = addPurchaseAndUpdateLater(childTransfer, update);
+        update = newUpdate.purchases;
+        childId = newUpdate.id;
       }
-      const transferPurchases: InputPurchaseType[] = [
-        {
-          ...basePurchase,
-          title: `【送金】${purchaseTitle}`,
-          method: newTransfer.from,
-          childPurchaseId: childId,
-        },
-        {
-          ...basePurchase,
-          title: `【入金】${purchaseTitle}`,
-          method: newTransfer.to,
-          income: true,
-        },
-      ];
-      batchAddDocPurchase(transferPurchases);
+      const fromPurchase = {
+        ...basePurchase,
+        title: `【送】${purchaseTitle}`,
+        method: from,
+        childPurchaseId: childId,
+        id: "",
+        assetId: from.assetId,
+        difference: childId ? 0 : -price,
+        balance: 0,
+      };
+      update = addPurchaseAndUpdateLater(fromPurchase, update).purchases;
+      const toPurchase = {
+        ...basePurchase,
+        title: `【受】${purchaseTitle}`,
+        method: to,
+        id: "",
+        assetId: to.assetId,
+        difference: price,
+        balance: 0,
+      };
+      update = addPurchaseAndUpdateLater(toPurchase, update).purchases;
+      updateAndAddPurchases(update);
+      setPurchaseList(update);
     }
     setNewTransfer(defaultTransferInput);
-  }, [newTransfer, tabId]);
+  }, [
+    currentUser,
+    date,
+    description,
+    from,
+    price,
+    purchaseList,
+    setPurchaseList,
+    tabId,
+    to,
+  ]);
 
   const addTemplate = useCallback(() => {
-    if (auth.currentUser) {
-      const userId = auth.currentUser.uid;
+    if (currentUser) {
+      const userId = currentUser.uid;
       addDocTransferTemplate({ ...newTransfer, userId });
     }
-  }, [newTransfer]);
+  }, [currentUser, newTransfer]);
 
   const plainProps = {
     handleNewTransferInput,
