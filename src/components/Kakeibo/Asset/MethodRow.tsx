@@ -15,9 +15,14 @@ import { deleteDocMethod, updateDocMethod } from "../../../firebase";
 import {
   isValidatedNum,
   numericProps,
+  sumSpentAndIncome,
 } from "../../../utilities/purchaseUtilities";
-import { useMethod } from "../../../hooks/useData";
+import { useMethod, usePurchase } from "../../../hooks/useData";
 import TableCellWrapper from "../TableCellWrapper";
+import {
+  getNextMonthFirstDay,
+  getThisMonthFirstDay,
+} from "../../../utilities/dateUtilities";
 
 type PlainMethodRowProps = {
   method: MethodListType;
@@ -30,10 +35,8 @@ type PlainMethodRowProps = {
   removeMethod: () => void;
   saveChanges: () => void;
   inputError: string;
-  methodPurchaseSum: {
-    income: number;
-    spent: number;
-  };
+  thisMonthSpent: number;
+  thisMonthIncome: number;
 };
 
 const PlainMethodRow = memo(
@@ -50,8 +53,8 @@ const PlainMethodRow = memo(
           helperText={props.inputError}
         />
       </TableCellWrapper>
-      <TableCellWrapper label={props.methodPurchaseSum.income} />
-      <TableCellWrapper label={-props.methodPurchaseSum.spent} />
+      <TableCellWrapper label={props.thisMonthIncome} />
+      <TableCellWrapper label={-props.thisMonthSpent} />
       <TableCellWrapper>
         <Select
           value={props.methodInput.timing}
@@ -97,16 +100,7 @@ const PlainMethodRow = memo(
   )
 );
 
-const MethodRow = ({
-  method,
-  methodPurchaseSum,
-}: {
-  method: MethodListType;
-  methodPurchaseSum: {
-    income: number;
-    spent: number;
-  };
-}) => {
+const MethodRow = ({ method }: { method: MethodListType }) => {
   const { methodList } = useMethod();
   const [methodInput, setMethodInput] = useState<MethodListType>(method);
 
@@ -114,10 +108,8 @@ const MethodRow = ({
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       const { name, value } = e.target;
       if (name === "timingDate") {
-        if (isValidatedNum(value) && Number(value) < 32) {
-          setMethodInput((prev) => ({ ...prev, [name]: Number(value) }));
-          return;
-        }
+        if (isValidatedNum(value) && Number(value) < 32)
+          return setMethodInput((prev) => ({ ...prev, [name]: Number(value) }));
         return;
       }
       setMethodInput((prev) => ({ ...prev, [name]: value }));
@@ -125,31 +117,24 @@ const MethodRow = ({
     []
   );
 
-  const inputError = useMemo(() => {
-    if (
-      methodList.filter(
-        (method) =>
-          method.label === methodInput.label && method.id !== methodInput.id
-      ).length > 0
-    ) {
-      return "他の支払い方法と同じ名前は禁止です";
-    } else {
-      return "";
-    }
-  }, [methodInput, methodList]);
-
   const handleSelectInput = useCallback((e: SelectChangeEvent<string>) => {
     const { name, value } = e.target;
     setMethodInput((prev) => ({ ...prev, [name]: value }));
   }, []);
 
+  const inputError = useMemo(() => {
+    return methodList.filter(
+      (m) => m.label === methodInput.label && m.id !== methodInput.id
+    ).length > 0
+      ? "他の支払い方法と同じ名前は禁止です"
+      : "";
+  }, [methodInput, methodList]);
+
   const saveChanges = useCallback(() => {
-    if (method.timing === "翌月" && method.timingDate < 1) {
-      alert("決済日は1以上を指定してください");
-      return;
-    }
+    if (method.timing === "翌月" && method.timingDate < 1)
+      return alert("決済日は1以上を指定してください");
     updateDocMethod(method.id, methodInput);
-  }, [method.id, method.timing, method.timingDate, methodInput]);
+  }, [method, methodInput]);
 
   const removeMethod = useCallback(() => {
     deleteDocMethod(method.id);
@@ -161,6 +146,17 @@ const MethodRow = ({
       method.timing !== methodInput.timing,
     [method, methodInput]
   );
+  const { purchaseList } = usePurchase();
+  const methodPurchase = purchaseList.filter((p) => p.method.id === method.id);
+  const thisMonthPurchase = methodPurchase.filter(
+    (p) => getNextMonthFirstDay() > p.date && p.date >= getThisMonthFirstDay()
+  );
+  const thisMonthSpent = sumSpentAndIncome(
+    thisMonthPurchase.filter((p) => p.difference < 0)
+  );
+  const thisMonthIncome = sumSpentAndIncome(
+    thisMonthPurchase.filter((p) => p.difference > 0)
+  );
 
   const plainProps = {
     method,
@@ -171,7 +167,8 @@ const MethodRow = ({
     saveChanges,
     removeMethod,
     inputError,
-    methodPurchaseSum,
+    thisMonthSpent,
+    thisMonthIncome,
   };
 
   return <PlainMethodRow {...plainProps} />;

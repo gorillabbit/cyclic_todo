@@ -63,7 +63,7 @@ const PlainPurchaseInput = memo(
             label="日付"
             value={newPurchase.date}
             sx={{ maxWidth: 150 }}
-            onChange={(value) => handleNewPurchaseInput("date", value)}
+            onChange={(v) => handleNewPurchaseInput("date", v)}
           />
           <Autocomplete
             value={newPurchase.category}
@@ -166,16 +166,6 @@ const PurchaseInput = () => {
     if (!currentUser) return alert("ログインしてください");
 
     let updates = updatePurchases;
-
-    console.log(
-      updatePurchases
-        .sort((a, b) => a.date.getTime() - b.date.getTime())
-        .map((p) => ({
-          balance: p.balance,
-          title: p.title,
-          date: p.date.toLocaleDateString(),
-        }))
-    );
     const { income, price, ...newPurchaseData } = newPurchase;
     const difference = income ? price : -price;
     const { assetId, timing } = method;
@@ -213,16 +203,6 @@ const PurchaseInput = () => {
       }).purchases;
     }
 
-    console.log(
-      updates
-        .sort((a, b) => a.date.getTime() - b.date.getTime())
-        .map((p) => ({
-          balance: p.balance,
-          title: p.title,
-          date: p.date.toLocaleDateString(),
-        }))
-    );
-
     updateAndAddPurchases(updates);
     setPurchaseList(updates);
     setNewPurchase(defaultPurchaseInputWithTabId);
@@ -237,10 +217,7 @@ const PurchaseInput = () => {
 
   const addTemplate = useCallback(() => {
     if (newPurchase && currentUser) {
-      if (!newPurchase.title) {
-        alert("品目名を入力してください");
-        return;
-      }
+      if (!newPurchase.title) return alert("品目名を入力してください");
       addDocPurchaseTemplate({ ...newPurchase, userId: currentUser.uid });
     }
   }, [currentUser, newPurchase]);

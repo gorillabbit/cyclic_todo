@@ -251,11 +251,12 @@ const EditPurchaseScheduleRow = ({
     const update = purchaseList.filter(
       (purchase) => purchase.assetId === editFormData.method.assetId
     );
+    const { id, ...editFormDataWithoutId } = editFormData;
     // アップデートし、編集を閉じる
     const updateCurrentPurchaseSchedule = (
       feature: Partial<InputPurchaseScheduleRowType>
     ) => {
-      updateDocPurchaseSchedule(editFormData.id, {
+      updateDocPurchaseSchedule(id, {
         ...editFormData,
         ...feature,
       });
@@ -263,14 +264,10 @@ const EditPurchaseScheduleRow = ({
     };
     updateCurrentPurchaseSchedule({});
     // まず子タスクをすべて削除し、その後で新たな予定タスクを追加する
-    const update2 = await deleteScheduledPurchases(update, editFormData.id);
+    const update2 = await deleteScheduledPurchases(update, id);
     // idが含まれると、子タスクのidがそれになってしまう
-    const { id: editFormDataId, ...editFormDataWithoutId } = editFormData;
-    const update3 = addScheduledPurchase(
-      editFormDataId,
-      editFormDataWithoutId,
-      update2
-    );
+
+    const update3 = addScheduledPurchase(id, editFormDataWithoutId, update2);
     updateAndAddPurchases(update3);
     setPurchaseList(update3);
   }, [editFormData, purchaseList, setIsEdit, setPurchaseList]);

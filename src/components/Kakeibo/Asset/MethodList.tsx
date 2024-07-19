@@ -14,24 +14,16 @@ import { defaultMethod, MethodListType, MethodType } from "../../../types";
 import { getAuth } from "firebase/auth";
 import { addDocMethod } from "../../../firebase";
 import { useTab } from "../../../hooks/useData";
-import { sumSpentAndIncome } from "../../../utilities/purchaseUtilities";
 import MethodRow from "./MethodRow";
-import { PurchaseDataType } from "../../../types/purchaseTypes";
 
 type PlainMethodListProps = {
   open: boolean;
   filteredMethodList: MethodListType[];
-  methodPurchase: (methodId: string) => { income: number; spent: number };
   addMethod: () => void;
 };
 
 const PlainMethodList = memo(
-  ({
-    open,
-    filteredMethodList,
-    methodPurchase,
-    addMethod,
-  }: PlainMethodListProps) => (
+  ({ open, filteredMethodList, addMethod }: PlainMethodListProps) => (
     <TableRow>
       <TableCell sx={{ paddingY: 0 }} colSpan={6}>
         <Collapse in={open} timeout="auto" unmountOnExit>
@@ -47,11 +39,7 @@ const PlainMethodList = memo(
             </TableHead>
             <TableBody>
               {filteredMethodList.map((method) => (
-                <MethodRow
-                  method={method}
-                  key={method.id}
-                  methodPurchaseSum={methodPurchase(method.id)}
-                />
+                <MethodRow method={method} key={method.id} />
               ))}
             </TableBody>
           </Table>
@@ -69,30 +57,11 @@ const MethodList = memo(
     open,
     assetId,
     filteredMethodList,
-    filteredPurchases,
   }: {
     open: boolean;
     assetId: string;
     filteredMethodList: MethodListType[];
-    filteredPurchases: PurchaseDataType[];
   }) => {
-    const methodPurchase = useCallback(
-      (methodId: string) => {
-        const methodPurchaseList = filteredPurchases.filter(
-          (purchase) => purchase.method?.id === methodId
-        );
-        return {
-          income: sumSpentAndIncome(
-            methodPurchaseList.filter((purchase) => purchase.difference > 0)
-          ),
-          spent: sumSpentAndIncome(
-            methodPurchaseList.filter((purchase) => purchase.difference <= 0)
-          ),
-        };
-      },
-      [filteredPurchases]
-    );
-
     const auth = getAuth();
     const { tabId } = useTab();
     const addMethod = useCallback(() => {
@@ -110,7 +79,6 @@ const MethodList = memo(
     const plainProps = {
       open,
       filteredMethodList,
-      methodPurchase,
       addMethod,
     };
     return <PlainMethodList {...plainProps} />;

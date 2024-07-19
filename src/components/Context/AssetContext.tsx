@@ -3,6 +3,7 @@ import { orderBy, where } from "firebase/firestore";
 import { AssetListType } from "../../types.js";
 import { useFirestoreQuery } from "../../utilities/firebaseUtilities";
 import { useTab } from "../../hooks/useData.js";
+import { dbNames } from "../../firebase.js";
 
 type AssetContextType = {
   assetList: AssetListType[];
@@ -21,7 +22,7 @@ export const AssetProvider = memo(
       [tabId]
     );
     const { documents: assetList } = useFirestoreQuery<AssetListType>(
-      "Assets",
+      dbNames.asset,
       assetQueryConstraints,
       true
     );

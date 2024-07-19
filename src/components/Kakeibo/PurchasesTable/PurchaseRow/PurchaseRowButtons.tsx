@@ -62,7 +62,9 @@ const PlainPurchaseRowButtons = memo(
       )}
       <DeleteConfirmDialog
         target={purchase.title}
-        {...{ openDialog, setOpenDialog, deleteAction }}
+        openDialog={openDialog}
+        setOpenDialog={setOpenDialog}
+        deleteAction={deleteAction}
       />
     </Box>
   )

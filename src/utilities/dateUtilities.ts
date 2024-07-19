@@ -14,7 +14,6 @@ import {
 } from "date-fns";
 import ja from "date-fns/locale/ja";
 import { TaskType } from "../types";
-import { useMemo } from "react";
 
 export const checkTaskDue = (dueString: string) => {
   const today = new Date();
@@ -102,11 +101,11 @@ export const getPayLaterDate = (baseDate: Date, dateNum: number) => {
   return nextMonthDate;
 };
 
-export const useNextMonthFirstDay = () => {
-  // 次の月の1日を取得
-  const firstDayOfNextMonth = useMemo(
-    () => startOfMonth(addMonths(new Date(), 1)),
-    []
-  );
-  return firstDayOfNextMonth;
+// 次の月の1日を取得
+export const getNextMonthFirstDay = () => {
+  return startOfMonth(addMonths(new Date(), 1));
+};
+
+export const getThisMonthFirstDay = () => {
+  return startOfMonth(new Date());
 };

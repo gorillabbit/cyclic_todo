@@ -96,12 +96,18 @@ const PlainTransferInput = memo(
         <Tooltip title={methodError}>
           <>
             <TransferInputButtons
-              {...{ methodError, addTransfer, addTemplate }}
+              methodError={methodError}
+              addTransfer={addTransfer}
+              addTemplate={addTemplate}
             />
           </>
         </Tooltip>
       ) : (
-        <TransferInputButtons {...{ methodError, addTransfer, addTemplate }} />
+        <TransferInputButtons
+          methodError={methodError}
+          addTransfer={addTransfer}
+          addTemplate={addTemplate}
+        />
       )}
     </>
   )
@@ -120,9 +126,8 @@ const TransferInput = () => {
   const handleNewTransferInput = useCallback(
     (name: string, value: string | Date | MethodListType | null) => {
       if (name === "price" && typeof value === "string") {
-        if (isValidatedNum(value)) {
+        if (isValidatedNum(value))
           setNewTransfer((prev) => ({ ...prev, [name]: Number(value) }));
-        }
         return;
       }
       setNewTransfer((prev) => ({ ...prev, [name]: value }));
@@ -137,59 +142,53 @@ const TransferInput = () => {
   }, [from.assetId, to.assetId, to.timing]);
 
   const addTransfer = useCallback(async () => {
-    if (currentUser) {
-      const userId = currentUser.uid;
-      const purchaseTitle = `${from.label}→${to.label}`;
-      const basePurchase = {
-        userId,
-        price,
-        category: "送受金",
-        childPurchaseId: "",
-        date,
-        description,
-        tabId,
-      };
-      let childId = "";
-      let update = purchaseList;
-      if (from.timing === "翌月" && from.timingDate) {
-        const childTransfer: PurchaseDataType = {
-          ...basePurchase,
-          title: `【送】${purchaseTitle}`,
-          date: getPayLaterDate(date, from.timingDate),
-          method: from,
-          balance: 0,
-          difference: -price,
-          id: "",
-          assetId: from.assetId,
-        };
-        const newUpdate = addPurchaseAndUpdateLater(childTransfer, update);
-        update = newUpdate.purchases;
-        childId = newUpdate.id;
-      }
-      const fromPurchase = {
+    if (!currentUser) return console.error("ログインしていません");
+    const purchaseTitle = `${from.label}→${to.label}`;
+    const basePurchase = {
+      userId: currentUser.uid,
+      price,
+      category: "送受金",
+      childPurchaseId: "",
+      date,
+      description,
+      tabId,
+      id: "",
+      balance: 0,
+    };
+    let childId = "";
+    let update = purchaseList;
+    if (from.timing === "翌月" && from.timingDate) {
+      const childTransfer: PurchaseDataType = {
         ...basePurchase,
         title: `【送】${purchaseTitle}`,
+        date: getPayLaterDate(date, from.timingDate),
         method: from,
-        childPurchaseId: childId,
-        id: "",
+        difference: -price,
         assetId: from.assetId,
-        difference: childId ? 0 : -price,
-        balance: 0,
       };
-      update = addPurchaseAndUpdateLater(fromPurchase, update).purchases;
-      const toPurchase = {
-        ...basePurchase,
-        title: `【受】${purchaseTitle}`,
-        method: to,
-        id: "",
-        assetId: to.assetId,
-        difference: price,
-        balance: 0,
-      };
-      update = addPurchaseAndUpdateLater(toPurchase, update).purchases;
-      updateAndAddPurchases(update);
-      setPurchaseList(update);
+      const newUpdate = addPurchaseAndUpdateLater(childTransfer, update);
+      update = newUpdate.purchases;
+      childId = newUpdate.id;
     }
+    const fromPurchase = {
+      ...basePurchase,
+      title: `【送】${purchaseTitle}`,
+      method: from,
+      childPurchaseId: childId,
+      assetId: from.assetId,
+      difference: childId ? 0 : -price,
+    };
+    update = addPurchaseAndUpdateLater(fromPurchase, update).purchases;
+    const toPurchase = {
+      ...basePurchase,
+      title: `【受】${purchaseTitle}`,
+      method: to,
+      assetId: to.assetId,
+      difference: price,
+    };
+    update = addPurchaseAndUpdateLater(toPurchase, update).purchases;
+    updateAndAddPurchases(update);
+    setPurchaseList(update);
     setNewTransfer(defaultTransferInput);
   }, [
     currentUser,
@@ -204,10 +203,9 @@ const TransferInput = () => {
   ]);
 
   const addTemplate = useCallback(() => {
-    if (currentUser) {
-      const userId = currentUser.uid;
-      addDocTransferTemplate({ ...newTransfer, userId });
-    }
+    if (!currentUser) return console.error("ログインしていません");
+    const userId = currentUser.uid;
+    addDocTransferTemplate({ ...newTransfer, userId });
   }, [currentUser, newTransfer]);
 
   const plainProps = {

@@ -14,6 +14,7 @@ import {
   PurchaseDataType,
   PurchaseRawDataType,
 } from "../../types/purchaseTypes.js";
+import { dbNames } from "../../firebase.js";
 
 type PurchaseContextType = {
   purchaseList: PurchaseDataType[];
@@ -37,7 +38,7 @@ export const PurchaseProvider = memo(
     );
     const { documents: purchaseRawList } =
       useFirestoreQuery<PurchaseRawDataType>(
-        "Purchases",
+        dbNames.purchase,
         purchaseQueryConstraints,
         true
       );

@@ -3,6 +3,7 @@ import { orderBy, where } from "firebase/firestore";
 import { LogType, LogsCompleteLogsType } from "../../types.js";
 import { useFirestoreQuery } from "../../utilities/firebaseUtilities";
 import { useAccount, useTab } from "../../hooks/useData.js";
+import { dbNames } from "../../firebase.js";
 
 type LogContextType = {
   logList: LogType[];
@@ -27,7 +28,7 @@ export const LogProvider = memo(
       [tabId]
     );
     const { documents: logList } = useFirestoreQuery<LogType>(
-      "logs",
+      dbNames.log,
       logQueryConstraints
     );
 
@@ -37,7 +38,7 @@ export const LogProvider = memo(
     );
     const { documents: logsCompleteLogsList } =
       useFirestoreQuery<LogsCompleteLogsType>(
-        "logsCompleteLogs",
+        dbNames.logsCompleteLog,
         logsCompleteLogsQueryConstraints,
         true
       );
@@ -55,7 +56,7 @@ export const LogProvider = memo(
       [Account?.email, Account?.id, tabId]
     );
     const { documents: sharedLogList } = useFirestoreQuery<LogType>(
-      "logs",
+      dbNames.log,
       sharedLogsQueryConstraints,
       true
     );

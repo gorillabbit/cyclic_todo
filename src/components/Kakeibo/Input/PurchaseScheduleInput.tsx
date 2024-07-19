@@ -29,7 +29,6 @@ import {
 import { usePurchase, useMethod, useTab } from "../../../hooks/useData";
 import { PurchaseDataType } from "../../../types/purchaseTypes";
 
-const auth = getAuth();
 const defaultNewPurchase: InputPurchaseScheduleType = {
   userId: "",
   title: "",
@@ -47,6 +46,7 @@ const defaultNewPurchase: InputPurchaseScheduleType = {
 };
 
 const PurchaseScheduleInput = () => {
+  const { currentUser } = getAuth();
   const { categorySet } = usePurchase();
   const { methodList } = useMethod();
   const { tabId } = useTab();
@@ -87,27 +87,24 @@ const PurchaseScheduleInput = () => {
     []
   );
 
-  const addPurchaseSchedule = useCallback(() => {
-    if (!newPurchaseSchedule.title) {
-      alert("品目名を入力してください");
-      return;
-    }
-    if (auth.currentUser) {
-      const userId = auth.currentUser.uid;
-      addDocPurchaseSchedule({ ...newPurchaseSchedule, userId }).then(
-        (docRef) => {
-          const result = addScheduledPurchase(
-            docRef.id,
-            newPurchaseSchedule,
-            updatePurchases
-          );
-          updateAndAddPurchases(result);
-          setPurchaseList(result);
-        }
-      );
-      setNewPurchaseSchedule(defaultNewPurchase);
-    }
-  }, [newPurchaseSchedule, setPurchaseList, updatePurchases]);
+  const addPurchaseSchedule = useCallback(async () => {
+    if (!newPurchaseSchedule.title)
+      return console.error("品目名を入力してください");
+    if (!currentUser) return console.error("ログインしてください");
+
+    const addedSchedule = await addDocPurchaseSchedule({
+      ...newPurchaseSchedule,
+      userId: currentUser.uid,
+    });
+    const result = addScheduledPurchase(
+      addedSchedule.id,
+      newPurchaseSchedule,
+      updatePurchases
+    );
+    updateAndAddPurchases(result);
+    setPurchaseList(result);
+    setNewPurchaseSchedule(defaultNewPurchase);
+  }, [currentUser, newPurchaseSchedule, setPurchaseList, updatePurchases]);
 
   return (
     <>

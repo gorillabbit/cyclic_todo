@@ -78,7 +78,9 @@ const PlainEditPricePurchaseRow = memo(
         <TableCellWrapper label={editFormData.method.label} />
         {!isSmall && (
           <UnderHalfRow
-            {...{ editFormData, handleSaveClick, handleEditFormChange }}
+            editFormData={editFormData}
+            handleSaveClick={handleSaveClick}
+            handleEditFormChange={handleEditFormChange}
           />
         )}
       </TableRow>
@@ -86,7 +88,9 @@ const PlainEditPricePurchaseRow = memo(
         <TableRow>
           <TableCellWrapper />
           <UnderHalfRow
-            {...{ editFormData, handleSaveClick, handleEditFormChange }}
+            editFormData={editFormData}
+            handleSaveClick={handleSaveClick}
+            handleEditFormChange={handleEditFormChange}
           />
         </TableRow>
       )}
@@ -113,7 +117,6 @@ const EditPricePurchaseRow = ({
     const certainPurchase = {
       ...editFormData,
       isUncertain: false,
-      date: editFormData.date,
     };
     const update = await updatePurchaseAndUpdateLater(
       editFormData.id,
@@ -146,7 +149,6 @@ const EditPricePurchaseRow = ({
       setPurchaseList(update.purchases);
     }
     setEditFormData((prev) => ({ ...prev, isUncertain: false }));
-
     setIsEditPrice(false);
   }, [
     editFormData,

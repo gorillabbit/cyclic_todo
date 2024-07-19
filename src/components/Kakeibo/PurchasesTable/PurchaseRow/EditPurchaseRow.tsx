@@ -107,7 +107,6 @@ const PlainEditPurchaseRow = memo(
             size="small"
           />
         </TableCellWrapper>
-
         <TableCellWrapper>
           <Autocomplete
             value={editFormData.category}
@@ -134,19 +133,21 @@ const PlainEditPurchaseRow = memo(
         </TableCellWrapper>
         {!isSmall && (
           <UnderHalfRow
-            {...{ editFormData, handleEditFormChange, handleSaveClick }}
+            editFormData={editFormData}
+            handleEditFormChange={handleEditFormChange}
+            handleSaveClick={handleSaveClick}
           />
         )}
       </TableRow>
       {isSmall && (
-        <>
-          <TableRow>
-            <TableCellWrapper />
-            <UnderHalfRow
-              {...{ editFormData, handleEditFormChange, handleSaveClick }}
-            />
-          </TableRow>
-        </>
+        <TableRow>
+          <TableCellWrapper />
+          <UnderHalfRow
+            editFormData={editFormData}
+            handleEditFormChange={handleEditFormChange}
+            handleSaveClick={handleSaveClick}
+          />
+        </TableRow>
       )}
     </>
   )
@@ -213,7 +214,6 @@ const EditPurchaseRow = ({
       {
         ...editFormData,
         ...update,
-        date: editFormData.date,
       },
       updatedPurchases
     );

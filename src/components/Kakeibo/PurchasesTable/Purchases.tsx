@@ -56,7 +56,7 @@ const PlainPurchases = memo(
     HeaderCellWrapper,
   }: PlainPurchaseProps): JSX.Element => (
     <>
-      <AssetsList orderedPurchase={orderedPurchase} />
+      <AssetsList />
       <DoughnutContainer monthlyPurchases={monthlyPurchases} />
       <PurchaseSchedules />
       <TableContainer component={Paper}>
@@ -109,7 +109,9 @@ const PlainPurchases = memo(
               <PurchasesRow
                 key={purchase.id}
                 groupPurchases={getGroupPurchases(purchase)}
-                {...{ index, purchase, isSmall }}
+                index={index}
+                purchase={purchase}
+                isSmall={isSmall}
               />
             ))}
           </TableBody>
@@ -125,28 +127,27 @@ const Purchases = memo((): JSX.Element => {
   const monthlyPurchases = useMemo(
     () =>
       purchaseList.filter(
-        (purchase) =>
-          purchase.date.getMonth() === month.getMonth() &&
-          purchase.date.getFullYear() === month.getFullYear()
+        (p) =>
+          p.date.getMonth() === month.getMonth() &&
+          p.date.getFullYear() === month.getFullYear()
       ),
     [month, purchaseList]
   );
 
   // 後払いを合計する(収入に後払いはないので考慮しない)
   const groupedPurchasesDoc = useMemo(() => {
-    return monthlyPurchases.reduce((acc, purchase) => {
-      if (!isLaterPayment(purchase)) return acc;
-      const keyString = purchase.method.label + purchase.date.getDate(); // 同じ日なら同じものとして扱う
+    return monthlyPurchases.reduce((acc, p) => {
+      if (!isLaterPayment(p)) return acc;
+      const keyString = p.method.label + p.date.getDate(); // 同じ日なら同じものとして扱う
       if (!acc[keyString]) {
         acc[keyString] = {
-          ...purchase,
+          ...p,
           difference: 0,
-          date: purchase.date,
         };
       }
-      acc[keyString].difference += Number(purchase.difference);
+      acc[keyString].difference += Number(p.difference);
       // 後払いの残高を正しいものにする
-      acc[keyString].balance = Number(purchase.balance);
+      acc[keyString].balance = Number(p.balance);
       return acc;
     }, {} as { [key: string]: PurchaseDataType });
   }, [monthlyPurchases]);
@@ -157,9 +158,9 @@ const Purchases = memo((): JSX.Element => {
   );
   const neutralizedGroupedPayLaterPurchase = useMemo(
     () =>
-      groupedPayLaterPurchases.map((groupedPayLaterPurchase) => ({
-        ...groupedPayLaterPurchase,
-        title: groupedPayLaterPurchase.method.label + "引き落し",
+      groupedPayLaterPurchases.map((p) => ({
+        ...p,
+        title: p.method.label + "引き落し",
         category: "後支払い",
         isUncertain: false,
         description: "",
@@ -171,7 +172,7 @@ const Purchases = memo((): JSX.Element => {
     () =>
       [
         // 後払いは合計したので、除外する
-        ...monthlyPurchases.filter((purchase) => !isLaterPayment(purchase)),
+        ...monthlyPurchases.filter((p) => !isLaterPayment(p)),
         ...neutralizedGroupedPayLaterPurchase,
       ].sort((a, b) => a.date.getTime() - b.date.getTime()),
     [monthlyPurchases, neutralizedGroupedPayLaterPurchase]
@@ -188,9 +189,7 @@ const Purchases = memo((): JSX.Element => {
   const getGroupPurchases = useCallback(
     (groupedPurchase: PurchaseDataType) =>
       monthlyPurchases.filter(
-        (purchase) =>
-          isLaterPayment(purchase) &&
-          purchase.method.id === groupedPurchase.method.id
+        (p) => isLaterPayment(p) && p.method.id === groupedPurchase.method.id
       ),
     [monthlyPurchases]
   );
@@ -211,7 +210,12 @@ const Purchases = memo((): JSX.Element => {
     value: keyof PurchaseDataType;
   }) => (
     <TableHeadCell
-      {...{ label, value, orderBy, setOrderBy, isAsc, setIsAsc }}
+      label={label}
+      value={value}
+      orderBy={orderBy}
+      setOrderBy={setOrderBy}
+      isAsc={isAsc}
+      setIsAsc={setIsAsc}
     />
   );
 

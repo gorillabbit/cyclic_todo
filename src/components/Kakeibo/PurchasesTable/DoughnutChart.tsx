@@ -3,7 +3,7 @@ import { memo, useMemo } from "react";
 import { Doughnut } from "react-chartjs-2";
 import { Chart, ArcElement, Tooltip, Legend, Title, ChartData } from "chart.js";
 import { Box } from "@mui/material";
-import { PurchaseListType } from "../../../types";
+import { PurchaseDataType } from "../../../types/purchaseTypes";
 
 Chart.register(ArcElement, Tooltip, Legend, Title);
 
@@ -24,7 +24,7 @@ const colors = [
 ];
 
 interface DoughnutChartProps {
-  purchaseList: PurchaseListType[];
+  purchaseList: PurchaseDataType[];
   title: string;
 }
 
@@ -46,8 +46,8 @@ const DoughnutChart = memo(
     const data = useMemo(() => {
       const categoryTotals: Record<string, { price: number; color: string }> =
         {};
-      purchaseList.forEach(({ category, price }, index) => {
-        const priceNumber = Number(price);
+      purchaseList.forEach(({ category, difference }, index) => {
+        const priceNumber = Math.abs(difference);
         if (priceNumber > 0) {
           if (!categoryTotals[category]) {
             categoryTotals[category] = {
@@ -66,7 +66,9 @@ const DoughnutChart = memo(
           const indexB = categories.indexOf(b.category);
           return indexA - indexB;
         })
-        .filter((item) => item.price > 0 && categories.includes(item.category));
+        .filter(
+          (item) => item.difference > 0 && categories.includes(item.category)
+        );
 
       return {
         datasets: [
@@ -80,7 +82,7 @@ const DoughnutChart = memo(
             labels: categories,
           },
           {
-            data: subData.map((item) => Number(item.price)),
+            data: subData.map((item) => Number(item.difference)),
             backgroundColor: subData.map(
               (item) => categoryTotals[item.category].color
             ),
