@@ -7,7 +7,9 @@ const config = {
   clientId: import.meta.env.VITE_GOOGLE_CALENDER_CLIENT_ID,
   apiKey: import.meta.env.VITE_GOOGLE_CALENDER_API_KEY,
   scope: import.meta.env.VITE_GOOGLE_CALENDER_SCOPES,
-  discoveryDocs: [import.meta.env.VITE_GOOGLE_CALENDER_DISCOVERY_DOCS],
+  discoveryDocs: [
+    "https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest",
+  ],
 };
 
 const CalendarSignInButton = () => {
@@ -15,7 +17,6 @@ const CalendarSignInButton = () => {
   useEffect(() => {
     const initClient = async () => {
       await gapi.client.init(config);
-      await gapi.client.load("calendar", "v3");
       const isSignedIn = gapi.auth2.getAuthInstance()?.isSignedIn;
       isSignedIn.listen(setIsSignedIn);
       setIsSignedIn(isSignedIn?.get());

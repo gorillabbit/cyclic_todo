@@ -84,9 +84,7 @@ const PlainNormalPurchaseRow = memo(
             </IconButton>
           )}
         </TableCellWrapper>
-        <TableCellWrapper
-          label={editFormData.date.toLocaleDateString() + "日"}
-        />
+        <TableCellWrapper label={editFormData.date.toLocaleDateString()} />
         <TableCellWrapper label={editFormData.title} />
         <TableCellWrapper label={editFormData.category} />
         <TableCellWrapper label={editFormData.method.label} />
@@ -129,6 +127,8 @@ const NormalPurchaseRow = (
     [props.index]
   );
   const plainProps = { ...props, rowColor };
+  // TODO 残高が他の残高と区別できるようにする
+  // TODO 残高の推移グラフを描く
   return <PlainNormalPurchaseRow {...plainProps} />;
 };
 

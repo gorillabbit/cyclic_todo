@@ -86,7 +86,7 @@ const DoughnutContainer = ({
     currentMonthIncomeList,
     currentMonthIncome,
   };
-
+  // TODO 円グラフじゃなくて棒グラフに変更する
   return <PlainDoughnutContainer {...plainProps} />;
 };
 
