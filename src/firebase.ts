@@ -31,7 +31,6 @@ import {
   defaultPurchaseData,
   InputFieldPurchaseType,
   PurchaseDataType,
-  PurchaseDataType,
 } from "./types/purchaseTypes";
 
 // Firebase configuration
