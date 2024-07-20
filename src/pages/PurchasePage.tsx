@@ -28,10 +28,10 @@ const PlainPurchasePage = memo(({ isSmall }: PlainPurchasePageProps) => {
   );
 });
 
-const PurchasePage = () => {
+const PurchasePage = memo(() => {
   const isSmall = useIsSmall();
   const plainProps = { isSmall };
   return <PlainPurchasePage {...plainProps} />;
-};
+});
 
 export default PurchasePage;

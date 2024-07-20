@@ -113,7 +113,7 @@ const Calendar = () => {
   };
 
   useEffect(() => {
-    gapi.auth2.getAuthInstance().isSignedIn.listen((isSignedIn: boolean) => {
+    gapi.auth2.getAuthInstance()?.isSignedIn.listen((isSignedIn: boolean) => {
       setIsSignedIn(isSignedIn);
       if (isSignedIn) {
         listUpcomingEvents();

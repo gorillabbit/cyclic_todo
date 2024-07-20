@@ -3,16 +3,16 @@ import { memo, useMemo } from "react";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import PaymentsIcon from "@mui/icons-material/Payments";
-import { InputPurchaseRowType } from "../../../../types";
 import PurchaseRowButtons from "./PurchaseRowButtons";
 import TableCellWrapper from "../../TableCellWrapper";
+import { PurchaseDataType } from "../../../../types/purchaseTypes";
 
 type UnderHalfRowProps = {
   isGroup: boolean;
-  editFormData: InputPurchaseRowType;
+  editFormData: PurchaseDataType;
   setIsEdit: (value: React.SetStateAction<boolean>) => void;
   setIsEditPrice: React.Dispatch<React.SetStateAction<boolean>>;
-  setOpenDialog: React.Dispatch<React.SetStateAction<boolean>>;
+  updatePurchases: PurchaseDataType[];
 };
 
 const UnderHalfRow = memo(
@@ -21,26 +21,30 @@ const UnderHalfRow = memo(
     isGroup,
     setIsEdit,
     setIsEditPrice,
-    setOpenDialog,
+    updatePurchases,
   }: UnderHalfRowProps) => (
     <>
       <TableCellWrapper>
-        {editFormData.price}
+        {editFormData.difference}
         {editFormData.method.timing === "翌月" &&
           editFormData.childPurchaseId && <Chip label="翌月" />}
         {editFormData.isUncertain && <Chip label="未確" />}
       </TableCellWrapper>
+      <TableCellWrapper label={editFormData.balance} />
       <TableCellWrapper label={editFormData.description} />
       <TableCellWrapper>
-        <PaymentsIcon color={editFormData.income ? "success" : "error"} />
+        <PaymentsIcon
+          color={editFormData.difference > 0 ? "success" : "error"}
+        />
       </TableCellWrapper>
       <TableCellWrapper>
         {!isGroup && (
           <PurchaseRowButtons
+            purchase={editFormData}
             setIsEdit={setIsEdit}
             setIsEditPrice={setIsEditPrice}
-            setOpenDialog={setOpenDialog}
             isUncertain={editFormData.isUncertain}
+            updatePurchases={updatePurchases}
           />
         )}
       </TableCellWrapper>
@@ -63,9 +67,9 @@ const PlainNormalPurchaseRow = memo(
     editFormData,
     isSmall,
     setIsEdit,
-    setOpenDialog,
     setIsEditPrice,
     rowColor,
+    updatePurchases,
   }: PlainNormalPurchaseRowProps): JSX.Element => (
     <>
       <TableRow sx={{ pb: 0.5, bgcolor: rowColor }}>
@@ -80,19 +84,19 @@ const PlainNormalPurchaseRow = memo(
             </IconButton>
           )}
         </TableCellWrapper>
-        <TableCellWrapper label={editFormData.date.getDate() + "日"} />
+        <TableCellWrapper
+          label={editFormData.date.toLocaleDateString() + "日"}
+        />
         <TableCellWrapper label={editFormData.title} />
         <TableCellWrapper label={editFormData.category} />
         <TableCellWrapper label={editFormData.method.label} />
         {!isSmall && (
           <UnderHalfRow
-            {...{
-              setIsEdit,
-              setIsEditPrice,
-              setOpenDialog,
-              editFormData,
-              isGroup,
-            }}
+            setIsEdit={setIsEdit}
+            setIsEditPrice={setIsEditPrice}
+            editFormData={editFormData}
+            isGroup={isGroup}
+            updatePurchases={updatePurchases}
           />
         )}
       </TableRow>
@@ -100,13 +104,11 @@ const PlainNormalPurchaseRow = memo(
         <TableRow sx={{ bgcolor: rowColor }}>
           <TableCellWrapper />
           <UnderHalfRow
-            {...{
-              setIsEdit,
-              setIsEditPrice,
-              setOpenDialog,
-              editFormData,
-              isGroup,
-            }}
+            setIsEdit={setIsEdit}
+            setIsEditPrice={setIsEditPrice}
+            editFormData={editFormData}
+            isGroup={isGroup}
+            updatePurchases={updatePurchases}
           />
         </TableRow>
       )}

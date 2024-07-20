@@ -17,6 +17,7 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import { where } from "firebase/firestore";
 import { useTab } from "../../../hooks/useData";
 import TableCellWrapper from "../TableCellWrapper";
+import { dbNames } from "../../../firebase";
 
 type PlainPurchaseSchedulesProps = {
   purchaseScheduleList: PurchaseScheduleListType[];
@@ -55,11 +56,8 @@ const PlainPurchaseSchedules = memo(
               </TableRow>
             </TableHead>
             <TableBody>
-              {purchaseScheduleList.map((purchaseSchedule) => (
-                <PurchaseScheduleRow
-                  purchaseSchedule={purchaseSchedule}
-                  key={purchaseSchedule.id}
-                />
+              {purchaseScheduleList.map((ps) => (
+                <PurchaseScheduleRow purchaseSchedule={ps} key={ps.id} />
               ))}
             </TableBody>
           </Table>
@@ -78,7 +76,7 @@ const PurchaseSchedules = () => {
   );
   const { documents: purchaseScheduleList } =
     useFirestoreQuery<PurchaseScheduleListType>(
-      "PurchaseSchedules",
+      dbNames.purchaseSchedule,
       purchaseScheduleQueryConstraints,
       true
     );

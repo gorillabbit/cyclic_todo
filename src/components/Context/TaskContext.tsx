@@ -3,6 +3,7 @@ import { orderBy, where } from "firebase/firestore";
 import { TaskType } from "../../types.js";
 import { useFirestoreQuery } from "../../utilities/firebaseUtilities";
 import { useTab } from "../../hooks/useData.js";
+import { dbNames } from "../../firebase.js";
 
 type TaskContextType = {
   taskList: TaskType[];
@@ -26,7 +27,7 @@ export const TaskProvider = memo(
     );
 
     const { documents: taskList } = useFirestoreQuery<TaskType>(
-      "tasks",
+      dbNames.task,
       tasksQueryConstraints
     );
 

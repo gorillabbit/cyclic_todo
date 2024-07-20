@@ -3,6 +3,7 @@ import { orderBy, where } from "firebase/firestore";
 import { MethodListType } from "../../types.js";
 import { useFirestoreQuery } from "../../utilities/firebaseUtilities";
 import { useTab } from "../../hooks/useData.js";
+import { dbNames } from "../../firebase.js";
 
 type MethodContextType = {
   methodList: MethodListType[];
@@ -21,7 +22,7 @@ export const MethodProvider = memo(
       [tabId]
     );
     const { documents: methodList } = useFirestoreQuery<MethodListType>(
-      "Methods",
+      dbNames.method,
       methodQueryConstraints,
       true
     );

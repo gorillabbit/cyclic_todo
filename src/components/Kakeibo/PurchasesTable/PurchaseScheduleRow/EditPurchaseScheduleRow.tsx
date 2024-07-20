@@ -20,6 +20,7 @@ import {
   addScheduledPurchase,
   deleteScheduledPurchases,
   numericProps,
+  updateAndAddPurchases,
   weekDaysString,
 } from "../../../../utilities/purchaseUtilities";
 import { useMethod, usePurchase } from "../../../../hooks/useData";
@@ -243,15 +244,19 @@ const EditPurchaseScheduleRow = ({
   isSmall: boolean;
 }) => {
   const { methodList } = useMethod();
-  const { categorySet, purchaseList } = usePurchase();
+  const { categorySet, purchaseList, setPurchaseList } = usePurchase();
 
   // 編集内容を保存する関数
-  const handleSaveClick = useCallback(() => {
+  const handleSaveClick = useCallback(async () => {
+    const update = purchaseList.filter(
+      (purchase) => purchase.assetId === editFormData.method.assetId
+    );
+    const { id, ...editFormDataWithoutId } = editFormData;
     // アップデートし、編集を閉じる
     const updateCurrentPurchaseSchedule = (
       feature: Partial<InputPurchaseScheduleRowType>
     ) => {
-      updateDocPurchaseSchedule(editFormData.id, {
+      updateDocPurchaseSchedule(id, {
         ...editFormData,
         ...feature,
       });
@@ -259,11 +264,13 @@ const EditPurchaseScheduleRow = ({
     };
     updateCurrentPurchaseSchedule({});
     // まず子タスクをすべて削除し、その後で新たな予定タスクを追加する
-    deleteScheduledPurchases(purchaseList, editFormData.id);
+    const update2 = await deleteScheduledPurchases(update, id);
     // idが含まれると、子タスクのidがそれになってしまう
-    const { id: editFormDataId, ...editFormDataWithoutId } = editFormData;
-    addScheduledPurchase(editFormDataId, editFormDataWithoutId);
-  }, [editFormData, purchaseList, setIsEdit]);
+
+    const update3 = addScheduledPurchase(id, editFormDataWithoutId, update2);
+    updateAndAddPurchases(update3);
+    setPurchaseList(update3);
+  }, [editFormData, purchaseList, setIsEdit, setPurchaseList]);
 
   const handleEditFormChange = useCallback(
     (event: { target: { name: string; value: unknown } }) => {

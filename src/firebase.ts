@@ -14,11 +14,9 @@ import {
   MethodType,
   AccountType,
   MethodListType,
-  InputPurchaseRowType,
   TaskType,
   InputLogType,
   LogType,
-  InputPurchaseType,
   InputPurchaseScheduleType,
   AssetType,
   TaskInputType,
@@ -29,6 +27,11 @@ import {
   InputPurchaseScheduleRowType,
   InputTabType,
 } from "./types";
+import {
+  defaultPurchaseData,
+  InputFieldPurchaseType,
+  PurchaseDataType,
+} from "./types/purchaseTypes";
 
 // Firebase configuration
 const firebaseConfig = {
@@ -119,14 +122,22 @@ export const updateDocAccount = (id: string, updates: Partial<AccountType>) =>
 export const deleteDocAccount = (id: string) =>
   deleteDocOperation(dbNames.account, id);
 
-export const addDocPurchase = (v: InputPurchaseType) =>
-  addDocOperation(dbNames.purchase, v);
+/**
+ *
+ * @param v InputPurchaseTypeの一部。ない部分はdefaultPurchaseInputで補完される
+ * @returns
+ */
+export const addDocPurchase = (v: PurchaseDataType) =>
+  addDocOperation(dbNames.purchase, {
+    ...defaultPurchaseData,
+    ...v,
+  });
 export const updateDocPurchase = (
   id: string,
-  updates: Partial<InputPurchaseRowType>
+  updates: Partial<PurchaseDataType>
 ) => updateDocOperation(dbNames.purchase, id, updates);
 export const batchAddDocPurchase = (
-  purchaseList: (InputPurchaseType & { id?: string })[]
+  purchaseList: (PurchaseDataType & { id?: string })[]
 ) => {
   const batch = writeBatch(db);
   purchaseList.forEach((obj) => {
@@ -140,10 +151,26 @@ export const batchAddDocPurchase = (
   });
   batch.commit().catch((error) => console.error("バッチ書き込み失敗:", error));
 };
+export const bulkUpdateDocPurchase = async (
+  purchaseList: PurchaseDataType[]
+) => {
+  const batch = writeBatch(db);
+  purchaseList.forEach((obj: PurchaseDataType) => {
+    const { id, ...updateFields } = obj; // id を取り除いて残りのフィールドを取得
+    const docRef = doc(collection(db, dbNames.purchase), id);
+    batch.update(docRef, updateFields);
+  });
+  try {
+    return await batch.commit();
+  } catch (error) {
+    return console.error("バッチ書き込み失敗:", error);
+  }
+};
+
 export const deleteDocPurchase = (id: string) =>
   deleteDocOperation(dbNames.purchase, id);
 
-export const addDocPurchaseTemplate = (v: InputPurchaseType) =>
+export const addDocPurchaseTemplate = (v: InputFieldPurchaseType) =>
   addDocOperation(dbNames.purchaseTemplate, v);
 export const deleteDocPurchaseTemplate = (id: string) =>
   deleteDocOperation(dbNames.purchaseTemplate, id);

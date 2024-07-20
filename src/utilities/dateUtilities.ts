@@ -10,6 +10,7 @@ import {
   differenceInSeconds,
   addMonths,
   lastDayOfMonth,
+  startOfMonth,
 } from "date-fns";
 import ja from "date-fns/locale/ja";
 import { TaskType } from "../types";
@@ -82,17 +83,29 @@ export const calculateNext期日 = (task: TaskType, 更新元date: Date) => {
 export const getPayLaterDate = (baseDate: Date, dateNum: number) => {
   // 翌月を取得
   const nextMonth = addMonths(baseDate, 1);
-
-  // 翌月の25日を設定
   let nextMonthDate = new Date(
     nextMonth.getFullYear(),
     nextMonth.getMonth(),
-    dateNum
+    dateNum,
+    // 以下は後払いを時刻でソートして、並べるため 時刻で並べないと、どの後払いが後になるかわからない。
+    // timestampは、更新するため、時刻が一緒になるので順序を判別できない
+    nextMonth.getHours(),
+    nextMonth.getMinutes(),
+    nextMonth.getSeconds()
   );
 
-  // 翌月に25日が存在しない場合、その月の最後の日を取得
+  // 翌月にその日が存在しない場合、その月の最後の日を取得
   if (nextMonthDate.getMonth() !== nextMonth.getMonth()) {
     nextMonthDate = lastDayOfMonth(nextMonth);
   }
   return nextMonthDate;
+};
+
+// 次の月の1日を取得
+export const getNextMonthFirstDay = () => {
+  return startOfMonth(addMonths(new Date(), 1));
+};
+
+export const getThisMonthFirstDay = () => {
+  return startOfMonth(new Date());
 };

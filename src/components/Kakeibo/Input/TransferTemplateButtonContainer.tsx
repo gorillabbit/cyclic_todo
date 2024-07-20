@@ -17,16 +17,15 @@ const PlainTemplateButtonsContainer = memo(
     transfers,
     setNewTransfer,
   }: PlainTemplateButtonsContainerProps): JSX.Element => (
-    <>
-      <Box m={0.5}>
-        {transfers.map((transfer) => (
-          <TransferTemplateButton
-            {...{ transfer, setNewTransfer }}
-            key={transfer.id}
-          />
-        ))}
-      </Box>
-    </>
+    <Box m={0.5}>
+      {transfers.map((transfer) => (
+        <TransferTemplateButton
+          transfer={transfer}
+          setNewTransfer={setNewTransfer}
+          key={transfer.id}
+        />
+      ))}
+    </Box>
   )
 );
 

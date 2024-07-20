@@ -1,15 +1,18 @@
 import { Box } from "@mui/material";
 import { memo, useMemo } from "react";
-import { InputPurchaseType, PurchaseListType } from "../../../types";
 import { orderBy, where } from "firebase/firestore";
 import { useFirestoreQuery } from "../../../utilities/firebaseUtilities";
 import TemplateButton from "./TemplateButton";
 import { dbNames } from "../../../firebase";
 import { useTab } from "../../../hooks/useData";
+import {
+  InputFieldPurchaseType,
+  TemplateButtonType,
+} from "../../../types/purchaseTypes";
 
 type PlainTemplateButtonsContainerProps = {
-  templates: PurchaseListType[];
-  setNewPurchase: (value: React.SetStateAction<InputPurchaseType>) => void;
+  templates: TemplateButtonType[];
+  setNewPurchase: (value: React.SetStateAction<InputFieldPurchaseType>) => void;
 };
 
 const PlainTemplateButtonsContainer = memo(
@@ -28,14 +31,14 @@ const PlainTemplateButtonsContainer = memo(
 const TemplateButtonsContainer = ({
   setNewPurchase,
 }: {
-  setNewPurchase: (value: React.SetStateAction<InputPurchaseType>) => void;
+  setNewPurchase: (value: React.SetStateAction<InputFieldPurchaseType>) => void;
 }) => {
   const { tabId } = useTab();
   const purchaseTemplatesQueryConstraints = useMemo(
     () => [orderBy("timestamp", "desc"), where("tabId", "==", tabId)],
     [tabId]
   );
-  const { documents: templates } = useFirestoreQuery<PurchaseListType>(
+  const { documents: templates } = useFirestoreQuery<TemplateButtonType>(
     dbNames.purchaseTemplate,
     purchaseTemplatesQueryConstraints,
     true

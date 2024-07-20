@@ -1,76 +1,66 @@
 import {
   TableRow,
   TableCell,
-  Collapse,
   TextField,
   Button,
   IconButton,
-  Table,
-  TableBody,
-  TableHead,
-  Box,
+  TextFieldVariants,
+  TextFieldProps,
 } from "@mui/material";
-import { memo, useCallback, useMemo, useState } from "react";
-import {
-  AssetListType,
-  AssetType,
-  MethodListType,
-  MethodType,
-  BalanceLog,
-  defaultMethod,
-  PurchaseListType,
-} from "../../../types";
+import { memo, useCallback, useEffect, useMemo, useState } from "react";
+import { AssetListType, MethodListType } from "../../../types";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import DeleteIcon from "@mui/icons-material/Delete";
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import {
-  addDocMethod,
   deleteDocAsset,
   deleteDocMethod,
   updateDocAsset,
 } from "../../../firebase";
-import { getAuth } from "firebase/auth";
-import MethodList from "./MethodList";
 import {
-  sumSpentAndIncome,
+  addPurchaseAndUpdateLater,
+  getLastPurchase,
   numericProps,
+  updateAndAddPurchases,
 } from "../../../utilities/purchaseUtilities";
-import { Timestamp } from "firebase/firestore";
-import { getUnixTime } from "date-fns";
 import DeleteConfirmDialog from "../DeleteConfirmDialog";
 import { useIsSmall } from "../../../hooks/useWindowSize";
-import { useMethod, useTab, usePurchase } from "../../../hooks/useData";
+import {
+  useAccount,
+  useMethod,
+  usePurchase,
+  useTab,
+} from "../../../hooks/useData";
 import TableCellWrapper from "../TableCellWrapper";
+import { getNextMonthFirstDay } from "../../../utilities/dateUtilities";
+import MethodList from "./MethodList";
+import { PurchaseDataType } from "../../../types/purchaseTypes";
+
+const tableInputStyle: {
+  sx: TextFieldProps["sx"];
+  variant: TextFieldVariants;
+  size: "small";
+} = {
+  sx: { maxWidth: 150 },
+  variant: "outlined",
+  size: "small",
+};
 
 type UnderHalfRowProps = {
-  isNameChanged: boolean;
-  isBalanceChanged: boolean;
+  isNameChanged: boolean | undefined;
+  isBalanceChanged: boolean | undefined;
   removeAsset: () => void;
   saveChanges: () => void;
-  updateLog: () => void;
-  isAddedPurchases: boolean;
 };
 
 const UnderHalfRow = memo(
   ({
-    isAddedPurchases,
-    updateLog,
     isNameChanged,
     isBalanceChanged,
     saveChanges,
     removeAsset,
   }: UnderHalfRowProps) => (
     <TableCellWrapper align="right" colSpan={2}>
-      <Button
-        sx={{ mx: 0.5 }}
-        variant={isAddedPurchases ? "contained" : "text"}
-        color="primary"
-        disabled={!isAddedPurchases}
-        onClick={updateLog}
-      >
-        更新
-      </Button>
       <Button
         variant={isNameChanged || isBalanceChanged ? "contained" : "text"}
         color="primary"
@@ -87,54 +77,46 @@ const UnderHalfRow = memo(
 );
 
 type PlainAssetRowProps = UnderHalfRowProps & {
-  assetInput: AssetType;
+  assetNameInput: string;
+  assetId: string;
   handleAssetInput: (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => void;
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   filteredMethodList: MethodListType[];
-  addMethod: () => void;
   handleBalanceInput: (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => void;
-  balanceInput: number;
-  currentBalance: number;
-  displayBalance: number;
+  balanceInput: number | undefined;
   openDialog: boolean;
   setOpenDialog: React.Dispatch<React.SetStateAction<boolean>>;
   deleteAction: () => void;
   isSmall: boolean;
-  latestLog: BalanceLog;
-  methodSpent: number;
-  methodPurchase: (methodId: string) => { income: number; spent: number };
+  lastPurchase: PurchaseDataType | undefined;
+  monthEndBalance: number | undefined;
 };
 
 const PlainAssetRow = memo(
   ({
     open,
     setOpen,
-    assetInput,
+    assetNameInput,
     handleAssetInput,
     isNameChanged,
     isBalanceChanged,
     saveChanges,
-    updateLog,
     removeAsset,
     filteredMethodList,
-    addMethod,
     handleBalanceInput,
     balanceInput,
-    isAddedPurchases,
-    currentBalance,
-    displayBalance,
     openDialog,
     setOpenDialog,
     deleteAction,
     isSmall,
-    latestLog,
-    methodSpent,
-    methodPurchase,
+    assetId,
+    lastPurchase,
+    monthEndBalance,
   }: PlainAssetRowProps): JSX.Element => (
     <>
       <TableRow>
@@ -149,47 +131,28 @@ const PlainAssetRow = memo(
         </TableCell>
         <TableCellWrapper>
           <TextField
-            variant="outlined"
-            value={assetInput.name}
+            {...tableInputStyle}
+            value={assetNameInput}
             name="name"
             onChange={handleAssetInput}
-            size="small"
-            sx={{ maxWidth: 150 }}
           />
         </TableCellWrapper>
-        <TableCellWrapper sx={{ display: "flex" }}>
+        <TableCellWrapper>
           <TextField
-            variant="outlined"
-            value={isBalanceChanged ? balanceInput : displayBalance}
+            {...tableInputStyle}
+            value={isBalanceChanged ? balanceInput : lastPurchase?.balance ?? 0}
             name="balance"
             onChange={handleBalanceInput}
-            size="small"
             inputProps={numericProps}
-            sx={{ maxWidth: 150 }}
           />
-          {isAddedPurchases && (
-            <Box alignContent="center" ml={1}>
-              {"→ " + currentBalance}
-            </Box>
-          )}
         </TableCellWrapper>
-        <TableCellWrapper>
-          {(isBalanceChanged ? balanceInput : displayBalance) + methodSpent}
-        </TableCellWrapper>
-        <TableCellWrapper>
-          {latestLog.timestamp.toDate().toLocaleDateString()}
-        </TableCellWrapper>
+        <TableCellWrapper>{monthEndBalance}</TableCellWrapper>
         {!isSmall && (
           <UnderHalfRow
-            {...{
-              latestLog,
-              isAddedPurchases,
-              updateLog,
-              isNameChanged,
-              isBalanceChanged,
-              saveChanges,
-              removeAsset,
-            }}
+            isNameChanged={isNameChanged}
+            isBalanceChanged={isBalanceChanged}
+            saveChanges={saveChanges}
+            removeAsset={removeAsset}
           />
         )}
       </TableRow>
@@ -197,124 +160,133 @@ const PlainAssetRow = memo(
         <TableRow>
           <TableCellWrapper colSpan={2} />
           <UnderHalfRow
-            {...{
-              latestLog,
-              isAddedPurchases,
-              updateLog,
-              isNameChanged,
-              isBalanceChanged,
-              saveChanges,
-              removeAsset,
-            }}
+            isNameChanged={isNameChanged}
+            isBalanceChanged={isBalanceChanged}
+            saveChanges={saveChanges}
+            removeAsset={removeAsset}
           />
         </TableRow>
       )}
 
-      <TableRow>
-        <TableCell sx={{ paddingY: 0 }} colSpan={6}>
-          <Collapse in={open} timeout="auto" unmountOnExit>
-            <Table size="small" aria-label="purchases">
-              <TableHead>
-                <TableRow>
-                  <TableCellWrapper label="名前" />
-                  <TableCellWrapper label="今月の収入" />
-                  <TableCellWrapper label="今月の支出" />
-                  <TableCellWrapper label="決済タイミング" />
-                  <TableCellWrapper colSpan={2} />
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {filteredMethodList.map((method) => (
-                  <MethodList
-                    method={method}
-                    key={method.id}
-                    methodPurchaseSum={methodPurchase(method.id)}
-                  />
-                ))}
-              </TableBody>
-            </Table>
-            <IconButton onClick={addMethod} color="primary">
-              <AddCircleOutlineIcon />
-            </IconButton>
-          </Collapse>
-        </TableCell>
-      </TableRow>
+      <MethodList
+        open={open}
+        assetId={assetId}
+        filteredMethodList={filteredMethodList}
+      />
       <DeleteConfirmDialog
-        target={assetInput.name}
-        {...{ openDialog, setOpenDialog, deleteAction }}
+        target={assetNameInput}
+        openDialog={openDialog}
+        setOpenDialog={setOpenDialog}
+        deleteAction={deleteAction}
       />
     </>
   )
 );
 
-const AssetRow = ({
-  asset,
-  methodSpent,
-  filteredPurchases,
-}: {
-  asset: AssetListType;
-  methodSpent: number;
-  filteredPurchases: PurchaseListType[];
-}) => {
+const AssetRow = memo(({ asset }: { asset: AssetListType }) => {
+  const assetId = asset.id;
+  const assetName = asset.name;
+  const { purchaseList, setPurchaseList } = usePurchase();
+  const [updatePurchases, setUpdatePurchases] = useState<PurchaseDataType[]>(
+    []
+  );
+
+  useEffect(() => {
+    setUpdatePurchases(purchaseList.filter((p) => p.assetId === assetId));
+  }, [purchaseList, assetId]);
+
+  const [balanceInput, setBalanceInput] = useState<number | undefined>(
+    undefined
+  );
   const [open, setOpen] = useState(false);
   const [openDialog, setOpenDialog] = useState<boolean>(false);
-  const [assetInput, setAssetInput] = useState<AssetListType>(asset);
-  const [balanceLogs, setBalanceLogs] = useState(asset.balanceLog);
-  const latestLog = balanceLogs.slice(-1)[0];
-  const displayBalance = latestLog.balance;
-  const [balanceInput, setBalanceInput] = useState<number>(displayBalance);
+  const [assetNameInput, setAssetNameInput] = useState<string>(assetName);
+  const lastPurchase = getLastPurchase(new Date(), updatePurchases);
+  const monthEndPurchase = getLastPurchase(
+    getNextMonthFirstDay(),
+    updatePurchases
+  );
+  const monthEndBalance = monthEndPurchase?.balance;
   const isSmall = useIsSmall();
 
   const handleAssetInput = useCallback(
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      const { name, value } = e.target;
-      setAssetInput((prev) => ({ ...prev, [name]: value }));
+      setAssetNameInput(e.target.value);
     },
     []
   );
 
-  const handleBalanceInput = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { value } = e.target;
-    const numValue = Number(value);
-    Number.isNaN(numValue)
-      ? alert("不適切な入力です")
-      : setBalanceInput(numValue);
-  };
+  const isNameChanged = assetName !== assetNameInput;
 
-  const isNameChanged = useMemo(
-    () => asset.name !== assetInput.name,
-    [asset.name, assetInput.name]
-  );
-
-  const isBalanceChanged = useMemo(
-    () => displayBalance !== balanceInput,
-    [balanceInput, displayBalance]
-  );
-
-  const getNewLog = useCallback(
-    (balance: number): BalanceLog => ({
-      timestamp: new Timestamp(getUnixTime(new Date()), 0),
-      balance: balance,
-    }),
+  const handleBalanceInput = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      const numValue = Number(e.target.value);
+      Number.isNaN(numValue)
+        ? alert("不適切な入力です")
+        : setBalanceInput(numValue);
+    },
     []
   );
 
-  // 配列を更新してもreactが更新されないため。stateで更新する必要がある
+  // TODO どういう時に「変更」が活性化するかきちんと考える
+  const isBalanceChanged = useMemo(
+    () => balanceInput !== undefined && lastPurchase?.balance !== balanceInput,
+    [balanceInput, lastPurchase]
+  );
+
+  const { Account } = useAccount();
+  const userId = Account?.id;
+  const { tabId } = useTab();
+
+  // 編集内容を保存する関数
   const saveChanges = useCallback(() => {
-    const updates = assetInput;
-    const newLog = getNewLog(balanceInput);
-    if (isBalanceChanged) {
-      updates.balanceLog.push(newLog);
+    if (isBalanceChanged && balanceInput && userId) {
+      const updatePurchase = addPurchaseAndUpdateLater(
+        {
+          assetId,
+          balance: balanceInput,
+          date: new Date(),
+          difference: balanceInput - (lastPurchase?.balance ?? 0),
+          childPurchaseId: "",
+          userId,
+          tabId,
+          title: `${asset.name}残高調整`,
+          method: {
+            id: "",
+            userId,
+            assetId,
+            tabId,
+            timing: "即時",
+            label: "資産追加",
+            timingDate: 0,
+          },
+          category: "",
+          description: "",
+          id: "",
+        },
+        updatePurchases
+      );
+      updateAndAddPurchases(updatePurchase.purchases);
+      setPurchaseList(updatePurchase.purchases);
     }
-    updateDocAsset(asset.id, updates);
-    setBalanceLogs((prev) => [...prev, newLog]);
-  }, [asset.id, assetInput, balanceInput, getNewLog, isBalanceChanged]);
+    updateDocAsset(assetId, { name: assetNameInput });
+  }, [
+    asset.name,
+    assetId,
+    assetNameInput,
+    balanceInput,
+    isBalanceChanged,
+    lastPurchase?.balance,
+    setPurchaseList,
+    tabId,
+    updatePurchases,
+    userId,
+  ]);
 
   const { methodList } = useMethod();
-  const filteredMethodList = methodList.filter(
-    (method) => method.assetId === asset.id
+  const filteredMethodList = useMemo(
+    () => methodList.filter((method) => method.assetId === assetId),
+    [methodList, assetId]
   );
 
   const removeAsset = useCallback(() => {
@@ -322,93 +294,34 @@ const AssetRow = ({
   }, []);
 
   const deleteAction = useCallback(() => {
-    deleteDocAsset(asset.id);
+    deleteDocAsset(assetId);
     if (filteredMethodList.length > 0) {
       filteredMethodList.forEach((method) => deleteDocMethod(method.id));
     }
-  }, [asset.id, filteredMethodList]);
-
-  const auth = getAuth();
-  const { tabId } = useTab();
-  const addMethod = useCallback(() => {
-    if (auth.currentUser) {
-      const userId = auth.currentUser.uid;
-      const newMethod: MethodType = {
-        ...defaultMethod,
-        userId,
-        assetId: asset.id,
-        tabId,
-      };
-      addDocMethod(newMethod);
-    }
-  }, [asset.id, auth.currentUser, tabId]);
-
-  const { purchaseList } = usePurchase();
-  const relatedPurchases = sumSpentAndIncome(
-    purchaseList.filter(
-      (purchase) =>
-        purchase.method.assetId === asset.id &&
-        purchase.date.toDate() < new Date() &&
-        latestLog.timestamp.toDate() < purchase.date.toDate() &&
-        !purchase.childPurchaseId
-    )
-  );
-
-  const currentBalance = displayBalance + relatedPurchases;
-  const isAddedPurchases = relatedPurchases !== 0;
-  const updateLog = useCallback(() => {
-    const balanceLog = getNewLog(currentBalance);
-    updateDocAsset(asset.id, {
-      balanceLog: [...assetInput.balanceLog, balanceLog],
-    });
-    setBalanceLogs((prev) => [...prev, balanceLog]);
-    setBalanceInput(currentBalance);
-  }, [asset.id, assetInput.balanceLog, currentBalance, getNewLog]);
-
-  const methodPurchase = useCallback(
-    (methodId: string) => {
-      const methodPurchaseList = filteredPurchases.filter(
-        (purchase) => purchase.method?.id === methodId
-      );
-      return {
-        income: sumSpentAndIncome(
-          methodPurchaseList.filter((purchase) => purchase.income)
-        ),
-        spent: sumSpentAndIncome(
-          methodPurchaseList.filter((purchase) => !purchase.income)
-        ),
-      };
-    },
-    [filteredPurchases]
-  );
+  }, [assetId, filteredMethodList]);
 
   const plainProps = {
     open,
     setOpen,
-    assetInput,
+    assetNameInput,
     handleAssetInput,
     isNameChanged,
     isBalanceChanged,
     saveChanges,
-    updateLog,
     removeAsset,
     filteredMethodList,
-    addMethod,
     handleBalanceInput,
     balanceInput,
-    isAddedPurchases,
-    currentBalance,
-    displayBalance,
     openDialog,
     setOpenDialog,
     deleteAction,
     isSmall,
-    latestLog,
-    methodSpent,
-    methodPurchase,
+    lastPurchase,
+    monthEndBalance,
+    assetId,
   };
 
   return <PlainAssetRow {...plainProps} />;
-};
+});
 
 export default AssetRow;

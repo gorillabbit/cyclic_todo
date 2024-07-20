@@ -1,19 +1,18 @@
 import { Box } from "@mui/material";
 import { memo, useMemo } from "react";
 import DoughnutChart from "./DoughnutChart";
-import { PurchaseListType } from "../../../types";
 import {
   isLaterPayment,
-  filterPurchasesByIncomeType,
   sumSpentAndIncome,
 } from "../../../utilities/purchaseUtilities";
+import { PurchaseDataType } from "../../../types/purchaseTypes";
 
 type PlainDoughnutContainerProps = {
-  currentMonthNetSpentList: PurchaseListType[];
+  currentMonthNetSpentList: PurchaseDataType[];
   currentMonthNetSpent: number;
-  currentMonthPaymentList: PurchaseListType[];
+  currentMonthPaymentList: PurchaseDataType[];
   currentMonthPayment: number;
-  currentMonthIncomeList: PurchaseListType[];
+  currentMonthIncomeList: PurchaseDataType[];
   currentMonthIncome: number;
 };
 
@@ -46,7 +45,7 @@ const PlainDoughnutContainer = memo(
 const DoughnutContainer = ({
   monthlyPurchases,
 }: {
-  monthlyPurchases: PurchaseListType[];
+  monthlyPurchases: PurchaseDataType[];
 }) => {
   const PurchasesWithoutTransfer = useMemo(
     () => monthlyPurchases.filter((purchase) => purchase.category !== "送受金"),
@@ -59,38 +58,25 @@ const DoughnutContainer = ({
       : purchase.category,
   }));
 
-  const currentMonthSpentList = useMemo(
-    () => filterPurchasesByIncomeType(PayLaterCategoryPurchase, "spent"),
-    [PayLaterCategoryPurchase]
+  const currentMonthSpentList = PayLaterCategoryPurchase.filter(
+    (p) => p.difference < 0
   );
-
   // 今月使った金額を示す。カードの支払は含まない
   const currentMonthNetSpentList = currentMonthSpentList.filter(
     (spent) => !isLaterPayment(spent)
   );
-  const currentMonthNetSpent = useMemo(
-    () => sumSpentAndIncome(currentMonthNetSpentList),
-    [currentMonthNetSpentList]
-  );
+  const currentMonthNetSpent = sumSpentAndIncome(currentMonthNetSpentList);
 
   // 今月の支払金額
   const currentMonthPaymentList = currentMonthSpentList.filter(
     (spent) => !spent.childPurchaseId
   );
-  const currentMonthPayment = useMemo(
-    () => sumSpentAndIncome(currentMonthPaymentList),
-    [currentMonthPaymentList]
-  );
+  const currentMonthPayment = sumSpentAndIncome(currentMonthPaymentList);
 
-  const currentMonthIncomeList = useMemo(
-    () => filterPurchasesByIncomeType(PayLaterCategoryPurchase, "income"),
-    [PayLaterCategoryPurchase]
+  const currentMonthIncomeList = PayLaterCategoryPurchase.filter(
+    (p) => p.difference > 0
   );
-
-  const currentMonthIncome = useMemo(
-    () => sumSpentAndIncome(currentMonthIncomeList),
-    [currentMonthIncomeList]
-  );
+  const currentMonthIncome = sumSpentAndIncome(currentMonthIncomeList);
 
   const plainProps = {
     currentMonthNetSpentList,
