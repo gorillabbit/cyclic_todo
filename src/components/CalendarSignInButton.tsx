@@ -16,9 +16,9 @@ const CalendarSignInButton = () => {
     const initClient = async () => {
       await gapi.client.init(config);
       await gapi.client.load("calendar", "v3");
-      const isSignedIn = gapi.auth2.getAuthInstance().isSignedIn;
+      const isSignedIn = gapi.auth2.getAuthInstance()?.isSignedIn;
       isSignedIn.listen(setIsSignedIn);
-      setIsSignedIn(isSignedIn.get());
+      setIsSignedIn(isSignedIn?.get());
     };
     gapi.load("client:auth2", initClient);
   }, []);
