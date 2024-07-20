@@ -201,7 +201,7 @@ export const updateAllLaterPurchases = (
     balance:
       purchase.date > date
         ? Number(purchase.balance) + Number(difference)
-        : purchase.balance,
+        : Number(purchase.balance),
   }));
 };
 
@@ -213,7 +213,9 @@ export const deletePurchaseAndUpdateLater = async (
   const purchase = docSnap.data() as PurchaseRawDataType;
   deleteDocPurchase(purchaseId);
   const filteredPurchase = updatePurchases.filter((p) => p.id !== purchaseId);
-  const difference = purchase.childPurchaseId ? 0 : -purchase.difference;
+  const difference = purchase.childPurchaseId
+    ? 0
+    : Number(-purchase.difference);
   return updateAllLaterPurchases(
     purchase.date.toDate(),
     difference,
@@ -232,7 +234,7 @@ export const addPurchaseAndUpdateLater = (
     updatePurchases
   );
   const lastPurchase = getLastPurchase(purchase.date, purchases);
-  const lastBalance = lastPurchase?.balance ?? 0;
+  const lastBalance = Number(lastPurchase?.balance ?? 0);
   const newDocRef = doc(collection(db, dbNames.purchase));
   return {
     purchases: [

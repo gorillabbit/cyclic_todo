@@ -217,16 +217,19 @@ const EditPurchaseRow = ({
       },
       updatedPurchases
     );
-
+    // 編集が完了したあとにそれとわかる何かを表示するスナックバーなど。
     updateAndAddPurchases(updatedPurchases1.purchases);
     setPurchaseList(updatedPurchases1.purchases);
-
     setIsEdit(false);
   }, [editFormData, setIsEdit, setPurchaseList, updatePurchases]);
 
   const handleEditFormChange = useCallback(
     (event: { target: { name: string; value: unknown } }) => {
       const { name, value } = event.target;
+      if (name === "difference") {
+        console.log(Number(value));
+        return setEditFormData((prev) => ({ ...prev, [name]: Number(value) }));
+      }
       setEditFormData((prev) => ({ ...prev, [name]: value }));
     },
     [setEditFormData]

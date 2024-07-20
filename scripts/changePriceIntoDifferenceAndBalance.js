@@ -1,5 +1,4 @@
 import { db } from "./firebase.js";
-import fs from "fs";
 
 async function updateDocuments() {
   const collectionRef = db.collection("Purchases");
@@ -11,8 +10,6 @@ async function updateDocuments() {
 
   const batch = db.batch();
   const lastPurchases = {};
-  const assets = {};
-  const logs = [];
   const purchases = await Promise.all(
     snapshot._docs().map(async (docSnap) => {
       const docRef = collectionRef.doc(docSnap.id);
@@ -20,7 +17,6 @@ async function updateDocuments() {
       return { id: docRef.id, ...doc.data(), docRef };
     })
   );
-  console.log(purchases);
 
   purchases
     .sort((a, b) => {
@@ -32,35 +28,18 @@ async function updateDocuments() {
       if (!lastPurchase) {
         lastPurchases[assetId] = 0;
       }
-      if (!assets[data.method.id]) {
-        assets[data.method.id] = {
-          名前: data.method.label,
-          assetId: data.method.assetId,
-        };
-      }
-
-      const difference = data.income ? data.price : -data.price;
+      const difference =
+        data.difference ?? (data.income ? data.price : -data.price);
       const balance =
-        Number(lastPurchase ?? 0) +
+        Number(lastPurchase ? lastPurchase : 0) +
         Number(data.childPurchaseId ? 0 : difference);
-      logs.push({
-        id: data.id,
-        title: data.title,
-        //balance,
-        //difference,
-        date: data.date,
-        seconds: data.date._seconds,
-        dateStr: data.date.toDate(),
-      });
       batch.update(data.docRef, {
         difference,
         balance,
+        assetId: data.method.assetId,
       });
       lastPurchases[assetId] = balance;
     });
-
-  fs.writeFileSync("output.json", JSON.stringify(logs));
-  console.log(lastPurchases, assets);
   await batch.commit();
 }
 
