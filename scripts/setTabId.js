@@ -1,8 +1,6 @@
-const admin = require('firebase-admin');
-
+import admin from "firebase-admin"
 // サービスアカウントのJSONファイルのパスを指定
-//const serviceAccount = require('./service_account.json');
-const serviceAccount = require('./service_account_prd.json');
+import serviceAccount from "./service_account.json" assert { type: 'json' };
 
 // Firebase Admin SDK の初期化
 admin.initializeApp({

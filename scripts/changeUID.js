@@ -1,26 +1,7 @@
-const admin = require('firebase-admin');
-
-// サービスアカウントのJSONファイルのパスを指定
-const serviceAccount = require('./service_account.json');
-
-// Firebase Admin SDK の初期化
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-});
-const db = admin.firestore();
+import {db} from "./firebase.js"
 
 const dbNames = {
-  task: "tasks",
-  log: "logs",
-  logsCompleteLog: "logsCompleteLogs",
-  account: "Accounts",
-  accountLink: "AccountLinks",
-  purchase: "Purchases",
-  purchaseTemplate: "PurchaseTemplates",
-  asset: "Assets",
-  purchaseSchedule: "PurchaseSchedules",
-  method: "Methods",
-  transferTemplate: "TransferTemplates",
+  tabs: "Tabs",
 };
 
 async function updateDocuments(dbName) {
