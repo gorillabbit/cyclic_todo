@@ -67,7 +67,8 @@ const DoughnutChart = memo(
           return indexA - indexB;
         })
         .filter(
-          (item) => item.difference > 0 && categories.includes(item.category)
+          (item) =>
+            Math.abs(item.difference) > 0 && categories.includes(item.category)
         );
 
       return {
