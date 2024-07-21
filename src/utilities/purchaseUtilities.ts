@@ -10,7 +10,6 @@ import {
   setDoc,
   addDoc,
   query,
-  or,
   orderBy,
   getDocs,
   writeBatch,
@@ -368,7 +367,10 @@ export const updateAndAddPurchases = (updatePurchases: PurchaseDataType[]) => {
   });
 };
 
-
+interface oldPurchases extends PurchaseRawDataType {
+  price?: number;
+  income?: boolean;
+}
 export const updateDocuments = async () => {
   const q = query(collection(db, dbNames.purchase), orderBy("date", "asc"));
   const data = await getDocs(q);
@@ -379,7 +381,7 @@ export const updateDocuments = async () => {
   const lastPurchases: Record<string, number> = {};
   const purchases = await Promise.all(
     data.docs.map(async (doc) => {
-      return { ...{ id: doc.id, ...doc.data() } as PurchaseRawDataType, doc };
+      return { ...{ id: doc.id, ...doc.data() } as oldPurchases, doc };
     })
   );
 
@@ -394,7 +396,7 @@ export const updateDocuments = async () => {
       const lastPurchase = lastPurchases[assetId];
       if (!lastPurchase) lastPurchases[assetId] = 0;
       const difference =
-        data.difference ?? (data.income ? data.price : -data.price);
+        data.difference ?? (data.income ? data.price : -(data.price ?? 0));
       const balance =
         Number(lastPurchase ? lastPurchase : 0) +
         Number(data.childPurchaseId ? 0 : difference);
