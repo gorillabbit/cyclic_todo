@@ -1,11 +1,11 @@
 import { Box } from "@mui/material";
 import { memo, useMemo } from "react";
-import DoughnutChart from "./DoughnutChart";
 import {
   isLaterPayment,
   sumSpentAndIncome,
 } from "../../../utilities/purchaseUtilities";
 import { PurchaseDataType } from "../../../types/purchaseTypes";
+import StackedBarChart from "../StackedBarChart";
 
 type PlainDoughnutContainerProps = {
   currentMonthNetSpentList: PurchaseDataType[];
@@ -26,15 +26,15 @@ const PlainDoughnutContainer = memo(
     currentMonthIncome,
   }: PlainDoughnutContainerProps) => (
     <Box display="flex" flexWrap="wrap" justifyContent="center">
-      <DoughnutChart
+      <StackedBarChart
         purchaseList={currentMonthNetSpentList}
         title={`今月の使用金額 ${-currentMonthNetSpent}円`}
       />
-      <DoughnutChart
+      <StackedBarChart
         purchaseList={currentMonthPaymentList}
         title={`今月の支払い金額 ${-currentMonthPayment}円`}
       />
-      <DoughnutChart
+      <StackedBarChart
         purchaseList={currentMonthIncomeList}
         title={`今月の収入金額 ${currentMonthIncome}円`}
       />

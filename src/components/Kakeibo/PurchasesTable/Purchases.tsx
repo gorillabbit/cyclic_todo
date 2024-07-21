@@ -21,7 +21,7 @@ import {
   sortObjectsByParameter,
   updateDocuments,
 } from "../../../utilities/purchaseUtilities";
-import DoughnutContainer from "./DoughnutContainer";
+import DoughnutContainer from "./ChartContainer";
 import TableHeadCell from "./TableHeadCell";
 import { usePurchase } from "../../../hooks/useData";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
