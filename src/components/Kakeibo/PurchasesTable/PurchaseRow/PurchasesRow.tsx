@@ -6,7 +6,7 @@ import {
   TableBody,
   TableHead,
 } from "@mui/material";
-import { memo, useEffect, useState } from "react";
+import { memo, useState } from "react";
 import EditPurchaseRow from "./EditPurchaseRow";
 import NormalPurchaseRow from "./NormalPurchaseRow";
 import EditPricePurchaseRow from "./EditPricePurchaseRow";
@@ -26,7 +26,7 @@ type PlainPurchasesRowProps = {
   isEditPrice: boolean;
   setIsEditPrice: React.Dispatch<React.SetStateAction<boolean>>;
   index: number;
-  updatePurchases: PurchaseDataType[];
+  purchaseList: PurchaseDataType[];
 };
 
 const PlainPurchasesRow = memo(
@@ -43,42 +43,36 @@ const PlainPurchasesRow = memo(
     isEditPrice,
     setIsEditPrice,
     index,
-    updatePurchases,
+    purchaseList,
   }: PlainPurchasesRowProps): JSX.Element => (
     <>
       {isEdit ? (
         <EditPurchaseRow
-          {...{
-            setIsEdit,
-            editFormData,
-            setEditFormData,
-            isSmall,
-            updatePurchases,
-          }}
+          setIsEdit={setIsEdit}
+          editFormData={editFormData}
+          setEditFormData={setEditFormData}
+          isSmall={isSmall}
+          updatePurchases={purchaseList}
         />
       ) : isEditPrice ? (
         <EditPricePurchaseRow
-          {...{
-            setIsEditPrice,
-            editFormData,
-            setEditFormData,
-            isSmall,
-            updatePurchases,
-          }}
+          setIsEditPrice={setIsEditPrice}
+          editFormData={editFormData}
+          setEditFormData={setEditFormData}
+          isSmall={isSmall}
+          updatePurchases={purchaseList}
         />
       ) : (
         <NormalPurchaseRow
-          {...{
-            isGroup,
-            setOpen,
-            open,
-            editFormData,
-            isSmall,
-            setIsEdit,
-            setIsEditPrice,
-            index,
-            updatePurchases,
-          }}
+          isGroup={isGroup}
+          setOpen={setOpen}
+          open={open}
+          editFormData={editFormData}
+          isSmall={isSmall}
+          setIsEdit={setIsEdit}
+          setIsEditPrice={setIsEditPrice}
+          index={index}
+          updatePurchases={purchaseList}
         />
       )}
       {isGroup && (
@@ -141,15 +135,6 @@ const PurchasesRow = ({
   const [editFormData, setEditFormData] = useState<PurchaseDataType>(purchase);
 
   const { purchaseList } = usePurchase();
-  const [updatePurchases, setUpdatePurchases] = useState<PurchaseDataType[]>(
-    []
-  );
-
-  useEffect(() => {
-    setUpdatePurchases(
-      purchaseList.filter((p) => p.assetId === editFormData.method.assetId)
-    );
-  }, [editFormData.method.assetId, purchaseList]);
 
   const plainProps = {
     groupPurchases,
@@ -164,7 +149,7 @@ const PurchasesRow = ({
     isEditPrice,
     setIsEditPrice,
     index,
-    updatePurchases,
+    purchaseList,
   };
   return <PlainPurchasesRow {...plainProps} />;
 };

@@ -180,29 +180,42 @@ export const sortObjectsByParameter = (
   });
 };
 
-export const getLastPurchase = (
+/**
+ * assetIdが同じ支払いのうち、dateが指定された日付より前の最後の支払いの残高を取得する
+ * @param assetId 
+ * @param date 
+ * @param updatePurchases 
+ * @returns 
+ */
+export const getLastBalance = (
+  assetId: string,
   date: Date,
   updatePurchases: PurchaseDataType[]
-): PurchaseDataType | undefined => {
-  return updatePurchases
+): number => {
+  const lastPurchase = updatePurchases.filter((p) => p.assetId === assetId)
     .sort((a, b) => b.date.getTime() - a.date.getTime())
     .find((purchase) => purchase.date <= date);
+  // NaNに対応するために??ではなく三項演算子を使う
+  return Number(lastPurchase?.balance) ? Number(lastPurchase?.balance) : 0
 };
 
 // ある時点より後の支払いすべてを更新する
 export const updateAllLaterPurchases = (
+  assetId: string,
   date: Date,
   difference: number,
   updatePurchases: PurchaseDataType[]
 ) => {
   if (difference === 0) return updatePurchases;
-  return updatePurchases.map((purchase) => ({
-    ...purchase,
+  const filteredPurchases = updatePurchases.filter((p) => p.assetId === assetId);
+  const restPurchases = updatePurchases.filter((p) => p.assetId !== assetId);
+  return [...filteredPurchases.map((p) => ({
+    ...p,
     balance:
-      purchase.date > date
-        ? Number(purchase.balance) + Number(difference)
-        : Number(purchase.balance),
-  }));
+      p.date > date
+        ? Number(p.balance) + Number(difference)
+        : Number(p.balance),
+  })), ...restPurchases]
 };
 
 export const deletePurchaseAndUpdateLater = async (
@@ -217,24 +230,25 @@ export const deletePurchaseAndUpdateLater = async (
     ? 0
     : Number(-purchase.difference);
   return updateAllLaterPurchases(
+    purchase.assetId,
     purchase.date.toDate(),
     difference,
     filteredPurchase
   );
 };
-
+// TODO 子タスクの有無による、differenceをゼロにするかをここにまとめる
 export const addPurchaseAndUpdateLater = (
   purchase: PurchaseDataType,
   updatePurchases: PurchaseDataType[]
 ) => {
   const difference = purchase.childPurchaseId ? 0 : Number(purchase.difference);
   const purchases = updateAllLaterPurchases(
+    purchase.assetId,
     purchase.date,
     difference,
     updatePurchases
   );
-  const lastPurchase = getLastPurchase(purchase.date, purchases);
-  const lastBalance = Number(lastPurchase?.balance ?? 0);
+  const lastBalance = getLastBalance(purchase.assetId, purchase.date, purchases);
   const newDocRef = doc(collection(db, dbNames.purchase));
   return {
     purchases: [
@@ -257,6 +271,7 @@ export const updatePurchaseAndUpdateLater = async (
   const currentPurchases = updatePurchases.find((p) => p.id === purchaseId);
   if (!currentPurchases) return { purchases: updatePurchases };
   const updatedLaterPurchases = updateAllLaterPurchases(
+    currentPurchases.assetId,
     currentPurchases.date,
     -currentPurchases.difference,
     updatePurchases.filter((p) => p.id !== purchaseId)

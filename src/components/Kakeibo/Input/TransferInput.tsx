@@ -176,7 +176,7 @@ const TransferInput = () => {
       method: from,
       childPurchaseId: childId,
       assetId: from.assetId,
-      difference: childId ? 0 : -price,
+      difference: -price,
     };
     update = addPurchaseAndUpdateLater(fromPurchase, update).purchases;
     const toPurchase = {

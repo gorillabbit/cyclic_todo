@@ -23,6 +23,7 @@ async function updateDocuments() {
       b.date.toDate().getTime() - a.date.toDate().getTime();
     })
     .forEach((data) => {
+      if (!data.tabId) return;
       const assetId = String(data.method.assetId);
       const lastPurchase = lastPurchases[assetId];
       if (!lastPurchase) {

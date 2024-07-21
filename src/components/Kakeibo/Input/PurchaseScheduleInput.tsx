@@ -9,7 +9,7 @@ import {
   TextField,
 } from "@mui/material";
 import StyledCheckbox from "../../StyledCheckbox";
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { addDocPurchaseSchedule } from "../../../firebase";
 import { getAuth } from "firebase/auth";
 import {
@@ -27,7 +27,6 @@ import {
   weekDaysString,
 } from "../../../utilities/purchaseUtilities";
 import { usePurchase, useMethod, useTab } from "../../../hooks/useData";
-import { PurchaseDataType } from "../../../types/purchaseTypes";
 
 const defaultNewPurchase: InputPurchaseScheduleType = {
   userId: "",
@@ -51,22 +50,11 @@ const PurchaseScheduleInput = () => {
   const { methodList } = useMethod();
   const { tabId } = useTab();
   const { purchaseList, setPurchaseList } = usePurchase();
-  const [updatePurchases, setUpdatePurchases] = useState<PurchaseDataType[]>(
-    []
-  );
   const [newPurchaseSchedule, setNewPurchaseSchedule] =
     useState<InputPurchaseScheduleType>({
       ...defaultNewPurchase,
       tabId,
     });
-
-  useEffect(() => {
-    setUpdatePurchases(
-      purchaseList.filter(
-        (p) => p.assetId === newPurchaseSchedule.method.assetId
-      )
-    );
-  }, [newPurchaseSchedule.method.assetId, purchaseList]);
 
   const handleNewPurchaseScheduleInput = useCallback(
     (name: string, value: string | Date | boolean | MethodListType | null) => {
@@ -99,12 +87,12 @@ const PurchaseScheduleInput = () => {
     const result = addScheduledPurchase(
       addedSchedule.id,
       newPurchaseSchedule,
-      updatePurchases
+      purchaseList
     );
     updateAndAddPurchases(result);
     setPurchaseList(result);
     setNewPurchaseSchedule(defaultNewPurchase);
-  }, [currentUser, newPurchaseSchedule, setPurchaseList, updatePurchases]);
+  }, [currentUser, newPurchaseSchedule, setPurchaseList, purchaseList]);
 
   return (
     <>

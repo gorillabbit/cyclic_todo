@@ -1,7 +1,7 @@
 import { Autocomplete, Box, Button, FormGroup, TextField } from "@mui/material";
 import StyledCheckbox from "../../StyledCheckbox";
 import { DatePicker } from "@mui/x-date-pickers";
-import { memo, useCallback, useEffect, useMemo, useState } from "react";
+import { memo, useCallback, useMemo, useState } from "react";
 import { addDocPurchaseTemplate } from "../../../firebase";
 import { getAuth } from "firebase/auth";
 import { MethodListType } from "../../../types";
@@ -121,9 +121,6 @@ const PurchaseInput = () => {
   const { tabId } = useTab();
   const { purchaseList, setPurchaseList } = usePurchase();
   const { currentUser } = getAuth();
-  const [updatePurchases, setUpdatePurchases] = useState<PurchaseDataType[]>(
-    []
-  );
   const defaultPurchaseInputWithTabId = useMemo(
     () => ({ ...defaultInputFieldPurchase, tabId }),
     [tabId]
@@ -132,12 +129,6 @@ const PurchaseInput = () => {
     defaultPurchaseInputWithTabId
   );
   const method = newPurchase.method;
-
-  useEffect(() => {
-    setUpdatePurchases(
-      purchaseList.filter((p) => p.assetId === method?.assetId)
-    );
-  }, [method?.assetId, purchaseList]);
 
   const handleNewPurchaseInput = useCallback(
     (name: string, value: string | Date | boolean | MethodListType | null) => {
@@ -165,7 +156,7 @@ const PurchaseInput = () => {
     if (!method) return alert("支払い方法を入力してください");
     if (!currentUser) return alert("ログインしてください");
 
-    let updates = updatePurchases;
+    let updates = purchaseList;
     const { income, price, ...newPurchaseData } = newPurchase;
     const difference = income ? price : -price;
     const { assetId, timing } = method;
@@ -190,12 +181,12 @@ const PurchaseInput = () => {
     };
 
     if (timing === "即時") {
-      updates = _addPurchase(updatePurchases, {}).purchases;
+      updates = _addPurchase(purchaseList, {}).purchases;
     } else {
       // 後払いの場合
       const payLaterDate = getPayLaterDate(newPurchase.date, method.timingDate);
       // まず引き落とされる支払いを追加し、そのIDを現在の支払いに追加する
-      const purchasesAndId = _addPurchase(updatePurchases, {
+      const purchasesAndId = _addPurchase(purchaseList, {
         date: payLaterDate,
       });
       updates = _addPurchase(purchasesAndId.purchases, {
@@ -212,7 +203,7 @@ const PurchaseInput = () => {
     method,
     newPurchase,
     setPurchaseList,
-    updatePurchases,
+    purchaseList,
   ]);
 
   const addTemplate = useCallback(() => {

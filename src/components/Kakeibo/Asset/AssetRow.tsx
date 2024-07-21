@@ -19,7 +19,7 @@ import {
 } from "../../../firebase";
 import {
   addPurchaseAndUpdateLater,
-  getLastPurchase,
+  getLastBalance,
   numericProps,
   updateAndAddPurchases,
 } from "../../../utilities/purchaseUtilities";
@@ -93,8 +93,8 @@ type PlainAssetRowProps = UnderHalfRowProps & {
   setOpenDialog: React.Dispatch<React.SetStateAction<boolean>>;
   deleteAction: () => void;
   isSmall: boolean;
-  lastPurchase: PurchaseDataType | undefined;
-  monthEndBalance: number | undefined;
+  lastBalance: number;
+  monthEndBalance: number;
 };
 
 const PlainAssetRow = memo(
@@ -115,7 +115,7 @@ const PlainAssetRow = memo(
     deleteAction,
     isSmall,
     assetId,
-    lastPurchase,
+    lastBalance,
     monthEndBalance,
   }: PlainAssetRowProps): JSX.Element => (
     <>
@@ -140,7 +140,7 @@ const PlainAssetRow = memo(
         <TableCellWrapper>
           <TextField
             {...tableInputStyle}
-            value={isBalanceChanged ? balanceInput : lastPurchase?.balance ?? 0}
+            value={isBalanceChanged ? balanceInput : lastBalance}
             name="balance"
             onChange={handleBalanceInput}
             inputProps={numericProps}
@@ -201,12 +201,12 @@ const AssetRow = memo(({ asset }: { asset: AssetListType }) => {
   const [open, setOpen] = useState(false);
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const [assetNameInput, setAssetNameInput] = useState<string>(assetName);
-  const lastPurchase = getLastPurchase(new Date(), updatePurchases);
-  const monthEndPurchase = getLastPurchase(
+  const lastBalance = getLastBalance(assetId, new Date(), updatePurchases);
+  const monthEndBalance = getLastBalance(
+    assetId,
     getNextMonthFirstDay(),
     updatePurchases
   );
-  const monthEndBalance = monthEndPurchase?.balance;
   const isSmall = useIsSmall();
 
   const handleAssetInput = useCallback(
@@ -230,8 +230,8 @@ const AssetRow = memo(({ asset }: { asset: AssetListType }) => {
 
   // TODO どういう時に「変更」が活性化するかきちんと考える
   const isBalanceChanged = useMemo(
-    () => balanceInput !== undefined && lastPurchase?.balance !== balanceInput,
-    [balanceInput, lastPurchase]
+    () => balanceInput !== undefined && lastBalance !== balanceInput,
+    [balanceInput, lastBalance]
   );
 
   const { Account } = useAccount();
@@ -246,7 +246,7 @@ const AssetRow = memo(({ asset }: { asset: AssetListType }) => {
           assetId,
           balance: balanceInput,
           date: new Date(),
-          difference: balanceInput - (lastPurchase?.balance ?? 0),
+          difference: balanceInput - lastBalance,
           childPurchaseId: "",
           userId,
           tabId,
@@ -276,7 +276,7 @@ const AssetRow = memo(({ asset }: { asset: AssetListType }) => {
     assetNameInput,
     balanceInput,
     isBalanceChanged,
-    lastPurchase?.balance,
+    lastBalance,
     setPurchaseList,
     tabId,
     updatePurchases,
@@ -316,7 +316,7 @@ const AssetRow = memo(({ asset }: { asset: AssetListType }) => {
     setOpenDialog,
     deleteAction,
     isSmall,
-    lastPurchase,
+    lastBalance,
     monthEndBalance,
     assetId,
   };
