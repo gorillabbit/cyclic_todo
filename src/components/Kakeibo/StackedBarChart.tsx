@@ -9,6 +9,7 @@ import {
   Legend,
 } from "chart.js";
 import { PurchaseDataType } from "../../types/purchaseTypes";
+import { Box } from "@mui/material";
 
 ChartJS.register(
   CategoryScale,
@@ -24,29 +25,43 @@ interface DoughnutChartProps {
   title: string;
 }
 
-const StackedBarChart = ({ purchaseList, title }: DoughnutChartProps) => {
-  const categories = [...new Set(purchaseList.map((p) => p.category))];
+const useChartData = (purchaseList: PurchaseDataType[]) => {
+  const sortedPurchaseList = [...purchaseList].sort((a, b) =>
+    a.category.localeCompare(b.category)
+  );
+  const categories = [...new Set(sortedPurchaseList.map((p) => p.category))];
 
-  const categoryTotals = categories.map((category) => {
-    return purchaseList
-      .filter((p) => p.category === category)
-      .reduce((sum, p) => sum + Math.abs(p.difference), 0);
-  });
-
-  const getColor = (index: number) => {
-    return `rgba(${index * 30}, ${index * 60}, ${index * 60}, 0.5)`;
+  const calculateCategoryTotals = () => {
+    return categories.map((category) => {
+      return sortedPurchaseList
+        .filter((p) => p.category === category)
+        .reduce((sum, p) => sum + Math.abs(p.difference), 0);
+    });
   };
+
+  const generateColor = (index: number) => {
+    const r = (index * 30) % 255;
+    const g = (index * 60) % 255;
+    const b = (index * 90) % 255;
+    return `rgba(${r}, ${g}, ${b}, 0.5)`;
+  };
+
+  const categoryTotals = calculateCategoryTotals();
 
   const totalData = categories.map((category, index) => ({
     label: category,
     data: [categoryTotals[index]],
-    backgroundColor: getColor(index),
+    backgroundColor: generateColor(index),
+    borderColor: "white",
+    borderWidth: 1,
   }));
 
-  const detailData = purchaseList.map((p) => ({
+  const detailData = sortedPurchaseList.map((p) => ({
     label: p.title,
     data: [Math.abs(p.difference)],
-    backgroundColor: getColor(categories.indexOf(p.category)),
+    backgroundColor: generateColor(categories.indexOf(p.category)),
+    borderColor: "white",
+    borderWidth: 1,
   }));
 
   const combinedData = {
@@ -63,8 +78,17 @@ const StackedBarChart = ({ purchaseList, title }: DoughnutChartProps) => {
     ],
   };
 
+  return combinedData;
+};
+
+const StackedBarChart: React.FC<DoughnutChartProps> = ({
+  purchaseList,
+  title,
+}) => {
+  const combinedData = useChartData(purchaseList);
+
   const options = {
-    indexAxis: "y",
+    indexAxis: "y" as const,
     plugins: {
       title: {
         display: true,
@@ -82,9 +106,22 @@ const StackedBarChart = ({ purchaseList, title }: DoughnutChartProps) => {
         stacked: true,
       },
     },
+    maintainAspectRatio: false,
+    layout: {
+      padding: {
+        left: 0,
+        right: 0,
+        top: 0,
+        bottom: 0,
+      },
+    },
   };
 
-  return <Bar data={combinedData} options={options} />;
+  return (
+    <Box width="100%" height={150}>
+      <Bar data={combinedData} options={options} />
+    </Box>
+  );
 };
 
 export default StackedBarChart;
