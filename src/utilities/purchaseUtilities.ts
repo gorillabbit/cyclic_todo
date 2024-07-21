@@ -9,6 +9,11 @@ import {
   updateDoc,
   setDoc,
   addDoc,
+  query,
+  or,
+  orderBy,
+  getDocs,
+  writeBatch,
 } from "firebase/firestore";
 import { getPayLaterDate } from "./dateUtilities";
 import { PurchaseDataType, PurchaseRawDataType } from "../types/purchaseTypes";
@@ -362,3 +367,46 @@ export const updateAndAddPurchases = (updatePurchases: PurchaseDataType[]) => {
     }
   });
 };
+
+
+export const updateDocuments = async () => {
+  const q = query(collection(db, dbNames.purchase), orderBy("date", "asc"));
+  const data = await getDocs(q);
+
+  if (data.empty) return console.error("データがありません");
+
+  const batch = writeBatch(db);
+  const lastPurchases: Record<string, number> = {};
+  const purchases = await Promise.all(
+    data.docs.map(async (doc) => {
+      return { ...{ id: doc.id, ...doc.data() } as PurchaseRawDataType, doc };
+    })
+  );
+
+  purchases
+    .sort((a, b) =>
+      a.date.toDate().getTime() - b.date.toDate().getTime()
+    )
+    .forEach((data) => {
+      console.log(data)
+      if (!data.tabId) return;
+      const assetId = String(data.method.assetId);
+      const lastPurchase = lastPurchases[assetId];
+      if (!lastPurchase) lastPurchases[assetId] = 0;
+      const difference =
+        data.difference ?? (data.income ? data.price : -data.price);
+      const balance =
+        Number(lastPurchase ? lastPurchase : 0) +
+        Number(data.childPurchaseId ? 0 : difference);
+      const docRef = doc(db, dbNames.purchase, data.id);
+      batch.update(docRef, {
+        difference,
+        balance,
+        assetId: data.method.assetId,
+      });
+      lastPurchases[assetId] = balance;
+    });
+  await batch.commit();
+  window.location.reload();
+  console.log("データを更新しました");
+}

@@ -1,5 +1,6 @@
 import {
   Box,
+  Button,
   IconButton,
   Paper,
   Table,
@@ -18,6 +19,7 @@ import { useIsSmall } from "../../../hooks/useWindowSize";
 import {
   isLaterPayment,
   sortObjectsByParameter,
+  updateDocuments,
 } from "../../../utilities/purchaseUtilities";
 import DoughnutContainer from "./DoughnutContainer";
 import TableHeadCell from "./TableHeadCell";
@@ -74,6 +76,7 @@ const PlainPurchases = memo(
           <IconButton onClick={handleNextMonthButton}>
             <ArrowForwardIosIcon />
           </IconButton>
+          <Button onClick={updateDocuments}>再計算</Button>
         </Box>
         <Table size="small">
           <TableHead>

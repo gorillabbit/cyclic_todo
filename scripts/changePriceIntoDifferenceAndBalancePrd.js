@@ -1,6 +1,6 @@
 import { prdDb } from "./firebasePrd.js";
 
-async function updateDocuments() {
+export async function updateDocuments() {
   const collectionRef = prdDb.collection("Purchases");
   const snapshot = await collectionRef.orderBy("date", "asc").get();
 
