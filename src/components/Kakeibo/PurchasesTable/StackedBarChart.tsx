@@ -8,8 +8,8 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import { PurchaseDataType } from "../../types/purchaseTypes";
 import { Box } from "@mui/material";
+import { PurchaseDataType } from "../../../types/purchaseTypes";
 
 ChartJS.register(
   CategoryScale,
@@ -40,9 +40,9 @@ const useChartData = (purchaseList: PurchaseDataType[]) => {
   };
 
   const generateColor = (index: number) => {
-    const r = (index * 30) % 255;
-    const g = (index * 60) % 255;
-    const b = (index * 90) % 255;
+    const r = (index * 300) % 255;
+    const g = (index * 600) % 255;
+    const b = (index * 900) % 255;
     return `rgba(${r}, ${g}, ${b}, 0.5)`;
   };
 

@@ -5,7 +5,7 @@ import {
   sumSpentAndIncome,
 } from "../../../utilities/purchaseUtilities";
 import { PurchaseDataType } from "../../../types/purchaseTypes";
-import StackedBarChart from "../StackedBarChart";
+import StackedBarChart from "./StackedBarChart";
 
 type PlainDoughnutContainerProps = {
   currentMonthNetSpentList: PurchaseDataType[];
