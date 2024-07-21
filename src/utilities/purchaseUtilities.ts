@@ -390,7 +390,6 @@ export const updateDocuments = async () => {
       a.date.toDate().getTime() - b.date.toDate().getTime()
     )
     .forEach((data) => {
-      console.log(data)
       if (!data.tabId) return;
       const assetId = String(data.method.assetId);
       const lastPurchase = lastPurchases[assetId];

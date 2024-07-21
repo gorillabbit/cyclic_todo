@@ -38,6 +38,7 @@ export async function updateDocuments() {
         difference,
         balance,
         assetId: data.method.assetId,
+        childPurchaseId: data.childPurchaseId ?? "",
       });
       lastPurchases[assetId] = balance;
     });
