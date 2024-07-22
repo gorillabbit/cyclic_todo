@@ -34,7 +34,9 @@
     "react-chartjs-2": "5.2.0",
     "react-cookie": "7.1.4",
     "react-dom": "18.3.1",
+    "react-is": "18.3.1",
     "react-router-dom": "6.25.1",
+    "recharts": "2.13.0-alpha.4",
     "ts-node": "10.9.2",
     "typescript-eslint": "8.0.0-alpha.47"
   },

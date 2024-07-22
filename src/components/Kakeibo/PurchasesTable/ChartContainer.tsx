@@ -6,6 +6,7 @@ import {
 } from "../../../utilities/purchaseUtilities";
 import { PurchaseDataType } from "../../../types/purchaseTypes";
 import StackedBarChart from "./StackedBarChart";
+import BalanceChart from "./BalanceChart";
 
 type PlainDoughnutContainerProps = {
   currentMonthNetSpentList: PurchaseDataType[];
@@ -38,10 +39,12 @@ const PlainDoughnutContainer = memo(
         purchaseList={currentMonthIncomeList}
         title={`今月の収入金額 ${currentMonthIncome}円`}
       />
+
+      <BalanceChart />
     </Box>
   )
 );
-
+// 全期間の推移グラフも表示する。
 const DoughnutContainer = ({
   monthlyPurchases,
 }: {
