@@ -36,7 +36,7 @@
     "react-dom": "18.3.1",
     "react-router-dom": "6.25.1",
     "ts-node": "10.9.2",
-    "typescript-eslint": "8.0.0-alpha.48"
+    "typescript-eslint": "8.0.0-alpha.49"
   },
   "devDependencies": {
     "@types/cors": "2.8.17",
