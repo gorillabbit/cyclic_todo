@@ -7,6 +7,7 @@ import {
   CartesianGrid,
   ResponsiveContainer,
   Tooltip,
+  Brush,
 } from "recharts";
 import { format } from "date-fns";
 import { getNextMonthFirstDay } from "../../../utilities/dateUtilities";
@@ -48,10 +49,16 @@ const BalanceChart = () => {
           type="number"
           scale="time"
           domain={["auto", "auto"]}
+          tick={{ fontSize: 12 }}
         />
-        <YAxis yAxisId="left" />
-        <YAxis yAxisId="right" orientation="right" />
-        <Tooltip />
+        <YAxis yAxisId="left" tick={{ fontSize: 12 }} />
+        <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 12 }} />
+        <Tooltip
+          filterNull
+          cursor={{ stroke: "red", strokeWidth: 0.5 }}
+          labelFormatter={(label) => new Date(label).toLocaleDateString()}
+        />
+        <Brush />
         <CartesianGrid stroke="#eee" strokeDasharray="5 5" />
         {assetList.map((asset, index) => (
           <Line
