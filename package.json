@@ -32,13 +32,13 @@
     "gapi-script": "1.2.0",
     "react": "18.3.1",
     "react-chartjs-2": "5.2.0",
-    "react-cookie": "7.1.4",
+    "react-cookie": "7.2.0",
     "react-dom": "18.3.1",
     "react-is": "18.3.1",
     "react-router-dom": "6.25.1",
     "recharts": "2.13.0-alpha.4",
     "ts-node": "10.9.2",
-    "typescript-eslint": "8.0.0-alpha.47"
+    "typescript-eslint": "8.0.0-alpha.49"
   },
   "devDependencies": {
     "@types/cors": "2.8.17",
