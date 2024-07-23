@@ -9,6 +9,7 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
+  LabelList,
 } from "recharts";
 import { PurchaseDataType } from "../../types/purchaseTypes";
 import { usePurchase } from "../../hooks/useData";
@@ -43,24 +44,36 @@ const MonthlyStackedBarChart = () => {
       }
       result[month][category] += Math.abs(difference);
     });
-
-    return Object.keys(result).map((month) => ({
-      date: month,
-      ...result[month],
-    }));
+    return Object.keys(result).map((month) => {
+      const spentTotal = Object.entries(result[month]).reduce(
+        (acc, value) => (value[0] !== "給与" ? acc + value[1] : acc),
+        0
+      );
+      const incomeTotal = Object.entries(result[month]).reduce(
+        (acc, value) => (value[0] === "給与" ? acc + value[1] : acc),
+        0
+      );
+      return {
+        date: month,
+        spentTotal,
+        incomeTotal,
+        ...result[month],
+      };
+    });
   };
 
   const transformedSpent = useMemo(
     () => processData(pastPurchase),
     [pastPurchase]
   );
+  console.log(transformedSpent);
   // TODO すごいアドホックなのでどうにかする
   const purchaseCategories = pastPurchase.filter((p) => p.category !== "給与");
   const categories = [...new Set(purchaseCategories.map((p) => p.category))];
   return (
     <ResponsiveContainer width="100%" height={400}>
       <BarChart data={transformedSpent}>
-        <CartesianGrid strokeDasharray="3 3" />
+        <CartesianGrid strokeWidth={0.5} />
         <XAxis dataKey="date" tick={{ fontSize: 12 }} />
         <YAxis tick={{ fontSize: 12 }} />
         <Tooltip filterNull contentStyle={{ fontSize: 12 }} />
@@ -70,10 +83,16 @@ const MonthlyStackedBarChart = () => {
             key={category}
             dataKey={category}
             stackId="a"
-            fill={generateColor(index)}
-          />
+            fill={generateColor(index + 1)}
+          >
+            {index === categories.length - 1 && (
+              <LabelList dataKey="spentTotal" position="top" fontSize={12} />
+            )}
+          </Bar>
         ))}
-        <Bar dataKey={"給与"} stackId="b" fill={generateColor(1)} />
+        <Bar dataKey={"給与"} stackId="b" fill={generateColor(1)}>
+          <LabelList dataKey="incomeTotal" position="top" fontSize={12} />
+        </Bar>
       </BarChart>
     </ResponsiveContainer>
   );
