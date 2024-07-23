@@ -31,14 +31,6 @@ const useChartData = (purchaseList: PurchaseDataType[]) => {
   );
   const categories = [...new Set(sortedPurchaseList.map((p) => p.category))];
 
-  const calculateCategoryTotals = () => {
-    return categories.map((category) => {
-      return sortedPurchaseList
-        .filter((p) => p.category === category)
-        .reduce((sum, p) => sum + Math.abs(p.difference), 0);
-    });
-  };
-
   const generateColor = (index: number) => {
     const r = (index * 300) % 255;
     const g = (index * 600) % 255;
@@ -46,7 +38,11 @@ const useChartData = (purchaseList: PurchaseDataType[]) => {
     return `rgba(${r}, ${g}, ${b}, 0.5)`;
   };
 
-  const categoryTotals = calculateCategoryTotals();
+  const categoryTotals = categories.map((category) =>
+    sortedPurchaseList
+      .filter((p) => p.category === category)
+      .reduce((sum, p) => sum + Math.abs(p.difference), 0)
+  );
 
   const totalData = categories.map((category, index) => ({
     label: category,

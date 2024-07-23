@@ -13,6 +13,7 @@ type PlainDoughnutContainerProps = {
   currentMonthNetSpent: number;
   currentMonthPaymentList: PurchaseDataType[];
   currentMonthPayment: number;
+  currentMonthPaymentCategoryList: PurchaseDataType[];
   currentMonthIncomeList: PurchaseDataType[];
   currentMonthIncome: number;
 };
@@ -23,6 +24,7 @@ const PlainDoughnutContainer = memo(
     currentMonthNetSpent,
     currentMonthPaymentList,
     currentMonthPayment,
+    currentMonthPaymentCategoryList,
     currentMonthIncomeList,
     currentMonthIncome,
   }: PlainDoughnutContainerProps) => (
@@ -33,6 +35,10 @@ const PlainDoughnutContainer = memo(
       />
       <StackedBarChart
         purchaseList={currentMonthPaymentList}
+        title={`今月の支払い金額(支払い方法ごと) ${-currentMonthPayment}円`}
+      />
+      <StackedBarChart
+        purchaseList={currentMonthPaymentCategoryList}
         title={`今月の支払い金額 ${-currentMonthPayment}円`}
       />
       <StackedBarChart
@@ -51,30 +57,35 @@ const DoughnutContainer = ({
   monthlyPurchases: PurchaseDataType[];
 }) => {
   const PurchasesWithoutTransfer = useMemo(
-    () => monthlyPurchases.filter((purchase) => purchase.category !== "送受金"),
+    () => monthlyPurchases.filter((p) => p.category !== "送受金"),
     [monthlyPurchases]
   );
-  const PayLaterCategoryPurchase = PurchasesWithoutTransfer.map((purchase) => ({
-    ...purchase,
-    category: isLaterPayment(purchase)
-      ? purchase.method.label + "支払い"
-      : purchase.category,
-  }));
 
-  const currentMonthSpentList = PayLaterCategoryPurchase.filter(
+  const currentMonthSpentList = PurchasesWithoutTransfer.filter(
     (p) => p.difference < 0
   );
+
   // 今月使った金額を示す。カードの支払は含まない
   const currentMonthNetSpentList = currentMonthSpentList.filter(
     (spent) => !isLaterPayment(spent)
   );
   const currentMonthNetSpent = sumSpentAndIncome(currentMonthNetSpentList);
 
-  // 今月の支払金額
-  const currentMonthPaymentList = currentMonthSpentList.filter(
+  // 支払いが後払いの場合、カテゴリーを変更する
+  const PayLaterCategoryPurchase = currentMonthSpentList.map((p) => ({
+    ...p,
+    category: isLaterPayment(p) ? p.method.label + "支払い" : p.category,
+  }));
+  // 今月の支払金額(カード払いをまとめる)
+  const currentMonthPaymentList = PayLaterCategoryPurchase.filter(
     (spent) => !spent.childPurchaseId
   );
   const currentMonthPayment = sumSpentAndIncome(currentMonthPaymentList);
+
+  // 今月の支払金額(カテゴリーごと)
+  const currentMonthPaymentCategoryList = currentMonthSpentList.filter(
+    (spent) => !spent.childPurchaseId
+  );
 
   const currentMonthIncomeList = PayLaterCategoryPurchase.filter(
     (p) => p.difference > 0
@@ -86,6 +97,7 @@ const DoughnutContainer = ({
     currentMonthNetSpent,
     currentMonthPaymentList,
     currentMonthPayment,
+    currentMonthPaymentCategoryList,
     currentMonthIncomeList,
     currentMonthIncome,
   };

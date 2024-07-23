@@ -136,24 +136,27 @@ const Purchases = memo((): JSX.Element => {
       ),
     [month, purchaseList]
   );
+  console.log(monthlyPurchases);
 
   // 後払いを合計する(収入に後払いはないので考慮しない)
-  const groupedPurchasesDoc = useMemo(() => {
-    return monthlyPurchases.reduce((acc, p) => {
-      if (!isLaterPayment(p)) return acc;
-      const keyString = p.method.label + p.date.getDate(); // 同じ日なら同じものとして扱う
-      if (!acc[keyString]) {
-        acc[keyString] = {
-          ...p,
-          difference: 0,
-        };
-      }
-      acc[keyString].difference += Number(p.difference);
-      // 後払いの残高を正しいものにする
-      acc[keyString].balance = Number(p.balance);
-      return acc;
-    }, {} as { [key: string]: PurchaseDataType });
-  }, [monthlyPurchases]);
+  const groupedPurchasesDoc = useMemo(
+    () =>
+      monthlyPurchases.reduce((acc, p) => {
+        if (!isLaterPayment(p)) return acc;
+        const keyString = p.method.label + p.date.getDate(); // 同じ日なら同じものとして扱う
+        if (!acc[keyString]) {
+          acc[keyString] = {
+            ...p,
+            difference: 0,
+          };
+        }
+        acc[keyString].difference += Number(p.difference);
+        // 後払いの残高を正しいものにする
+        acc[keyString].balance = Number(p.balance);
+        return acc;
+      }, {} as { [key: string]: PurchaseDataType }),
+    [monthlyPurchases]
+  );
 
   const groupedPayLaterPurchases = useMemo(
     () => Object.values(groupedPurchasesDoc),
