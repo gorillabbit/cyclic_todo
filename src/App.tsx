@@ -12,6 +12,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import { db } from "./firebase";
 import HomePage from "./pages/HomePage";
+import KiyakuPage from "./pages/KiyakuPage";
 
 const App = memo((): JSX.Element => {
   const theme = createTheme({
@@ -62,6 +63,7 @@ const App = memo((): JSX.Element => {
             <Routes>
               <Route path="/Login" Component={LoginPage} />
               <Route path="/" Component={HomePage} />
+              <Route path="/kiyaku" Component={KiyakuPage} />
             </Routes>
           </AccountProvider>
         </ThemeProvider>

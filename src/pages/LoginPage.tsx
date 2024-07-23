@@ -15,7 +15,7 @@ import {
 import { memo, useCallback, useState } from "react";
 import { addDocTab, app, db, updateDocAccount } from "../firebase";
 import { collection, doc, getDoc, setDoc } from "firebase/firestore";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { AccountType, defaultAccountInput } from "../types";
 import { AccountToLink } from "../utilities/tabUtilities";
 
@@ -64,7 +64,6 @@ const PlainLoginPage = memo(
           <ToggleButton value="login">ログイン</ToggleButton>
           <ToggleButton value="signIn">新規登録</ToggleButton>
         </ToggleButtonGroup>
-
         <TextField
           label="メールアドレス"
           name="email"
@@ -93,6 +92,15 @@ const PlainLoginPage = memo(
           <Button onClick={handleSignIn}>新規登録</Button>
         )}
         <Button onClick={handleGoogleLogin}>Googleでログイン</Button>
+        <a
+          href="https://kiyac.app/privacypolicy/acPsTW24zNWV7gdS6Ez4"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          プライバシーポリシー
+        </a>
+        <Link to="/kiyaku">利用規約</Link>
+        このサービスを利用することで、プライバシーポリシー・利用規約に同意したものとみなされます。
       </Box>
     );
   }
