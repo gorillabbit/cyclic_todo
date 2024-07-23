@@ -136,7 +136,6 @@ const Purchases = memo((): JSX.Element => {
       ),
     [month, purchaseList]
   );
-  console.log(monthlyPurchases);
 
   // 後払いを合計する(収入に後払いはないので考慮しない)
   const groupedPurchasesDoc = useMemo(

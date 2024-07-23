@@ -7,6 +7,7 @@ import {
 import { PurchaseDataType } from "../../../types/purchaseTypes";
 import StackedBarChart from "./StackedBarChart";
 import BalanceChart from "./BalanceChart";
+import MonthlyStackedBarChart from "../MonthlyBarChats";
 
 type PlainDoughnutContainerProps = {
   currentMonthNetSpentList: PurchaseDataType[];
@@ -47,6 +48,7 @@ const PlainDoughnutContainer = memo(
       />
 
       <BalanceChart />
+      <MonthlyStackedBarChart />
     </Box>
   )
 );
