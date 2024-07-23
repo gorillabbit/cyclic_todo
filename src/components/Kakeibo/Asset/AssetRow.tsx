@@ -32,7 +32,7 @@ import {
   useTab,
 } from "../../../hooks/useData";
 import TableCellWrapper from "../TableCellWrapper";
-import { getNextMonthFirstDay } from "../../../utilities/dateUtilities";
+import { getFutureMonthFirstDay } from "../../../utilities/dateUtilities";
 import MethodList from "./MethodList";
 import { PurchaseDataType } from "../../../types/purchaseTypes";
 
@@ -204,7 +204,7 @@ const AssetRow = memo(({ asset }: { asset: AssetListType }) => {
   const lastBalance = getLastBalance(assetId, new Date(), updatePurchases);
   const monthEndBalance = getLastBalance(
     assetId,
-    getNextMonthFirstDay(),
+    getFutureMonthFirstDay(),
     updatePurchases
   );
   const isSmall = useIsSmall();

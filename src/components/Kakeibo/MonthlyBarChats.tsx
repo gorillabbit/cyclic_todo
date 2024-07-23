@@ -13,7 +13,7 @@ import {
 } from "recharts";
 import { PurchaseDataType } from "../../types/purchaseTypes";
 import { usePurchase } from "../../hooks/useData";
-import { getNextMonthFirstDay } from "../../utilities/dateUtilities";
+import { getFutureMonthFirstDay } from "../../utilities/dateUtilities";
 
 const generateColor = (index: number) => {
   const r = (index * 300) % 255;
@@ -26,7 +26,7 @@ const MonthlyStackedBarChart = () => {
   const { purchaseList } = usePurchase();
   const pastPurchase = purchaseList.filter(
     (p) =>
-      p.date < getNextMonthFirstDay() &&
+      p.date < getFutureMonthFirstDay(2) &&
       p.date >= new Date("2024-04-01") &&
       p.category !== "送受金" &&
       !p.childPurchaseId

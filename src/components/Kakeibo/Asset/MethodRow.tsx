@@ -20,7 +20,7 @@ import {
 import { useMethod, usePurchase } from "../../../hooks/useData";
 import TableCellWrapper from "../TableCellWrapper";
 import {
-  getNextMonthFirstDay,
+  getFutureMonthFirstDay,
   getThisMonthFirstDay,
 } from "../../../utilities/dateUtilities";
 
@@ -149,7 +149,7 @@ const MethodRow = ({ method }: { method: MethodListType }) => {
   const { purchaseList } = usePurchase();
   const methodPurchase = purchaseList.filter((p) => p.method.id === method.id);
   const thisMonthPurchase = methodPurchase.filter(
-    (p) => getNextMonthFirstDay() > p.date && p.date >= getThisMonthFirstDay()
+    (p) => getFutureMonthFirstDay() > p.date && p.date >= getThisMonthFirstDay()
   );
   const thisMonthSpent = sumSpentAndIncome(
     thisMonthPurchase.filter((p) => p.difference < 0)

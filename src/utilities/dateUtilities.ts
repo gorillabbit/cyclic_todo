@@ -102,8 +102,8 @@ export const getPayLaterDate = (baseDate: Date, dateNum: number) => {
 };
 
 // 次の月の1日を取得
-export const getNextMonthFirstDay = () => {
-  return startOfMonth(addMonths(new Date(), 1));
+export const getFutureMonthFirstDay = (addMonth = 1) => {
+  return startOfMonth(addMonths(new Date(), addMonth));
 };
 
 export const getThisMonthFirstDay = () => {

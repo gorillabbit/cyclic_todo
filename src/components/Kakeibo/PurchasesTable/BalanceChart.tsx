@@ -10,7 +10,7 @@ import {
   Brush,
 } from "recharts";
 import { format } from "date-fns";
-import { getNextMonthFirstDay } from "../../../utilities/dateUtilities";
+import { getFutureMonthFirstDay } from "../../../utilities/dateUtilities";
 
 // インデックスに基づいた色を生成する関数
 const getColorByIndex = (index: number) => {
@@ -23,7 +23,7 @@ const getColorByIndex = (index: number) => {
 const BalanceChart = () => {
   const { purchaseList } = usePurchase();
   const lastPurchase = purchaseList.filter(
-    (p) => p.date < getNextMonthFirstDay() && p.date >= new Date("2024-04-01")
+    (p) => p.date < getFutureMonthFirstDay() && p.date >= new Date("2024-04-01")
   );
   const { assetList } = useAsset();
   // 全ての日付を取得し、ユニークかつソートする
