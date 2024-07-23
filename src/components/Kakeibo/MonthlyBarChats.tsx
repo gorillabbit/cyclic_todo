@@ -53,6 +53,7 @@ const MonthlyStackedBarChart = () => {
     () => processData(pastPurchase),
     [pastPurchase]
   );
+  // TODO すごいアドホックなのでどうにかする
   const purchaseCategories = pastPurchase.filter((p) => p.category !== "給与");
   const categories = [...new Set(purchaseCategories.map((p) => p.category))];
   return (
