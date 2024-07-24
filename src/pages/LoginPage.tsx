@@ -1,6 +1,8 @@
 import {
   Box,
   Button,
+  Checkbox,
+  FormControlLabel,
   TextField,
   ToggleButton,
   ToggleButtonGroup,
@@ -34,6 +36,8 @@ type PlainLoginPageProps = {
   toggleButton: string;
   handleToggleButton: (value: string) => void;
   error: string;
+  agreeWithTerms: boolean;
+  setAgreeWithTerms: (value: boolean) => void;
 };
 
 const PlainLoginPage = memo(
@@ -46,6 +50,8 @@ const PlainLoginPage = memo(
     toggleButton,
     handleToggleButton,
     error,
+    agreeWithTerms,
+    setAgreeWithTerms,
   }: PlainLoginPageProps) => {
     return (
       <Box
@@ -84,6 +90,28 @@ const PlainLoginPage = memo(
             onChange={handleInputChange}
           />
         )}
+        {toggleButton === "signIn" && (
+          <>
+            <a
+              href="https://kiyac.app/privacypolicy/acPsTW24zNWV7gdS6Ez4"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              プライバシーポリシー
+            </a>
+            <Link to="/kiyaku">利用規約</Link>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  value={agreeWithTerms}
+                  onChange={() => setAgreeWithTerms(!agreeWithTerms)}
+                />
+              }
+              label="利用規約に同意する"
+            />
+            このサービスを利用することで、プライバシーポリシー・利用規約に同意したものとみなされます。
+          </>
+        )}
         {error && <Box color="red">{error}</Box>}
         {toggleButton === "login" && (
           <Button onClick={handleLogin}>ログイン</Button>
@@ -92,15 +120,6 @@ const PlainLoginPage = memo(
           <Button onClick={handleSignIn}>新規登録</Button>
         )}
         <Button onClick={handleGoogleLogin}>Googleでログイン</Button>
-        <a
-          href="https://kiyac.app/privacypolicy/acPsTW24zNWV7gdS6Ez4"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          プライバシーポリシー
-        </a>
-        <Link to="/kiyaku">利用規約</Link>
-        このサービスを利用することで、プライバシーポリシー・利用規約に同意したものとみなされます。
       </Box>
     );
   }
@@ -116,6 +135,7 @@ const LoginPage = () => {
   const [error, setError] = useState<string>("");
   const auth = getAuth(app);
   const navigate = useNavigate();
+  const [agreeWithTerms, setAgreeWithTerms] = useState<boolean>(false);
 
   const handleInputChange = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
@@ -175,8 +195,10 @@ const LoginPage = () => {
   const accountRef = collection(db, "Accounts");
   const handleSignIn = useCallback(() => {
     if (!Fields.email || !Fields.password) {
-      alert("メールアドレスとパスワードを入力してください");
-      return;
+      return alert("メールアドレスとパスワードを入力してください");
+    }
+    if (!agreeWithTerms) {
+      return alert("利用規約に同意してください");
     }
     createUserWithEmailAndPassword(auth, Fields.email, Fields.password)
       .then(async (userCredential) => {
@@ -198,6 +220,9 @@ const LoginPage = () => {
   }, [Fields, accountRef, auth, createDefaultTabs, successLogin]);
 
   const handleGoogleLogin = useCallback(() => {
+    if (!agreeWithTerms && toggleButton === "signIn") {
+      return alert("利用規約に同意してください");
+    }
     const provider = new GoogleAuthProvider();
     signInWithPopup(auth, provider)
       .then(async (result) => {
@@ -231,6 +256,8 @@ const LoginPage = () => {
     toggleButton,
     handleToggleButton,
     error,
+    agreeWithTerms,
+    setAgreeWithTerms,
   };
   return <PlainLoginPage {...plainProps} />;
 };
