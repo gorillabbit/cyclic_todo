@@ -11,9 +11,9 @@ import {
   ResponsiveContainer,
   LabelList,
 } from "recharts";
-import { PurchaseDataType } from "../../types/purchaseTypes";
-import { usePurchase } from "../../hooks/useData";
-import { getFutureMonthFirstDay } from "../../utilities/dateUtilities";
+import { PurchaseDataType } from "../../../types/purchaseTypes";
+import { usePurchase } from "../../../hooks/useData";
+import { getFutureMonthFirstDay } from "../../../utilities/dateUtilities";
 
 const generateColor = (index: number) => {
   const r = (index * 300) % 255;
@@ -66,7 +66,6 @@ const MonthlyStackedBarChart = () => {
     () => processData(pastPurchase),
     [pastPurchase]
   );
-  console.log(transformedSpent);
   // TODO すごいアドホックなのでどうにかする
   const purchaseCategories = pastPurchase.filter((p) => p.category !== "給与");
   const categories = [...new Set(purchaseCategories.map((p) => p.category))];

@@ -23,7 +23,8 @@ const getColorByIndex = (index: number) => {
 const BalanceChart = () => {
   const { purchaseList } = usePurchase();
   const lastPurchase = purchaseList.filter(
-    (p) => p.date < getFutureMonthFirstDay() && p.date >= new Date("2024-04-01")
+    (p) =>
+      p.date < getFutureMonthFirstDay(2) && p.date >= new Date("2024-04-01")
   );
   const { assetList } = useAsset();
   // 全ての日付を取得し、ユニークかつソートする
