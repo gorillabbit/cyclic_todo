@@ -43,17 +43,14 @@ export const isLaterPayment = (purchase: PurchaseDataType): boolean =>
  * @param value
  * @returns
  */
-export const isValidatedNum = (value: string): boolean => {
+export const validatedNum = (value: string): string => {
   const numValue = Number(value);
   if (numValue < 0) {
-    alert("0未満は入力できません");
-    return false;
+    return "0未満は入力できません";
   } else if (Number.isNaN(numValue)) {
-    alert("不適切な入力です");
-    return false;
-  } else {
-    return true;
+    return "不適切な入力です";
   }
+  return "";
 };
 
 /**

@@ -13,7 +13,7 @@ import { MethodListType } from "../../../types";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { deleteDocMethod, updateDocMethod } from "../../../firebase";
 import {
-  isValidatedNum,
+  validatedNum,
   numericProps,
   sumSpentAndIncome,
 } from "../../../utilities/purchaseUtilities";
@@ -108,7 +108,7 @@ const MethodRow = ({ method }: { method: MethodListType }) => {
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       const { name, value } = e.target;
       if (name === "timingDate") {
-        if (isValidatedNum(value) && Number(value) < 32)
+        if (validatedNum(value) && Number(value) < 32)
           return setMethodInput((prev) => ({ ...prev, [name]: Number(value) }));
         return;
       }
