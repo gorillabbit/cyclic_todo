@@ -1,6 +1,6 @@
 import { z, ZodEffects, ZodError, ZodObject, } from "zod";
 import { ErrorType, InputPurchaseScheduleType, InputTransferType, MethodType } from "../../types";
-import { InputFieldPurchaseType } from "../../types/purchaseTypes";
+import { InputFieldPurchaseType, PurchaseDataType } from "../../types/purchaseTypes";
 
 const title = z.string().min(1, { message: "品目名を入力してください" });
 const price = z.union([z.string(), z.number()]).refine((val) => Number(val) >= 0, { message: '金額は正の数である必要があります' })
@@ -14,12 +14,24 @@ const method = z.object({
     timing: z.enum(["即時", "翌月"]),
     timingDate: dateNumber,
 })
+const difference = z.union([z.string(), z.number()]).refine((val) => Number(val), { message: '金額は数である必要があります' })
 
 const purchaseSchema = z.object({
     title,
     price,
     date,
     method,
+});
+
+const editMethod = z.object({
+    label: z.string().min(1, { message: "支払い方法を選択してください" }),
+})
+
+const editPurchaseSchema = z.object({
+    title,
+    difference,
+    date,
+    method: editMethod,
 });
 
 const purchaseScheduleSchema = z.object({
@@ -67,6 +79,10 @@ const validateField = <T, F extends ZodObject<any> | ZodEffects<any>>(schema: F,
 
 export const validatePurchase = (input: InputFieldPurchaseType) => {
     return validateField<typeof input, typeof purchaseSchema>(purchaseSchema, input);
+}
+
+export const validateEditPurchase = (input: PurchaseDataType) => {
+    return validateField<typeof input, typeof editPurchaseSchema>(editPurchaseSchema, input);
 }
 
 export const validatePurchaseSchedule = (input: InputPurchaseScheduleType) => {
