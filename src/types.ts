@@ -84,7 +84,7 @@ export interface AccountType extends AccountInputType {
 }
 
 export interface AccountLinkType
-  extends Pick<AccountType, "id" | "email" | "name" | "icon"> {}
+  extends Pick<AccountType, "id" | "email" | "name" | "icon"> { }
 
 export const defaultAccountInput: AccountInputType = {
   email: "",
@@ -198,3 +198,5 @@ export interface InputTabType {
 export interface TabType extends InputTabType {
   id: string;
 }
+
+export type ErrorType = Record<string, string | undefined> 
