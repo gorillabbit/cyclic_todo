@@ -240,26 +240,14 @@ const EditPurchaseRow = ({
   const [errors, setErrors] = useState<ErrorType>({});
   const hasError = getHasError(errors);
 
-  const validateAndSetErrors = useCallback((input: PurchaseDataType) => {
-    const errors = validateEditPurchase(input);
-    setErrors(errors);
-    return getHasError(errors);
-  }, []);
-
-  const setNewPurchaseWithValidation = (
-    name: string,
-    value: string | Date | boolean | MethodListType | null
-  ) => {
-    setEditFormData((prev) => {
-      const nextPurchase = { ...prev, [name]: value };
-      validateAndSetErrors(nextPurchase);
-      return nextPurchase;
-    });
-  };
-
   const handleEditFormChange = useCallback(
     (name: string, value: string | Date | boolean | MethodListType | null) => {
-      setNewPurchaseWithValidation(name, value);
+      setEditFormData((prev) => {
+        const nextPurchase = { ...prev, [name]: value };
+        const errors = validateEditPurchase(nextPurchase);
+        setErrors(errors);
+        return nextPurchase;
+      });
     },
     []
   );

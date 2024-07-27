@@ -1,6 +1,6 @@
 import { TextField, IconButton, TableRow, TableCell } from "@mui/material";
 import PaymentsIcon from "@mui/icons-material/Payments";
-import { memo, useCallback } from "react";
+import { memo, useCallback, useState } from "react";
 import DoneIcon from "@mui/icons-material/Done";
 import { db, dbNames } from "../../../../firebase";
 import {
@@ -9,19 +9,21 @@ import {
   updatePurchaseAndUpdateLater,
 } from "../../../../utilities/purchaseUtilities";
 import TableCellWrapper from "../../TableCellWrapper";
-import { PurchaseDataType } from "../../../../types/purchaseTypes";
+import {
+  PurchaseDataType,
+  PurchaseRawDataType,
+} from "../../../../types/purchaseTypes";
 import { doc, getDoc } from "firebase/firestore";
 import { usePurchase } from "../../../../hooks/useData";
+import { ErrorType } from "../../../../types";
+import { getHasError, validateEditPurchase } from "../../KakeiboSchemas";
 
 type UnderHalfRowProps = {
-  handleEditFormChange: (event: {
-    target: {
-      name: string;
-      value: unknown;
-    };
-  }) => void;
+  handleEditFormChange: (name: string, value: string | number) => void;
   editFormData: PurchaseDataType;
   handleSaveClick: () => void;
+  hasError: boolean;
+  errors: ErrorType;
 };
 
 const UnderHalfRow = memo(
@@ -29,15 +31,18 @@ const UnderHalfRow = memo(
     editFormData,
     handleSaveClick,
     handleEditFormChange,
+    errors,
+    hasError,
   }: UnderHalfRowProps) => (
     <>
       <TableCellWrapper>
         <TextField
-          name="price"
           value={editFormData.difference}
-          onChange={handleEditFormChange}
+          onChange={(e) => handleEditFormChange("difference", e.target.value)}
           size="small"
           inputProps={numericProps}
+          error={!!errors.difference}
+          helperText={errors.difference}
         />
       </TableCellWrapper>
       <TableCellWrapper>
@@ -47,7 +52,11 @@ const UnderHalfRow = memo(
       </TableCellWrapper>
       <TableCellWrapper label={editFormData.description} />
       <TableCell padding="none">
-        <IconButton onClick={handleSaveClick} color="success">
+        <IconButton
+          onClick={handleSaveClick}
+          color="success"
+          disabled={hasError}
+        >
           <DoneIcon />
         </IconButton>
       </TableCell>
@@ -65,6 +74,8 @@ const PlainEditPricePurchaseRow = memo(
     handleEditFormChange,
     isSmall,
     handleSaveClick,
+    errors,
+    hasError,
   }: PlainEditPricePurchaseRowProps): JSX.Element => (
     <>
       <TableRow>
@@ -81,6 +92,8 @@ const PlainEditPricePurchaseRow = memo(
             editFormData={editFormData}
             handleSaveClick={handleSaveClick}
             handleEditFormChange={handleEditFormChange}
+            errors={errors}
+            hasError={hasError}
           />
         )}
       </TableRow>
@@ -91,6 +104,8 @@ const PlainEditPricePurchaseRow = memo(
             editFormData={editFormData}
             handleSaveClick={handleSaveClick}
             handleEditFormChange={handleEditFormChange}
+            errors={errors}
+            hasError={hasError}
           />
         </TableRow>
       )}
@@ -130,13 +145,13 @@ const EditPricePurchaseRow = ({
         certainPurchase;
       const childPurchase = (
         await getDoc(doc(db, dbNames.purchase, editFormData.childPurchaseId))
-      ).data() as PurchaseDataType;
+      ).data() as PurchaseRawDataType;
 
       const update2 = await updatePurchaseAndUpdateLater(
         editFormData.childPurchaseId,
         {
           ...childPurchaseWithoutId,
-          date: childPurchase.date,
+          date: childPurchase.date.toDate(),
           childPurchaseId: "",
           id: "",
         },
@@ -158,19 +173,32 @@ const EditPricePurchaseRow = ({
     updatePurchases,
   ]);
 
-  const handleEditFormChange = useCallback(
-    (event: { target: { name: string; value: unknown } }) => {
-      const { name, value } = event.target;
-      setEditFormData((prev) => ({ ...prev, [name]: value }));
-    },
-    [setEditFormData]
-  );
+  const [errors, setErrors] = useState<ErrorType>({});
+  const hasError = getHasError(errors);
+
+  const validateAndSetErrors = useCallback((input: PurchaseDataType) => {
+    const errors = validateEditPurchase(input);
+    setErrors(errors);
+    return getHasError(errors);
+  }, []);
+
+  const handleEditFormChange = (name: string, value: string | number) => {
+    setEditFormData((prev) => {
+      const nextPurchase = { ...prev, [name]: value };
+      validateAndSetErrors(nextPurchase);
+      return nextPurchase;
+    });
+  };
+
+  console.log(errors);
 
   const plainProps = {
     editFormData,
     handleEditFormChange,
     handleSaveClick,
     isSmall,
+    errors,
+    hasError,
   };
   return <PlainEditPricePurchaseRow {...plainProps} />;
 };
