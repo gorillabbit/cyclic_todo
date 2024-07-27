@@ -1,5 +1,5 @@
 import { z, ZodEffects, ZodError, ZodObject, } from "zod";
-import { ErrorType, InputPurchaseScheduleType, InputTransferType } from "../../types";
+import { ErrorType, InputPurchaseScheduleType, InputTransferType, MethodType } from "../../types";
 import { InputFieldPurchaseType } from "../../types/purchaseTypes";
 
 const title = z.string().min(1, { message: "品目名を入力してください" });
@@ -7,29 +7,30 @@ const price = z.union([z.string(), z.number()]).refine((val) => Number(val) >= 0
 const date = z.date().refine((val) => !isNaN(val.getTime()), {
     message: "有効な日付を入力してください",
 })
+const dateNumber = z.union([z.string(), z.number()]).refine((val) => Number(val) > 0 && 32 > Number(val), { message: '1~31の数である必要があります' })
 const method = z.object({
     label: z.string().min(1, { message: "支払い方法を選択してください" }),
     assetId: z.string(),
     timing: z.enum(["即時", "翌月"]),
+    timingDate: dateNumber,
 })
-const scheduleDate = z.union([z.string(), z.number()]).refine((val) => Number(val) > 0 && 32 > Number(val), { message: '1~31の数である必要があります' })
 
-export const purchaseSchema = z.object({
+const purchaseSchema = z.object({
     title,
     price,
     date,
     method,
 });
 
-export const purchaseScheduleSchema = z.object({
+const purchaseScheduleSchema = z.object({
     title,
     price,
-    date: scheduleDate,
+    date: dateNumber,
     method,
     endDate: date,
 });
 
-export const transferSchema = z.object({
+const transferSchema = z.object({
     price,
     date,
     from: method,
@@ -74,6 +75,10 @@ export const validatePurchaseSchedule = (input: InputPurchaseScheduleType) => {
 
 export const validateTransfer = (input: InputTransferType) => {
     return validateField<typeof input, typeof transferSchema>(transferSchema, input);
+}
+
+export const validateMethod = (input: MethodType) => {
+    return validateField<typeof input, typeof method>(method, input);
 }
 
 /**

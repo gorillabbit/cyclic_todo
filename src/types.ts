@@ -115,7 +115,7 @@ export const defaultMethod: MethodType = {
   label: "",
   assetId: "",
   timing: "即時",
-  timingDate: 0,
+  timingDate: 1,
   tabId: "",
 };
 
