@@ -23,8 +23,9 @@ import {
   updateAndAddPurchases,
   weekDaysString,
 } from "../../../../utilities/purchaseUtilities";
-import { useMethod, usePurchase } from "../../../../hooks/useData";
+import { usePurchase } from "../../../../hooks/useData";
 import TableCellWrapper from "../../TableCellWrapper";
+import MethodSelector from "../../ScreenParts/MethodSelector";
 
 type PlainEditPurchaseScheduleRowProps = {
   editFormData: InputPurchaseScheduleRowType;
@@ -37,8 +38,10 @@ type PlainEditPurchaseScheduleRowProps = {
   }) => void;
   categorySet: string[];
   handleAutocompleteChange: (name: string, value: unknown) => void;
-  methodList: MethodListType[];
-  handleMethodChange: (value: string | MethodListType | null) => void;
+  handleMethodChange: (
+    name: string,
+    value: string | MethodListType | null
+  ) => void;
   isSmall: boolean;
   handleSaveClick: () => void;
 };
@@ -50,7 +53,6 @@ const PlainEditPurchaseScheduleRow = memo(
     handleEditFormChange,
     categorySet,
     handleAutocompleteChange,
-    methodList,
     handleMethodChange,
     isSmall,
     handleSaveClick,
@@ -138,15 +140,11 @@ const PlainEditPurchaseScheduleRow = memo(
               />
             </TableCellWrapper>
             <TableCellWrapper>
-              <Autocomplete
-                value={editFormData.method}
-                sx={{ minWidth: 150 }}
-                options={methodList}
-                freeSolo
-                onChange={(_e, v) => handleMethodChange(v)}
-                renderInput={(params) => (
-                  <TextField {...params} label="支払い方法" size="small" />
-                )}
+              <MethodSelector
+                newMethod={editFormData.method}
+                handleInput={handleMethodChange}
+                errors={undefined}
+                isSmall
               />
             </TableCellWrapper>
             <TableCellWrapper>
@@ -189,15 +187,11 @@ const PlainEditPurchaseScheduleRow = memo(
               />
             </TableCellWrapper>
             <TableCellWrapper>
-              <Autocomplete
-                value={editFormData.method}
-                sx={{ minWidth: 150 }}
-                options={methodList}
-                freeSolo
-                onChange={(_e, v) => handleMethodChange(v)}
-                renderInput={(params) => (
-                  <TextField {...params} label="支払い方法" size="small" />
-                )}
+              <MethodSelector
+                newMethod={editFormData.method}
+                handleInput={handleMethodChange}
+                errors={undefined}
+                isSmall
               />
             </TableCellWrapper>
             <TableCellWrapper>
@@ -243,7 +237,6 @@ const EditPurchaseScheduleRow = ({
   >;
   isSmall: boolean;
 }) => {
-  const { methodList } = useMethod();
   const { categorySet, purchaseList, setPurchaseList } = usePurchase();
 
   // 編集内容を保存する関数
@@ -291,11 +284,11 @@ const EditPurchaseScheduleRow = ({
   );
 
   const handleMethodChange = useCallback(
-    (value: string | MethodListType | null) => {
+    (name: string, value: string | MethodListType | null) => {
       if (value && typeof value !== "string") {
         setEditFormData((prev) => ({
           ...prev,
-          method: value,
+          [name]: value,
         }));
       }
     },
@@ -312,7 +305,6 @@ const EditPurchaseScheduleRow = ({
   const plainProps = {
     editFormData,
     categorySet,
-    methodList,
     handleEditFormChange,
     handleDateFormChange,
     handleMethodChange,

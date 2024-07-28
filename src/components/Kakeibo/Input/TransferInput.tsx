@@ -1,4 +1,4 @@
-import { Autocomplete, Box, Button, FormGroup, TextField } from "@mui/material";
+import { Box, Button, FormGroup, TextField } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
 import { memo, useCallback, useMemo, useState } from "react";
 import { addDocTransferTemplate } from "../../../firebase";
@@ -16,9 +16,10 @@ import {
 } from "../../../utilities/purchaseUtilities";
 import { getPayLaterDate } from "../../../utilities/dateUtilities";
 import TransferTemplateButtonsContainer from "./TransferTemplateButtonContainer";
-import { useMethod, usePurchase, useTab } from "../../../hooks/useData";
+import { usePurchase, useTab } from "../../../hooks/useData";
 import { PurchaseDataType } from "../../../types/purchaseTypes";
 import { getHasError, validateTransfer } from "../KakeiboSchemas";
+import MethodSelector from "../ScreenParts/MethodSelector";
 
 type PlainTransferInputProps = {
   handleNewTransferInput: (
@@ -29,7 +30,6 @@ type PlainTransferInputProps = {
   addTransfer: () => void;
   addTemplate: () => void;
   setNewTransfer: React.Dispatch<React.SetStateAction<InputTransferType>>;
-  methodList: MethodListType[];
   errors: ErrorType;
   hasError: boolean;
 };
@@ -41,7 +41,6 @@ const PlainTransferInput = memo(
     addTransfer,
     addTemplate,
     setNewTransfer,
-    methodList,
     errors,
     hasError,
   }: PlainTransferInputProps): JSX.Element => (
@@ -63,39 +62,17 @@ const PlainTransferInput = memo(
             sx={{ maxWidth: 150 }}
             onChange={(value) => handleNewTransferInput("date", value)}
           />
-          <Autocomplete
-            value={newTransfer.from?.label ? newTransfer.from : null}
-            sx={{ width: 150 }}
-            options={methodList}
-            onChange={(_e, v) => handleNewTransferInput("from", v)}
-            isOptionEqualToValue={(option, value) =>
-              option.label === value?.label
-            }
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                error={!!errors.from}
-                helperText={errors.from}
-                label="送金元"
-              />
-            )}
+          <MethodSelector
+            newMethod={newTransfer.from}
+            handleInput={handleNewTransferInput}
+            errors={errors.from}
+            inputName="from"
           />
-          <Autocomplete
-            value={newTransfer.to?.label ? newTransfer.to : null}
-            sx={{ width: 150 }}
-            options={methodList}
-            onChange={(_e, v) => handleNewTransferInput("to", v)}
-            isOptionEqualToValue={(option, value) =>
-              option.label === value?.label
-            }
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                error={!!errors.to}
-                helperText={errors.to}
-                label="送金先"
-              />
-            )}
+          <MethodSelector
+            newMethod={newTransfer.to}
+            handleInput={handleNewTransferInput}
+            errors={errors.to}
+            inputName="to"
           />
           <TextField
             label="備考"
@@ -218,14 +195,12 @@ const TransferInput = () => {
     addDocTransferTemplate({ ...newTransfer, userId: currentUser.uid });
   }, [currentUser, newTransfer]);
 
-  const { methodList } = useMethod();
   const plainProps = {
     handleNewTransferInput,
     newTransfer,
     addTransfer,
     addTemplate,
     setNewTransfer,
-    methodList,
     errors,
     hasError,
   };

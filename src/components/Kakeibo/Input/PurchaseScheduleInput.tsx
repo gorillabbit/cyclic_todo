@@ -26,8 +26,9 @@ import {
   updateAndAddPurchases,
   weekDaysString,
 } from "../../../utilities/purchaseUtilities";
-import { usePurchase, useMethod, useTab } from "../../../hooks/useData";
+import { usePurchase, useTab } from "../../../hooks/useData";
 import { getHasError, validatePurchaseSchedule } from "../KakeiboSchemas";
+import MethodSelector from "../ScreenParts/MethodSelector";
 
 const defaultNewPurchase: InputPurchaseScheduleType = {
   userId: "",
@@ -48,7 +49,6 @@ const defaultNewPurchase: InputPurchaseScheduleType = {
 const PurchaseScheduleInput = () => {
   const { currentUser } = getAuth();
   const { categorySet } = usePurchase();
-  const { methodList } = useMethod();
   const { tabId } = useTab();
   const { purchaseList, setPurchaseList } = usePurchase();
 
@@ -184,21 +184,10 @@ const PurchaseScheduleInput = () => {
               <TextField {...params} label="カテゴリー" />
             )}
           />
-          <Autocomplete
-            value={
-              newPurchaseSchedule.method?.id ? newPurchaseSchedule.method : null
-            }
-            sx={{ minWidth: 150 }}
-            options={methodList}
-            onChange={(_e, v) => handleNewPurchaseScheduleInput("method", v)}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label="支払い方法"
-                error={!!errors.method}
-                helperText={errors.method}
-              />
-            )}
+          <MethodSelector
+            newMethod={newPurchaseSchedule.method}
+            handleInput={handleNewPurchaseScheduleInput}
+            errors={errors.method}
           />
           <StyledCheckbox
             value={newPurchaseSchedule.income}

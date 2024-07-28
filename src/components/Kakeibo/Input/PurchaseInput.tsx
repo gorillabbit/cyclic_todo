@@ -12,7 +12,7 @@ import {
 } from "../../../utilities/purchaseUtilities";
 import TemplateButtons from "./TemplateButtonsContainer";
 import { getPayLaterDate } from "../../../utilities/dateUtilities";
-import { useTab, usePurchase, useMethod } from "../../../hooks/useData";
+import { useTab, usePurchase } from "../../../hooks/useData";
 import {
   defaultInputFieldPurchase,
   InputFieldPurchaseType,
@@ -20,6 +20,7 @@ import {
 } from "../../../types/purchaseTypes";
 import { set } from "date-fns";
 import { getHasError, validatePurchase } from "../KakeiboSchemas";
+import MethodSelector from "../ScreenParts/MethodSelector";
 
 type PlainPurchaseInputProps = {
   handleNewPurchaseInput: (
@@ -31,7 +32,6 @@ type PlainPurchaseInputProps = {
   addTemplate: () => void;
   setNewPurchase: React.Dispatch<React.SetStateAction<InputFieldPurchaseType>>;
   categorySet: string[];
-  methodList: MethodListType[];
   errors: Record<string, string | undefined>;
   hasError: boolean;
 };
@@ -44,7 +44,6 @@ const PlainPurchaseInput = memo(
     addTemplate,
     setNewPurchase,
     categorySet,
-    methodList,
     errors,
     hasError,
   }: PlainPurchaseInputProps): JSX.Element => (
@@ -83,22 +82,10 @@ const PlainPurchaseInput = memo(
               <TextField {...params} label="カテゴリー" />
             )}
           />
-          <Autocomplete
-            value={newPurchase.method?.label ? newPurchase.method : null}
-            sx={{ minWidth: 150 }}
-            options={methodList}
-            onChange={(_e, v) => handleNewPurchaseInput("method", v)}
-            isOptionEqualToValue={(option, value) =>
-              option.label === value?.label
-            }
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                error={!!errors.method}
-                helperText={errors.method}
-                label="支払い方法"
-              />
-            )}
+          <MethodSelector
+            newMethod={newPurchase.method}
+            handleInput={handleNewPurchaseInput}
+            errors={errors.method}
           />
           <StyledCheckbox
             value={newPurchase.income}
@@ -251,7 +238,6 @@ const PurchaseInput = () => {
   }, [currentUser, newPurchase]);
 
   const { categorySet } = usePurchase();
-  const { methodList } = useMethod();
 
   const plainProps = {
     handleNewPurchaseInput,
@@ -260,7 +246,6 @@ const PurchaseInput = () => {
     addTemplate,
     setNewPurchase,
     categorySet,
-    methodList,
     errors,
     hasError,
   };

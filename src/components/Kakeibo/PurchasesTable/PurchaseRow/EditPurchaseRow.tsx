@@ -10,7 +10,7 @@ import { memo, useCallback, useState } from "react";
 import DoneIcon from "@mui/icons-material/Done";
 import { ErrorType, MethodListType } from "../../../../types";
 import { getPayLaterDate } from "../../../../utilities/dateUtilities";
-import { useMethod, usePurchase } from "../../../../hooks/useData";
+import { usePurchase } from "../../../../hooks/useData";
 import TableCellWrapper from "../../TableCellWrapper";
 import { PurchaseDataType } from "../../../../types/purchaseTypes";
 import {
@@ -20,6 +20,7 @@ import {
   updatePurchaseAndUpdateLater,
 } from "../../../../utilities/purchaseUtilities";
 import { getHasError, validateEditPurchase } from "../../KakeiboSchemas";
+import MethodSelector from "../../ScreenParts/MethodSelector";
 
 type UnderHalfRowProps = {
   editFormData: PurchaseDataType;
@@ -77,7 +78,6 @@ const UnderHalfRow = memo(
 type PlainEditPurchaseRowProps = UnderHalfRowProps & {
   isSmall: boolean;
   categorySet: string[];
-  methodList: MethodListType[];
 };
 
 const PlainEditPurchaseRow = memo(
@@ -85,7 +85,6 @@ const PlainEditPurchaseRow = memo(
     editFormData,
     handleEditFormChange,
     categorySet,
-    methodList,
     isSmall,
     handleSaveClick,
     errors,
@@ -124,21 +123,11 @@ const PlainEditPurchaseRow = memo(
           />
         </TableCellWrapper>
         <TableCellWrapper>
-          <Autocomplete
-            value={editFormData.method}
-            sx={{ minWidth: 150 }}
-            options={methodList}
-            freeSolo
-            onChange={(_e, v) => handleEditFormChange("method", v)}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label="支払い方法"
-                size="small"
-                error={!!errors.method}
-                helperText={errors.method}
-              />
-            )}
+          <MethodSelector
+            newMethod={editFormData.method}
+            handleInput={handleEditFormChange}
+            errors={errors.method}
+            isSmall
           />
         </TableCellWrapper>
         {!isSmall && (
@@ -180,7 +169,6 @@ const EditPurchaseRow = ({
   isSmall: boolean;
   updatePurchases: PurchaseDataType[];
 }) => {
-  const { methodList } = useMethod();
   const { categorySet, setPurchaseList } = usePurchase();
 
   // 編集内容を保存する関数
@@ -255,7 +243,6 @@ const EditPurchaseRow = ({
   const plainProps = {
     editFormData,
     categorySet,
-    methodList,
     handleEditFormChange,
     handleSaveClick,
     isSmall,
