@@ -9,7 +9,7 @@ import {
   Legend,
 } from "chart.js";
 import { Box } from "@mui/material";
-import { PurchaseDataType } from "../../../types/purchaseTypes";
+import { PurchaseDataType } from "../../../../types/purchaseTypes";
 
 ChartJS.register(
   CategoryScale,

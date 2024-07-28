@@ -11,9 +11,9 @@ import {
   ResponsiveContainer,
   LabelList,
 } from "recharts";
-import { PurchaseDataType } from "../../../types/purchaseTypes";
-import { usePurchase } from "../../../hooks/useData";
-import { getFutureMonthFirstDay } from "../../../utilities/dateUtilities";
+import { usePurchase } from "../../../../hooks/useData";
+import { PurchaseDataType } from "../../../../types/purchaseTypes";
+import { getFutureMonthFirstDay } from "../../../../utilities/dateUtilities";
 
 const generateColor = (index: number) => {
   const r = (index * 300) % 255;

@@ -1,13 +1,13 @@
 import { Box } from "@mui/material";
 import { memo, useMemo } from "react";
+import { PurchaseDataType } from "../../../../types/purchaseTypes";
 import {
   isLaterPayment,
   sumSpentAndIncome,
-} from "../../../utilities/purchaseUtilities";
-import { PurchaseDataType } from "../../../types/purchaseTypes";
-import StackedBarChart from "./StackedBarChart";
+} from "../../../../utilities/purchaseUtilities";
 import BalanceChart from "./BalanceChart";
 import MonthlyStackedBarChart from "./MonthlyBarChats";
+import StackedBarChart from "./StackedBarChart";
 
 type PlainDoughnutContainerProps = {
   currentMonthNetSpentList: PurchaseDataType[];
