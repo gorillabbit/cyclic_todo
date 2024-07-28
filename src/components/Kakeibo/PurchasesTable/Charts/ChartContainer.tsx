@@ -89,10 +89,12 @@ const DoughnutContainer = ({
     (spent) => !spent.childPurchaseId
   );
 
-  const currentMonthIncomeList = PayLaterCategoryPurchase.filter(
+  const currentMonthIncomeList = PurchasesWithoutTransfer.filter(
     (p) => p.difference > 0
   );
   const currentMonthIncome = sumSpentAndIncome(currentMonthIncomeList);
+
+  console.log(currentMonthIncomeList);
 
   const plainProps = {
     currentMonthNetSpentList,
