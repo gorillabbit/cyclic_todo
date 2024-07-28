@@ -60,7 +60,7 @@ const UnderHalfRow = memo(
     saveChanges,
     removeAsset,
   }: UnderHalfRowProps) => (
-    <TableCellWrapper align="right" colSpan={2}>
+    <TableCellWrapper align="right" colSpan={2} sx={{ borderBottom: 0 }}>
       <Button
         variant={isNameChanged || isBalanceChanged ? "contained" : "text"}
         color="primary"
@@ -95,6 +95,7 @@ type PlainAssetRowProps = UnderHalfRowProps & {
   isSmall: boolean;
   lastBalance: number;
   monthEndBalance: number;
+  isOpen: boolean;
 };
 
 const PlainAssetRow = memo(
@@ -117,37 +118,50 @@ const PlainAssetRow = memo(
     assetId,
     lastBalance,
     monthEndBalance,
+    isOpen,
   }: PlainAssetRowProps): JSX.Element => (
     <>
       <TableRow>
-        <TableCell padding="none">
-          <IconButton
-            aria-label="expand row"
-            size="small"
-            onClick={() => setOpen(!open)}
-          >
-            {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-          </IconButton>
+        <TableCell padding="none" sx={{ borderBottom: 0 }}>
+          {isOpen && (
+            <IconButton
+              aria-label="expand row"
+              size="small"
+              onClick={() => setOpen(!open)}
+            >
+              {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+            </IconButton>
+          )}
         </TableCell>
-        <TableCellWrapper>
-          <TextField
-            {...tableInputStyle}
-            value={assetNameInput}
-            name="name"
-            onChange={handleAssetInput}
-          />
+        <TableCellWrapper sx={{ borderBottom: 0 }}>
+          {isOpen ? (
+            <TextField
+              {...tableInputStyle}
+              value={assetNameInput}
+              name="name"
+              onChange={handleAssetInput}
+            />
+          ) : (
+            <>{assetNameInput}</>
+          )}
         </TableCellWrapper>
-        <TableCellWrapper>
-          <TextField
-            {...tableInputStyle}
-            value={isBalanceChanged ? balanceInput : lastBalance}
-            name="balance"
-            onChange={handleBalanceInput}
-            inputProps={numericProps}
-          />
+        <TableCellWrapper sx={{ borderBottom: 0 }}>
+          {isOpen ? (
+            <TextField
+              {...tableInputStyle}
+              value={isBalanceChanged ? balanceInput : lastBalance}
+              name="balance"
+              onChange={handleBalanceInput}
+              inputProps={numericProps}
+            />
+          ) : (
+            <>{lastBalance}</>
+          )}
         </TableCellWrapper>
-        <TableCellWrapper>{monthEndBalance}</TableCellWrapper>
-        {!isSmall && (
+        <TableCellWrapper sx={{ borderBottom: 0 }}>
+          {monthEndBalance}
+        </TableCellWrapper>
+        {!isSmall && isOpen && (
           <UnderHalfRow
             isNameChanged={isNameChanged}
             isBalanceChanged={isBalanceChanged}
@@ -156,9 +170,9 @@ const PlainAssetRow = memo(
           />
         )}
       </TableRow>
-      {isSmall && (
+      {isSmall && isOpen && (
         <TableRow>
-          <TableCellWrapper colSpan={2} />
+          <TableCellWrapper colSpan={2} sx={{ borderBottom: 0 }} />
           <UnderHalfRow
             isNameChanged={isNameChanged}
             isBalanceChanged={isBalanceChanged}
@@ -183,145 +197,148 @@ const PlainAssetRow = memo(
   )
 );
 
-const AssetRow = memo(({ asset }: { asset: AssetListType }) => {
-  const assetId = asset.id;
-  const assetName = asset.name;
-  const { purchaseList, setPurchaseList } = usePurchase();
-  const [updatePurchases, setUpdatePurchases] = useState<PurchaseDataType[]>(
-    []
-  );
+const AssetRow = memo(
+  ({ asset, isOpen }: { asset: AssetListType; isOpen: boolean }) => {
+    const assetId = asset.id;
+    const assetName = asset.name;
+    const { purchaseList, setPurchaseList } = usePurchase();
+    const [updatePurchases, setUpdatePurchases] = useState<PurchaseDataType[]>(
+      []
+    );
 
-  useEffect(() => {
-    setUpdatePurchases(purchaseList.filter((p) => p.assetId === assetId));
-  }, [purchaseList, assetId]);
+    useEffect(() => {
+      setUpdatePurchases(purchaseList.filter((p) => p.assetId === assetId));
+    }, [purchaseList, assetId]);
 
-  const [balanceInput, setBalanceInput] = useState<number | undefined>(
-    undefined
-  );
-  const [open, setOpen] = useState(false);
-  const [openDialog, setOpenDialog] = useState<boolean>(false);
-  const [assetNameInput, setAssetNameInput] = useState<string>(assetName);
-  const lastBalance = getLastBalance(assetId, new Date(), updatePurchases);
-  const monthEndBalance = getLastBalance(
-    assetId,
-    getFutureMonthFirstDay(),
-    updatePurchases
-  );
-  const isSmall = useIsSmall();
+    const [balanceInput, setBalanceInput] = useState<number | undefined>(
+      undefined
+    );
+    const [open, setOpen] = useState(false);
+    const [openDialog, setOpenDialog] = useState<boolean>(false);
+    const [assetNameInput, setAssetNameInput] = useState<string>(assetName);
+    const lastBalance = getLastBalance(assetId, new Date(), updatePurchases);
+    const monthEndBalance = getLastBalance(
+      assetId,
+      getFutureMonthFirstDay(),
+      updatePurchases
+    );
+    const isSmall = useIsSmall();
 
-  const handleAssetInput = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      setAssetNameInput(e.target.value);
-    },
-    []
-  );
+    const handleAssetInput = useCallback(
+      (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        setAssetNameInput(e.target.value);
+      },
+      []
+    );
 
-  const isNameChanged = assetName !== assetNameInput;
+    const isNameChanged = assetName !== assetNameInput;
 
-  const handleBalanceInput = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      const numValue = Number(e.target.value);
-      Number.isNaN(numValue)
-        ? alert("不適切な入力です")
-        : setBalanceInput(numValue);
-    },
-    []
-  );
+    const handleBalanceInput = useCallback(
+      (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const numValue = Number(e.target.value);
+        Number.isNaN(numValue)
+          ? alert("不適切な入力です")
+          : setBalanceInput(numValue);
+      },
+      []
+    );
 
-  // TODO どういう時に「変更」が活性化するかきちんと考える
-  const isBalanceChanged = useMemo(
-    () => balanceInput !== undefined && lastBalance !== balanceInput,
-    [balanceInput, lastBalance]
-  );
+    // TODO どういう時に「変更」が活性化するかきちんと考える
+    const isBalanceChanged = useMemo(
+      () => balanceInput !== undefined && lastBalance !== balanceInput,
+      [balanceInput, lastBalance]
+    );
 
-  const { Account } = useAccount();
-  const userId = Account?.id;
-  const { tabId } = useTab();
+    const { Account } = useAccount();
+    const userId = Account?.id;
+    const { tabId } = useTab();
 
-  // 編集内容を保存する関数
-  const saveChanges = useCallback(() => {
-    if (isBalanceChanged && balanceInput && userId) {
-      const updatePurchase = addPurchaseAndUpdateLater(
-        {
-          assetId,
-          balance: balanceInput,
-          date: new Date(),
-          difference: balanceInput - lastBalance,
-          childPurchaseId: "",
-          userId,
-          tabId,
-          title: `${asset.name}残高調整`,
-          method: {
-            id: "",
-            userId,
+    // 編集内容を保存する関数
+    const saveChanges = useCallback(() => {
+      if (isBalanceChanged && balanceInput && userId) {
+        const updatePurchase = addPurchaseAndUpdateLater(
+          {
             assetId,
+            balance: balanceInput,
+            date: new Date(),
+            difference: balanceInput - lastBalance,
+            childPurchaseId: "",
+            userId,
             tabId,
-            timing: "即時",
-            label: "資産追加",
-            timingDate: 0,
+            title: `${asset.name}残高調整`,
+            method: {
+              id: "",
+              userId,
+              assetId,
+              tabId,
+              timing: "即時",
+              label: "資産追加",
+              timingDate: 0,
+            },
+            category: "",
+            description: "",
+            id: "",
           },
-          category: "",
-          description: "",
-          id: "",
-        },
-        updatePurchases
-      );
-      updateAndAddPurchases(updatePurchase.purchases);
-      setPurchaseList(updatePurchase.purchases);
-    }
-    updateDocAsset(assetId, { name: assetNameInput });
-  }, [
-    asset.name,
-    assetId,
-    assetNameInput,
-    balanceInput,
-    isBalanceChanged,
-    lastBalance,
-    setPurchaseList,
-    tabId,
-    updatePurchases,
-    userId,
-  ]);
+          updatePurchases
+        );
+        updateAndAddPurchases(updatePurchase.purchases);
+        setPurchaseList(updatePurchase.purchases);
+      }
+      updateDocAsset(assetId, { name: assetNameInput });
+    }, [
+      asset.name,
+      assetId,
+      assetNameInput,
+      balanceInput,
+      isBalanceChanged,
+      lastBalance,
+      setPurchaseList,
+      tabId,
+      updatePurchases,
+      userId,
+    ]);
 
-  const { methodList } = useMethod();
-  const filteredMethodList = useMemo(
-    () => methodList.filter((method) => method.assetId === assetId),
-    [methodList, assetId]
-  );
+    const { methodList } = useMethod();
+    const filteredMethodList = useMemo(
+      () => methodList.filter((method) => method.assetId === assetId),
+      [methodList, assetId]
+    );
 
-  const removeAsset = useCallback(() => {
-    setOpenDialog(true);
-  }, []);
+    const removeAsset = useCallback(() => {
+      setOpenDialog(true);
+    }, []);
 
-  const deleteAction = useCallback(() => {
-    deleteDocAsset(assetId);
-    if (filteredMethodList.length > 0) {
-      filteredMethodList.forEach((method) => deleteDocMethod(method.id));
-    }
-  }, [assetId, filteredMethodList]);
+    const deleteAction = useCallback(() => {
+      deleteDocAsset(assetId);
+      if (filteredMethodList.length > 0) {
+        filteredMethodList.forEach((method) => deleteDocMethod(method.id));
+      }
+    }, [assetId, filteredMethodList]);
 
-  const plainProps = {
-    open,
-    setOpen,
-    assetNameInput,
-    handleAssetInput,
-    isNameChanged,
-    isBalanceChanged,
-    saveChanges,
-    removeAsset,
-    filteredMethodList,
-    handleBalanceInput,
-    balanceInput,
-    openDialog,
-    setOpenDialog,
-    deleteAction,
-    isSmall,
-    lastBalance,
-    monthEndBalance,
-    assetId,
-  };
+    const plainProps = {
+      open,
+      setOpen,
+      assetNameInput,
+      handleAssetInput,
+      isNameChanged,
+      isBalanceChanged,
+      saveChanges,
+      removeAsset,
+      filteredMethodList,
+      handleBalanceInput,
+      balanceInput,
+      openDialog,
+      setOpenDialog,
+      deleteAction,
+      isSmall,
+      lastBalance,
+      monthEndBalance,
+      assetId,
+      isOpen,
+    };
 
-  return <PlainAssetRow {...plainProps} />;
-});
+    return <PlainAssetRow {...plainProps} />;
+  }
+);
 
 export default AssetRow;

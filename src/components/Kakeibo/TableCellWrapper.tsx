@@ -10,7 +10,7 @@ const TableCellWrapper = (props: {
 }) => {
   return (
     <TableCell
-      sx={{ px: 0.5, ...props.sx }}
+      sx={{ py: 0.5, px: 0.5, ...props.sx }}
       colSpan={props.colSpan}
       align={props.align}
     >
