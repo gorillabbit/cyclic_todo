@@ -1,7 +1,6 @@
 import {
   TableCell,
   TextField,
-  Autocomplete,
   IconButton,
   TableRow,
   InputAdornment,
@@ -26,6 +25,7 @@ import {
 import { usePurchase } from "../../../../hooks/useData";
 import TableCellWrapper from "../../TableCellWrapper";
 import MethodSelector from "../../ScreenParts/MethodSelector";
+import CategorySelector from "../../ScreenParts/CategorySelector";
 
 type PlainEditPurchaseScheduleRowProps = {
   editFormData: InputPurchaseScheduleRowType;
@@ -36,7 +36,6 @@ type PlainEditPurchaseScheduleRowProps = {
       value: unknown;
     };
   }) => void;
-  categorySet: string[];
   handleAutocompleteChange: (name: string, value: unknown) => void;
   handleMethodChange: (
     name: string,
@@ -51,7 +50,6 @@ const PlainEditPurchaseScheduleRow = memo(
     editFormData,
     handleDateFormChange,
     handleEditFormChange,
-    categorySet,
     handleAutocompleteChange,
     handleMethodChange,
     isSmall,
@@ -128,15 +126,10 @@ const PlainEditPurchaseScheduleRow = memo(
         {!isSmall && (
           <>
             <TableCellWrapper>
-              <Autocomplete
-                value={editFormData.category}
-                sx={{ minWidth: 150 }}
-                options={categorySet}
-                freeSolo
-                onChange={(_e, v) => handleAutocompleteChange("category", v)}
-                renderInput={(params) => (
-                  <TextField {...params} label="分類" size="small" />
-                )}
+              <CategorySelector
+                newCategory={editFormData.category}
+                handleInput={handleAutocompleteChange}
+                isSmall
               />
             </TableCellWrapper>
             <TableCellWrapper>
@@ -175,15 +168,10 @@ const PlainEditPurchaseScheduleRow = memo(
         <>
           <TableRow>
             <TableCellWrapper>
-              <Autocomplete
-                value={editFormData.category}
-                sx={{ minWidth: 150 }}
-                options={categorySet}
-                freeSolo
-                onChange={(_e, v) => handleAutocompleteChange("category", v)}
-                renderInput={(params) => (
-                  <TextField {...params} label="分類" size="small" />
-                )}
+              <CategorySelector
+                newCategory={editFormData.category}
+                handleInput={handleAutocompleteChange}
+                isSmall
               />
             </TableCellWrapper>
             <TableCellWrapper>
@@ -237,7 +225,7 @@ const EditPurchaseScheduleRow = ({
   >;
   isSmall: boolean;
 }) => {
-  const { categorySet, purchaseList, setPurchaseList } = usePurchase();
+  const { purchaseList, setPurchaseList } = usePurchase();
 
   // 編集内容を保存する関数
   const handleSaveClick = useCallback(async () => {
@@ -304,7 +292,6 @@ const EditPurchaseScheduleRow = ({
 
   const plainProps = {
     editFormData,
-    categorySet,
     handleEditFormChange,
     handleDateFormChange,
     handleMethodChange,

@@ -1,4 +1,4 @@
-import { Autocomplete, Box, Button, FormGroup, TextField } from "@mui/material";
+import { Box, Button, FormGroup, TextField } from "@mui/material";
 import StyledCheckbox from "../../StyledCheckbox";
 import { DatePicker } from "@mui/x-date-pickers";
 import { memo, useCallback, useMemo, useState } from "react";
@@ -21,6 +21,7 @@ import {
 import { set } from "date-fns";
 import { getHasError, validatePurchase } from "../KakeiboSchemas";
 import MethodSelector from "../ScreenParts/MethodSelector";
+import CategorySelector from "../ScreenParts/CategorySelector";
 
 type PlainPurchaseInputProps = {
   handleNewPurchaseInput: (
@@ -31,7 +32,6 @@ type PlainPurchaseInputProps = {
   addPurchase: () => void;
   addTemplate: () => void;
   setNewPurchase: React.Dispatch<React.SetStateAction<InputFieldPurchaseType>>;
-  categorySet: string[];
   errors: Record<string, string | undefined>;
   hasError: boolean;
 };
@@ -43,7 +43,6 @@ const PlainPurchaseInput = memo(
     addPurchase,
     addTemplate,
     setNewPurchase,
-    categorySet,
     errors,
     hasError,
   }: PlainPurchaseInputProps): JSX.Element => (
@@ -72,15 +71,9 @@ const PlainPurchaseInput = memo(
             sx={{ maxWidth: 150 }}
             onChange={(v) => handleNewPurchaseInput("date", v)}
           />
-          <Autocomplete
-            value={newPurchase.category}
-            onChange={(_e, v) => handleNewPurchaseInput("category", v)}
-            sx={{ minWidth: 150 }}
-            options={categorySet}
-            freeSolo
-            renderInput={(params) => (
-              <TextField {...params} label="カテゴリー" />
-            )}
+          <CategorySelector
+            newCategory={newPurchase.category}
+            handleInput={handleNewPurchaseInput}
           />
           <MethodSelector
             newMethod={newPurchase.method}
@@ -237,15 +230,12 @@ const PurchaseInput = () => {
     addDocPurchaseTemplate({ ...newPurchase, userId: currentUser.uid });
   }, [currentUser, newPurchase]);
 
-  const { categorySet } = usePurchase();
-
   const plainProps = {
     handleNewPurchaseInput,
     newPurchase,
     addPurchase,
     addTemplate,
     setNewPurchase,
-    categorySet,
     errors,
     hasError,
   };

@@ -1,10 +1,4 @@
-import {
-  TableCell,
-  TextField,
-  Autocomplete,
-  IconButton,
-  TableRow,
-} from "@mui/material";
+import { TableCell, TextField, IconButton, TableRow } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
 import { memo, useCallback, useState } from "react";
 import DoneIcon from "@mui/icons-material/Done";
@@ -21,6 +15,7 @@ import {
 } from "../../../../utilities/purchaseUtilities";
 import { getHasError, validateEditPurchase } from "../../KakeiboSchemas";
 import MethodSelector from "../../ScreenParts/MethodSelector";
+import CategorySelector from "../../ScreenParts/CategorySelector";
 
 type UnderHalfRowProps = {
   editFormData: PurchaseDataType;
@@ -77,14 +72,12 @@ const UnderHalfRow = memo(
 
 type PlainEditPurchaseRowProps = UnderHalfRowProps & {
   isSmall: boolean;
-  categorySet: string[];
 };
 
 const PlainEditPurchaseRow = memo(
   ({
     editFormData,
     handleEditFormChange,
-    categorySet,
     isSmall,
     handleSaveClick,
     errors,
@@ -111,15 +104,10 @@ const PlainEditPurchaseRow = memo(
           />
         </TableCellWrapper>
         <TableCellWrapper>
-          <Autocomplete
-            value={editFormData.category}
-            sx={{ minWidth: 150 }}
-            options={categorySet}
-            freeSolo
-            onChange={(_e, v) => handleEditFormChange("category", v)}
-            renderInput={(params) => (
-              <TextField {...params} label="分類" size="small" />
-            )}
+          <CategorySelector
+            newCategory={editFormData.category}
+            handleInput={handleEditFormChange}
+            isSmall
           />
         </TableCellWrapper>
         <TableCellWrapper>
@@ -169,7 +157,7 @@ const EditPurchaseRow = ({
   isSmall: boolean;
   updatePurchases: PurchaseDataType[];
 }) => {
-  const { categorySet, setPurchaseList } = usePurchase();
+  const { setPurchaseList } = usePurchase();
 
   // 編集内容を保存する関数
   const handleSaveClick = useCallback(async () => {
@@ -242,7 +230,6 @@ const EditPurchaseRow = ({
 
   const plainProps = {
     editFormData,
-    categorySet,
     handleEditFormChange,
     handleSaveClick,
     isSmall,

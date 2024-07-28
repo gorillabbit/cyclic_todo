@@ -1,5 +1,4 @@
 import {
-  Autocomplete,
   Box,
   Button,
   FormGroup,
@@ -29,6 +28,7 @@ import {
 import { usePurchase, useTab } from "../../../hooks/useData";
 import { getHasError, validatePurchaseSchedule } from "../KakeiboSchemas";
 import MethodSelector from "../ScreenParts/MethodSelector";
+import CategorySelector from "../ScreenParts/CategorySelector";
 
 const defaultNewPurchase: InputPurchaseScheduleType = {
   userId: "",
@@ -48,7 +48,6 @@ const defaultNewPurchase: InputPurchaseScheduleType = {
 
 const PurchaseScheduleInput = () => {
   const { currentUser } = getAuth();
-  const { categorySet } = usePurchase();
   const { tabId } = useTab();
   const { purchaseList, setPurchaseList } = usePurchase();
 
@@ -174,15 +173,9 @@ const PurchaseScheduleInput = () => {
               handleNewPurchaseScheduleInput("endDate", value)
             }
           />
-          <Autocomplete
-            value={newPurchaseSchedule.category}
-            onChange={(_e, v) => handleNewPurchaseScheduleInput("category", v)}
-            sx={{ minWidth: 150 }}
-            options={categorySet}
-            freeSolo
-            renderInput={(params) => (
-              <TextField {...params} label="カテゴリー" />
-            )}
+          <CategorySelector
+            newCategory={newPurchaseSchedule.category}
+            handleInput={handleNewPurchaseScheduleInput}
           />
           <MethodSelector
             newMethod={newPurchaseSchedule.method}
