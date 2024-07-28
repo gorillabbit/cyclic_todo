@@ -10,7 +10,6 @@ import {
 import StyledCheckbox from "../../StyledCheckbox";
 import { useState, useCallback, useMemo } from "react";
 import { addDocPurchaseSchedule } from "../../../firebase";
-import { getAuth } from "firebase/auth";
 import {
   ErrorType,
   InputPurchaseScheduleType,
@@ -25,7 +24,7 @@ import {
   updateAndAddPurchases,
   weekDaysString,
 } from "../../../utilities/purchaseUtilities";
-import { usePurchase, useTab } from "../../../hooks/useData";
+import { useAccount, usePurchase, useTab } from "../../../hooks/useData";
 import { getHasError, validatePurchaseSchedule } from "../KakeiboSchemas";
 import MethodSelector from "../ScreenParts/MethodSelector";
 import CategorySelector from "../ScreenParts/CategorySelector";
@@ -47,9 +46,7 @@ const defaultNewPurchase: InputPurchaseScheduleType = {
 };
 
 const PurchaseScheduleInput = () => {
-  const { currentUser } = getAuth();
   const { tabId } = useTab();
-  const { purchaseList, setPurchaseList } = usePurchase();
 
   const [newPurchaseSchedule, setNewPurchaseSchedule] =
     useState<InputPurchaseScheduleType>({
@@ -82,13 +79,16 @@ const PurchaseScheduleInput = () => {
   );
 
   const addPurchaseSchedule = useCallback(async () => {
+    const { Account } = useAccount();
+    const { purchaseList, setPurchaseList } = usePurchase();
+
     const isError = validateAndSetErrors(newPurchaseSchedule);
     if (isError) return;
-    if (!currentUser) return console.error("ログインしてください");
+    if (!Account) return console.error("ログインしてください");
 
     const addedSchedule = await addDocPurchaseSchedule({
       ...newPurchaseSchedule,
-      userId: currentUser.uid,
+      userId: Account.id,
     });
     const result = addScheduledPurchase(
       addedSchedule.id,
@@ -98,7 +98,7 @@ const PurchaseScheduleInput = () => {
     updateAndAddPurchases(result);
     setPurchaseList(result);
     setNewPurchaseSchedule(defaultNewPurchase);
-  }, [currentUser, newPurchaseSchedule, setPurchaseList, purchaseList]);
+  }, [newPurchaseSchedule]);
 
   return (
     <>

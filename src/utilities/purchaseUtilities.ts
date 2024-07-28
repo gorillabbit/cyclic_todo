@@ -312,13 +312,13 @@ export const addScheduledPurchase = (
     return [];
   };
   getDays().forEach((dateDay, index) => {
-    const docId = doc(collection(db, dbNames.purchase)).id;
+    const childPurchaseId = doc(collection(db, dbNames.purchase)).id;
     const hasLaterPayment = method.timing === "翌月";
 
     purchaseList.push({
       ...purchaseBase,
       date: dateDay,
-      childPurchaseId: hasLaterPayment ? docId : "",
+      childPurchaseId: hasLaterPayment ? childPurchaseId : "",
       difference: hasLaterPayment ? 0 : difference,
       id: "",
     });
@@ -326,7 +326,7 @@ export const addScheduledPurchase = (
     if (hasLaterPayment) {
       purchaseList.push({
         ...purchaseBase,
-        id: docId,
+        id: childPurchaseId,
         date: getPayLaterDate(
           set(dateDay, { milliseconds: index }),
           method.timingDate
@@ -338,7 +338,6 @@ export const addScheduledPurchase = (
   });
   let newUpdatePurchases = updatePurchases;
   for (const purchase of purchaseList) {
-    console.log(newUpdatePurchases);
     newUpdatePurchases = addPurchaseAndUpdateLater(
       purchase,
       newUpdatePurchases
