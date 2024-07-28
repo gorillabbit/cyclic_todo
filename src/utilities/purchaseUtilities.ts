@@ -401,6 +401,7 @@ export const updateDocuments = async () => {
         difference,
         balance,
         assetId: data.method.assetId,
+        timestamp: new Date()
       });
       lastPurchases[assetId] = balance;
     });
