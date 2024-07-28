@@ -265,10 +265,12 @@ export const addPurchaseAndUpdateLater = (
 };
 
 export const updatePurchaseAndUpdateLater = async (
-  purchaseId: string, // 子供の支払いの場合は下のpurchaseと食い違うので必要
+  purchaseId: string, // 子支払いの場合は下のpurchaseと食い違うので必要
   purchase: PurchaseDataType,
   updatePurchases: PurchaseDataType[]
 ) => {
+  // purchaseIdで指定した支払いを取得して、その支払いの差額を計算して、引く
+  // その後のcurrentPurchase以外の支払いを更新する
   const currentPurchases = updatePurchases.find((p) => p.id === purchaseId);
   if (!currentPurchases) return { purchases: updatePurchases };
   const updatedLaterPurchases = updateAllLaterPurchases(

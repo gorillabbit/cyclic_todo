@@ -161,16 +161,15 @@ const EditPurchaseRow = ({
 
   // 編集内容を保存する関数
   const handleSaveClick = useCallback(async () => {
-    const method = editFormData.method;
-    const timing = method.timing;
+    const { timing, timingDate } = editFormData.method;
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { id: _id, childPurchaseId, ...purchaseWithoutIds } = editFormData;
     // 日付の変更にも対応できるように後払いも更新する
     const childPurchase = {
       ...purchaseWithoutIds,
-      date: getPayLaterDate(editFormData.date, method.timingDate),
+      date: getPayLaterDate(editFormData.date, timingDate),
       childPurchaseId: "",
-      id: "",
+      id: childPurchaseId,
     };
     // TODO ここらへんのTimestampやらDateやらの変換をどうにかする
     let update = { childPurchaseId, difference: editFormData.difference };
