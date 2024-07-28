@@ -43,8 +43,6 @@ const NarrowDownDialog = ({
   };
   assetLabelList.unshift(defaultAsset);
 
-  console.log(filterObject.date);
-
   const handleFilterApply = (name: string, value: any) => {
     if (name === "asset") {
       value = value ? value.id : "";

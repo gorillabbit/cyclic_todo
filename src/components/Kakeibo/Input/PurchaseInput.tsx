@@ -3,7 +3,6 @@ import StyledCheckbox from "../../StyledCheckbox";
 import { DatePicker } from "@mui/x-date-pickers";
 import { memo, useCallback, useMemo, useState } from "react";
 import { addDocPurchaseTemplate } from "../../../firebase";
-import { getAuth } from "firebase/auth";
 import { ErrorType, MethodListType } from "../../../types";
 import {
   addPurchaseAndUpdateLater,
@@ -12,7 +11,7 @@ import {
 } from "../../../utilities/purchaseUtilities";
 import TemplateButtons from "./TemplateButtonsContainer";
 import { getPayLaterDate } from "../../../utilities/dateUtilities";
-import { useTab, usePurchase } from "../../../hooks/useData";
+import { useTab, usePurchase, useAccount } from "../../../hooks/useData";
 import {
   defaultInputFieldPurchase,
   InputFieldPurchaseType,
@@ -121,17 +120,9 @@ const PlainPurchaseInput = memo(
 );
 
 const PurchaseInput = () => {
-  const { tabId } = useTab();
-  const { purchaseList, setPurchaseList } = usePurchase();
-  const { currentUser } = getAuth();
-  const defaultPurchaseInputWithTabId = useMemo(
-    () => ({ ...defaultInputFieldPurchase, tabId }),
-    [tabId]
-  );
   const [newPurchase, setNewPurchase] = useState<InputFieldPurchaseType>(
-    defaultPurchaseInputWithTabId
+    defaultInputFieldPurchase
   );
-  const method = newPurchase.method;
 
   const [errors, setErrors] = useState<ErrorType>({});
 
@@ -169,15 +160,23 @@ const PurchaseInput = () => {
     []
   );
 
-  const addPurchase = useCallback(async () => {
-    const isError = validateAndSetErrors(newPurchase);
-    if (isError) return;
-    if (!currentUser) return console.error("ログインしていません");
+  const { Account } = useAccount();
 
-    let updates = purchaseList;
+  const isError = useCallback(() => {
+    const validateError = validateAndSetErrors(newPurchase);
+    if (!Account) console.error("ログインしていません");
+    return validateError || !Account;
+  }, [Account]);
+
+  const addPurchase = useCallback(async () => {
+    if (isError()) return;
+
+    const { tabId } = useTab();
+    const { purchaseList, setPurchaseList } = usePurchase();
+
     const { income, price, ...newPurchaseData } = newPurchase;
     const difference = income ? price : -price;
-    const { assetId, timing } = method;
+    const { assetId, timing, timingDate } = newPurchase.method;
 
     const _addPurchase = (
       purchases: PurchaseDataType[],
@@ -185,50 +184,37 @@ const PurchaseInput = () => {
     ) => {
       const purchaseData = {
         ...newPurchaseData,
-        userId: currentUser.uid,
+        tabId,
+        userId: Account?.id || "",
         childPurchaseId: "",
         difference,
         assetId,
         balance: 0,
         id: "",
+        ...options,
       };
-      return addPurchaseAndUpdateLater(
-        { ...purchaseData, ...options },
-        purchases
-      );
+      return addPurchaseAndUpdateLater(purchaseData, purchases);
     };
-
-    if (timing === "即時") {
-      updates = _addPurchase(purchaseList, {}).purchases;
-    } else {
-      // 後払いの場合
-      const payLaterDate = getPayLaterDate(newPurchase.date, method.timingDate);
-      // まず引き落とされる支払いを追加し、そのIDを現在の支払いに追加する
-      const purchasesAndId = _addPurchase(purchaseList, {
-        date: payLaterDate,
-      });
-      updates = _addPurchase(purchasesAndId.purchases, {
-        childPurchaseId: purchasesAndId.id,
-      }).purchases;
-    }
-    updateAndAddPurchases(updates);
-    setPurchaseList(updates);
-    setNewPurchase(defaultPurchaseInputWithTabId);
-  }, [
-    currentUser,
-    defaultPurchaseInputWithTabId,
-    method,
-    newPurchase,
-    setPurchaseList,
-    purchaseList,
-  ]);
+    const is即時 = timing === "即時";
+    const addedPurchaseAndId = _addPurchase(
+      purchaseList,
+      is即時 ? {} : { date: getPayLaterDate(newPurchase.date, timingDate) }
+    );
+    const { purchases: addedPurchases, id: addedId } = addedPurchaseAndId;
+    const purchaseListToAdd = is即時
+      ? addedPurchases
+      : _addPurchase(addedPurchases, {
+          childPurchaseId: addedId,
+        }).purchases;
+    updateAndAddPurchases(purchaseListToAdd);
+    setPurchaseList(purchaseListToAdd);
+    setNewPurchase(defaultInputFieldPurchase);
+  }, [Account, defaultInputFieldPurchase, newPurchase]);
 
   const addTemplate = useCallback(() => {
-    const isError = validateAndSetErrors(newPurchase);
-    if (isError) return;
-    if (!currentUser) return console.error("ログインしていません");
-    addDocPurchaseTemplate({ ...newPurchase, userId: currentUser.uid });
-  }, [currentUser, newPurchase]);
+    if (isError()) return;
+    addDocPurchaseTemplate({ ...newPurchase, userId: Account?.id || "" });
+  }, [Account, newPurchase]);
 
   const plainProps = {
     handleNewPurchaseInput,

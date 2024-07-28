@@ -3,7 +3,6 @@ import { defaultMethodList, MethodListType } from "../types";
 
 interface PurchaseBaseType {
   userId: string;
-  tabId: string;
   title: string;
   date: Date;
   method: MethodListType;
@@ -13,7 +12,6 @@ interface PurchaseBaseType {
 }
 const defaultPurchaseBase: PurchaseBaseType = {
   userId: "",
-  tabId: "",
   title: "",
   date: new Date(),
   method: defaultMethodList,
@@ -33,6 +31,7 @@ export const defaultInputFieldPurchase: InputFieldPurchaseType = {
 };
 export interface PurchaseDataType extends PurchaseBaseType {
   id: string;
+  tabId: string;
   assetId: string;
   difference: number;
   balance: number;
@@ -47,6 +46,7 @@ export const defaultPurchaseData: PurchaseDataType = {
   childPurchaseId: "",
   assetId: "",
   id: "",
+  tabId: "",
 };
 export interface PurchaseRawDataType extends Omit<PurchaseDataType, "date"> {
   id: string;
