@@ -24,7 +24,7 @@ const PlainTableHeadCell = memo(
   }: PlainTableHeadCellProps) => (
     <TableCell
       sortDirection={orderBy === value ? (isAsc ? "asc" : "desc") : false}
-      sx={{ px: 0.5 }}
+      sx={{ p: 0 }}
     >
       <TableSortLabel
         active={orderBy === value}
