@@ -21,17 +21,17 @@ import {
   sortObjectsByParameter,
   updateDocuments,
 } from "../../../utilities/purchaseUtilities";
-import DoughnutContainer from "./ChartContainer";
 import TableHeadCell from "./TableHeadCell";
 import { usePurchase } from "../../../hooks/useData";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import { PurchaseDataType } from "../../../types/purchaseTypes";
 import TableCellWrapper from "../TableCellWrapper";
+import DoughnutContainer from "./Charts/ChartContainer";
+import NarrowDownDialog from "./NarrowDownDialog";
 
 type PlainPurchaseProps = {
   monthlyPurchases: PurchaseDataType[];
-  orderedPurchase: PurchaseDataType[];
   getGroupPurchases: (groupedPurchase: PurchaseDataType) => PurchaseDataType[];
   month: Date;
   handleNextMonthButton: () => void;
@@ -44,18 +44,29 @@ type PlainPurchaseProps = {
     label: string;
     value: keyof PurchaseDataType;
   }) => JSX.Element;
+  filteredPurchases: PurchaseDataType[];
+  setFilterObject: React.Dispatch<
+    React.SetStateAction<Partial<PurchaseDataType>>
+  >;
+  openNarrowDown: boolean;
+  setOpenNarrowDown: React.Dispatch<React.SetStateAction<boolean>>;
+  filterObject: Partial<PurchaseDataType>;
 };
 
 const PlainPurchases = memo(
   ({
     monthlyPurchases,
-    orderedPurchase,
     getGroupPurchases,
     month,
     handleNextMonthButton,
     handlePastMonthButton,
     isSmall,
     HeaderCellWrapper,
+    filteredPurchases,
+    setFilterObject,
+    openNarrowDown,
+    setOpenNarrowDown,
+    filterObject,
   }: PlainPurchaseProps): JSX.Element => (
     <>
       <AssetsList />
@@ -77,6 +88,7 @@ const PlainPurchases = memo(
             <ArrowForwardIosIcon />
           </IconButton>
           <Button onClick={updateDocuments}>再計算</Button>
+          <Button onClick={() => setOpenNarrowDown(true)}>絞り込み</Button>
         </Box>
         <Table size="small">
           <TableHead>
@@ -108,7 +120,7 @@ const PlainPurchases = memo(
             )}
           </TableHead>
           <TableBody>
-            {orderedPurchase.map((purchase, index) => (
+            {filteredPurchases.map((purchase, index) => (
               <PurchasesRow
                 key={purchase.id}
                 groupPurchases={getGroupPurchases(purchase)}
@@ -120,6 +132,12 @@ const PlainPurchases = memo(
           </TableBody>
         </Table>
       </TableContainer>
+      <NarrowDownDialog
+        setFilterObject={setFilterObject}
+        openNarrowDown={openNarrowDown}
+        setOpenNarrowDown={setOpenNarrowDown}
+        filterObject={filterObject}
+      />
     </>
   )
 );
@@ -207,6 +225,32 @@ const Purchases = memo((): JSX.Element => {
     [isAsc, orderBy, purchasesWithoutGroupFlag]
   );
 
+  // 絞り込み機能
+  const [openNarrowDown, setOpenNarrowDown] = useState<boolean>(false);
+  const [filterObject, setFilterObject] = useState<Partial<PurchaseDataType>>(
+    {}
+  );
+  const filteredPurchases = useMemo(
+    () =>
+      orderedPurchase.filter((p) =>
+        Object.entries(filterObject)
+          .filter((object) => object[1])
+          .every(([key, value]) =>
+            p[key as keyof PurchaseDataType]
+              ?.toString()
+              .includes(value?.toString())
+          )
+      ),
+    [filterObject, orderedPurchase]
+  );
+
+  const filterProps = {
+    openNarrowDown,
+    setOpenNarrowDown,
+    filterObject,
+    setFilterObject,
+  };
+
   const HeaderCellWrapper = ({
     label,
     value,
@@ -237,6 +281,8 @@ const Purchases = memo((): JSX.Element => {
     isAsc,
     setIsAsc,
     HeaderCellWrapper,
+    filteredPurchases,
+    ...filterProps,
   };
   return <PlainPurchases {...plainProps} />;
 });
