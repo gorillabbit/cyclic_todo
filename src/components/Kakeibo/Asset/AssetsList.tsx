@@ -7,6 +7,7 @@ import {
   IconButton,
   TableHead,
   TableCell,
+  Tooltip,
 } from "@mui/material";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import CloseFullscreenIcon from "@mui/icons-material/CloseFullscreen";
@@ -32,36 +33,30 @@ const PlainAssetsList = memo(
         <TableHead>
           <TableRow>
             <TableCell padding="none">
-              <IconButton onClick={() => props.setIsOpen(!props.isOpen)}>
-                {props.isOpen ? (
-                  <CloseFullscreenIcon />
-                ) : (
-                  <KeyboardArrowDownIcon />
-                )}
-              </IconButton>
+              <Tooltip title={props.isOpen ? "編集を終える" : "資産を編集する"}>
+                <IconButton onClick={() => props.setIsOpen(!props.isOpen)}>
+                  {props.isOpen ? (
+                    <CloseFullscreenIcon />
+                  ) : (
+                    <KeyboardArrowDownIcon />
+                  )}
+                </IconButton>
+              </Tooltip>
             </TableCell>
-            {props.isOpen ? (
-              <>
-                <TableCellWrapper label="名前" />
-                <TableCellWrapper label="残高" />
-                <TableCellWrapper label="月末残高" />
-                <TableCellWrapper />
-              </>
-            ) : (
-              <TableCellWrapper label="資産を開く" colSpan={5} />
-            )}
+            <TableCellWrapper label="名前" />
+            <TableCellWrapper label="残高" />
+            <TableCellWrapper label="月末残高" />
+            <TableCellWrapper />
           </TableRow>
         </TableHead>
-        {props.isOpen && (
-          <TableBody>
-            {props.assetList.map((asset) => (
-              <AssetRow asset={asset} key={asset.id} />
-            ))}
-            <TableRow>
-              <TableCellWrapper label="合計" colSpan={2} />
-            </TableRow>
-          </TableBody>
-        )}
+        <TableBody>
+          {props.assetList.map((asset) => (
+            <AssetRow asset={asset} key={asset.id} isOpen={props.isOpen} />
+          ))}
+          <TableRow>
+            <TableCellWrapper label="合計" colSpan={2} />
+          </TableRow>
+        </TableBody>
       </Table>
       {props.isOpen && (
         <IconButton onClick={props.addAsset} color="primary">
