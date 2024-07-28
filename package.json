@@ -38,7 +38,8 @@
     "react-router-dom": "6.25.1",
     "recharts": "2.13.0-alpha.4",
     "ts-node": "10.9.2",
-    "typescript-eslint": "8.0.0-alpha.54"
+    "typescript-eslint": "8.0.0-alpha.54",
+    "zod": "3.23.8"
   },
   "devDependencies": {
     "@types/cors": "2.8.17",

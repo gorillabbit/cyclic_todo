@@ -9,7 +9,7 @@ import {
   Tooltip,
   Brush,
 } from "recharts";
-import { format } from "date-fns";
+import { format, set } from "date-fns";
 import { getFutureMonthFirstDay } from "../../../utilities/dateUtilities";
 
 // インデックスに基づいた色を生成する関数
@@ -32,14 +32,18 @@ const BalanceChart = () => {
   dates.sort(); // 日付をソート
 
   // データセットを作成
-  const datasets = lastPurchase.map((p) => {
-    const asset = assetList.find((asset) => asset.id === p.assetId);
-    if (!asset) return {};
-    return {
-      time: p.date.getTime(),
-      [asset.name]: p.balance,
-    };
-  });
+  const datasets = lastPurchase
+    .map((p, index) => {
+      const asset = assetList.find((asset) => asset.id === p.assetId);
+      if (!asset) return;
+      return {
+        time: set(p.date, {
+          milliseconds: index, // データが更新されるとき、同じ時刻のデータが大量に作成される問題があるので暫定的解決策　TODO: 修正
+        }).getTime(),
+        [asset.name]: p.balance,
+      };
+    })
+    .filter((data) => data);
 
   return (
     <ResponsiveContainer width="100%" height={200}>

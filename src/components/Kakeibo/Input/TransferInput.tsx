@@ -1,10 +1,4 @@
-import {
-  Autocomplete,
-  Box,
-  FormGroup,
-  TextField,
-  Tooltip,
-} from "@mui/material";
+import { Autocomplete, Box, Button, FormGroup, TextField } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
 import { memo, useCallback, useMemo, useState } from "react";
 import { addDocTransferTemplate } from "../../../firebase";
@@ -13,18 +7,18 @@ import {
   MethodListType,
   InputTransferType,
   defaultTransferInput,
+  ErrorType,
 } from "../../../types";
 import {
   addPurchaseAndUpdateLater,
-  isValidatedNum,
   numericProps,
   updateAndAddPurchases,
 } from "../../../utilities/purchaseUtilities";
 import { getPayLaterDate } from "../../../utilities/dateUtilities";
-import TransferInputButtons from "./TransferInputButtons";
 import TransferTemplateButtonsContainer from "./TransferTemplateButtonContainer";
 import { useMethod, usePurchase, useTab } from "../../../hooks/useData";
 import { PurchaseDataType } from "../../../types/purchaseTypes";
+import { getHasError, validateTransfer } from "../KakeiboSchemas";
 
 type PlainTransferInputProps = {
   handleNewTransferInput: (
@@ -36,7 +30,8 @@ type PlainTransferInputProps = {
   addTemplate: () => void;
   setNewTransfer: React.Dispatch<React.SetStateAction<InputTransferType>>;
   methodList: MethodListType[];
-  methodError: string | undefined;
+  errors: ErrorType;
+  hasError: boolean;
 };
 
 const PlainTransferInput = memo(
@@ -47,7 +42,8 @@ const PlainTransferInput = memo(
     addTemplate,
     setNewTransfer,
     methodList,
-    methodError,
+    errors,
+    hasError,
   }: PlainTransferInputProps): JSX.Element => (
     <>
       <TransferTemplateButtonsContainer setNewTransfer={setNewTransfer} />
@@ -58,6 +54,8 @@ const PlainTransferInput = memo(
             value={newTransfer.price}
             inputProps={numericProps}
             onChange={(e) => handleNewTransferInput("price", e.target.value)}
+            error={!!errors.price}
+            helperText={errors.price}
           />
           <DatePicker
             label="日付"
@@ -66,21 +64,37 @@ const PlainTransferInput = memo(
             onChange={(value) => handleNewTransferInput("date", value)}
           />
           <Autocomplete
-            value={newTransfer.from.label ? newTransfer.from : null}
-            sx={{ minWidth: 150 }}
+            value={newTransfer.from?.label ? newTransfer.from : null}
+            sx={{ width: 150 }}
             options={methodList}
             onChange={(_e, v) => handleNewTransferInput("from", v)}
+            isOptionEqualToValue={(option, value) =>
+              option.label === value?.label
+            }
             renderInput={(params) => (
-              <TextField {...params} error={!!methodError} label="送金元" />
+              <TextField
+                {...params}
+                error={!!errors.from}
+                helperText={errors.from}
+                label="送金元"
+              />
             )}
           />
           <Autocomplete
-            value={newTransfer.to.label ? newTransfer.to : null}
-            sx={{ minWidth: 150 }}
+            value={newTransfer.to?.label ? newTransfer.to : null}
+            sx={{ width: 150 }}
             options={methodList}
             onChange={(_e, v) => handleNewTransferInput("to", v)}
+            isOptionEqualToValue={(option, value) =>
+              option.label === value?.label
+            }
             renderInput={(params) => (
-              <TextField {...params} error={!!methodError} label="送金先" />
+              <TextField
+                {...params}
+                error={!!errors.to}
+                helperText={errors.to}
+                label="送金先"
+              />
             )}
           />
           <TextField
@@ -92,30 +106,30 @@ const PlainTransferInput = memo(
           />
         </FormGroup>
       </Box>
-      {methodError ? (
-        <Tooltip title={methodError}>
-          <>
-            <TransferInputButtons
-              methodError={methodError}
-              addTransfer={addTransfer}
-              addTemplate={addTemplate}
-            />
-          </>
-        </Tooltip>
-      ) : (
-        <TransferInputButtons
-          methodError={methodError}
-          addTransfer={addTransfer}
-          addTemplate={addTemplate}
-        />
-      )}
+      <Box gap={1} display="flex" mt={1}>
+        <Button
+          sx={{ width: "50%" }}
+          variant="contained"
+          disabled={hasError}
+          onClick={addTransfer}
+        >
+          追加
+        </Button>
+        <Button
+          sx={{ width: "50%" }}
+          variant="outlined"
+          disabled={hasError}
+          onClick={addTemplate}
+        >
+          ボタン化
+        </Button>
+      </Box>
     </>
   )
 );
 
 const TransferInput = () => {
   const { currentUser } = getAuth();
-  const { methodList } = useMethod();
   const { tabId } = useTab();
   const [newTransfer, setNewTransfer] = useState<InputTransferType>({
     ...defaultTransferInput,
@@ -123,30 +137,35 @@ const TransferInput = () => {
   });
   const { purchaseList, setPurchaseList } = usePurchase();
 
+  const [errors, setErrors] = useState<ErrorType>({});
+
+  const validateAndSetErrors = useCallback((input: InputTransferType) => {
+    const errors = validateTransfer(input);
+    setErrors(errors);
+    return getHasError(errors);
+  }, []);
+
+  const hasError = useMemo(() => getHasError(errors), [errors]);
+
   const handleNewTransferInput = useCallback(
     (name: string, value: string | Date | MethodListType | null) => {
-      if (name === "price" && typeof value === "string") {
-        if (isValidatedNum(value))
-          setNewTransfer((prev) => ({ ...prev, [name]: Number(value) }));
-        return;
-      }
-      setNewTransfer((prev) => ({ ...prev, [name]: value }));
+      setNewTransfer((prev) => {
+        const nextTransfer = { ...prev, [name]: value };
+        validateAndSetErrors(nextTransfer);
+        return nextTransfer;
+      });
     },
     []
   );
-  const { price, date, description, from, to } = newTransfer;
-  const methodError = useMemo(() => {
-    if (!to.assetId || !from.assetId) return "送金元と送金先は必須です";
-    if (to.assetId === from.assetId) return "同じ資産には送金できません";
-    if (to.timing === "翌月") return "後払いの決済方法に入金はできません";
-  }, [from.assetId, to.assetId, to.timing]);
 
   const addTransfer = useCallback(async () => {
+    const isError = validateAndSetErrors(newTransfer);
+    if (isError) return;
     if (!currentUser) return console.error("ログインしていません");
+    const { price, date, description, from, to } = newTransfer;
     const purchaseTitle = `${from.label}→${to.label}`;
     const basePurchase = {
       userId: currentUser.uid,
-      price,
       category: "送受金",
       childPurchaseId: "",
       date,
@@ -190,24 +209,16 @@ const TransferInput = () => {
     updateAndAddPurchases(update);
     setPurchaseList(update);
     setNewTransfer(defaultTransferInput);
-  }, [
-    currentUser,
-    date,
-    description,
-    from,
-    price,
-    purchaseList,
-    setPurchaseList,
-    tabId,
-    to,
-  ]);
+  }, [currentUser, purchaseList, setPurchaseList, tabId, newTransfer]);
 
   const addTemplate = useCallback(() => {
+    const isError = validateAndSetErrors(newTransfer);
+    if (isError) return;
     if (!currentUser) return console.error("ログインしていません");
-    const userId = currentUser.uid;
-    addDocTransferTemplate({ ...newTransfer, userId });
+    addDocTransferTemplate({ ...newTransfer, userId: currentUser.uid });
   }, [currentUser, newTransfer]);
 
+  const { methodList } = useMethod();
   const plainProps = {
     handleNewTransferInput,
     newTransfer,
@@ -215,7 +226,8 @@ const TransferInput = () => {
     addTemplate,
     setNewTransfer,
     methodList,
-    methodError,
+    errors,
+    hasError,
   };
   return <PlainTransferInput {...plainProps} />;
 };

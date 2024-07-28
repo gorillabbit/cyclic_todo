@@ -6,9 +6,9 @@ import {
   TableRow,
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
-import { memo, useCallback } from "react";
+import { memo, useCallback, useState } from "react";
 import DoneIcon from "@mui/icons-material/Done";
-import { MethodListType } from "../../../../types";
+import { ErrorType, MethodListType } from "../../../../types";
 import { getPayLaterDate } from "../../../../utilities/dateUtilities";
 import { useMethod, usePurchase } from "../../../../hooks/useData";
 import TableCellWrapper from "../../TableCellWrapper";
@@ -19,16 +19,17 @@ import {
   updateAndAddPurchases,
   updatePurchaseAndUpdateLater,
 } from "../../../../utilities/purchaseUtilities";
+import { getHasError, validateEditPurchase } from "../../KakeiboSchemas";
 
 type UnderHalfRowProps = {
   editFormData: PurchaseDataType;
-  handleEditFormChange: (event: {
-    target: {
-      name: string;
-      value: unknown;
-    };
-  }) => void;
+  handleEditFormChange: (
+    name: string,
+    value: string | Date | boolean | MethodListType | null
+  ) => void;
   handleSaveClick: () => void;
+  hasError: boolean;
+  errors: ErrorType;
 };
 
 const UnderHalfRow = memo(
@@ -36,14 +37,17 @@ const UnderHalfRow = memo(
     editFormData,
     handleEditFormChange,
     handleSaveClick,
+    errors,
+    hasError,
   }: UnderHalfRowProps) => (
     <>
       <TableCellWrapper>
         <TextField
-          name="difference"
           value={editFormData.difference}
-          onChange={handleEditFormChange}
+          onChange={(e) => handleEditFormChange("difference", e.target.value)}
           size="small"
+          error={!!errors.difference}
+          helperText={errors.difference}
         />
       </TableCellWrapper>
       <TableCellWrapper label={editFormData.balance} />
@@ -51,14 +55,18 @@ const UnderHalfRow = memo(
         <TextField
           name="description"
           value={editFormData.description}
-          onChange={handleEditFormChange}
+          onChange={(e) => handleEditFormChange("description", e.target.value)}
           size="small"
         />
       </TableCellWrapper>
       <TableCellWrapper label={editFormData.difference > 0 ? "収入" : "支出"} />
 
       <TableCell padding="none">
-        <IconButton onClick={handleSaveClick} color="success">
+        <IconButton
+          onClick={handleSaveClick}
+          color="success"
+          disabled={hasError}
+        >
           <DoneIcon />
         </IconButton>
       </TableCell>
@@ -67,44 +75,40 @@ const UnderHalfRow = memo(
 );
 
 type PlainEditPurchaseRowProps = UnderHalfRowProps & {
-  handleDateFormChange: (value: Date | null | undefined) => void;
   isSmall: boolean;
   categorySet: string[];
   methodList: MethodListType[];
-  handleAutocompleteChange: (name: string, value: unknown) => void;
-  handleMethodChange: (value: string | MethodListType | null) => void;
 };
 
 const PlainEditPurchaseRow = memo(
   ({
     editFormData,
-    handleDateFormChange,
     handleEditFormChange,
     categorySet,
-    handleAutocompleteChange,
     methodList,
-    handleMethodChange,
     isSmall,
     handleSaveClick,
+    errors,
+    hasError,
   }: PlainEditPurchaseRowProps): JSX.Element => (
     <>
       <TableRow>
         <TableCellWrapper />
         <TableCellWrapper>
           <DatePicker
-            name="date"
             value={editFormData.date}
-            onChange={handleDateFormChange}
+            onChange={(v) => handleEditFormChange("date", v)}
             slotProps={{ textField: { size: "small" } }}
             sx={{ maxWidth: 190 }}
           />
         </TableCellWrapper>
         <TableCellWrapper>
           <TextField
-            name="title"
             value={editFormData.title}
-            onChange={handleEditFormChange}
+            onChange={(e) => handleEditFormChange("title", e.target.value)}
             size="small"
+            error={!!errors.title}
+            helperText={errors.title}
           />
         </TableCellWrapper>
         <TableCellWrapper>
@@ -113,7 +117,7 @@ const PlainEditPurchaseRow = memo(
             sx={{ minWidth: 150 }}
             options={categorySet}
             freeSolo
-            onChange={(_e, v) => handleAutocompleteChange("category", v)}
+            onChange={(_e, v) => handleEditFormChange("category", v)}
             renderInput={(params) => (
               <TextField {...params} label="分類" size="small" />
             )}
@@ -125,9 +129,15 @@ const PlainEditPurchaseRow = memo(
             sx={{ minWidth: 150 }}
             options={methodList}
             freeSolo
-            onChange={(_e, v) => handleMethodChange(v)}
+            onChange={(_e, v) => handleEditFormChange("method", v)}
             renderInput={(params) => (
-              <TextField {...params} label="支払い方法" size="small" />
+              <TextField
+                {...params}
+                label="支払い方法"
+                size="small"
+                error={!!errors.method}
+                helperText={errors.method}
+              />
             )}
           />
         </TableCellWrapper>
@@ -136,6 +146,8 @@ const PlainEditPurchaseRow = memo(
             editFormData={editFormData}
             handleEditFormChange={handleEditFormChange}
             handleSaveClick={handleSaveClick}
+            errors={errors}
+            hasError={hasError}
           />
         )}
       </TableRow>
@@ -146,6 +158,8 @@ const PlainEditPurchaseRow = memo(
             editFormData={editFormData}
             handleEditFormChange={handleEditFormChange}
             handleSaveClick={handleSaveClick}
+            errors={errors}
+            hasError={hasError}
           />
         </TableRow>
       )}
@@ -223,45 +237,19 @@ const EditPurchaseRow = ({
     setIsEdit(false);
   }, [editFormData, setIsEdit, setPurchaseList, updatePurchases]);
 
+  const [errors, setErrors] = useState<ErrorType>({});
+  const hasError = getHasError(errors);
+
   const handleEditFormChange = useCallback(
-    (event: { target: { name: string; value: unknown } }) => {
-      const { name, value } = event.target;
-      if (name === "difference") {
-        console.log(Number(value));
-        return setEditFormData((prev) => ({ ...prev, [name]: Number(value) }));
-      }
-      setEditFormData((prev) => ({ ...prev, [name]: value }));
+    (name: string, value: string | Date | boolean | MethodListType | null) => {
+      setEditFormData((prev) => {
+        const nextPurchase = { ...prev, [name]: value };
+        const errors = validateEditPurchase(nextPurchase);
+        setErrors(errors);
+        return nextPurchase;
+      });
     },
-    [setEditFormData]
-  );
-
-  const handleDateFormChange = useCallback(
-    (value: Date | null | undefined) => {
-      setEditFormData((prev) => ({
-        ...prev,
-        date: value ?? new Date(),
-      }));
-    },
-    [setEditFormData]
-  );
-
-  const handleMethodChange = useCallback(
-    (value: string | MethodListType | null) => {
-      if (value && typeof value !== "string") {
-        setEditFormData((prev) => ({
-          ...prev,
-          method: value,
-        }));
-      }
-    },
-    [setEditFormData]
-  );
-
-  const handleAutocompleteChange = useCallback(
-    (name: string, value: unknown) => {
-      setEditFormData((prev) => ({ ...prev, [name]: value }));
-    },
-    [setEditFormData]
+    []
   );
 
   const plainProps = {
@@ -269,11 +257,10 @@ const EditPurchaseRow = ({
     categorySet,
     methodList,
     handleEditFormChange,
-    handleDateFormChange,
-    handleMethodChange,
     handleSaveClick,
-    handleAutocompleteChange,
     isSmall,
+    errors,
+    hasError,
   };
   return <PlainEditPurchaseRow {...plainProps} />;
 };

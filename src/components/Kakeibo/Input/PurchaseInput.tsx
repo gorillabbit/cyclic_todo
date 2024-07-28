@@ -4,10 +4,9 @@ import { DatePicker } from "@mui/x-date-pickers";
 import { memo, useCallback, useMemo, useState } from "react";
 import { addDocPurchaseTemplate } from "../../../firebase";
 import { getAuth } from "firebase/auth";
-import { MethodListType } from "../../../types";
+import { ErrorType, MethodListType } from "../../../types";
 import {
   addPurchaseAndUpdateLater,
-  isValidatedNum,
   numericProps,
   updateAndAddPurchases,
 } from "../../../utilities/purchaseUtilities";
@@ -20,6 +19,7 @@ import {
   PurchaseDataType,
 } from "../../../types/purchaseTypes";
 import { set } from "date-fns";
+import { getHasError, validatePurchase } from "../KakeiboSchemas";
 
 type PlainPurchaseInputProps = {
   handleNewPurchaseInput: (
@@ -32,6 +32,8 @@ type PlainPurchaseInputProps = {
   setNewPurchase: React.Dispatch<React.SetStateAction<InputFieldPurchaseType>>;
   categorySet: string[];
   methodList: MethodListType[];
+  errors: Record<string, string | undefined>;
+  hasError: boolean;
 };
 
 const PlainPurchaseInput = memo(
@@ -43,6 +45,8 @@ const PlainPurchaseInput = memo(
     setNewPurchase,
     categorySet,
     methodList,
+    errors,
+    hasError,
   }: PlainPurchaseInputProps): JSX.Element => (
     <>
       <TemplateButtons setNewPurchase={setNewPurchase} />
@@ -52,12 +56,16 @@ const PlainPurchaseInput = memo(
             label="品目"
             value={newPurchase.title}
             onChange={(e) => handleNewPurchaseInput("title", e.target.value)}
+            error={!!errors.title}
+            helperText={errors.title}
           />
           <TextField
             label="金額"
             value={newPurchase.price}
             inputProps={numericProps}
             onChange={(e) => handleNewPurchaseInput("price", e.target.value)}
+            error={!!errors.price}
+            helperText={errors.price}
           />
           <DatePicker
             label="日付"
@@ -84,7 +92,12 @@ const PlainPurchaseInput = memo(
               option.label === value?.label
             }
             renderInput={(params) => (
-              <TextField {...params} label="支払い方法" />
+              <TextField
+                {...params}
+                error={!!errors.method}
+                helperText={errors.method}
+                label="支払い方法"
+              />
             )}
           />
           <StyledCheckbox
@@ -106,10 +119,20 @@ const PlainPurchaseInput = memo(
         </FormGroup>
       </Box>
       <Box gap={1} display="flex" my={1}>
-        <Button sx={{ width: "50%" }} variant="contained" onClick={addPurchase}>
+        <Button
+          sx={{ width: "50%" }}
+          variant="contained"
+          onClick={addPurchase}
+          disabled={hasError}
+        >
           追加
         </Button>
-        <Button sx={{ width: "50%" }} variant="outlined" onClick={addTemplate}>
+        <Button
+          sx={{ width: "50%" }}
+          variant="outlined"
+          onClick={addTemplate}
+          disabled={hasError}
+        >
           ボタン化
         </Button>
       </Box>
@@ -130,13 +153,28 @@ const PurchaseInput = () => {
   );
   const method = newPurchase.method;
 
+  const [errors, setErrors] = useState<ErrorType>({});
+
+  const validateAndSetErrors = useCallback((input: InputFieldPurchaseType) => {
+    const errors = validatePurchase(input);
+    setErrors(errors);
+    return getHasError(errors);
+  }, []);
+
+  const hasError = useMemo(() => getHasError(errors), [errors]);
+  const setNewPurchaseWithValidation = (
+    name: string,
+    value: string | Date | boolean | MethodListType | null
+  ) => {
+    setNewPurchase((prev) => {
+      const nextPurchase = { ...prev, [name]: value };
+      validateAndSetErrors(nextPurchase);
+      return nextPurchase;
+    });
+  };
+
   const handleNewPurchaseInput = useCallback(
     (name: string, value: string | Date | boolean | MethodListType | null) => {
-      if (name === "price" && typeof value === "string") {
-        if (isValidatedNum(value))
-          setNewPurchase((prev) => ({ ...prev, [name]: Number(value) }));
-        return;
-      }
       if (name === "date" && value instanceof Date) {
         const currentTime = new Date();
         const updatedDate = set(value, {
@@ -144,17 +182,17 @@ const PurchaseInput = () => {
           minutes: currentTime.getMinutes(),
           seconds: currentTime.getSeconds(),
         });
-        setNewPurchase((prev) => ({ ...prev, [name]: updatedDate }));
+        return setNewPurchaseWithValidation(name, updatedDate);
       }
-      setNewPurchase((prev) => ({ ...prev, [name]: value }));
+      setNewPurchaseWithValidation(name, value);
     },
     []
   );
 
   const addPurchase = useCallback(async () => {
-    if (!newPurchase.title) return alert("品目名を入力してください");
-    if (!method) return alert("支払い方法を入力してください");
-    if (!currentUser) return alert("ログインしてください");
+    const isError = validateAndSetErrors(newPurchase);
+    if (isError) return;
+    if (!currentUser) return console.error("ログインしていません");
 
     let updates = purchaseList;
     const { income, price, ...newPurchaseData } = newPurchase;
@@ -193,7 +231,6 @@ const PurchaseInput = () => {
         childPurchaseId: purchasesAndId.id,
       }).purchases;
     }
-
     updateAndAddPurchases(updates);
     setPurchaseList(updates);
     setNewPurchase(defaultPurchaseInputWithTabId);
@@ -207,10 +244,10 @@ const PurchaseInput = () => {
   ]);
 
   const addTemplate = useCallback(() => {
-    if (newPurchase && currentUser) {
-      if (!newPurchase.title) return alert("品目名を入力してください");
-      addDocPurchaseTemplate({ ...newPurchase, userId: currentUser.uid });
-    }
+    const isError = validateAndSetErrors(newPurchase);
+    if (isError) return;
+    if (!currentUser) return console.error("ログインしていません");
+    addDocPurchaseTemplate({ ...newPurchase, userId: currentUser.uid });
   }, [currentUser, newPurchase]);
 
   const { categorySet } = usePurchase();
@@ -224,6 +261,8 @@ const PurchaseInput = () => {
     setNewPurchase,
     categorySet,
     methodList,
+    errors,
+    hasError,
   };
   return <PlainPurchaseInput {...plainProps} />;
 };

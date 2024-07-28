@@ -9,10 +9,11 @@ import {
   TextField,
 } from "@mui/material";
 import StyledCheckbox from "../../StyledCheckbox";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { addDocPurchaseSchedule } from "../../../firebase";
 import { getAuth } from "firebase/auth";
 import {
+  ErrorType,
   InputPurchaseScheduleType,
   MethodListType,
   defaultMethodList,
@@ -21,12 +22,12 @@ import { addYears } from "date-fns";
 import { DatePicker } from "@mui/x-date-pickers";
 import {
   addScheduledPurchase,
-  isValidatedNum,
   numericProps,
   updateAndAddPurchases,
   weekDaysString,
 } from "../../../utilities/purchaseUtilities";
 import { usePurchase, useMethod, useTab } from "../../../hooks/useData";
+import { getHasError, validatePurchaseSchedule } from "../KakeiboSchemas";
 
 const defaultNewPurchase: InputPurchaseScheduleType = {
   userId: "",
@@ -50,34 +51,40 @@ const PurchaseScheduleInput = () => {
   const { methodList } = useMethod();
   const { tabId } = useTab();
   const { purchaseList, setPurchaseList } = usePurchase();
+
   const [newPurchaseSchedule, setNewPurchaseSchedule] =
     useState<InputPurchaseScheduleType>({
       ...defaultNewPurchase,
       tabId,
     });
 
+  const [errors, setErrors] = useState<ErrorType>({});
+
+  const validateAndSetErrors = useCallback(
+    (input: InputPurchaseScheduleType) => {
+      const errors = validatePurchaseSchedule(input);
+      setErrors(errors);
+      return getHasError(errors);
+    },
+    []
+  );
+
+  const hasError = useMemo(() => getHasError(errors), [errors]);
+
   const handleNewPurchaseScheduleInput = useCallback(
     (name: string, value: string | Date | boolean | MethodListType | null) => {
-      if (typeof value === "string" && (name === "price" || name === "date")) {
-        const numValue = Number(value);
-        if (isValidatedNum(value)) {
-          if (name === "date" && numValue > 31) {
-            alert("32以上入力できません。");
-            return;
-          }
-          setNewPurchaseSchedule((prev) => ({ ...prev, [name]: numValue }));
-          return;
-        }
-        return;
-      }
-      setNewPurchaseSchedule((prev) => ({ ...prev, [name]: value }));
+      setNewPurchaseSchedule((prev) => {
+        const nextPurchase = { ...prev, [name]: value };
+        validateAndSetErrors(nextPurchase);
+        return nextPurchase;
+      });
     },
     []
   );
 
   const addPurchaseSchedule = useCallback(async () => {
-    if (!newPurchaseSchedule.title)
-      return console.error("品目名を入力してください");
+    const isError = validateAndSetErrors(newPurchaseSchedule);
+    if (isError) return;
     if (!currentUser) return console.error("ログインしてください");
 
     const addedSchedule = await addDocPurchaseSchedule({
@@ -104,6 +111,8 @@ const PurchaseScheduleInput = () => {
             onChange={(e) =>
               handleNewPurchaseScheduleInput("title", e.target.value)
             }
+            error={!!errors.title}
+            helperText={errors.title}
           />
           <TextField
             label="金額"
@@ -112,9 +121,12 @@ const PurchaseScheduleInput = () => {
               handleNewPurchaseScheduleInput("price", e.target.value)
             }
             inputProps={numericProps}
+            error={!!errors.price}
+            helperText={errors.price}
           />
           <Select
             value={newPurchaseSchedule.cycle}
+            sx={{ maxHeight: "56px" }}
             onChange={(e) =>
               handleNewPurchaseScheduleInput("cycle", e.target.value)
             }
@@ -136,6 +148,8 @@ const PurchaseScheduleInput = () => {
               onChange={(e) =>
                 handleNewPurchaseScheduleInput("date", e.target.value)
               }
+              error={!!errors.date}
+              helperText={errors.date}
             />
           )}
           {newPurchaseSchedule.cycle === "毎週" && (
@@ -178,7 +192,12 @@ const PurchaseScheduleInput = () => {
             options={methodList}
             onChange={(_e, v) => handleNewPurchaseScheduleInput("method", v)}
             renderInput={(params) => (
-              <TextField {...params} label="支払い方法" />
+              <TextField
+                {...params}
+                label="支払い方法"
+                error={!!errors.method}
+                helperText={errors.method}
+              />
             )}
           />
           <StyledCheckbox
@@ -217,6 +236,7 @@ const PurchaseScheduleInput = () => {
         variant="contained"
         onClick={addPurchaseSchedule}
         sx={{ width: "100%", mt: 1 }}
+        disabled={hasError}
       >
         追加
       </Button>

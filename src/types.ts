@@ -84,7 +84,7 @@ export interface AccountType extends AccountInputType {
 }
 
 export interface AccountLinkType
-  extends Pick<AccountType, "id" | "email" | "name" | "icon"> {}
+  extends Pick<AccountType, "id" | "email" | "name" | "icon"> { }
 
 export const defaultAccountInput: AccountInputType = {
   email: "",
@@ -115,7 +115,7 @@ export const defaultMethod: MethodType = {
   label: "",
   assetId: "",
   timing: "即時",
-  timingDate: 0,
+  timingDate: 1,
   tabId: "",
 };
 
@@ -198,3 +198,5 @@ export interface InputTabType {
 export interface TabType extends InputTabType {
   id: string;
 }
+
+export type ErrorType = Record<string, string | undefined> 
