@@ -162,17 +162,18 @@ const PurchaseInput = () => {
 
   const { Account } = useAccount();
 
+  // 第2因数にnewPurchaseを追加しないと、newPurchaseを更新しても関数が更新されず、初期値が使われてしまう。
   const isError = useCallback(() => {
     const validateError = validateAndSetErrors(newPurchase);
     if (!Account) console.error("ログインしていません");
     return validateError || !Account;
-  }, [Account]);
+  }, [Account, newPurchase]);
 
+  // useTabを関数内で呼び出すと、Invalid hook call. Hooks can only be called inside of the body of a function component.というエラーが出る。
+  const { tabId } = useTab();
+  const { purchaseList, setPurchaseList } = usePurchase();
   const addPurchase = useCallback(async () => {
     if (isError()) return;
-
-    const { tabId } = useTab();
-    const { purchaseList, setPurchaseList } = usePurchase();
 
     const { income, price, ...newPurchaseData } = newPurchase;
     const difference = income ? price : -price;

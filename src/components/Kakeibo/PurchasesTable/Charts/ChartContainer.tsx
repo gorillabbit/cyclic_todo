@@ -94,8 +94,6 @@ const DoughnutContainer = ({
   );
   const currentMonthIncome = sumSpentAndIncome(currentMonthIncomeList);
 
-  console.log(currentMonthIncomeList);
-
   const plainProps = {
     currentMonthNetSpentList,
     currentMonthNetSpent,
