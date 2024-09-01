@@ -194,8 +194,8 @@ export const getLastBalance = (
   updatePurchases: PurchaseDataType[]
 ): number => {
   const lastPurchase = updatePurchases.filter((p) => p.assetId === assetId)
-    .sort((a, b) => b.date.getTime() - a.date.getTime())
-    .find((purchase) => purchase.date <= date);
+    .sort((a, b) => b.payDate.getTime() - a.payDate.getTime())
+    .find((purchase) => purchase.payDate <= date);
   // NaNに対応するために??ではなく三項演算子を使う
   return Number(lastPurchase?.balance) ? Number(lastPurchase?.balance) : 0
 };

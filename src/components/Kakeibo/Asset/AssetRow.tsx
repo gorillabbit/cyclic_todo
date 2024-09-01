@@ -20,7 +20,6 @@ import {
 import {
   addPurchaseAndUpdateLater,
   getLastBalance,
-  numericProps,
   updateAndAddPurchases,
 } from "../../../utilities/purchaseUtilities";
 import DeleteConfirmDialog from "../DeleteConfirmDialog";
@@ -146,19 +145,20 @@ const PlainAssetRow = memo(
           )}
         </TableCellWrapper>
         <TableCellWrapper sx={{ borderBottom: 0 }}>
+          {/* 残高 */}
           {isOpen ? (
             <TextField
               {...tableInputStyle}
               value={isBalanceChanged ? balanceInput : lastBalance}
               name="balance"
               onChange={handleBalanceInput}
-              inputProps={numericProps}
             />
           ) : (
             <>{lastBalance}</>
           )}
         </TableCellWrapper>
         <TableCellWrapper sx={{ borderBottom: 0 }}>
+          {/* 月末残高 */}
           {monthEndBalance}
         </TableCellWrapper>
         {!isSmall && isOpen && (
@@ -273,7 +273,7 @@ const AssetRow = memo(
               tabId,
               timing: "即時",
               label: "資産追加",
-              timingDate: 0,
+              timingDate: 1,
             },
             category: "",
             description: "",
