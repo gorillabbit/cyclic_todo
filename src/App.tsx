@@ -13,6 +13,7 @@ import LoginPage from "./pages/LoginPage";
 import { db } from "./firebase";
 import HomePage from "./pages/HomePage";
 import KiyakuPage from "./pages/KiyakuPage";
+import ja from "date-fns/locale/ja";
 
 const App = memo((): JSX.Element => {
   const theme = createTheme({
@@ -56,7 +57,7 @@ const App = memo((): JSX.Element => {
   }, [auth, setAccount]);
   return (
     <BrowserRouter>
-      <LocalizationProvider dateAdapter={AdapterDateFns}>
+      <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ja}>
         <ThemeProvider theme={theme}>
           <AccountProvider {...{ Account }}>
             <Header />
