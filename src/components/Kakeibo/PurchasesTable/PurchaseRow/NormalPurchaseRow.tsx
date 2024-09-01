@@ -6,6 +6,7 @@ import PaymentsIcon from "@mui/icons-material/Payments";
 import PurchaseRowButtons from "./PurchaseRowButtons";
 import TableCellWrapper from "../../TableCellWrapper";
 import { PurchaseDataType } from "../../../../types/purchaseTypes";
+import { useAsset } from "../../../../hooks/useData";
 
 type UnderHalfRowProps = {
   isGroup: boolean;
@@ -13,6 +14,7 @@ type UnderHalfRowProps = {
   setIsEdit: (value: React.SetStateAction<boolean>) => void;
   setIsEditPrice: React.Dispatch<React.SetStateAction<boolean>>;
   updatePurchases: PurchaseDataType[];
+  assetName: string | undefined;
 };
 
 const UnderHalfRow = memo(
@@ -22,15 +24,23 @@ const UnderHalfRow = memo(
     setIsEdit,
     setIsEditPrice,
     updatePurchases,
+    assetName,
   }: UnderHalfRowProps) => (
     <>
       <TableCellWrapper>
         {editFormData.difference}
-        {editFormData.method.timing === "翌月" &&
-          editFormData.childPurchaseId && <Chip label="翌月" />}
+        {editFormData.method.timing === "翌月" && !isGroup && (
+          <Chip label="翌月" />
+        )}
         {editFormData.isUncertain && <Chip label="未確" />}
       </TableCellWrapper>
-      <TableCellWrapper label={editFormData.balance} />
+      <TableCellWrapper
+        label={
+          editFormData.method.timing === "翌月" && !isGroup
+            ? "-"
+            : assetName + " " + editFormData.balance
+        }
+      />
       <TableCellWrapper label={editFormData.description} />
       <TableCellWrapper>
         <PaymentsIcon
@@ -70,6 +80,7 @@ const PlainNormalPurchaseRow = memo(
     setIsEditPrice,
     rowColor,
     updatePurchases,
+    assetName,
   }: PlainNormalPurchaseRowProps): JSX.Element => (
     <>
       <TableRow sx={{ pb: 0.5, bgcolor: rowColor }}>
@@ -95,6 +106,7 @@ const PlainNormalPurchaseRow = memo(
             editFormData={editFormData}
             isGroup={isGroup}
             updatePurchases={updatePurchases}
+            assetName={assetName}
           />
         )}
       </TableRow>
@@ -107,6 +119,7 @@ const PlainNormalPurchaseRow = memo(
             editFormData={editFormData}
             isGroup={isGroup}
             updatePurchases={updatePurchases}
+            assetName={assetName}
           />
         </TableRow>
       )}
@@ -114,19 +127,26 @@ const PlainNormalPurchaseRow = memo(
   )
 );
 
-const NormalPurchaseRow = (
-  props: UnderHalfRowProps & {
-    setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-    open: boolean;
-    isSmall: boolean;
-    index: number;
-  }
-) => {
+const NormalPurchaseRow = (props: {
+  isGroup: boolean;
+  editFormData: PurchaseDataType;
+  setIsEdit: (value: React.SetStateAction<boolean>) => void;
+  setIsEditPrice: React.Dispatch<React.SetStateAction<boolean>>;
+  updatePurchases: PurchaseDataType[];
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  open: boolean;
+  isSmall: boolean;
+  index: number;
+}) => {
   const rowColor = useMemo(
     () => (props.index % 2 === 0 ? "#f0f0f0" : "white"),
     [props.index]
   );
-  const plainProps = { ...props, rowColor };
+  const { assetList } = useAsset();
+  const assetName = assetList.find(
+    (asset) => asset.id === props.editFormData.assetId
+  )?.name;
+  const plainProps = { ...props, rowColor, assetName };
   // TODO 残高が他の残高と区別できるようにする
   // TODO 残高の推移グラフを描く
   return <PlainNormalPurchaseRow {...plainProps} />;

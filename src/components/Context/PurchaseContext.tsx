@@ -64,6 +64,7 @@ export const PurchaseProvider = memo(
           return {
             ...purchase,
             date: purchase.date.toDate(),
+            payDate: purchase.payDate.toDate(),
           };
         })
       );

@@ -6,16 +6,15 @@ import { addDocPurchaseTemplate } from "../../../firebase";
 import { ErrorType, MethodListType } from "../../../types";
 import {
   addPurchaseAndUpdateLater,
+  getPayDate,
   numericProps,
   updateAndAddPurchases,
 } from "../../../utilities/purchaseUtilities";
 import TemplateButtons from "./TemplateButtonsContainer";
-import { getPayLaterDate } from "../../../utilities/dateUtilities";
 import { useTab, usePurchase, useAccount } from "../../../hooks/useData";
 import {
   defaultInputFieldPurchase,
   InputFieldPurchaseType,
-  PurchaseDataType,
 } from "../../../types/purchaseTypes";
 import { set } from "date-fns";
 import { getHasError, validatePurchase } from "../KakeiboSchemas";
@@ -177,38 +176,24 @@ const PurchaseInput = () => {
 
     const { income, price, ...newPurchaseData } = newPurchase;
     const difference = income ? price : -price;
-    const { assetId, timing, timingDate } = newPurchase.method;
 
-    const _addPurchase = (
-      purchases: PurchaseDataType[],
-      options: Partial<PurchaseDataType>
-    ) => {
-      const purchaseData = {
-        ...newPurchaseData,
-        tabId,
-        userId: Account?.id || "",
-        childPurchaseId: "",
-        difference,
-        assetId,
-        balance: 0,
-        id: "",
-        ...options,
-      };
-      return addPurchaseAndUpdateLater(purchaseData, purchases);
+    const purchaseData = {
+      ...newPurchaseData,
+      tabId,
+      userId: Account?.id || "",
+      payDate: getPayDate(newPurchase),
+      difference,
+      assetId: newPurchase.method.assetId,
+      balance: 0,
+      id: "",
     };
-    const is即時 = timing === "即時";
-    const addedPurchaseAndId = _addPurchase(
-      purchaseList,
-      is即時 ? {} : { date: getPayLaterDate(newPurchase.date, timingDate) }
+    const addedPurchaseAndId = addPurchaseAndUpdateLater(
+      purchaseData,
+      purchaseList
     );
-    const { purchases: addedPurchases, id: addedId } = addedPurchaseAndId;
-    const purchaseListToAdd = is即時
-      ? addedPurchases
-      : _addPurchase(addedPurchases, {
-          childPurchaseId: addedId,
-        }).purchases;
-    updateAndAddPurchases(purchaseListToAdd);
-    setPurchaseList(purchaseListToAdd);
+    const { purchases: addedPurchases } = addedPurchaseAndId;
+    updateAndAddPurchases(addedPurchases);
+    setPurchaseList(addedPurchases);
     setNewPurchase(defaultInputFieldPurchase);
   }, [Account, defaultInputFieldPurchase, newPurchase]);
 

@@ -92,21 +92,23 @@ const PlainPurchasesRow = memo(
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {groupPurchases.map((groupPurchase) => (
-                    <TableRow key={groupPurchase.id}>
-                      <TableCell>
-                        {groupPurchase.date.toLocaleString().split(" ")[0]}
-                      </TableCell>
-                      <TableCell>{groupPurchase.title}</TableCell>
-                      <TableCell>{groupPurchase.difference + "円"}</TableCell>
-                      <TableCell>{groupPurchase.balance + "円"}</TableCell>
-                      <TableCell>{groupPurchase.category}</TableCell>
-                      <TableCell>
-                        {groupPurchase.balance > 0 ? "収入" : "支出"}
-                      </TableCell>
-                      <TableCell>{groupPurchase.description}</TableCell>
-                    </TableRow>
-                  ))}
+                  {groupPurchases
+                    .sort((a, b) => a.date.getTime() - b.date.getTime())
+                    .map((groupPurchase) => (
+                      <TableRow key={groupPurchase.id}>
+                        <TableCell>
+                          {groupPurchase.date.toLocaleString().split(" ")[0]}
+                        </TableCell>
+                        <TableCell>{groupPurchase.title}</TableCell>
+                        <TableCell>{groupPurchase.difference + "円"}</TableCell>
+                        <TableCell>{groupPurchase.balance + "円"}</TableCell>
+                        <TableCell>{groupPurchase.category}</TableCell>
+                        <TableCell>
+                          {groupPurchase.balance > 0 ? "収入" : "支出"}
+                        </TableCell>
+                        <TableCell>{groupPurchase.description}</TableCell>
+                      </TableRow>
+                    ))}
                 </TableBody>
               </Table>
             </Collapse>
@@ -131,7 +133,7 @@ const PurchasesRow = ({
   const [isEdit, setIsEdit] = useState<boolean>(false);
   const [isEditPrice, setIsEditPrice] = useState<boolean>(false);
   const [open, setOpen] = useState(false);
-  const isGroup = groupPurchases.length > 0 && !purchase.childPurchaseId;
+  const isGroup = groupPurchases.length > 0;
   const [editFormData, setEditFormData] = useState<PurchaseDataType>(purchase);
 
   const { purchaseList } = usePurchase();

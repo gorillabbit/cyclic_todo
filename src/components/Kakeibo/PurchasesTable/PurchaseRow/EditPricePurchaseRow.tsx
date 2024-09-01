@@ -2,18 +2,13 @@ import { TextField, IconButton, TableRow, TableCell } from "@mui/material";
 import PaymentsIcon from "@mui/icons-material/Payments";
 import { memo, useCallback, useState } from "react";
 import DoneIcon from "@mui/icons-material/Done";
-import { db, dbNames } from "../../../../firebase";
 import {
   numericProps,
   updateAndAddPurchases,
   updatePurchaseAndUpdateLater,
 } from "../../../../utilities/purchaseUtilities";
 import TableCellWrapper from "../../TableCellWrapper";
-import {
-  PurchaseDataType,
-  PurchaseRawDataType,
-} from "../../../../types/purchaseTypes";
-import { doc, getDoc } from "firebase/firestore";
+import { PurchaseDataType } from "../../../../types/purchaseTypes";
 import { usePurchase } from "../../../../hooks/useData";
 import { ErrorType } from "../../../../types";
 import { getHasError, validateEditPurchase } from "../../KakeiboSchemas";
@@ -134,35 +129,11 @@ const EditPricePurchaseRow = ({
       isUncertain: false,
     };
     const update = await updatePurchaseAndUpdateLater(
-      editFormData.id,
       certainPurchase,
       updatePurchases
     );
-    // 決済Purchaseもあるなら変更する
-    if (editFormData.childPurchaseId) {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { id, date, childPurchaseId, ...childPurchaseWithoutId } =
-        certainPurchase;
-      const childPurchase = (
-        await getDoc(doc(db, dbNames.purchase, editFormData.childPurchaseId))
-      ).data() as PurchaseRawDataType;
-
-      const update2 = await updatePurchaseAndUpdateLater(
-        editFormData.childPurchaseId,
-        {
-          ...childPurchaseWithoutId,
-          date: childPurchase.date.toDate(),
-          childPurchaseId: "",
-          id: "",
-        },
-        update.purchases
-      );
-      updateAndAddPurchases(update2.purchases);
-      setPurchaseList(update2.purchases);
-    } else {
-      updateAndAddPurchases(update.purchases);
-      setPurchaseList(update.purchases);
-    }
+    updateAndAddPurchases(update.purchases);
+    setPurchaseList(update.purchases);
     setEditFormData((prev) => ({ ...prev, isUncertain: false }));
     setIsEditPrice(false);
   }, [
@@ -189,8 +160,6 @@ const EditPricePurchaseRow = ({
       return nextPurchase;
     });
   };
-
-  console.log(errors);
 
   const plainProps = {
     editFormData,

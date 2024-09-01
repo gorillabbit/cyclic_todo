@@ -100,16 +100,10 @@ const PurchaseRowButtons = ({
 
   const deleteAction = useCallback(async () => {
     let updates = updatePurchases;
-    if (purchase.childPurchaseId) {
-      updates = await deletePurchaseAndUpdateLater(
-        purchase.childPurchaseId,
-        updates
-      );
-    }
     updates = await deletePurchaseAndUpdateLater(purchase.id, updates);
     updateAndAddPurchases(updates);
     setPurchaseList(updates);
-  }, [purchase.childPurchaseId, purchase.id, setPurchaseList, updatePurchases]);
+  }, [purchase.id, setPurchaseList, updatePurchases]);
 
   const plainProps = {
     purchase,

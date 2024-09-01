@@ -5,19 +5,23 @@ interface PurchaseBaseType {
   userId: string;
   title: string;
   date: Date;
+  payDate: Date;
   method: MethodListType;
   category: string;
   description: string;
   isUncertain?: boolean;
+  isGroup?: boolean;
 }
 const defaultPurchaseBase: PurchaseBaseType = {
   userId: "",
   title: "",
   date: new Date(),
+  payDate: new Date(),
   method: defaultMethodList,
   category: "",
   description: "",
   isUncertain: false,
+  isGroup: false,
 };
 
 export interface InputFieldPurchaseType extends PurchaseBaseType {
@@ -36,21 +40,21 @@ export interface PurchaseDataType extends PurchaseBaseType {
   difference: number;
   balance: number;
   parentScheduleId?: string;
-  childPurchaseId: string;
+
 }
 export const defaultPurchaseData: PurchaseDataType = {
   ...defaultPurchaseBase,
   difference: 0,
   balance: 0,
   parentScheduleId: "",
-  childPurchaseId: "",
   assetId: "",
   id: "",
   tabId: "",
 };
-export interface PurchaseRawDataType extends Omit<PurchaseDataType, "date"> {
+export interface PurchaseRawDataType extends Omit<PurchaseDataType, "date" | "payDate"> {
   id: string;
   date: Timestamp;
+  payDate: Timestamp;
 }
 
 export interface TemplateButtonType extends InputFieldPurchaseType {
