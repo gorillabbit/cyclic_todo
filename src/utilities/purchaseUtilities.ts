@@ -350,7 +350,7 @@ interface oldPurchases extends PurchaseRawDataType {
   income?: boolean;
 }
 export const updateDocuments = async () => {
-  const q = query(collection(db, dbNames.purchase), orderBy("date", "asc"));
+  const q = query(collection(db, dbNames.purchase), orderBy("payDate", "asc"));
   const data = await getDocs(q);
 
   if (data.empty) return console.error("データがありません");
@@ -364,9 +364,6 @@ export const updateDocuments = async () => {
   );
 
   purchases
-    .sort((a, b) =>
-      a.payDate.toDate().getTime() - b.payDate.toDate().getTime()
-    )
     .forEach((data) => {
       console.log(data)
       if (!data.tabId) return;
