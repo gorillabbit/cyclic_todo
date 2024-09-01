@@ -365,7 +365,7 @@ export const updateDocuments = async () => {
 
   purchases
     .sort((a, b) =>
-      a.date.toDate().getTime() - b.date.toDate().getTime()
+      a.payDate.toDate().getTime() - b.payDate.toDate().getTime()
     )
     .forEach((data) => {
       if (!data.tabId) return;

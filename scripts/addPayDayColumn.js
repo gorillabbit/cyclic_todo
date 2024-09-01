@@ -1,4 +1,4 @@
-import { prdDb } from "./firebasePrd.js";
+import { db } from "./firebase.js";
 import { addMonths, lastDayOfMonth } from "date-fns";
 
 const getPayLaterDate = (baseDate, dateNum) => {
@@ -23,14 +23,14 @@ const getPayLaterDate = (baseDate, dateNum) => {
 };
 
 async function updateDocuments() {
-  const collectionRef = prdDb.collection("Purchases");
+  const collectionRef = db.collection("Purchases");
   const snapshot = await collectionRef.orderBy("date", "asc").get();
 
   if (snapshot.empty) {
     return console.error("データがありません");
   }
 
-  const batch = prdDb.batch();
+  const batch = db.batch();
 
   const purchases = await Promise.all(
     snapshot._docs().map(async (docSnap) => {
@@ -56,7 +56,7 @@ async function updateDocuments() {
 updateDocuments();
 
 async function deleteChildPurchase() {
-  const collectionRef = prdDb.collection("Purchases");
+  const collectionRef = db.collection("Purchases");
   const snapshot = await collectionRef.get();
 
   if (snapshot.empty) {
