@@ -5,6 +5,7 @@ import {
   Table,
   TableBody,
   TableHead,
+  Typography,
 } from "@mui/material";
 import { memo, useState } from "react";
 import EditPurchaseRow from "./EditPurchaseRow";
@@ -104,7 +105,11 @@ const PlainPurchasesRow = memo(
                         <TableCell>{groupPurchase.balance + "円"}</TableCell>
                         <TableCell>{groupPurchase.category}</TableCell>
                         <TableCell>
-                          {groupPurchase.balance > 0 ? "収入" : "支出"}
+                          {groupPurchase.difference > 0 ? (
+                            <Typography color="#ed5151">収入</Typography>
+                          ) : (
+                            "支出"
+                          )}
                         </TableCell>
                         <TableCell>{groupPurchase.description}</TableCell>
                       </TableRow>
