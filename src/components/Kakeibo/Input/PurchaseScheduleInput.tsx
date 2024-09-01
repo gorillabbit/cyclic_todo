@@ -78,10 +78,9 @@ const PurchaseScheduleInput = () => {
     []
   );
 
+  const { Account } = useAccount();
+  const { purchaseList, setPurchaseList } = usePurchase();
   const addPurchaseSchedule = useCallback(async () => {
-    const { Account } = useAccount();
-    const { purchaseList, setPurchaseList } = usePurchase();
-
     const isError = validateAndSetErrors(newPurchaseSchedule);
     if (isError) return;
     if (!Account) return console.error("ログインしてください");
