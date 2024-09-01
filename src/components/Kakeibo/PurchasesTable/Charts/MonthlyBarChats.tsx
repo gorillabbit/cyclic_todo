@@ -28,8 +28,7 @@ const MonthlyStackedBarChart = () => {
     (p) =>
       p.date < getFutureMonthFirstDay(2) &&
       p.date >= new Date("2024-04-01") &&
-      p.category !== "送受金" &&
-      !p.childPurchaseId
+      p.category !== "送受金"
   );
   const processData = (purchase: PurchaseDataType[]) => {
     const result: { [key: string]: { [key: string]: number } } = {};
