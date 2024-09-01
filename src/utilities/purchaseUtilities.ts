@@ -1,7 +1,7 @@
 import { InputBaseComponentProps } from "@mui/material";
-import { InputPurchaseScheduleType, WeekDay } from "../types";
+import { InputPurchaseScheduleType, MethodType, WeekDay } from "../types";
 import { db, dbNames, deleteDocPurchase } from "../firebase";
-import { addMonths, nextDay, addDays, set } from "date-fns";
+import { addMonths, nextDay, addDays } from "date-fns";
 import {
   doc,
   collection,
@@ -36,7 +36,7 @@ export const numericProps: InputBaseComponentProps = {
  * @returns boolean
  */
 export const isLaterPayment = (purchase: PurchaseDataType): boolean =>
-  purchase.method.timing === "翌月" && !purchase.childPurchaseId;
+  purchase.method.timing === "翌月"
 
 /**
  * 数値が0以下、NaNかどうか
@@ -203,7 +203,7 @@ export const getLastBalance = (
 // ある時点より後の支払いすべてを更新する
 export const updateAllLaterPurchases = (
   assetId: string,
-  date: Date,
+  payDate: Date,
   difference: number,
   updatePurchases: PurchaseDataType[]
 ) => {
@@ -213,7 +213,7 @@ export const updateAllLaterPurchases = (
   return [...filteredPurchases.map((p) => ({
     ...p,
     balance:
-      p.date > date
+      p.payDate > payDate
         ? Number(p.balance) + Number(difference)
         : Number(p.balance),
   })), ...restPurchases]
@@ -227,25 +227,22 @@ export const deletePurchaseAndUpdateLater = async (
   const purchase = docSnap.data() as PurchaseRawDataType;
   deleteDocPurchase(purchaseId);
   const filteredPurchase = updatePurchases.filter((p) => p.id !== purchaseId);
-  const difference = purchase.childPurchaseId
-    ? 0
-    : Number(-purchase.difference);
   return updateAllLaterPurchases(
     purchase.assetId,
-    purchase.date.toDate(),
-    difference,
+    purchase.payDate.toDate(),
+    Number(-purchase.difference),
     filteredPurchase
   );
 };
-// TODO 子タスクの有無による、differenceをゼロにするかをここにまとめる
+
 export const addPurchaseAndUpdateLater = (
   purchase: PurchaseDataType,
   updatePurchases: PurchaseDataType[]
 ) => {
-  const difference = purchase.childPurchaseId ? 0 : Number(purchase.difference);
+  const difference = Number(purchase.difference)
   const purchases = updateAllLaterPurchases(
     purchase.assetId,
-    purchase.date,
+    purchase.payDate,
     difference,
     updatePurchases
   );
@@ -265,19 +262,18 @@ export const addPurchaseAndUpdateLater = (
 };
 
 export const updatePurchaseAndUpdateLater = async (
-  purchaseId: string, // 子支払いの場合は下のpurchaseと食い違うので必要
   purchase: PurchaseDataType,
   updatePurchases: PurchaseDataType[]
 ) => {
   // purchaseIdで指定した支払いを取得して、その支払いの差額を計算して、引く
   // その後のcurrentPurchase以外の支払いを更新する
-  const currentPurchases = updatePurchases.find((p) => p.id === purchaseId);
+  const currentPurchases = updatePurchases.find((p) => p.id === purchase.id);
   if (!currentPurchases) return { purchases: updatePurchases };
   const updatedLaterPurchases = updateAllLaterPurchases(
     currentPurchases.assetId,
-    currentPurchases.date,
+    currentPurchases.payDate,
     -currentPurchases.difference,
-    updatePurchases.filter((p) => p.id !== purchaseId)
+    updatePurchases.filter((p) => p.id !== purchase.id)
   );
   return addPurchaseAndUpdateLater(purchase, updatedLaterPurchases);
 };
@@ -305,6 +301,8 @@ export const addScheduledPurchase = (
     parentScheduleId: purchaseScheduleId,
     assetId: method.assetId,
     balance: 0,
+    difference,
+    id: "",
   };
 
   const purchaseList: PurchaseDataType[] = [];
@@ -313,30 +311,12 @@ export const addScheduledPurchase = (
     if (cycle === "毎週" && day) return listWeeklyDaysUntil(day, endDate);
     return [];
   };
-  getDays().forEach((dateDay, index) => {
-    const childPurchaseId = doc(collection(db, dbNames.purchase)).id;
-    const hasLaterPayment = method.timing === "翌月";
-
+  getDays().forEach((dateDay) => {
     purchaseList.push({
       ...purchaseBase,
       date: dateDay,
-      childPurchaseId: hasLaterPayment ? childPurchaseId : "",
-      difference: hasLaterPayment ? 0 : difference,
-      id: "",
+      payDate: method.timing === "即時" ? dateDay : getPayLaterDate(dateDay, method.timingDate),
     });
-    // カード払いの場合は後払いの日も追加する
-    if (hasLaterPayment) {
-      purchaseList.push({
-        ...purchaseBase,
-        id: childPurchaseId,
-        date: getPayLaterDate(
-          set(dateDay, { milliseconds: index }),
-          method.timingDate
-        ),
-        childPurchaseId: "",
-        difference,
-      });
-    }
   });
   let newUpdatePurchases = updatePurchases;
   for (const purchase of purchaseList) {
@@ -396,7 +376,7 @@ export const updateDocuments = async () => {
         data.difference ?? (data.income ? data.price : -(data.price ?? 0));
       const balance =
         Number(lastPurchase ? lastPurchase : 0) +
-        Number(data.childPurchaseId ? 0 : difference);
+        Number(difference);
       const docRef = doc(db, dbNames.purchase, data.id);
       batch.update(docRef, {
         difference,
@@ -409,4 +389,10 @@ export const updateDocuments = async () => {
   await batch.commit();
   window.location.reload();
   console.log("データを更新しました");
+}
+
+export const getPayDate = (purchase: { method: MethodType, date: Date }) => {
+  const { method, date } = purchase;
+  const { timing, timingDate } = method;
+  return timing === "即時" ? date : getPayLaterDate(date, timingDate);
 }

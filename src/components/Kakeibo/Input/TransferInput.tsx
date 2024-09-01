@@ -11,13 +11,12 @@ import {
 } from "../../../types";
 import {
   addPurchaseAndUpdateLater,
+  getPayDate,
   numericProps,
   updateAndAddPurchases,
 } from "../../../utilities/purchaseUtilities";
-import { getPayLaterDate } from "../../../utilities/dateUtilities";
 import TransferTemplateButtonsContainer from "./TransferTemplateButtonContainer";
 import { usePurchase, useTab } from "../../../hooks/useData";
-import { PurchaseDataType } from "../../../types/purchaseTypes";
 import { getHasError, validateTransfer } from "../KakeiboSchemas";
 import MethodSelector from "../ScreenParts/MethodSelector";
 
@@ -140,37 +139,22 @@ const TransferInput = () => {
     if (isError) return;
     if (!currentUser) return console.error("ログインしていません");
     const { price, date, description, from, to } = newTransfer;
-    const purchaseTitle = `${from.label}→${to.label}`;
     const basePurchase = {
       userId: currentUser.uid,
       category: "送受金",
-      childPurchaseId: "",
       date,
       description,
       tabId,
       id: "",
       balance: 0,
     };
-    let childId = "";
     let update = purchaseList;
-    if (from.timing === "翌月" && from.timingDate) {
-      const childTransfer: PurchaseDataType = {
-        ...basePurchase,
-        title: `【送】${purchaseTitle}`,
-        date: getPayLaterDate(date, from.timingDate),
-        method: from,
-        difference: -price,
-        assetId: from.assetId,
-      };
-      const newUpdate = addPurchaseAndUpdateLater(childTransfer, update);
-      update = newUpdate.purchases;
-      childId = newUpdate.id;
-    }
+    const purchaseTitle = `${from.label}→${to.label}`;
     const fromPurchase = {
       ...basePurchase,
       title: `【送】${purchaseTitle}`,
       method: from,
-      childPurchaseId: childId,
+      payDate: getPayDate({ date, method: from }),
       assetId: from.assetId,
       difference: -price,
     };
@@ -179,6 +163,7 @@ const TransferInput = () => {
       ...basePurchase,
       title: `【受】${purchaseTitle}`,
       method: to,
+      payDate: getPayDate({ date, method: to }),
       assetId: to.assetId,
       difference: price,
     };

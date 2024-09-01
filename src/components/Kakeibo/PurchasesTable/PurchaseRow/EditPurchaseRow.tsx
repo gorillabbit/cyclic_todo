@@ -3,13 +3,11 @@ import { DatePicker } from "@mui/x-date-pickers";
 import { memo, useCallback, useState } from "react";
 import DoneIcon from "@mui/icons-material/Done";
 import { ErrorType, MethodListType } from "../../../../types";
-import { getPayLaterDate } from "../../../../utilities/dateUtilities";
 import { usePurchase } from "../../../../hooks/useData";
 import TableCellWrapper from "../../TableCellWrapper";
 import { PurchaseDataType } from "../../../../types/purchaseTypes";
 import {
-  addPurchaseAndUpdateLater,
-  deletePurchaseAndUpdateLater,
+  getPayDate,
   updateAndAddPurchases,
   updatePurchaseAndUpdateLater,
 } from "../../../../utilities/purchaseUtilities";
@@ -161,54 +159,20 @@ const EditPurchaseRow = ({
 
   // 編集内容を保存する関数
   const handleSaveClick = useCallback(async () => {
-    const { timing, timingDate } = editFormData.method;
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { id: _id, childPurchaseId, ...purchaseWithoutIds } = editFormData;
-    // 日付の変更にも対応できるように後払いも更新する
-    const childPurchase = {
-      ...purchaseWithoutIds,
-      date: getPayLaterDate(editFormData.date, timingDate),
-      childPurchaseId: "",
-      id: childPurchaseId,
-    };
-    // TODO ここらへんのTimestampやらDateやらの変換をどうにかする
-    let update = { childPurchaseId, difference: editFormData.difference };
-    let updatedPurchases = updatePurchases;
-    if (childPurchaseId) {
-      if (timing === "即時") {
-        // 後払い → 即時払い = 後払いを消す
-        updatedPurchases = await deletePurchaseAndUpdateLater(
-          childPurchaseId,
-          updatePurchases
-        );
-        update = { ...update, childPurchaseId: "" };
-      } else {
-        // 後払い → 後払い = 後払いを更新する
-        updatedPurchases = (
-          await updatePurchaseAndUpdateLater(
-            childPurchaseId,
-            childPurchase,
-            updatePurchases
-          )
-        ).purchases;
-      }
-    } else if (timing === "翌月") {
-      // 即時払い → 後払い = 後払いを作る
-      const docs = addPurchaseAndUpdateLater(childPurchase, updatePurchases);
-      update = { ...update, childPurchaseId: docs.id, difference: 0 };
-      updatedPurchases = docs.purchases;
-    }
-    const updatedPurchases1 = await updatePurchaseAndUpdateLater(
-      editFormData.id,
-      {
-        ...editFormData,
-        ...update,
-      },
-      updatedPurchases
-    );
+    const method = editFormData.method;
+    const 更新後purchase = (
+      await updatePurchaseAndUpdateLater(
+        {
+          ...editFormData,
+          assetId: method.assetId,
+          payDate: getPayDate(editFormData),
+        },
+        updatePurchases
+      )
+    ).purchases;
     // 編集が完了したあとにそれとわかる何かを表示するスナックバーなど。
-    updateAndAddPurchases(updatedPurchases1.purchases);
-    setPurchaseList(updatedPurchases1.purchases);
+    updateAndAddPurchases(更新後purchase);
+    setPurchaseList(更新後purchase);
     setIsEdit(false);
   }, [editFormData, setIsEdit, setPurchaseList, updatePurchases]);
 

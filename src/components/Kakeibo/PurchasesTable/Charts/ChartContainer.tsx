@@ -79,15 +79,11 @@ const DoughnutContainer = ({
     category: isLaterPayment(p) ? p.method.label + "支払い" : p.category,
   }));
   // 今月の支払金額(カード払いをまとめる)
-  const currentMonthPaymentList = PayLaterCategoryPurchase.filter(
-    (spent) => !spent.childPurchaseId
-  );
+  const currentMonthPaymentList = PayLaterCategoryPurchase;
   const currentMonthPayment = sumSpentAndIncome(currentMonthPaymentList);
 
   // 今月の支払金額(カテゴリーごと)
-  const currentMonthPaymentCategoryList = currentMonthSpentList.filter(
-    (spent) => !spent.childPurchaseId
-  );
+  const currentMonthPaymentCategoryList = currentMonthSpentList;
 
   const currentMonthIncomeList = PurchasesWithoutTransfer.filter(
     (p) => p.difference > 0

@@ -31,7 +31,7 @@ import DoughnutContainer from "./Charts/ChartContainer";
 import NarrowDownDialog from "./NarrowDownDialog";
 
 type PlainPurchaseProps = {
-  monthlyPurchases: PurchaseDataType[];
+  monthlyPurchasesAddedPayLaterPurchase: PurchaseDataType[];
   getGroupPurchases: (groupedPurchase: PurchaseDataType) => PurchaseDataType[];
   month: Date;
   handleNextMonthButton: () => void;
@@ -55,7 +55,7 @@ type PlainPurchaseProps = {
 
 const PlainPurchases = memo(
   ({
-    monthlyPurchases,
+    monthlyPurchasesAddedPayLaterPurchase,
     getGroupPurchases,
     month,
     handleNextMonthButton,
@@ -70,7 +70,9 @@ const PlainPurchases = memo(
   }: PlainPurchaseProps): JSX.Element => (
     <>
       <AssetsList />
-      <DoughnutContainer monthlyPurchases={monthlyPurchases} />
+      <DoughnutContainer
+        monthlyPurchases={monthlyPurchasesAddedPayLaterPurchase}
+      />
       <PurchaseSchedules />
       <TableContainer component={Paper}>
         <Box display="flex" justifyContent="center">
@@ -144,8 +146,18 @@ const PlainPurchases = memo(
 
 const Purchases = memo((): JSX.Element => {
   const { purchaseList } = usePurchase();
+  const isSmall = useIsSmall();
+
+  // 月の切り替え
   const [month, setMonth] = useState<Date>(new Date());
-  const monthlyPurchases = useMemo(
+  const handleNextMonthButton = useCallback(() => {
+    setMonth((prev) => addMonths(prev, 1));
+  }, []);
+  const handlePastMonthButton = useCallback(() => {
+    setMonth((prev) => addMonths(prev, -1));
+  }, []);
+
+  const その月に発生した支払い = useMemo(
     () =>
       purchaseList.filter(
         (p) =>
@@ -155,70 +167,62 @@ const Purchases = memo((): JSX.Element => {
     [month, purchaseList]
   );
 
-  // 後払いを合計する(収入に後払いはないので考慮しない)
-  const groupedPurchasesDoc = useMemo(
+  const 後払いでその月に払うもの = useMemo(
     () =>
-      monthlyPurchases.reduce((acc, p) => {
-        if (!isLaterPayment(p)) return acc;
-        const keyString = p.method.label + p.date.getDate(); // 同じ日なら同じものとして扱う
-        if (!acc[keyString]) {
-          acc[keyString] = {
-            ...p,
-            difference: 0,
-          };
-        }
-        acc[keyString].difference += Number(p.difference);
+      purchaseList.filter(
+        (p) =>
+          isLaterPayment(p) &&
+          p.payDate.getMonth() === month.getMonth() &&
+          p.payDate.getFullYear() === month.getFullYear()
+      ),
+    [その月に発生した支払い, month]
+  );
+
+  const purchasesWithoutGroupFlag = useMemo(() => {
+    // 後払いを合計する(収入に後払いはないので考慮しない)
+    const 後払い毎の合計 = {} as { [key: string]: PurchaseDataType };
+    後払いでその月に払うもの.forEach((p) => {
+      const keyString =
+        p.method.label + p.payDate.getMonth() + "/" + p.payDate.getDate(); // 支払日が同じ日のものを合計する
+      const target = 後払い毎の合計[keyString];
+      if (!target) {
+        // 後払いの合計を合計としてふさわしい形に変換
+        後払い毎の合計[keyString] = {
+          ...p,
+          parentScheduleId: "",
+          id: keyString,
+          date: p.payDate,
+          title: p.method.label + "引き落し",
+          category: "後支払い",
+          isUncertain: false,
+          description: "",
+          isGroup: true,
+          difference: Number(p.difference),
+        };
+      } else {
+        target.difference += Number(p.difference);
         // 後払いの残高を正しいものにする
-        acc[keyString].balance = Number(p.balance);
-        return acc;
-      }, {} as { [key: string]: PurchaseDataType }),
-    [monthlyPurchases]
-  );
+        target.balance = Number(p.balance);
+      }
+    });
 
-  const groupedPayLaterPurchases = useMemo(
-    () => Object.values(groupedPurchasesDoc),
-    [groupedPurchasesDoc]
-  );
-  const neutralizedGroupedPayLaterPurchase = useMemo(
-    () =>
-      groupedPayLaterPurchases.map((p) => ({
-        ...p,
-        title: p.method.label + "引き落し",
-        category: "後支払い",
-        isUncertain: false,
-        description: "",
-      })),
-    [groupedPayLaterPurchases]
-  );
-
-  const purchasesWithoutGroupFlag = useMemo(
-    () =>
-      [
-        // 後払いは合計したので、除外する
-        ...monthlyPurchases.filter((p) => !isLaterPayment(p)),
-        ...neutralizedGroupedPayLaterPurchase,
-      ].sort((a, b) => a.date.getTime() - b.date.getTime()),
-    [monthlyPurchases, neutralizedGroupedPayLaterPurchase]
-  );
-
-  const handleNextMonthButton = useCallback(() => {
-    setMonth((prev) => addMonths(prev, 1));
-  }, []);
-  const handlePastMonthButton = useCallback(() => {
-    setMonth((prev) => addMonths(prev, -1));
-  }, []);
+    return その月に発生した支払い.concat(Object.values(後払い毎の合計));
+  }, [後払いでその月に払うもの, month]);
 
   // その月のPurchaseしか表示されないのでこれでいい
+  // 発生した後払いは含めない
   const getGroupPurchases = useCallback(
-    (groupedPurchase: PurchaseDataType) =>
-      monthlyPurchases.filter(
-        (p) => isLaterPayment(p) && p.method.id === groupedPurchase.method.id
-      ),
-    [monthlyPurchases]
+    (groupedPurchase: PurchaseDataType) => {
+      if (!groupedPurchase.isGroup) return [];
+      return 後払いでその月に払うもの.filter(
+        (p) => p.method.id === groupedPurchase.method.id
+      );
+    },
+    [後払いでその月に払うもの]
   );
 
-  const isSmall = useIsSmall();
-  const [orderBy, setOrderBy] = useState<keyof PurchaseDataType>("date");
+  // 並び替え機能
+  const [orderBy, setOrderBy] = useState<keyof PurchaseDataType>("date"); // 並び替えの初期値はdate
   const [isAsc, setIsAsc] = useState<boolean>(true);
   const orderedPurchase = useMemo(
     () => sortObjectsByParameter(purchasesWithoutGroupFlag, orderBy, isAsc),
@@ -269,7 +273,7 @@ const Purchases = memo((): JSX.Element => {
   );
 
   const plainProps = {
-    monthlyPurchases,
+    monthlyPurchasesAddedPayLaterPurchase: purchasesWithoutGroupFlag,
     orderedPurchase,
     getGroupPurchases,
     month,
