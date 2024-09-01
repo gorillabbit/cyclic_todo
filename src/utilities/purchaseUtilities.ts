@@ -368,15 +368,17 @@ export const updateDocuments = async () => {
       a.payDate.toDate().getTime() - b.payDate.toDate().getTime()
     )
     .forEach((data) => {
+      console.log(data)
       if (!data.tabId) return;
       const assetId = String(data.method.assetId);
-      const lastPurchase = lastPurchases[assetId];
-      if (!lastPurchase) lastPurchases[assetId] = 0;
+      const lastBalances = lastPurchases[assetId];
+      if (!lastBalances) lastPurchases[assetId] = 0;
       const difference =
         data.difference ?? (data.income ? data.price : -(data.price ?? 0));
       const balance =
-        Number(lastPurchase ? lastPurchase : 0) +
+        Number(lastBalances ? lastBalances : 0) +
         Number(difference);
+
       const docRef = doc(db, dbNames.purchase, data.id);
       batch.update(docRef, {
         difference,
@@ -384,6 +386,7 @@ export const updateDocuments = async () => {
         assetId: data.method.assetId,
         timestamp: new Date()
       });
+
       lastPurchases[assetId] = balance;
     });
   await batch.commit();
