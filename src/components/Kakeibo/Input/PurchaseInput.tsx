@@ -175,7 +175,7 @@ const PurchaseInput = () => {
     if (isError()) return;
 
     const { income, price, ...newPurchaseData } = newPurchase;
-    const difference = income ? price : -price;
+    const difference = income ? Number(price) : -Number(price);
 
     const purchaseData = {
       ...newPurchaseData,

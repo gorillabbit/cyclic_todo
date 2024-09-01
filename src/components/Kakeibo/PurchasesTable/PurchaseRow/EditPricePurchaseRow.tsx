@@ -126,6 +126,7 @@ const EditPricePurchaseRow = ({
   const handleSaveClick = useCallback(async () => {
     const certainPurchase = {
       ...editFormData,
+      difference: Number(editFormData.difference),
       isUncertain: false,
     };
     const update = await updatePurchaseAndUpdateLater(
