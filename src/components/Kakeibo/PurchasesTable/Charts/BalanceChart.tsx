@@ -11,6 +11,7 @@ import {
 import { format, set } from "date-fns";
 import { usePurchase, useAsset } from "../../../../hooks/useData";
 import { getFutureMonthFirstDay } from "../../../../utilities/dateUtilities";
+import { fontSizeObj } from "./DefaultConsts";
 
 // インデックスに基づいた色を生成する関数
 const getColorByIndex = (index: number) => {
@@ -24,21 +25,24 @@ const BalanceChart = () => {
   const { purchaseList } = usePurchase();
   const lastPurchase = purchaseList.filter(
     (p) =>
-      p.date < getFutureMonthFirstDay(2) && p.date >= new Date("2024-04-01")
+      // とりあえず2ヶ月先までのデータを表示 TODO: 条件は変更できるように
+      p.payDate < getFutureMonthFirstDay(2) &&
+      // 2024年4月以降のデータを表示 TODO: 条件は変更できるように
+      p.payDate >= new Date("2024-04-01")
   );
   const { assetList } = useAsset();
-  // 全ての日付を取得し、ユニークかつソートする
-  const dates = lastPurchase.map((p) => p.date);
-  dates.sort(); // 日付をソート
 
   // データセットを作成
   const datasets = lastPurchase
+    // 支払いの日付でソート
+    .sort((a, b) => a.payDate.getTime() - b.payDate.getTime())
     .map((p, index) => {
       const asset = assetList.find((asset) => asset.id === p.assetId);
       if (!asset) return;
       return {
-        time: set(p.date, {
-          milliseconds: index, // データが更新されるとき、同じ時刻のデータが大量に作成される問題があるので暫定的解決策　TODO: 修正
+        time: set(p.payDate, {
+          // データが更新されるとき、同じ時刻のデータが大量に作成される問題があるので暫定的解決策　TODO: 修正
+          milliseconds: index,
         }).getTime(),
         [asset.name]: p.balance,
       };
@@ -54,10 +58,10 @@ const BalanceChart = () => {
           type="number"
           scale="time"
           domain={["auto", "auto"]}
-          tick={{ fontSize: 12 }}
+          tick={fontSizeObj}
         />
-        <YAxis yAxisId="left" tick={{ fontSize: 12 }} />
-        <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 12 }} />
+        <YAxis yAxisId="left" tick={fontSizeObj} />
+        <YAxis yAxisId="right" orientation="right" tick={fontSizeObj} />
         <Tooltip
           filterNull
           cursor={{ stroke: "red", strokeWidth: 0.5 }}
@@ -75,6 +79,8 @@ const BalanceChart = () => {
             activeDot={{ r: 6 }}
             dot={{ r: 1 }}
             strokeWidth={2}
+            // SMBCだけ金額が大きいので左側のY軸に表示
+            // TODO: どの資産を左右に表示するかは設定で変更できるように
             yAxisId={asset.name === "SMBC" ? "left" : "right"}
           />
         ))}

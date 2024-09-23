@@ -14,6 +14,7 @@ import {
 import { usePurchase } from "../../../../hooks/useData";
 import { PurchaseDataType } from "../../../../types/purchaseTypes";
 import { getFutureMonthFirstDay } from "../../../../utilities/dateUtilities";
+import { defaultFontSize, fontSizeObj } from "./DefaultConsts";
 
 const generateColor = (index: number) => {
   const r = (index * 300) % 255;
@@ -65,16 +66,16 @@ const MonthlyStackedBarChart = () => {
     () => processData(pastPurchase),
     [pastPurchase]
   );
-  // TODO すごいアドホックなのでどうにかする
+  // TODO 給与だけ収入として表示する。すごいアドホックなのでどうにかする
   const purchaseCategories = pastPurchase.filter((p) => p.category !== "給与");
   const categories = [...new Set(purchaseCategories.map((p) => p.category))];
   return (
     <ResponsiveContainer width="100%" height={400}>
       <BarChart data={transformedSpent}>
         <CartesianGrid strokeWidth={0.5} />
-        <XAxis dataKey="date" tick={{ fontSize: 12 }} />
-        <YAxis tick={{ fontSize: 12 }} />
-        <Tooltip filterNull contentStyle={{ fontSize: 12 }} />
+        <XAxis dataKey="date" tick={fontSizeObj} />
+        <YAxis tick={fontSizeObj} />
+        <Tooltip filterNull contentStyle={fontSizeObj} />
         <Legend />
         {categories.map((category, index) => (
           <Bar
@@ -84,12 +85,20 @@ const MonthlyStackedBarChart = () => {
             fill={generateColor(index + 1)}
           >
             {index === categories.length - 1 && (
-              <LabelList dataKey="spentTotal" position="top" fontSize={12} />
+              <LabelList
+                dataKey="spentTotal"
+                position="top"
+                fontSize={defaultFontSize}
+              />
             )}
           </Bar>
         ))}
         <Bar dataKey={"給与"} stackId="b" fill={generateColor(1)}>
-          <LabelList dataKey="incomeTotal" position="top" fontSize={12} />
+          <LabelList
+            dataKey="incomeTotal"
+            position="top"
+            fontSize={defaultFontSize}
+          />
         </Bar>
       </BarChart>
     </ResponsiveContainer>
