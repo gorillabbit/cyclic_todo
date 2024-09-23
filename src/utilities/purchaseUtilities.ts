@@ -38,6 +38,12 @@ export const numericProps: InputBaseComponentProps = {
 export const isLaterPayment = (purchase: PurchaseDataType): boolean =>
   purchase.method.timing === "翌月"
 
+export const is今月の支払いwithout後払いの支払い = (purchase: PurchaseDataType, currentMonth: Date): boolean => {
+  const is購入が今月 = purchase.date.getMonth() === currentMonth.getMonth()
+  const is後払いではない = purchase.category !== "後支払い"
+  return is購入が今月 && is後払いではない
+}
+
 /**
  * 数値が0以下、NaNかどうか
  * @param value

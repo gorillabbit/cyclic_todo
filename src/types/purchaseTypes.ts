@@ -4,8 +4,8 @@ import { defaultMethodList, MethodListType } from "../types";
 interface PurchaseBaseType {
   userId: string;
   title: string;
-  date: Date;
-  payDate: Date;
+  date: Date; // 商品を買った日
+  payDate: Date; // お金を支払った日
   method: MethodListType;
   category: string;
   description: string;

@@ -2,7 +2,7 @@ import { Box } from "@mui/material";
 import { memo, useMemo } from "react";
 import { PurchaseDataType } from "../../../../types/purchaseTypes";
 import {
-  isLaterPayment,
+  is今月の支払いwithout後払いの支払い,
   sumSpentAndIncome,
 } from "../../../../utilities/purchaseUtilities";
 import BalanceChart from "./BalanceChart";
@@ -36,11 +36,11 @@ const PlainDoughnutContainer = memo(
       />
       <StackedBarChart
         purchaseList={currentMonthPaymentList}
-        title={`今月の支払い金額(支払い方法ごと) ${-currentMonthPayment}円`}
+        title={`今月の支払い金額 ${-currentMonthPayment}円`}
       />
       <StackedBarChart
         purchaseList={currentMonthPaymentCategoryList}
-        title={`今月の支払い金額 ${-currentMonthPayment}円`}
+        title={`今月の支払い金額(支払い方法ごと) ${-currentMonthPayment}円`}
       />
       <StackedBarChart
         purchaseList={currentMonthIncomeList}
@@ -55,8 +55,10 @@ const PlainDoughnutContainer = memo(
 // 全期間の推移グラフも表示する。
 const DoughnutContainer = ({
   monthlyPurchases,
+  currentMonth,
 }: {
   monthlyPurchases: PurchaseDataType[];
+  currentMonth: Date;
 }) => {
   const PurchasesWithoutTransfer = useMemo(
     () => monthlyPurchases.filter((p) => p.category !== "送受金"),
@@ -68,27 +70,29 @@ const DoughnutContainer = ({
   );
 
   // 今月使った金額を示す。カードの支払は含まない
-  const currentMonthNetSpentList = currentMonthSpentList.filter(
-    (spent) => !isLaterPayment(spent)
+  const currentMonthNetSpentList = currentMonthSpentList.filter((spent) =>
+    is今月の支払いwithout後払いの支払い(spent, currentMonth)
   );
   const currentMonthNetSpent = sumSpentAndIncome(currentMonthNetSpentList);
 
-  // 支払いが後払いの場合、カテゴリーを変更する
-  const PayLaterCategoryPurchase = currentMonthSpentList.map((p) => ({
-    ...p,
-    category: isLaterPayment(p) ? p.method.label + "支払い" : p.category,
-  }));
-  // 今月の支払金額(カード払いをまとめる)
-  const currentMonthPaymentList = PayLaterCategoryPurchase;
+  // 今月の支払金額(カテゴリーごと)(カード払いをまとめる)
+  const currentMonthPaymentList = currentMonthSpentList.filter(
+    (spent) => spent.payDate.getMonth() === currentMonth.getMonth()
+  );
   const currentMonthPayment = sumSpentAndIncome(currentMonthPaymentList);
 
-  // 今月の支払金額(カテゴリーごと)
-  const currentMonthPaymentCategoryList = currentMonthSpentList;
+  // 今月の支払金額(支払い方法ごと)
+  const currentMonthPaymentCategoryList = currentMonthPaymentList.map((p) => ({
+    ...p,
+    category: p.method.label,
+  }));
 
   const currentMonthIncomeList = PurchasesWithoutTransfer.filter(
     (p) => p.difference > 0
   );
   const currentMonthIncome = sumSpentAndIncome(currentMonthIncomeList);
+
+  console.log("monthlyPurchases", monthlyPurchases);
 
   const plainProps = {
     currentMonthNetSpentList,

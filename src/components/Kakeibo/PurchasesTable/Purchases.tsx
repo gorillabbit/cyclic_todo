@@ -72,6 +72,7 @@ const PlainPurchases = memo(
       <AssetsList />
       <DoughnutContainer
         monthlyPurchases={monthlyPurchasesAddedPayLaterPurchase}
+        currentMonth={month}
       />
       <PurchaseSchedules />
       <TableContainer component={Paper}>
