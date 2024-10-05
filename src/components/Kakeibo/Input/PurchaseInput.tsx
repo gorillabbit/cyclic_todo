@@ -198,8 +198,14 @@ const PurchaseInput = () => {
   }, [Account, defaultInputFieldPurchase, newPurchase]);
 
   const addTemplate = useCallback(() => {
+    console.log(isError());
+    console.log(newPurchase);
     if (isError()) return;
-    addDocPurchaseTemplate({ ...newPurchase, userId: Account?.id || "" });
+    addDocPurchaseTemplate({
+      ...newPurchase,
+      userId: Account?.id || "",
+      tabId,
+    });
   }, [Account, newPurchase]);
 
   const plainProps = {

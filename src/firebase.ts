@@ -170,7 +170,7 @@ export const bulkUpdateDocPurchase = async (
 export const deleteDocPurchase = (id: string) =>
   deleteDocOperation(dbNames.purchase, id);
 
-export const addDocPurchaseTemplate = (v: InputFieldPurchaseType) =>
+export const addDocPurchaseTemplate = (v: InputFieldPurchaseType & { tabId: string }) =>
   addDocOperation(dbNames.purchaseTemplate, v);
 export const deleteDocPurchaseTemplate = (id: string) =>
   deleteDocOperation(dbNames.purchaseTemplate, id);
@@ -198,7 +198,7 @@ export const updateDocMethod = (id: string, updates: MethodListType) =>
 export const deleteDocMethod = (id: string) =>
   deleteDocOperation(dbNames.method, id);
 
-export const addDocTransferTemplate = (v: InputTransferType) =>
+export const addDocTransferTemplate = (v: InputTransferType & { tabId: string }) =>
   addDocOperation(dbNames.transferTemplate, v);
 export const deleteDocTransferTemplate = (id: string) =>
   deleteDocOperation(dbNames.transferTemplate, id);

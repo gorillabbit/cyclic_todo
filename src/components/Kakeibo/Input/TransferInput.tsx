@@ -177,7 +177,7 @@ const TransferInput = () => {
     const isError = validateAndSetErrors(newTransfer);
     if (isError) return;
     if (!currentUser) return console.error("ログインしていません");
-    addDocTransferTemplate({ ...newTransfer, userId: currentUser.uid });
+    addDocTransferTemplate({ ...newTransfer, userId: currentUser.uid, tabId });
   }, [currentUser, newTransfer]);
 
   const plainProps = {
