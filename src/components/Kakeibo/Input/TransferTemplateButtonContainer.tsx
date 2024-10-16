@@ -1,6 +1,6 @@
 import { Box } from "@mui/material";
 import { memo, useMemo } from "react";
-import { InputTransferType, TransferType } from "../../../types";
+import { TransferType } from "../../../types";
 import { orderBy, where } from "firebase/firestore";
 import { useFirestoreQuery } from "../../../utilities/firebaseUtilities";
 import { dbNames } from "../../../firebase";
@@ -9,19 +9,19 @@ import { useTab } from "../../../hooks/useData";
 
 type PlainTemplateButtonsContainerProps = {
   transfers: TransferType[];
-  setNewTransfer: React.Dispatch<React.SetStateAction<InputTransferType>>;
+  useTemplate: (transfer: TransferType) => void;
 };
 
 const PlainTemplateButtonsContainer = memo(
   ({
     transfers,
-    setNewTransfer,
+    useTemplate,
   }: PlainTemplateButtonsContainerProps): JSX.Element => (
     <Box m={0.5}>
       {transfers.map((transfer) => (
         <TransferTemplateButton
           transfer={transfer}
-          setNewTransfer={setNewTransfer}
+          useTemplate={useTemplate}
           key={transfer.id}
         />
       ))}
@@ -30,9 +30,9 @@ const PlainTemplateButtonsContainer = memo(
 );
 
 const TransferTemplateButtonsContainer = ({
-  setNewTransfer,
+  useTemplate,
 }: {
-  setNewTransfer: React.Dispatch<React.SetStateAction<InputTransferType>>;
+  useTemplate: (transfer: TransferType) => void;
 }) => {
   const { tabId } = useTab();
   const purchaseTemplatesQueryConstraints = useMemo(
@@ -47,7 +47,7 @@ const TransferTemplateButtonsContainer = ({
 
   const plainProps = {
     transfers,
-    setNewTransfer,
+    useTemplate,
   };
   return <PlainTemplateButtonsContainer {...plainProps} />;
 };

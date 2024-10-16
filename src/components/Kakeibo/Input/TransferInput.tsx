@@ -8,6 +8,7 @@ import {
   InputTransferType,
   defaultTransferInput,
   ErrorType,
+  TransferType,
 } from "../../../types";
 import {
   addPurchaseAndUpdateLater,
@@ -28,9 +29,9 @@ type PlainTransferInputProps = {
   newTransfer: InputTransferType;
   addTransfer: () => void;
   addTemplate: () => void;
-  setNewTransfer: React.Dispatch<React.SetStateAction<InputTransferType>>;
   errors: ErrorType;
   hasError: boolean;
+  useTemplate: (transfer: TransferType) => void;
 };
 
 const PlainTransferInput = memo(
@@ -39,12 +40,12 @@ const PlainTransferInput = memo(
     newTransfer,
     addTransfer,
     addTemplate,
-    setNewTransfer,
     errors,
     hasError,
+    useTemplate,
   }: PlainTransferInputProps): JSX.Element => (
     <>
-      <TransferTemplateButtonsContainer setNewTransfer={setNewTransfer} />
+      <TransferTemplateButtonsContainer useTemplate={useTemplate} />
       <Box display="flex">
         <FormGroup row sx={{ gap: 1, mr: 1, width: "100%" }}>
           <TextField
@@ -135,9 +136,12 @@ const TransferInput = () => {
   );
 
   const addTransfer = useCallback(async () => {
-    const isError = validateAndSetErrors(newTransfer);
-    if (isError) return;
-    if (!currentUser) return console.error("ログインしていません");
+    if (validateAndSetErrors(newTransfer)) {
+      return console.error("エラーがあります");
+    }
+    if (!currentUser) {
+      return console.error("ログインしていません");
+    }
     const { price, date, description, from, to } = newTransfer;
     const basePurchase = {
       userId: currentUser.uid,
@@ -174,20 +178,30 @@ const TransferInput = () => {
   }, [currentUser, purchaseList, setPurchaseList, tabId, newTransfer]);
 
   const addTemplate = useCallback(() => {
-    const isError = validateAndSetErrors(newTransfer);
-    if (isError) return;
+    if (validateAndSetErrors(newTransfer)) return;
     if (!currentUser) return console.error("ログインしていません");
     addDocTransferTemplate({ ...newTransfer, userId: currentUser.uid, tabId });
   }, [currentUser, newTransfer]);
+
+  const useTemplate = useCallback((transfer: TransferType) => {
+    // idが残ると、idが同じDocが複数作成され、削除できなくなる
+    const { id, ...templateTransferWithoutId } = transfer;
+    const newTemplateTransfer = {
+      ...templateTransferWithoutId,
+      date: new Date(),
+    };
+    setNewTransfer(newTemplateTransfer);
+    validateAndSetErrors(newTemplateTransfer);
+  }, []);
 
   const plainProps = {
     handleNewTransferInput,
     newTransfer,
     addTransfer,
     addTemplate,
-    setNewTransfer,
     errors,
     hasError,
+    useTemplate,
   };
   return <PlainTransferInput {...plainProps} />;
 };

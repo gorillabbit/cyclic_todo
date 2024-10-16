@@ -1,6 +1,6 @@
 import { Chip } from "@mui/material";
 import { memo, useCallback, useState } from "react";
-import { InputTransferType, TransferType } from "../../../types";
+import { TransferType } from "../../../types";
 import { deleteDocTransferTemplate } from "../../../firebase";
 import DeleteConfirmDialog from "../DeleteConfirmDialog";
 
@@ -38,23 +38,17 @@ const PlainTransferTemplateButton = memo(
 );
 
 const TransferTemplateButton = ({
-  setNewTransfer,
   transfer,
+  useTemplate,
 }: {
-  setNewTransfer: React.Dispatch<React.SetStateAction<InputTransferType>>;
   transfer: TransferType;
+  useTemplate: (transfer: TransferType) => void;
 }) => {
   const [openDialog, setOpenDialog] = useState<boolean>(false);
 
   const onClickTransferTemplateButton = useCallback(() => {
-    // idが残ると、idが同じDocが複数作成され、削除できなくなる
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { id, ...templateTransferWithoutId } = transfer;
-    setNewTransfer({
-      ...templateTransferWithoutId,
-      date: new Date(),
-    });
-  }, [setNewTransfer, transfer]);
+    useTemplate(transfer);
+  }, [transfer]);
 
   const handleDeleteButtonClick = useCallback(() => {
     setOpenDialog(true);
