@@ -32,25 +32,37 @@ const MonthlyStackedBarChart = () => {
       p.category !== "送受金"
   );
   const processData = (purchase: PurchaseDataType[]) => {
-    const result: { [key: string]: { [key: string]: number } } = {};
+    const result: {
+      [key: string]: { [key: string]: number };
+    } = {};
 
+    // 月ごとにカテゴリごとの支出を集計
     purchase.forEach(({ date, difference, category }) => {
       const month = date.toISOString().substring(0, 7); // YYYY-MM形式
       if (!result[month]) {
         result[month] = {};
       }
-      if (!result[month][category]) {
-        result[month][category] = 0;
+      if (difference > 0) {
+        if (!result[month][category + "_i"]) {
+          result[month][category + "_i"] = 0;
+        }
+        result[month][category + "_i"] += Number(difference);
+      } else {
+        if (!result[month][category]) {
+          result[month][category] = 0;
+        }
+        result[month][category] += Math.abs(difference);
       }
-      result[month][category] += Math.abs(difference);
     });
+
+    // 月ごとに収入を集計
     return Object.keys(result).map((month) => {
       const spentTotal = Object.entries(result[month]).reduce(
-        (acc, value) => (value[0] !== "給与" ? acc + value[1] : acc),
+        (acc, value) => (!value[0].includes("_i") ? acc + value[1] : acc),
         0
       );
       const incomeTotal = Object.entries(result[month]).reduce(
-        (acc, value) => (value[0] === "給与" ? acc + value[1] : acc),
+        (acc, value) => (value[0].includes("_i") ? acc + value[1] : acc),
         0
       );
       return {
@@ -66,9 +78,12 @@ const MonthlyStackedBarChart = () => {
     () => processData(pastPurchase),
     [pastPurchase]
   );
-  // TODO 給与だけ収入として表示する。すごいアドホックなのでどうにかする
-  const purchaseCategories = pastPurchase.filter((p) => p.category !== "給与");
-  const categories = [...new Set(purchaseCategories.map((p) => p.category))];
+
+  const spentPurchases = pastPurchase.filter((p) => p.difference < 0);
+  const spentCategories = [...new Set(spentPurchases.map((p) => p.category))];
+
+  const incomePurchases = pastPurchase.filter((p) => p.difference > 0);
+  const incomeCategories = [...new Set(incomePurchases.map((p) => p.category))];
   return (
     <ResponsiveContainer width="100%" height={400}>
       <BarChart data={transformedSpent}>
@@ -77,14 +92,14 @@ const MonthlyStackedBarChart = () => {
         <YAxis tick={fontSizeObj} />
         <Tooltip filterNull contentStyle={fontSizeObj} />
         <Legend />
-        {categories.map((category, index) => (
+        {spentCategories.map((category, index) => (
           <Bar
             key={category}
             dataKey={category}
             stackId="a"
             fill={generateColor(index + 1)}
           >
-            {index === categories.length - 1 && (
+            {index === spentCategories.length - 1 && (
               <LabelList
                 dataKey="spentTotal"
                 position="top"
@@ -93,13 +108,21 @@ const MonthlyStackedBarChart = () => {
             )}
           </Bar>
         ))}
-        <Bar dataKey={"給与"} stackId="b" fill={generateColor(1)}>
-          <LabelList
-            dataKey="incomeTotal"
-            position="top"
-            fontSize={defaultFontSize}
-          />
-        </Bar>
+        {incomeCategories.map((category, index) => (
+          <Bar
+            dataKey={category + "_i"}
+            stackId="b"
+            fill={generateColor(index + 1)}
+          >
+            {index === incomeCategories.length - 1 && (
+              <LabelList
+                dataKey="incomeTotal"
+                position="top"
+                fontSize={defaultFontSize}
+              />
+            )}
+          </Bar>
+        ))}
       </BarChart>
     </ResponsiveContainer>
   );
