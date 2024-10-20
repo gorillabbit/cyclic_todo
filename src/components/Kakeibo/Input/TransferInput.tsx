@@ -152,7 +152,6 @@ const TransferInput = () => {
       id: "",
       balance: 0,
     };
-    let update = purchaseList;
     const purchaseTitle = `${from.label}→${to.label}`;
     const fromPurchase = {
       ...basePurchase,
@@ -162,7 +161,11 @@ const TransferInput = () => {
       assetId: from.assetId,
       difference: -price,
     };
-    update = addPurchaseAndUpdateLater(fromPurchase, update).purchases;
+    const addedFromPurchase = addPurchaseAndUpdateLater(
+      fromPurchase,
+      purchaseList
+    ).purchases;
+
     const toPurchase = {
       ...basePurchase,
       title: `【受】${purchaseTitle}`,
@@ -171,18 +174,27 @@ const TransferInput = () => {
       assetId: to.assetId,
       difference: price,
     };
-    update = addPurchaseAndUpdateLater(toPurchase, update).purchases;
-    updateAndAddPurchases(update);
-    setPurchaseList(update);
+    const addedFromAndToPurchase = addPurchaseAndUpdateLater(
+      toPurchase,
+      addedFromPurchase
+    ).purchases;
+    updateAndAddPurchases(addedFromAndToPurchase);
+    setPurchaseList(addedFromAndToPurchase);
     setNewTransfer(defaultTransferInput);
   }, [currentUser, purchaseList, setPurchaseList, tabId, newTransfer]);
 
   const addTemplate = useCallback(() => {
-    if (validateAndSetErrors(newTransfer)) return;
-    if (!currentUser) return console.error("ログインしていません");
+    // TODO ここの処理をaddTransferと共通化できないか考える
+    if (validateAndSetErrors(newTransfer)) {
+      return console.error("エラーがあります");
+    }
+    if (!currentUser) {
+      return console.error("ログインしていません");
+    }
     addDocTransferTemplate({ ...newTransfer, userId: currentUser.uid, tabId });
   }, [currentUser, newTransfer]);
 
+  // テンプレボタンを押したときの処理
   const useTemplate = useCallback((transfer: TransferType) => {
     // idが残ると、idが同じDocが複数作成され、削除できなくなる
     const { id, ...templateTransferWithoutId } = transfer;

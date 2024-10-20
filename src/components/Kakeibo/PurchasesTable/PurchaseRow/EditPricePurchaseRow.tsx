@@ -129,12 +129,11 @@ const EditPricePurchaseRow = ({
       difference: Number(editFormData.difference),
       isUncertain: false,
     };
-    const update = await updatePurchaseAndUpdateLater(
-      certainPurchase,
-      updatePurchases
-    );
-    updateAndAddPurchases(update.purchases);
-    setPurchaseList(update.purchases);
+    const update = (
+      await updatePurchaseAndUpdateLater(certainPurchase, updatePurchases)
+    ).purchases;
+    updateAndAddPurchases(update);
+    setPurchaseList(update);
     setEditFormData((prev) => ({ ...prev, isUncertain: false }));
     setIsEditPrice(false);
   }, [

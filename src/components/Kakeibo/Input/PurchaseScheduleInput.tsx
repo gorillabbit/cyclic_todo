@@ -20,7 +20,6 @@ import { addYears } from "date-fns";
 import { DatePicker } from "@mui/x-date-pickers";
 import {
   addScheduledPurchase,
-  numericProps,
   updateAndAddPurchases,
   weekDaysString,
 } from "../../../utilities/purchaseUtilities";
@@ -82,8 +81,12 @@ const PurchaseScheduleInput = () => {
   const { purchaseList, setPurchaseList } = usePurchase();
   const addPurchaseSchedule = useCallback(async () => {
     const isError = validateAndSetErrors(newPurchaseSchedule);
-    if (isError) return;
-    if (!Account) return console.error("ログインしてください");
+    if (isError) {
+      return;
+    }
+    if (!Account) {
+      return console.error("ログインしてください");
+    }
 
     const addedSchedule = await addDocPurchaseSchedule({
       ...newPurchaseSchedule,
@@ -118,7 +121,6 @@ const PurchaseScheduleInput = () => {
             onChange={(e) =>
               handleNewPurchaseScheduleInput("price", e.target.value)
             }
-            inputProps={numericProps}
             error={!!errors.price}
             helperText={errors.price}
           />
@@ -141,7 +143,6 @@ const PurchaseScheduleInput = () => {
                   <InputAdornment position="start">日</InputAdornment>
                 ),
               }}
-              inputProps={numericProps}
               sx={{ maxWidth: 150 }}
               onChange={(e) =>
                 handleNewPurchaseScheduleInput("date", e.target.value)

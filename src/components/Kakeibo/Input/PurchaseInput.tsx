@@ -164,7 +164,9 @@ const PurchaseInput = () => {
   // 第2因数にnewPurchaseを追加しないと、newPurchaseを更新しても関数が更新されず、初期値が使われてしまう。
   const isError = useCallback(() => {
     const validateError = validateAndSetErrors(newPurchase);
-    if (!Account) console.error("ログインしていません");
+    if (!Account) {
+      console.error("ログインしていません");
+    }
     return validateError || !Account;
   }, [Account, newPurchase]);
 
@@ -172,7 +174,9 @@ const PurchaseInput = () => {
   const { tabId } = useTab();
   const { purchaseList, setPurchaseList } = usePurchase();
   const addPurchase = useCallback(async () => {
-    if (isError()) return;
+    if (isError()) {
+      return;
+    }
 
     const { income, price, ...newPurchaseData } = newPurchase;
     const difference = income ? Number(price) : -Number(price);
@@ -198,9 +202,9 @@ const PurchaseInput = () => {
   }, [Account, defaultInputFieldPurchase, newPurchase]);
 
   const addTemplate = useCallback(() => {
-    console.log(isError());
-    console.log(newPurchase);
-    if (isError()) return;
+    if (isError()) {
+      return;
+    }
     addDocPurchaseTemplate({
       ...newPurchase,
       userId: Account?.id || "",
