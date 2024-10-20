@@ -38,40 +38,32 @@ const MonthlyStackedBarChart = () => {
 
     // 月ごとにカテゴリごとの支出を集計
     purchase.forEach(({ date, difference, category }) => {
-      const month = date.toISOString().substring(0, 7); // YYYY-MM形式
+      const month = date.toISOString().slice(0, 7); // YYYY-MM形式
       if (!result[month]) {
         result[month] = {};
       }
+      const differenceNumber = Math.abs(difference);
       if (difference > 0) {
-        if (!result[month][category + "_i"]) {
-          result[month][category + "_i"] = 0;
-        }
-        result[month][category + "_i"] += Number(difference);
+        const incomeCategory = category + "_i";
+
+        result[month][incomeCategory] =
+          (result[month][incomeCategory] || 0) + differenceNumber;
+
+        result[month].incomeTotal =
+          (result[month].incomeTotal || 0) + differenceNumber;
       } else {
-        if (!result[month][category]) {
-          result[month][category] = 0;
-        }
-        result[month][category] += Math.abs(difference);
+        result[month][category] =
+          (result[month][category] || 0) + differenceNumber;
+
+        result[month].spentTotal =
+          (result[month].spentTotal || 0) + differenceNumber;
       }
     });
 
-    // 月ごとに収入を集計
-    return Object.keys(result).map((month) => {
-      const spentTotal = Object.entries(result[month]).reduce(
-        (acc, value) => (!value[0].includes("_i") ? acc + value[1] : acc),
-        0
-      );
-      const incomeTotal = Object.entries(result[month]).reduce(
-        (acc, value) => (value[0].includes("_i") ? acc + value[1] : acc),
-        0
-      );
-      return {
-        date: month,
-        spentTotal,
-        incomeTotal,
-        ...result[month],
-      };
-    });
+    return Object.keys(result).map((month) => ({
+      date: month,
+      ...result[month],
+    }));
   };
 
   const transformedSpent = useMemo(
@@ -110,6 +102,7 @@ const MonthlyStackedBarChart = () => {
         ))}
         {incomeCategories.map((category, index) => (
           <Bar
+            key={category + "_i"}
             dataKey={category + "_i"}
             stackId="b"
             fill={generateColor(index + 1)}
