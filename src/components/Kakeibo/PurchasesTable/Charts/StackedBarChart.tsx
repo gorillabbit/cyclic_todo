@@ -10,6 +10,7 @@ import {
 } from "chart.js";
 import { Box } from "@mui/material";
 import { PurchaseDataType } from "../../../../types/purchaseTypes";
+import { generateColor, makeCategorySet } from "./ChartUtils";
 
 ChartJS.register(
   CategoryScale,
@@ -26,27 +27,19 @@ interface DoughnutChartProps {
 }
 
 const useChartData = (purchaseList: PurchaseDataType[]) => {
-  const sortedPurchaseList = [...purchaseList].sort((a, b) =>
+  const sortedPurchaseList = purchaseList.sort((a, b) =>
     a.category.localeCompare(b.category)
   );
-  const categories = [...new Set(sortedPurchaseList.map((p) => p.category))];
-
-  const generateColor = (index: number) => {
-    const r = (index * 300) % 255;
-    const g = (index * 600) % 255;
-    const b = (index * 900) % 255;
-    return `rgba(${r}, ${g}, ${b}, 0.5)`;
-  };
-
-  const categoryTotals = categories.map((category) =>
-    sortedPurchaseList
-      .filter((p) => p.category === category)
-      .reduce((sum, p) => sum + Math.abs(p.difference), 0)
-  );
+  const categories = makeCategorySet(sortedPurchaseList);
 
   const totalData = categories.map((category, index) => ({
     label: category,
-    data: [categoryTotals[index]],
+    data: [
+      sortedPurchaseList
+        .filter((p) => p.category === category)
+        .reduce((sum, p) => sum + Math.abs(p.difference), 0),
+      0,
+    ],
     backgroundColor: generateColor(index),
     borderColor: "white",
     borderWidth: 1,
@@ -54,7 +47,7 @@ const useChartData = (purchaseList: PurchaseDataType[]) => {
 
   const detailData = sortedPurchaseList.map((p) => ({
     label: p.title,
-    data: [Math.abs(p.difference)],
+    data: [0, Math.abs(p.difference)],
     backgroundColor: generateColor(categories.indexOf(p.category)),
     borderColor: "white",
     borderWidth: 1,
@@ -62,16 +55,7 @@ const useChartData = (purchaseList: PurchaseDataType[]) => {
 
   const combinedData = {
     labels: ["合計", "詳細"],
-    datasets: [
-      ...totalData.map((dataset) => ({
-        ...dataset,
-        data: [dataset.data[0], 0],
-      })),
-      ...detailData.map((dataset) => ({
-        ...dataset,
-        data: [0, dataset.data[0]],
-      })),
-    ],
+    datasets: [...totalData, ...detailData],
   };
 
   return combinedData;

@@ -11,15 +11,8 @@ import {
 import { format, set } from "date-fns";
 import { usePurchase, useAsset } from "../../../../hooks/useData";
 import { getFutureMonthFirstDay } from "../../../../utilities/dateUtilities";
-import { fontSizeObj } from "./DefaultConsts";
-
-// インデックスに基づいた色を生成する関数
-const getColorByIndex = (index: number) => {
-  const r = (index * 50) % 255;
-  const g = (index * 100) % 255;
-  const b = (index * 150) % 255;
-  return `rgba(${r}, ${g}, ${b}, 0.5)`;
-};
+import { fontSizeObj } from "./DefaultConst";
+import { generateColor } from "./ChartUtils";
 
 const BalanceChart = () => {
   const { purchaseList } = usePurchase();
@@ -38,7 +31,9 @@ const BalanceChart = () => {
     .sort((a, b) => a.payDate.getTime() - b.payDate.getTime())
     .map((p, index) => {
       const asset = assetList.find((asset) => asset.id === p.assetId);
-      if (!asset) return;
+      if (!asset) {
+        return;
+      }
       return {
         time: set(p.payDate, {
           // データが更新されるとき、同じ時刻のデータが大量に作成される問題があるので暫定的解決策　TODO: 修正
@@ -47,6 +42,7 @@ const BalanceChart = () => {
         [asset.name]: p.balance,
       };
     })
+    // nullを除外
     .filter((data) => data);
 
   return (
@@ -73,7 +69,7 @@ const BalanceChart = () => {
           <Line
             type="monotone"
             dataKey={asset.name}
-            stroke={getColorByIndex(index)}
+            stroke={generateColor(index)}
             key={asset.id}
             connectNulls
             activeDot={{ r: 6 }}

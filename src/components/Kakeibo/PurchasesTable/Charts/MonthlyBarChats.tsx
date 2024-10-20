@@ -14,14 +14,8 @@ import {
 import { usePurchase } from "../../../../hooks/useData";
 import { PurchaseDataType } from "../../../../types/purchaseTypes";
 import { getFutureMonthFirstDay } from "../../../../utilities/dateUtilities";
-import { defaultFontSize, fontSizeObj } from "./DefaultConsts";
-
-const generateColor = (index: number) => {
-  const r = (index * 300) % 255;
-  const g = (index * 600) % 255;
-  const b = (index * 900) % 255;
-  return `rgba(${r}, ${g}, ${b}, 0.5)`;
-};
+import { defaultFontSize, fontSizeObj } from "./DefaultConst";
+import { generateColor, makeCategorySet } from "./ChartUtils";
 
 const MonthlyStackedBarChart = () => {
   const { purchaseList } = usePurchase();
@@ -72,10 +66,10 @@ const MonthlyStackedBarChart = () => {
   );
 
   const spentPurchases = pastPurchase.filter((p) => p.difference < 0);
-  const spentCategories = [...new Set(spentPurchases.map((p) => p.category))];
+  const spentCategories = makeCategorySet(spentPurchases);
 
   const incomePurchases = pastPurchase.filter((p) => p.difference > 0);
-  const incomeCategories = [...new Set(incomePurchases.map((p) => p.category))];
+  const incomeCategories = makeCategorySet(incomePurchases);
   return (
     <ResponsiveContainer width="100%" height={400}>
       <BarChart data={transformedSpent}>
