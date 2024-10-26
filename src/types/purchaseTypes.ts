@@ -40,8 +40,8 @@ export interface PurchaseDataType extends PurchaseBaseType {
   difference: number;
   balance: number;
   parentScheduleId?: string;
-
 }
+
 export const defaultPurchaseData: PurchaseDataType = {
   ...defaultPurchaseBase,
   difference: 0,
