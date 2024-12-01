@@ -23,7 +23,7 @@
     "@mui/x-date-pickers": "7.23.0",
     "bootstrap": "5.3.3",
     "bootstrap-icons": "1.11.3",
-    "chart.js": "4.4.6",
+    "chart.js": "4.4.7",
     "cors": "2.8.5",
     "date-fns": "2.30.0",
     "express": "4.21.1",
