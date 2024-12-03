@@ -43,11 +43,6 @@ const UnderHalfRow = memo(
       />
       <TableCellWrapper label={editFormData.description} />
       <TableCellWrapper>
-        <PaymentsIcon
-          color={editFormData.difference > 0 ? "success" : "error"}
-        />
-      </TableCellWrapper>
-      <TableCellWrapper>
         {!isGroup && (
           <PurchaseRowButtons
             purchase={editFormData}
@@ -83,7 +78,14 @@ const PlainNormalPurchaseRow = memo(
     assetName,
   }: PlainNormalPurchaseRowProps): JSX.Element => (
     <>
-      <TableRow sx={{ pb: 0.5, bgcolor: rowColor }}>
+      <TableRow
+        sx={{
+          pb: 0.5,
+          bgcolor: rowColor,
+          borderColor: editFormData.difference > 0 ? "#c5fcdc" : "#fcc9c5",
+          borderRightWidth: 10,
+        }}
+      >
         <TableCellWrapper>
           {isGroup && (
             <IconButton

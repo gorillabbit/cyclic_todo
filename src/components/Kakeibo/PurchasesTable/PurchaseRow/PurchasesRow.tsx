@@ -88,7 +88,6 @@ const PlainPurchasesRow = memo(
                     <TableCell>金額</TableCell>
                     <TableCell>残高</TableCell>
                     <TableCell>カテゴリー</TableCell>
-                    <TableCell>収入</TableCell>
                     <TableCell>備考</TableCell>
                   </TableRow>
                 </TableHead>
@@ -96,7 +95,13 @@ const PlainPurchasesRow = memo(
                   {groupPurchases
                     .sort((a, b) => a.date.getTime() - b.date.getTime())
                     .map((groupPurchase) => (
-                      <TableRow key={groupPurchase.id}>
+                      <TableRow
+                        key={groupPurchase.id}
+                        sx={{
+                          backgroundColor:
+                            groupPurchase.difference > 0 ? "#fcc9c5" : "",
+                        }}
+                      >
                         <TableCell>
                           {groupPurchase.date.toLocaleString().split(" ")[0]}
                         </TableCell>
@@ -104,13 +109,6 @@ const PlainPurchasesRow = memo(
                         <TableCell>{groupPurchase.difference + "円"}</TableCell>
                         <TableCell>{groupPurchase.balance + "円"}</TableCell>
                         <TableCell>{groupPurchase.category}</TableCell>
-                        <TableCell>
-                          {groupPurchase.difference > 0 ? (
-                            <Typography color="#ed5151">収入</Typography>
-                          ) : (
-                            "支出"
-                          )}
-                        </TableCell>
                         <TableCell>{groupPurchase.description}</TableCell>
                       </TableRow>
                     ))}

@@ -40,11 +40,7 @@ const UnderHalfRow = memo(
           helperText={errors.difference}
         />
       </TableCellWrapper>
-      <TableCellWrapper>
-        <PaymentsIcon
-          color={editFormData.difference > 0 ? "success" : "error"}
-        />
-      </TableCellWrapper>
+      <TableCellWrapper label={editFormData.balance} />
       <TableCellWrapper label={editFormData.description} />
       <TableCell padding="none">
         <IconButton
@@ -73,7 +69,12 @@ const PlainEditPricePurchaseRow = memo(
     hasError,
   }: PlainEditPricePurchaseRowProps): JSX.Element => (
     <>
-      <TableRow>
+      <TableRow
+        sx={{
+          borderColor: editFormData.difference > 0 ? "#c5fcdc" : "#fcc9c5",
+          borderRightWidth: 10,
+        }}
+      >
         <TableCellWrapper />
         <TableCellWrapper
           label={editFormData.date.toLocaleString().split(" ")[0]}

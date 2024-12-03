@@ -53,8 +53,6 @@ const UnderHalfRow = memo(
           size="small"
         />
       </TableCellWrapper>
-      <TableCellWrapper label={editFormData.difference > 0 ? "収入" : "支出"} />
-
       <TableCell padding="none">
         <IconButton
           onClick={handleSaveClick}
@@ -82,7 +80,12 @@ const PlainEditPurchaseRow = memo(
     hasError,
   }: PlainEditPurchaseRowProps): JSX.Element => (
     <>
-      <TableRow>
+      <TableRow
+        sx={{
+          borderColor: editFormData.difference > 0 ? "#c5fcdc" : "#fcc9c5",
+          borderRightWidth: 10,
+        }}
+      >
         <TableCellWrapper />
         <TableCellWrapper>
           <DatePicker

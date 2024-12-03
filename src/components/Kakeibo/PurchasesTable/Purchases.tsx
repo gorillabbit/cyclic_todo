@@ -107,7 +107,6 @@ const PlainPurchases = memo(
                   <HeaderCellWrapper label="金額" value="difference" />
                   <HeaderCellWrapper label="残高" value="balance" />
                   <HeaderCellWrapper label="備考" value="description" />
-                  <TableCellWrapper label="収入" />
                   <TableCell padding="none" />
                 </>
               )}
