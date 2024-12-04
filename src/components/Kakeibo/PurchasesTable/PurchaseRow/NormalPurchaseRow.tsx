@@ -2,7 +2,6 @@ import { IconButton, Chip, TableRow } from "@mui/material";
 import { memo, useMemo } from "react";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
-import PaymentsIcon from "@mui/icons-material/Payments";
 import PurchaseRowButtons from "./PurchaseRowButtons";
 import TableCellWrapper from "../../TableCellWrapper";
 import { PurchaseDataType } from "../../../../types/purchaseTypes";

@@ -3,7 +3,6 @@ import { memo, useCallback } from "react";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { InputPurchaseScheduleRowType } from "../../../../types";
-import PaymentsIcon from "@mui/icons-material/Payments";
 import TableCellWrapper from "../../TableCellWrapper";
 
 type PlainNormalPurchaseScheduleRowProps = {
@@ -18,7 +17,14 @@ const PlainNormalPurchaseScheduleRow = memo(
     handleEditClick,
     handleDeleteButton,
   }: PlainNormalPurchaseScheduleRowProps): JSX.Element => (
-    <TableRow key={editFormData.id}>
+    <TableRow
+      key={editFormData.id}
+      sx={{
+        pb: 0.5,
+        borderColor: editFormData.income ? "#c5fcdc" : "#fcc9c5",
+        borderRightWidth: 10,
+      }}
+    >
       <TableCellWrapper
         label={
           editFormData.cycle +
@@ -32,9 +38,6 @@ const PlainNormalPurchaseScheduleRow = memo(
       <TableCellWrapper label={editFormData.price} />
       <TableCellWrapper label={editFormData.category} />
       <TableCellWrapper label={editFormData.method.label} />
-      <TableCellWrapper>
-        <PaymentsIcon color={editFormData.income ? "success" : "error"} />
-      </TableCellWrapper>
       <TableCellWrapper>
         {editFormData.isUncertain && <Chip label="未確" />}
       </TableCellWrapper>

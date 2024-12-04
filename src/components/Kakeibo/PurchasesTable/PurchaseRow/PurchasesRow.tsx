@@ -5,7 +5,6 @@ import {
   Table,
   TableBody,
   TableHead,
-  Typography,
 } from "@mui/material";
 import { memo, useState } from "react";
 import EditPurchaseRow from "./EditPurchaseRow";

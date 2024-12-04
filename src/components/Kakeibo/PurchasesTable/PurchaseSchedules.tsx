@@ -49,7 +49,6 @@ const PlainPurchaseSchedules = memo(
                 <TableCellWrapper label="金額" />
                 <TableCellWrapper label="分類" />
                 <TableCellWrapper label="支払い方法" />
-                <TableCellWrapper label="収入" />
                 <TableCellWrapper label="未確定" />
                 <TableCellWrapper label="備考" />
                 <TableCellWrapper />
