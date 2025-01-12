@@ -109,7 +109,7 @@ def generate_pydantic_models(
 
 # Main execution
 if __name__ == "__main__":
-    sql_file_path = "../scripts/createAuroraTables.sql"  # SQL definition file path
+    sql_file_path = "./createAuroraTables.sql"  # SQL definition file path
     table_definitions = parse_sql_file(sql_file_path)
     models = generate_pydantic_models(table_definitions)
 
