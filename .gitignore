@@ -44,3 +44,6 @@ service_account.json
 functions/lib/*
 __pycache__/
 *:Zone.Identifier
+log.txt
+*/data/*.json
+*/output/*.json
