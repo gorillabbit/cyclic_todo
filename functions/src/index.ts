@@ -1,89 +1,78 @@
-import { onRequest } from "firebase-functions/v2/https";
-import { initializeApp } from "firebase-admin/app";
-import { getFirestore } from "firebase-admin/firestore";
-import express, { Application, Request, Response } from "express";
-import cors from "cors";
-import { MethodListType } from "./types";
+import * as functions from 'firebase-functions';
+import AppDataSource from './db';
+import { Item } from './entities/Item';
+import { CompleteLog } from './entities/CompleteLog';
 
-initializeApp();
+// Initialize the database connection
+AppDataSource.initialize()
+  .then(() => {
+    console.log('Database connection initialized');
+  })
+  .catch((err) => {
+    console.error('Error during Data Source initialization', err);
+  });
 
-const app: Application = express();
-const db = getFirestore();
-const USER_ID = "RSzGJ1om5iZMMvcmYBgThDhzpjc2";
-
-app.use(express.json());
-app.use(cors());
-
-const getDocumentData = async (collection: string, docId: string) => {
-  const doc = await db.collection(collection).doc(docId).get();
-  if (doc.exists) {
-    return doc.data();
-  } else {
-    return null;
-  }
-};
-
-app.use("/post", async (req, res) => {
+// API: /api/complete-logs - GET
+export const getCompleteLogs = functions.https.onRequest(async (req, res) => {
   try {
-    const { methodId, title, price, category, description } = req.body;
-    const methodData = (await getDocumentData(
-      "Methods",
-      methodId
-    )) as MethodListType;
-    if (!methodData) {
-      return res.status(404).json({ error: "Method not found" });
+    const { user_id, tab_id } = req.query;
+    const completeLogRepository = AppDataSource.getRepository(CompleteLog);
+
+    // Build query with filters
+    const queryBuilder = completeLogRepository.createQueryBuilder('complete_log');
+
+    if (user_id) {
+      queryBuilder.andWhere('complete_log.user_id = :user_id', { user_id });
     }
 
-    const purchase = {
-      title,
-      price,
-      date: new Date(),
-      category,
-      method: methodData,
-      income: false,
-      description,
-      userId: USER_ID,
-      tabId: "oycy7tRzr40Tu3P91hPh",
-      childPurchaseId: "",
-    };
-    const writeResult = await db.collection("Purchases").add(purchase);
-    return res
-      .status(200)
-      .json({ result: `Purchase with ID: ${writeResult.id} added.` });
-  } catch (error) {
-    return res.status(500).json({ error: error });
+    if (tab_id) {
+      queryBuilder.andWhere('complete_log.tab_id = :tab_id', { tab_id });
+    }
+
+    // Add relations
+    queryBuilder
+      .leftJoinAndSelect('complete_log.user', 'user')
+      .leftJoinAndSelect('complete_log.log', 'log')
+      .leftJoinAndSelect('complete_log.tab', 'tab')
+      .orderBy('complete_log.timestamp', 'DESC');
+
+    const completeLogs = await queryBuilder.getMany();
+    res.status(200).json(completeLogs);
+  } catch (err) {
+    console.error('Error fetching complete logs:', err);
+    res.status(500).send('Internal Server Error');
   }
 });
 
-app.use("/getCategory", async (_req, res) => {
+// API: /api/items - GET
+export const getItems = functions.https.onRequest(async (req, res) => {
   try {
-    const querySnapshot = await db
-      .collection("Purchases")
-      .where("userId", "==", USER_ID)
-      .select("category")
-      .get();
-
-    const categories = querySnapshot.docs.map((doc) => doc.data().category);
-    res.status(200).json([...new Set(categories)]);
-  } catch (error) {
-    res.status(500).json({ error: error });
+    const itemRepository = AppDataSource.getRepository(Item);
+    const items = await itemRepository.find();
+    res.status(200).json(items);
+  } catch (err) {
+    console.error('Error fetching data:', err);
+    res.status(500).send('Internal Server Error');
   }
 });
 
-app.use("/getMethods", async (_req: Request, res: Response) => {
+// API: /api/items - POST
+export const addItem = functions.https.onRequest(async (req, res) => {
+  const { name } = req.body;
+
+  if (!name) {
+    res.status(400).send('Missing "name" in request body');
+    return;
+  }
+
   try {
-    const querySnapshot = await db
-      .collection("Methods")
-      .where("userId", "==", USER_ID)
-      .get();
-
-    const methods = querySnapshot.docs.map(
-      (doc) => doc.data() as MethodListType
-    );
-    res.status(200).json(methods.filter((method) => method.timing == "即時"));
-  } catch (error) {
-    res.status(500).json({ error: error });
+    const itemRepository = AppDataSource.getRepository(Item);
+    const item = new Item();
+    item.name = name;
+    const result = await itemRepository.save(item);
+    res.status(201).json(result);
+  } catch (err) {
+    console.error('Error inserting data:', err);
+    res.status(500).send('Internal Server Error');
   }
 });
-
-exports.addPurchase = onRequest(app);
