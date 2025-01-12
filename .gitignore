@@ -47,3 +47,4 @@ __pycache__/
 log.txt
 */data/*.json
 */output/*.json
+ormconfig.json

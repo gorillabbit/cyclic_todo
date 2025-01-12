@@ -2,6 +2,12 @@ import { DataSource } from 'typeorm';
 import 'reflect-metadata';
 import { Item } from './entities/Item';
 import { CompleteLog } from './entities/CompleteLog';
+import { Purchase } from './entities/Purchase';
+import { Account } from './entities/Account';
+import { Tab } from './entities/Tab';
+import { Method } from './entities/Method';
+import { Asset } from './entities/Asset';
+import { Log } from './entities/Log';
 import 'dotenv/config';
 
 const AppDataSource = new DataSource({
@@ -13,7 +19,7 @@ const AppDataSource = new DataSource({
     database: process.env.DB_NAME,
     synchronize: false,
     logging: true,
-    entities: [Item, CompleteLog],
+    entities: [Item, CompleteLog, Purchase, Account, Tab, Method, Asset, Log],
     migrations: [],
     subscribers: [],
 });
