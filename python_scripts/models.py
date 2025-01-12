@@ -1,47 +1,44 @@
-from typing import Optional
-from pydantic import BaseModel
 import datetime
+from pydantic import BaseModel
+from typing import Optional, Any, Union
 
 
 class Accounts(BaseModel):
     id: str
-    receive_request: str
-    linked_accounts: str
+    receive_request: Union[dict[str, Any], list[dict[str, Any]], list[str], str]
+    linked_accounts: Union[dict[str, Any], list[dict[str, Any]], list[str], str]
     name: str
     icon: str
-    send_request: str
+    send_request: Union[dict[str, Any], list[dict[str, Any]], list[str], str]
     email: str
-    use_tab_ids: str
-
+    use_tab_ids: Union[dict[str, Any], list[dict[str, Any]], list[str], str]
 
 class Tabs(BaseModel):
     id: str
     name: str
     create_user_uid: str
-    shared_accounts: str
+    shared_accounts: Union[dict[str, Any], list[dict[str, Any]], list[str], str]
     type: str
     timestamp: datetime.datetime
     user_id: str
 
-
 class Tasks(BaseModel):
     id: str
-    is周期的: str
-    周期単位: str | None
-    周期日数: int | None
-    due_date: datetime.date
-    has_due_time: bool
-    icon: str
-    description: str
-    task_text: str
-    due_time: str
+    is周期的: Optional[str] = None
+    周期単位: Optional[str] = None
+    周期日数: Optional[int] = None
+    due_date: Optional[str] = None
+    has_due_time: Optional[bool] = None
+    icon: Optional[str] = None
+    description: Optional[str] = None
+    task_text: Optional[str] = None
+    due_time: Optional[str] = None
     user_id: str
-    has_due: bool
-    timestamp: datetime.datetime
-    toggle_completion_timestamp: datetime.datetime
-    completed: bool
+    has_due: Optional[bool] = None
+    timestamp: Optional[datetime.datetime] = None
+    toggle_completion_timestamp: Optional[datetime.datetime] = None
+    completed: Optional[bool] = None
     tab_id: str
-
 
 class Logs(BaseModel):
     id: str
@@ -52,37 +49,34 @@ class Logs(BaseModel):
     voice_announce_unit: str
     interval_unit: str
     icon: str
-    description: str
+    description: Optional[str] = None
     user_id: str
     duration: bool
-    archived: bool
-    accessible_accounts: str
+    archived: Optional[bool] = None
+    accessible_accounts: Optional[Union[dict[str, Any], list[dict[str, Any]], list[str], str]] = None
     voice_announce_num: int
-    reviewed: bool
-    display_feature: str
-    is_interval: bool
-    task_text: str
+    reviewed: Optional[bool] = None
+    display_feature: Optional[Union[dict[str, Any], list[dict[str, Any]], list[str], str]] = None
+    is_interval: Optional[bool] = None
+    task_text: Optional[str] = None
     timestamp: datetime.datetime
 
-
-class Logscompletelogs(BaseModel):
+class LogsCompleteLogs(BaseModel):
     id: str
-    processed: bool
-    memo: str
+    processed: Optional[bool] = None
+    memo: Optional[str] = None
     log_id: str
     type: str
     timestamp: datetime.datetime
     user_id: str
     tab_id: str
 
-
 class Assets(BaseModel):
     id: str
     tab_id: str
-    name: str | None
+    name: Optional[str] = None
     user_id: str
-    timestamp: datetime.datetime | None
-
+    timestamp: Optional[datetime.datetime] = None
 
 class Methods(BaseModel):
     id: str
@@ -91,9 +85,8 @@ class Methods(BaseModel):
     asset_id: str
     timing: str
     user_id: str
-    timestamp: datetime.datetime | None
+    timestamp: Optional[datetime.datetime] = None
     label: str
-
 
 class Purchases(BaseModel):
     id: str
@@ -104,17 +97,16 @@ class Purchases(BaseModel):
     price: Optional[int] = None
     description: str
     title: str
-    category: str | None
+    category: Optional[str] = None
     user_id: str
     child_purchase_id: Optional[str] = None
-    difference: int | None
+    difference: Optional[int] = None
     asset_id: str
     pay_date: Optional[datetime.datetime] = None
-    balance: int | None
+    balance: Optional[int] = None
     timestamp: Optional[datetime.datetime] = None
 
-
-class Purchase_schedules(BaseModel):
+class PurchaseSchedules(BaseModel):
     id: str
     date: int
     income: bool
@@ -125,14 +117,13 @@ class Purchase_schedules(BaseModel):
     title: str
     user_id: str
     cycle: str
-    price: str
-    is_uncertain: bool
+    price: int
+    is_uncertain: Optional[bool] = None
     category: str
     day: str
     timestamp: datetime.datetime
 
-
-class Purchase_templates(BaseModel):
+class PurchaseTemplates(BaseModel):
     id: str
     date: datetime.datetime
     income: bool
@@ -142,19 +133,18 @@ class Purchase_templates(BaseModel):
     title: str
     user_id: str
     price: int
-    is_uncertain: bool
-    is_group: bool
+    is_uncertain: Optional[bool] = None
+    is_group: Optional[bool] = None
     category: str
     timestamp: datetime.datetime
 
-
-class Transfer_templates(BaseModel):
+class TransferTemplates(BaseModel):
     id: str
     date: datetime.datetime
     tab_id: str
     price: int
     description: str
-    from_method: str
-    to_method: str
+    from_method: Optional[str] = None
+    to_method: Optional[str] = None
     user_id: str
     timestamp: datetime.datetime
