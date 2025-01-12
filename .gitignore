@@ -42,3 +42,5 @@ service_account.json
 
 # Compiled JavaScript files
 functions/lib/*
+__pycache__/
+*:Zone.Identifier
