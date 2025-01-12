@@ -51,39 +51,53 @@ def extract_table_order(sql_file_path):
     return table_names
 
 
-def import_data(collection_path, connection):
-    """Import JSON data into the specified MySQL table."""
+def process_json_value(value):
+    """Process JSON value based on its type for MySQL insertion."""
+    if isinstance(value, list):
+        # JSON_ARRAY を正しく構築
+        return f"JSON_ARRAY({', '.join(json.dumps(v) for v in value)})"
+    elif value is None:
+        return "NULL"  # None を NULL に変換
+    elif isinstance(value, bool):
+        return "TRUE" if value else "FALSE"  # Boolean を TRUE/FALSE に変換
+    elif isinstance(value, int):
+        return str(value)  # int をそのまま文字列に変換
+    elif isinstance(value, str):
+        # 文字列を適切にエスケープ
+        return json.dumps(value)
+    return value
 
-    output_folder = (
-        Path(__file__).resolve().parents[1] / f"scripts/output/{collection_path}.json"
+
+def import_data(collection_name, connection):
+    """Import JSON data into the specified MySQL table."""
+    file_path = (
+        Path(__file__).resolve().parents[1] / f"scripts/output/{collection_name}.json"
     )
-    if not output_folder.exists():
-        print(f"File not found: {output_folder}")
+    if not file_path.exists():
+        print(f"File not found: {file_path}")
         return
 
-    with open(output_folder, "r", encoding="utf-8") as file:
+    with open(file_path, "r", encoding="utf-8") as file:
         data = json.load(file)
 
-    try:
-        with connection.cursor() as cursor:
-            for item in data:
+    with connection.cursor() as cursor:
+        for item in data:
+            try:
                 columns = ", ".join(item.keys())
-                placeholders = ", ".join(["%s"] * len(item))
-                values = list(item.values())
+                values = [process_json_value(v) for v in item.values()]
 
+                # SQL 文を生成
+                placeholders = ", ".join(values)
                 sql = (
-                    f"INSERT INTO {collection_path} ({columns}) VALUES ({placeholders})"
+                    f"INSERT INTO {collection_name} ({columns}) VALUES ({placeholders})"
                 )
-                print(" --------------------------------- ")
-                print(f"SQL実行中: {sql}")
-                print(f"values: {values}")
-                cursor.execute(sql, values)
+                print(f"# sql: {sql}")
+                cursor.execute(sql)
+            except Exception as e:
+                print(f"Failed to import {collection_name}: {e}")
 
-            connection.commit()
-            print(f"Imported {collection_path} to Aurora.")
-    except Exception as e:
-        connection.rollback()
-        print(f"import失敗 {collection_path}: {e}")
+        connection.commit()
+        print(f"Imported {collection_name} to Aurora.")
 
 
 def import_all_collections():

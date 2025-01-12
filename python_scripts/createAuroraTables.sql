@@ -5,13 +5,13 @@ use cyclictodo;
 DROP TABLE IF EXISTS accounts;
 CREATE TABLE accounts (
     id CHAR(20) NOT NULL PRIMARY KEY,
-    receive_request JSON NOT NULL,
-    linked_accounts JSON NOT NULL,
+    receive_request JSON NULL,
+    linked_accounts JSON NULL,
     name VARCHAR(255) NOT NULL,
     icon TEXT NOT NULL,
-    send_request JSON NOT NULL,
+    send_request JSON NULL,
     email VARCHAR(255) NOT NULL,
-    use_tab_ids JSON NOT NULL
+    use_tab_ids JSON NULL
 );
 
 DROP TABLE IF EXISTS tabs;

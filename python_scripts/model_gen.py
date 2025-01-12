@@ -80,7 +80,7 @@ def map_sql_type_to_python(sql_type: str, nullable: bool) -> str:
         "boolean": "bool",
         "date": "datetime.date",
         "datetime": "datetime.datetime",
-        "json": "Union[dict[str, Any], list[dict[str, Any]], list[str], str]",
+        "json": "Union[list[str], str]",
     }
     python_type = type_mapping.get(sql_type.lower(), "str")
     return f"Optional[{python_type}] = None" if nullable else python_type

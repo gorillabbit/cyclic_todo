@@ -5,19 +5,19 @@ from typing import Optional, Any, Union
 
 class Accounts(BaseModel):
     id: str
-    receive_request: Union[dict[str, Any], list[dict[str, Any]], list[str], str]
-    linked_accounts: Union[dict[str, Any], list[dict[str, Any]], list[str], str]
+    receive_request: Optional[Union[list[str], str]] = None
+    linked_accounts: Optional[Union[list[str], str]] = None
     name: str
     icon: str
-    send_request: Union[dict[str, Any], list[dict[str, Any]], list[str], str]
+    send_request: Optional[Union[list[str], str]] = None
     email: str
-    use_tab_ids: Union[dict[str, Any], list[dict[str, Any]], list[str], str]
+    use_tab_ids: Optional[Union[list[str], str]] = None
 
 class Tabs(BaseModel):
     id: str
     name: str
     create_user_uid: str
-    shared_accounts: Union[dict[str, Any], list[dict[str, Any]], list[str], str]
+    shared_accounts: Union[list[str], str]
     type: str
     timestamp: datetime.datetime
     user_id: str
@@ -53,10 +53,10 @@ class Logs(BaseModel):
     user_id: str
     duration: bool
     archived: Optional[bool] = None
-    accessible_accounts: Optional[Union[dict[str, Any], list[dict[str, Any]], list[str], str]] = None
+    accessible_accounts: Optional[Union[list[str], str]] = None
     voice_announce_num: int
     reviewed: Optional[bool] = None
-    display_feature: Optional[Union[dict[str, Any], list[dict[str, Any]], list[str], str]] = None
+    display_feature: Optional[Union[list[str], str]] = None
     is_interval: Optional[bool] = None
     task_text: Optional[str] = None
     timestamp: datetime.datetime

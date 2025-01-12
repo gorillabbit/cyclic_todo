@@ -42,7 +42,9 @@ def transform_object(obj: dict) -> dict:
         if isinstance(value, dict):
             return transform_object(value)
         if isinstance(value, list):
-            return [transform_value(None, item) for item in value]
+            if key in {"receiveRequest", "linkedAccounts", "sharedAccounts"}:
+                return [item["id"] for item in value] if value else None
+            return [transform_value(None, item) for item in value] if value else None
         return value
 
     return {camel_to_snake(k): transform_value(k, v) for k, v in obj.items()}
