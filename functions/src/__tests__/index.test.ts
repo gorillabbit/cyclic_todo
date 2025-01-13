@@ -16,6 +16,11 @@ describe('getPurchases Integration Test', () => {
     let mockRequest: any;
     let mockResponse: any;
 
+    console.log('DB_HOST', process.env.DB_HOST);
+    console.log('DB_PORT', process.env.DB_PORT);
+    console.log('DB_USER', process.env.DB_USER);
+    console.log('DB_PASSWORD', process.env.DB_PASSWORD);
+
     beforeAll(async () => {
         // Initialize database connection
         await AppDataSource.initialize();
@@ -31,8 +36,7 @@ describe('getPurchases Integration Test', () => {
         testAccounts = new Accounts();
         testAccounts.id = `test-account-${uuid_v4()}`.substring(0, 20);
         testAccounts.name = 'Test Accounts';
-        const res = await accountRepository.save(testAccounts);
-        console.log('res', res);
+        await accountRepository.save(testAccounts);
 
         // Create test tab
         testTabs = new Tabs();
