@@ -13,71 +13,71 @@ import { TransferTemplates } from "./TransferTemplates";
 @Entity("accounts", { schema: "cyclictodo" })
 export class Accounts {
   @Column("char", { primary: true, name: "id", length: 20 })
-  id: string;
+  id!: string;
 
   @Column("json", { name: "receive_request", nullable: true })
-  receiveRequest: object | null;
+  receiveRequest!: object | null;
 
   @Column("json", { name: "linked_accounts", nullable: true })
-  linkedAccounts: object | null;
+  linkedAccounts!: object | null;
 
   @Column("varchar", { name: "name", length: 255 })
-  name: string;
+  name!: string;
 
   @Column("text", { name: "icon" })
-  icon: string;
+  icon!: string;
 
   @Column("json", { name: "send_request", nullable: true })
-  sendRequest: object | null;
+  sendRequest!: object | null;
 
   @Column("varchar", { name: "email", length: 255 })
-  email: string;
+  email!: string;
 
   @Column("json", { name: "use_tab_ids", nullable: true })
-  useTabIds: object | null;
+  useTabIds!: object | null;
 
   @OneToMany(() => Assets, (assets) => assets.user)
-  assets: Assets[];
+  assets!: Assets[];
 
   @OneToMany(() => Logs, (logs) => logs.user)
-  logs: Logs[];
+  logs!: Logs[];
 
   @OneToMany(
     () => LogsCompleteLogs,
     (logsCompleteLogs) => logsCompleteLogs.user
   )
-  logsCompleteLogs: LogsCompleteLogs[];
+  logsCompleteLogs!: LogsCompleteLogs[];
 
   @OneToMany(() => Methods, (methods) => methods.user)
-  methods: Methods[];
+  methods!: Methods[];
 
   @OneToMany(
     () => PurchaseSchedules,
     (purchaseSchedules) => purchaseSchedules.user
   )
-  purchaseSchedules: PurchaseSchedules[];
+  purchaseSchedules!: PurchaseSchedules[];
 
   @OneToMany(
     () => PurchaseTemplates,
     (purchaseTemplates) => purchaseTemplates.user
   )
-  purchaseTemplates: PurchaseTemplates[];
+  purchaseTemplates!: PurchaseTemplates[];
 
   @OneToMany(() => Purchases, (purchases) => purchases.user)
-  purchases: Purchases[];
+  purchases!: Purchases[];
 
   @OneToMany(() => Tabs, (tabs) => tabs.createUserU)
-  tabs: Tabs[];
+  tabs!: Tabs[];
 
   @OneToMany(() => Tabs, (tabs) => tabs.user)
-  tabs2: Tabs[];
+  tabs2!: Tabs[];
 
   @OneToMany(() => Tasks, (tasks) => tasks.user)
-  tasks: Tasks[];
+  tasks!: Tasks[];
 
   @OneToMany(
     () => TransferTemplates,
     (transferTemplates) => transferTemplates.user
   )
-  transferTemplates: TransferTemplates[];
+  transferTemplates!: TransferTemplates[];
 }

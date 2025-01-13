@@ -15,37 +15,37 @@ import { LogsCompleteLogs } from "./LogsCompleteLogs";
 @Entity("logs", { schema: "cyclictodo" })
 export class Logs {
   @Column("char", { primary: true, name: "id", length: 20 })
-  id: string;
+  id!: string;
 
   @Column("tinyint", { name: "available_voice_announce", width: 1 })
-  availableVoiceAnnounce: boolean;
+  availableVoiceAnnounce!: boolean;
 
   @Column("char", { name: "tab_id", length: 20 })
-  tabId: string;
+  tabId!: string;
 
   @Column("int", { name: "interval_num" })
-  intervalNum: number;
+  intervalNum!: number;
 
   @Column("tinyint", { name: "available_memo", width: 1 })
-  availableMemo: boolean;
+  availableMemo!: boolean;
 
   @Column("varchar", { name: "voice_announce_unit", length: 20 })
-  voiceAnnounceUnit: string;
+  voiceAnnounceUnit!: string;
 
   @Column("varchar", { name: "interval_unit", length: 20 })
-  intervalUnit: string;
+  intervalUnit!: string;
 
   @Column("text", { name: "icon" })
-  icon: string;
+  icon!: string;
 
   @Column("varchar", { name: "description", nullable: true, length: 255 })
-  description: string | null;
+  description!: string | null;
 
   @Column("char", { name: "user_id", length: 20 })
-  userId: string;
+  userId!: string;
 
   @Column("tinyint", { name: "duration", width: 1 })
-  duration: boolean;
+  duration!: boolean;
 
   @Column("tinyint", {
     name: "archived",
@@ -53,13 +53,13 @@ export class Logs {
     width: 1,
     default: () => "'0'",
   })
-  archived: boolean | null;
+  archived!: boolean | null;
 
   @Column("json", { name: "accessible_accounts", nullable: true })
-  accessibleAccounts: object | null;
+  accessibleAccounts!: object | null;
 
   @Column("int", { name: "voice_announce_num" })
-  voiceAnnounceNum: number;
+  voiceAnnounceNum!: number;
 
   @Column("tinyint", {
     name: "reviewed",
@@ -67,10 +67,10 @@ export class Logs {
     width: 1,
     default: () => "'0'",
   })
-  reviewed: boolean | null;
+  reviewed!: boolean | null;
 
   @Column("json", { name: "display_feature", nullable: true })
-  displayFeature: object | null;
+  displayFeature!: object | null;
 
   @Column("tinyint", {
     name: "is_interval",
@@ -78,28 +78,28 @@ export class Logs {
     width: 1,
     default: () => "'0'",
   })
-  isInterval: boolean | null;
+  isInterval!: boolean | null;
 
   @Column("varchar", { name: "task_text", nullable: true, length: 255 })
-  taskText: string | null;
+  taskText!: string | null;
 
   @Column("datetime", { name: "timestamp" })
-  timestamp: Date;
+  timestamp!: Date;
 
   @ManyToOne(() => Tabs, (tabs) => tabs.logs, {
     onDelete: "NO ACTION",
     onUpdate: "NO ACTION",
   })
   @JoinColumn([{ name: "tab_id", referencedColumnName: "id" }])
-  tab: Tabs;
+  tab!: Tabs;
 
   @ManyToOne(() => Accounts, (accounts) => accounts.logs, {
     onDelete: "NO ACTION",
     onUpdate: "NO ACTION",
   })
   @JoinColumn([{ name: "user_id", referencedColumnName: "id" }])
-  user: Accounts;
+  user!: Accounts;
 
   @OneToMany(() => LogsCompleteLogs, (logsCompleteLogs) => logsCompleteLogs.log)
-  logsCompleteLogs: LogsCompleteLogs[];
+  logsCompleteLogs!: LogsCompleteLogs[];
 }

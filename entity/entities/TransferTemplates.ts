@@ -10,57 +10,57 @@ import { Accounts } from "./Accounts";
 @Entity("transfer_templates", { schema: "cyclictodo" })
 export class TransferTemplates {
   @Column("char", { primary: true, name: "id", length: 20 })
-  id: string;
+  id!: string;
 
   @Column("datetime", { name: "date" })
-  date: Date;
+  date!: Date;
 
   @Column("char", { name: "tab_id", length: 20 })
-  tabId: string;
+  tabId!: string;
 
   @Column("int", { name: "price" })
-  price: number;
+  price!: number;
 
   @Column("text", { name: "description" })
-  description: string;
+  description!: string;
 
   @Column("char", { name: "from_method", nullable: true, length: 20 })
-  fromMethod: string | null;
+  fromMethod!: string | null;
 
   @Column("char", { name: "to_method", nullable: true, length: 20 })
-  toMethod: string | null;
+  toMethod!: string | null;
 
   @Column("char", { name: "user_id", length: 20 })
-  userId: string;
+  userId!: string;
 
   @Column("datetime", { name: "timestamp" })
-  timestamp: Date;
+  timestamp!: Date;
 
   @ManyToOne(() => Methods, (methods) => methods.transferTemplates, {
     onDelete: "NO ACTION",
     onUpdate: "NO ACTION",
   })
   @JoinColumn([{ name: "from_method", referencedColumnName: "id" }])
-  fromMethod2: Methods;
+  fromMethod2!: Methods;
 
   @ManyToOne(() => Tabs, (tabs) => tabs.transferTemplates, {
     onDelete: "NO ACTION",
     onUpdate: "NO ACTION",
   })
   @JoinColumn([{ name: "tab_id", referencedColumnName: "id" }])
-  tab: Tabs;
+  tab!: Tabs;
 
   @ManyToOne(() => Methods, (methods) => methods.transferTemplates2, {
     onDelete: "NO ACTION",
     onUpdate: "NO ACTION",
   })
   @JoinColumn([{ name: "to_method", referencedColumnName: "id" }])
-  toMethod2: Methods;
+  toMethod2!: Methods;
 
   @ManyToOne(() => Accounts, (accounts) => accounts.transferTemplates, {
     onDelete: "NO ACTION",
     onUpdate: "NO ACTION",
   })
   @JoinColumn([{ name: "user_id", referencedColumnName: "id" }])
-  user: Accounts;
+  user!: Accounts;
 }

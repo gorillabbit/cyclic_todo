@@ -9,68 +9,68 @@ import { Accounts } from "./Accounts";
 @Entity("purchase_schedules", { schema: "cyclictodo" })
 export class PurchaseSchedules {
   @Column("char", { primary: true, name: "id", length: 20 })
-  id: string;
+  id!: string;
 
   @Column("int", { name: "date" })
-  date: number;
+  date!: number;
 
   @Column("tinyint", { name: "income", width: 1 })
-  income: boolean;
+  income!: boolean;
 
   @Column("char", { name: "tab_id", length: 20 })
-  tabId: string;
+  tabId!: string;
 
   @Column("char", { name: "method", length: 20 })
-  method: string;
+  method!: string;
 
   @Column("datetime", { name: "end_date" })
-  endDate: Date;
+  endDate!: Date;
 
   @Column("text", { name: "description" })
-  description: string;
+  description!: string;
 
   @Column("varchar", { name: "title", length: 255 })
-  title: string;
+  title!: string;
 
   @Column("char", { name: "user_id", length: 20 })
-  userId: string;
+  userId!: string;
 
   @Column("varchar", { name: "cycle", length: 50 })
-  cycle: string;
+  cycle!: string;
 
   @Column("int", { name: "price" })
-  price: number;
+  price!: number;
 
   @Column("tinyint", { name: "is_uncertain", nullable: true, width: 1 })
-  isUncertain: boolean | null;
+  isUncertain!: boolean | null;
 
   @Column("varchar", { name: "category", length: 100 })
-  category: string;
+  category!: string;
 
   @Column("varchar", { name: "day", length: 50 })
-  day: string;
+  day!: string;
 
   @Column("datetime", { name: "timestamp" })
-  timestamp: Date;
+  timestamp!: Date;
 
   @ManyToOne(() => Methods, (methods) => methods.purchaseSchedules, {
     onDelete: "NO ACTION",
     onUpdate: "NO ACTION",
   })
   @JoinColumn([{ name: "method", referencedColumnName: "id" }])
-  method2: Methods;
+  method2!: Methods;
 
   @ManyToOne(() => Tabs, (tabs) => tabs.purchaseSchedules, {
     onDelete: "NO ACTION",
     onUpdate: "NO ACTION",
   })
   @JoinColumn([{ name: "tab_id", referencedColumnName: "id" }])
-  tab: Tabs;
+  tab!: Tabs;
 
   @ManyToOne(() => Accounts, (accounts) => accounts.purchaseSchedules, {
     onDelete: "NO ACTION",
     onUpdate: "NO ACTION",
   })
   @JoinColumn([{ name: "user_id", referencedColumnName: "id" }])
-  user: Accounts;
+  user!: Accounts;
 }

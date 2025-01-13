@@ -22,73 +22,73 @@ import { TransferTemplates } from "./TransferTemplates";
 @Entity("tabs", { schema: "cyclictodo" })
 export class Tabs {
   @Column("char", { primary: true, name: "id", length: 20 })
-  id: string;
+  id!: string;
 
   @Column("varchar", { name: "name", length: 255 })
-  name: string;
+  name!: string;
 
   @Column("char", { name: "create_user_uid", length: 20 })
-  createUserUid: string;
+  createUserUid!: string;
 
   @Column("json", { name: "shared_accounts" })
-  sharedAccounts: object;
+  sharedAccounts!: object;
 
   @Column("varchar", { name: "type", length: 50 })
-  type: string;
+  type!: string;
 
   @Column("datetime", { name: "timestamp" })
-  timestamp: Date;
+  timestamp!: Date;
 
   @Column("char", { name: "user_id", length: 20 })
-  userId: string;
+  userId!: string;
 
   @OneToMany(() => Assets, (assets) => assets.tab)
-  assets: Assets[];
+  assets!: Assets[];
 
   @OneToMany(() => Logs, (logs) => logs.tab)
-  logs: Logs[];
+  logs!: Logs[];
 
   @OneToMany(() => LogsCompleteLogs, (logsCompleteLogs) => logsCompleteLogs.tab)
-  logsCompleteLogs: LogsCompleteLogs[];
+  logsCompleteLogs!: LogsCompleteLogs[];
 
   @OneToMany(() => Methods, (methods) => methods.tab)
-  methods: Methods[];
+  methods!: Methods[];
 
   @OneToMany(
     () => PurchaseSchedules,
     (purchaseSchedules) => purchaseSchedules.tab
   )
-  purchaseSchedules: PurchaseSchedules[];
+  purchaseSchedules!: PurchaseSchedules[];
 
   @OneToMany(
     () => PurchaseTemplates,
     (purchaseTemplates) => purchaseTemplates.tab
   )
-  purchaseTemplates: PurchaseTemplates[];
+  purchaseTemplates!: PurchaseTemplates[];
 
   @OneToMany(() => Purchases, (purchases) => purchases.tab)
-  purchases: Purchases[];
+  purchases!: Purchases[];
 
   @ManyToOne(() => Accounts, (accounts) => accounts.tabs, {
     onDelete: "NO ACTION",
     onUpdate: "NO ACTION",
   })
   @JoinColumn([{ name: "create_user_uid", referencedColumnName: "id" }])
-  createUserU: Accounts;
+  createUserU!: Accounts;
 
   @ManyToOne(() => Accounts, (accounts) => accounts.tabs2, {
     onDelete: "NO ACTION",
     onUpdate: "NO ACTION",
   })
   @JoinColumn([{ name: "user_id", referencedColumnName: "id" }])
-  user: Accounts;
+  user!: Accounts;
 
   @OneToMany(() => Tasks, (tasks) => tasks.tab)
-  tasks: Tasks[];
+  tasks!: Tasks[];
 
   @OneToMany(
     () => TransferTemplates,
     (transferTemplates) => transferTemplates.tab
   )
-  transferTemplates: TransferTemplates[];
+  transferTemplates!: TransferTemplates[];
 }

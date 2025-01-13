@@ -16,37 +16,37 @@ import { Purchases } from "./Purchases";
 @Entity("assets", { schema: "cyclictodo" })
 export class Assets {
   @Column("char", { primary: true, name: "id", length: 20 })
-  id: string;
+  id!: string;
 
   @Column("char", { name: "tab_id", length: 20 })
-  tabId: string;
+  tabId!: string;
 
   @Column("varchar", { name: "name", nullable: true, length: 255 })
-  name: string | null;
+  name!: string | null;
 
   @Column("char", { name: "user_id", length: 20 })
-  userId: string;
+  userId!: string;
 
   @Column("datetime", { name: "timestamp", nullable: true })
-  timestamp: Date | null;
+  timestamp!: Date | null;
 
   @ManyToOne(() => Tabs, (tabs) => tabs.assets, {
     onDelete: "NO ACTION",
     onUpdate: "NO ACTION",
   })
   @JoinColumn([{ name: "tab_id", referencedColumnName: "id" }])
-  tab: Tabs;
+  tab!: Tabs;
 
   @ManyToOne(() => Accounts, (accounts) => accounts.assets, {
     onDelete: "NO ACTION",
     onUpdate: "NO ACTION",
   })
   @JoinColumn([{ name: "user_id", referencedColumnName: "id" }])
-  user: Accounts;
+  user!: Accounts;
 
   @OneToMany(() => Methods, (methods) => methods.asset)
-  methods: Methods[];
+  methods!: Methods[];
 
   @OneToMany(() => Purchases, (purchases) => purchases.asset)
-  purchases: Purchases[];
+  purchases!: Purchases[];
 }

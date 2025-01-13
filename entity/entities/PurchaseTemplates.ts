@@ -9,31 +9,31 @@ import { Accounts } from "./Accounts";
 @Entity("purchase_templates", { schema: "cyclictodo" })
 export class PurchaseTemplates {
   @Column("char", { primary: true, name: "id", length: 20 })
-  id: string;
+  id!: string;
 
   @Column("datetime", { name: "date" })
-  date: Date;
+  date!: Date;
 
   @Column("tinyint", { name: "income", width: 1 })
-  income: boolean;
+  income!: boolean;
 
   @Column("char", { name: "tab_id", length: 20 })
-  tabId: string;
+  tabId!: string;
 
   @Column("char", { name: "method", length: 20 })
-  method: string;
+  method!: string;
 
   @Column("text", { name: "description" })
-  description: string;
+  description!: string;
 
   @Column("varchar", { name: "title", length: 255 })
-  title: string;
+  title!: string;
 
   @Column("char", { name: "user_id", length: 20 })
-  userId: string;
+  userId!: string;
 
   @Column("int", { name: "price" })
-  price: number;
+  price!: number;
 
   @Column("tinyint", {
     name: "is_uncertain",
@@ -41,7 +41,7 @@ export class PurchaseTemplates {
     width: 1,
     default: () => "'0'",
   })
-  isUncertain: boolean | null;
+  isUncertain!: boolean | null;
 
   @Column("tinyint", {
     name: "is_group",
@@ -49,32 +49,32 @@ export class PurchaseTemplates {
     width: 1,
     default: () => "'0'",
   })
-  isGroup: boolean | null;
+  isGroup!: boolean | null;
 
   @Column("varchar", { name: "category", length: 100 })
-  category: string;
+  category!: string;
 
   @Column("datetime", { name: "timestamp" })
-  timestamp: Date;
+  timestamp!: Date;
 
   @ManyToOne(() => Methods, (methods) => methods.purchaseTemplates, {
     onDelete: "NO ACTION",
     onUpdate: "NO ACTION",
   })
   @JoinColumn([{ name: "method", referencedColumnName: "id" }])
-  method2: Methods;
+  method2!: Methods;
 
   @ManyToOne(() => Tabs, (tabs) => tabs.purchaseTemplates, {
     onDelete: "NO ACTION",
     onUpdate: "NO ACTION",
   })
   @JoinColumn([{ name: "tab_id", referencedColumnName: "id" }])
-  tab: Tabs;
+  tab!: Tabs;
 
   @ManyToOne(() => Accounts, (accounts) => accounts.purchaseTemplates, {
     onDelete: "NO ACTION",
     onUpdate: "NO ACTION",
   })
   @JoinColumn([{ name: "user_id", referencedColumnName: "id" }])
-  user: Accounts;
+  user!: Accounts;
 }
