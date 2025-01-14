@@ -16,65 +16,65 @@ describe('getPurchases Integration Test', () => {
     let mockRequest: any;
     let mockResponse: any;
 
-    console.log('DB_HOST', process.env.DB_HOST);
-    console.log('DB_PORT', process.env.DB_PORT);
-    console.log('DB_USER', process.env.DB_USER);
-    console.log('DB_PASSWORD', process.env.DB_PASSWORD);
-
     beforeAll(async () => {
-        // Initialize database connection
-        await AppDataSource.initialize();
+        try {
+            // Initialize database connection
+            await AppDataSource.initialize();
 
-        // Create test data
-        const purchaseRepository = AppDataSource.getRepository(Purchases);
-        const accountRepository = AppDataSource.getRepository(Accounts);
-        const tabRepository = AppDataSource.getRepository(Tabs);
-        const methodRepository = AppDataSource.getRepository(Methods);
-        const assetRepository = AppDataSource.getRepository(Assets);
+            // Create test data
+            const purchaseRepository = AppDataSource.getRepository(Purchases);
+            const accountRepository = AppDataSource.getRepository(Accounts);
+            const tabRepository = AppDataSource.getRepository(Tabs);
+            const methodRepository = AppDataSource.getRepository(Methods);
+            const assetRepository = AppDataSource.getRepository(Assets);
 
-        // Create test account
-        testAccounts = new Accounts();
-        testAccounts.id = `test-account-${uuid_v4()}`.substring(0, 20);
-        testAccounts.name = 'Test Accounts';
-        await accountRepository.save(testAccounts);
+            // Create test account
+            testAccounts = new Accounts();
+            testAccounts.id = `test-account-${uuid_v4()}`.substring(0, 20);
+            testAccounts.name = 'Test Accounts';
+            await accountRepository.save(testAccounts);
 
-        // Create test tab
-        testTabs = new Tabs();
-        testTabs.id = `test-tab-${uuid_v4()}`.substring(0, 20);
-        testTabs.name = 'Test Tabs';
-        testTabs.userId = testAccounts.id;
-        testTabs.createUserUid = testAccounts.id;
-        await tabRepository.save(testTabs);
+            // Create test tab
+            testTabs = new Tabs();
+            testTabs.id = `test-tab-${uuid_v4()}`.substring(0, 20);
+            testTabs.name = 'Test Tabs';
+            testTabs.userId = testAccounts.id;
+            testTabs.createUserUid = testAccounts.id;
+            await tabRepository.save(testTabs);
 
-        // Create test asset
-        testAssets = new Assets();
-        testAssets.id = `test-asset-${uuid_v4()}`.substring(0, 20);
-        testAssets.name = 'Test Assets';
-        testAssets.userId = testAccounts.id;
-        testAssets.tabId = testTabs.id;
-        await assetRepository.save(testAssets);
+            // Create test asset
+            testAssets = new Assets();
+            testAssets.id = `test-asset-${uuid_v4()}`.substring(0, 20);
+            testAssets.name = 'Test Assets';
+            testAssets.userId = testAccounts.id;
+            testAssets.tabId = testTabs.id;
+            await assetRepository.save(testAssets);
 
-        // Create test method
-        testMethods = new Methods();
-        testMethods.id = `test-method-${uuid_v4()}`.substring(0, 20);
-        testMethods.label = 'Test Methods';
-        testMethods.tabId = testTabs.id;
-        testMethods.userId = testAccounts.id;
-        testMethods.assetId = testAssets.id;
-        await methodRepository.save(testMethods);
+            // Create test method
+            testMethods = new Methods();
+            testMethods.id = `test-method-${uuid_v4()}`.substring(0, 20);
+            testMethods.label = 'Test Methods';
+            testMethods.tabId = testTabs.id;
+            testMethods.userId = testAccounts.id;
+            testMethods.assetId = testAssets.id;
+            await methodRepository.save(testMethods);
 
-        // Create test purchase
-        testPurchases = new Purchases();
-        testPurchases.id = `test-purchase-${uuid_v4()}`.substring(0, 20);
-        testPurchases.userId = testAccounts.id;
-        testPurchases.tabId = testTabs.id;
-        testPurchases.method = testMethods.id;
-        testPurchases.assetId = testAssets.id;
-        testPurchases.title = 'Test Purchases';
-        testPurchases.price = 1000;
-        testPurchases.date = new Date();
-        testPurchases.description = 'Test Description';
-        await purchaseRepository.save(testPurchases);
+            // Create test purchase
+            testPurchases = new Purchases();
+            testPurchases.id = `test-purchase-${uuid_v4()}`.substring(0, 20);
+            testPurchases.userId = testAccounts.id;
+            testPurchases.tabId = testTabs.id;
+            testPurchases.method = testMethods.id;
+            testPurchases.assetId = testAssets.id;
+            testPurchases.title = 'Test Purchases';
+            testPurchases.price = 1000;
+            testPurchases.date = new Date();
+            testPurchases.description = 'Test Description';
+            await purchaseRepository.save(testPurchases);
+        } catch (error) {
+            console.error('Failed to initialize test data:', error);
+            throw error;
+        }
     });
 
     beforeEach(() => {
@@ -90,28 +90,40 @@ describe('getPurchases Integration Test', () => {
     });
 
     afterAll(async () => {
-        // Cleanup test data
-        const purchaseRepository = AppDataSource.getRepository(Purchases);
-        const accountRepository = AppDataSource.getRepository(Accounts);
-        const tabRepository = AppDataSource.getRepository(Tabs);
-        const methodRepository = AppDataSource.getRepository(Methods);
-        const assetRepository = AppDataSource.getRepository(Assets);
+        try {
+            // Cleanup test data
+            const purchaseRepository = AppDataSource.getRepository(Purchases);
+            const accountRepository = AppDataSource.getRepository(Accounts);
+            const tabRepository = AppDataSource.getRepository(Tabs);
+            const methodRepository = AppDataSource.getRepository(Methods);
+            const assetRepository = AppDataSource.getRepository(Assets);
 
-        await purchaseRepository.delete(testPurchases.id);
-        await methodRepository.delete(testMethods.id);
-        await assetRepository.delete(testAssets.id);
-        await tabRepository.delete(testTabs.id);
-        await accountRepository.delete(testAccounts.id);
+            if (testPurchases?.id) {
+                await purchaseRepository.delete(testPurchases.id);
+            }
+            if (testMethods?.id) {
+                await methodRepository.delete(testMethods.id);
+            }
+            if (testAssets?.id) {
+                await assetRepository.delete(testAssets.id);
+            }
+            if (testTabs?.id) {
+                await tabRepository.delete(testTabs.id);
+            }
+            if (testAccounts?.id) {
+                await accountRepository.delete(testAccounts.id);
+            }
 
-        // Close database connection
-        await AppDataSource.destroy();
+            // Close database connection
+            await AppDataSource.destroy();
+        } catch (error) {
+            console.error('Failed to cleanup test data:', error);
+        }
     });
 
     it('should fetch purchases with no filters', async () => {
-        // Execute function
         await getPurchases(mockRequest, mockResponse);
 
-        // Verify response
         expect(mockResponse.status).toHaveBeenCalledWith(200);
         const responseData = mockResponse.json.mock.calls[0][0];
         expect(responseData).toEqual(
@@ -128,16 +140,14 @@ describe('getPurchases Integration Test', () => {
     });
 
     it('should filter purchases by userId and tabId', async () => {
-        // Set query parameters
         mockRequest.query = {
             userId: testAccounts.id,
             tabId: testTabs.id,
         };
 
-        // Execute function
         await getPurchases(mockRequest, mockResponse);
+        console.log(mockRequest.query);
 
-        // Verify response
         expect(mockResponse.status).toHaveBeenCalledWith(200);
         const responseData = mockResponse.json.mock.calls[0][0];
         expect(responseData).toHaveLength(1);
@@ -153,15 +163,12 @@ describe('getPurchases Integration Test', () => {
     });
 
     it('should return empty array for non-existent userId', async () => {
-        // Set query parameters
         mockRequest.query = {
             userId: 'non-existent-user',
         };
 
-        // Execute function
         await getPurchases(mockRequest, mockResponse);
 
-        // Verify response
         expect(mockResponse.status).toHaveBeenCalledWith(200);
         const responseData = mockResponse.json.mock.calls[0][0];
         expect(responseData).toHaveLength(0);

@@ -22,10 +22,36 @@ const AppDataSource = new DataSource({
     database: process.env.DB_NAME,
     synchronize: false,
     logging: true,
-    entities: [Purchases, Accounts, Tabs, Methods, Assets, Logs, LogsCompleteLogs, PurchaseSchedules, PurchaseTemplates, Tasks, TransferTemplates],
+    entities: [
+        Purchases,
+        Accounts,
+        Tabs,
+        Methods,
+        Assets,
+        Logs,
+        LogsCompleteLogs,
+        PurchaseSchedules,
+        PurchaseTemplates,
+        Tasks,
+        TransferTemplates,
+    ],
     migrations: [],
     subscribers: [],
 });
 
+let isInitialized = false;
+
+export const initializeDatabase = async () => {
+    if (isInitialized) return;
+
+    try {
+        await AppDataSource.initialize();
+        isInitialized = true;
+        console.log('Database connection initialized');
+    } catch (err) {
+        console.error('Error during Data Source initialization', err);
+        throw err;
+    }
+};
 
 export default AppDataSource;

@@ -125,3 +125,55 @@ export interface PurchaseScheduleType
 export interface PurchaseScheduleListType extends PurchaseScheduleType {
   id: string;
 }
+
+export interface InputAccountType {
+  userId: string;
+  name: string;
+  email: string;
+  createdAt: Date;
+  updatedAt: Date;
+  tabId: string;
+}
+
+export interface AccountType extends Omit<InputAccountType, 'createdAt' | 'updatedAt'> {
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+export interface AccountListType extends AccountType {
+  id: string;
+}
+
+export const defaultAccount: AccountListType = {
+  userId: '',
+  name: '',
+  email: '',
+  createdAt: new Timestamp(0, 0),
+  updatedAt: new Timestamp(0, 0),
+  tabId: '',
+  id: ''
+};
+
+export interface InputTabType {
+  userId: string;
+  name: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface TabType extends Omit<InputTabType, 'createdAt' | 'updatedAt'> {
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+export interface TabListType extends TabType {
+  id: string;
+}
+
+export const defaultTab: TabListType = {
+  userId: '',
+  name: '',
+  createdAt: new Timestamp(0, 0),
+  updatedAt: new Timestamp(0, 0),
+  id: ''
+};
