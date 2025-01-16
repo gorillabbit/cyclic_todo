@@ -18,8 +18,6 @@ if (process.env.NODE_ENV !== 'test') {
 export const getPurchases = functions.https.onRequest(async (req, res) => {
   try {
     const { userId, tabId } = req.query;
-    console.log('userId:', userId, userId?.toString());
-    console.log('tabId:', tabId);
     const purchases = await getPurchasesService({
       userId: userId?.toString(),
       tabId: tabId?.toString()
@@ -36,7 +34,7 @@ export const getAccounts = functions.https.onRequest(async (req, res) => {
   try {
     const { userId } = req.query;
     const accounts = await getAccountsService({
-      userId: userId?.toString()
+      id: userId?.toString()
     });
     res.status(200).json(accounts);
   } catch (err) {

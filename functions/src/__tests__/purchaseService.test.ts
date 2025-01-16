@@ -146,7 +146,6 @@ describe('getPurchases Integration Test', () => {
         };
 
         await getPurchases(mockRequest, mockResponse);
-        console.log(mockRequest.query);
 
         expect(mockResponse.status).toHaveBeenCalledWith(200);
         const responseData = mockResponse.json.mock.calls[0][0];

@@ -1,52 +1,25 @@
 import AppDataSource from '../db';
 import { Accounts } from '../../../entity/entities/Accounts';
 import { QueryFailedError } from 'typeorm';
+import { DeepPartial } from 'typeorm/common/DeepPartial';
 
-interface GetAccountsParams {
-    userId?: string;
-    accountId?: string;
-}
+interface GetAccountsParams extends Partial<Accounts> { }
 
-interface CreateAccountParams {
+interface UpdateAccountParams extends Partial<Accounts> {
     id: string;
-    name: string;
-    icon: string;
-    email: string;
-    receiveRequest?: object;
-    linkedAccounts?: object;
-    sendRequest?: object;
-    useTabIds?: object;
 }
 
-interface UpdateAccountParams {
-    id: string;
-    name?: string;
-    icon?: string;
-    email?: string;
-    receiveRequest?: object;
-    linkedAccounts?: object;
-    sendRequest?: object;
-    useTabIds?: object;
-}
+interface DeleteAccountParams extends Pick<Accounts, 'id'> { }
 
-interface DeleteAccountParams {
-    accountId: string;
-}
-
-export const getAccountsService = async ({ userId, accountId }: GetAccountsParams) => {
+export const getAccountsService = async ({ id }: GetAccountsParams) => {
     try {
         const accountRepository = AppDataSource.getRepository(Accounts);
         const queryBuilder = accountRepository.createQueryBuilder('account');
-
-        if (userId) {
-            queryBuilder.andWhere('user_id = :userId', { userId });
+        if (id) {
+            queryBuilder.andWhere('id = :id', { id });
         }
 
-        if (accountId) {
-            queryBuilder.andWhere('id = :accountId', { accountId });
-        }
-
-        return await queryBuilder.getMany();
+        return await queryBuilder.getOne();
     } catch (err) {
         if (err instanceof QueryFailedError) {
             console.error('Database query failed:', err.message);
@@ -57,7 +30,7 @@ export const getAccountsService = async ({ userId, accountId }: GetAccountsParam
     }
 };
 
-export const createAccountService = async ({ id, name, icon, email, ...optionalFields }: CreateAccountParams) => {
+export const createAccountService = async ({ id, name, icon, email, ...optionalFields }: DeepPartial<Accounts>) => {
     try {
         const accountRepository = AppDataSource.getRepository(Accounts);
 
@@ -108,10 +81,10 @@ export const updateAccountService = async ({ id, ...updateFields }: UpdateAccoun
     }
 };
 
-export const deleteAccountService = async ({ accountId }: DeleteAccountParams) => {
+export const deleteAccountService = async ({ id }: DeleteAccountParams) => {
     try {
         const accountRepository = AppDataSource.getRepository(Accounts);
-        const result = await accountRepository.delete(accountId);
+        const result = await accountRepository.delete(id);
 
         if (result.affected === 0) {
             throw new Error('Account not found');

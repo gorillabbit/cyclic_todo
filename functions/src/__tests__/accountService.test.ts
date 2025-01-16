@@ -43,12 +43,12 @@ describe('getAccountsService Integration Test', () => {
     });
 
     it('should return empty array when no accounts exist', async () => {
-        const result = await getAccountsService({ userId: 'non-existent-user' });
+        const result = await getAccountsService({ id: 'non-existent-user' });
         expect(result).toEqual(null);
     });
 
     it('should return accounts for user', async () => {
-        const result = await getAccountsService({ userId: testAccount.id });
+        const result = await getAccountsService({ id: testAccount.id });
         expect(result).toEqual(
             expect.objectContaining({
                 id: testAccount.id,
@@ -63,7 +63,7 @@ describe('getAccountsService Integration Test', () => {
         // Force database connection to close to simulate error
         await AppDataSource.destroy();
 
-        await expect(getAccountsService({ userId: testAccount.id }))
+        await expect(getAccountsService({ id: testAccount.id }))
             .rejects.toThrow();
     });
 });
