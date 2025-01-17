@@ -1,7 +1,7 @@
 import AppDataSource from '../db';
 import { Accounts } from '../../../entity/entities/Accounts';
-import { QueryFailedError } from 'typeorm';
 import { DeepPartial } from 'typeorm/common/DeepPartial';
+import { errorQueryHandler } from './serviceUtils';
 
 interface GetAccountsParams extends Partial<Accounts> { }
 
@@ -21,12 +21,7 @@ export const getAccountsService = async ({ id }: GetAccountsParams) => {
 
         return await queryBuilder.getOne();
     } catch (err) {
-        if (err instanceof QueryFailedError) {
-            console.error('Database query failed:', err.message);
-            throw new Error('Database operation failed');
-        }
-        console.error('Unexpected error in getAccountsService:', err);
-        throw new Error('Failed to retrieve accounts');
+        return errorQueryHandler(err, 'getAccountsService');
     }
 };
 
@@ -45,12 +40,7 @@ export const createAccountService = async ({ id, name, icon, email, ...optionalF
         await accountRepository.save(newAccount);
         return newAccount;
     } catch (err) {
-        if (err instanceof QueryFailedError) {
-            console.error('Database query failed:', err.message);
-            throw new Error('Database operation failed');
-        }
-        console.error('Unexpected error in createAccountService:', err);
-        throw new Error('Failed to create account');
+        return errorQueryHandler(err, 'createAccountService');
     }
 };
 
@@ -72,12 +62,7 @@ export const updateAccountService = async ({ id, ...updateFields }: UpdateAccoun
         await accountRepository.update(id, updateData);
         return await accountRepository.findOneBy({ id });
     } catch (err) {
-        if (err instanceof QueryFailedError) {
-            console.error('Database query failed:', err.message);
-            throw new Error('Database operation failed');
-        }
-        console.error('Unexpected error in updateAccountService:', err);
-        throw new Error('Failed to update account');
+        return errorQueryHandler(err, 'updateAccountService');
     }
 };
 
@@ -92,11 +77,6 @@ export const deleteAccountService = async ({ id }: DeleteAccountParams) => {
 
         return { success: true };
     } catch (err) {
-        if (err instanceof QueryFailedError) {
-            console.error('Database query failed:', err.message);
-            throw new Error('Database operation failed');
-        }
-        console.error('Unexpected error in deleteAccountService:', err);
-        throw new Error('Failed to delete account');
+        return errorQueryHandler(err, 'deleteAccountService');
     }
 };
