@@ -53,6 +53,15 @@ jobs:
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           DB_NAME: ${{ secrets.DB_NAME }}
         run: npm --prefix functions test
+      - name: Deploy Firebase Functions
+        uses: w9jds/firebase-action@master
+        with:
+          args: deploy --only functions --force
+        env:
+          PROJECT_ID: cyclictodo
+          GCP_SA_KEY: ${{ secrets.GCP_SA }}
+          PROJECT_PATH: ./functions
+
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: "${{ secrets.GITHUB_TOKEN }}"
