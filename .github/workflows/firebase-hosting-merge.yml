@@ -26,6 +26,8 @@ jobs:
           VITE_GOOGLE_CALENDER_scope: ${{ secrets.VITE_GOOGLE_CALENDER_scope }}
           VITE_GOOGLE_CALENDER_discoveryDocs: ${{ secrets.VITE_GOOGLE_CALENDER_discoveryDocs }}
         run: npm run build --prefix app
+      - name: ci entity
+        run: npm --prefix entity ci
       - name: ci function
         run: npm --prefix functions ci
       - name: build functions
