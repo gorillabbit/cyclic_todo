@@ -40,15 +40,16 @@ jobs:
         run: npm --prefix functions test
       - name: build functions
         run: npm --prefix functions run build
-      - name: Deploy Firebase Functions
-        uses: w9jds/firebase-action@master
-        with:
-          args: deploy --only functions --force
+      - name: Install Firebase CLI
+        run: npm install -g firebase-tools
+      - name: Deploy to Firebase
         env:
-          PROJECT_ID: cyclictodo
-          GCP_SA_KEY: ${{ secrets.GCP_SA }}
-          PROJECT_PATH: ./functions
-
+          PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.GCP_SA }}
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GCP_SA }}
+        run: |
+          echo $FIREBASE_SERVICE_ACCOUNT > ${HOME}/firebase-service-account.json
+          firebase deploy --only functions,hosting --token "$(firebase login:ci --no-localhost --json | jq -r '.token')"
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: "${{ secrets.GITHUB_TOKEN }}"
