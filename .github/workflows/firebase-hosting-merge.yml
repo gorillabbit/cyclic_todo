@@ -23,7 +23,7 @@ jobs:
           VITE_GOOGLE_CALENDER_apiKey: ${{ secrets.VITE_GOOGLE_CALENDER_apiKey }}
           VITE_GOOGLE_CALENDER_scope: ${{ secrets.VITE_GOOGLE_CALENDER_scope }}
           VITE_GOOGLE_CALENDER_discoveryDocs: ${{ secrets.VITE_GOOGLE_CALENDER_discoveryDocs }}
-        run: npm ci | npm run build --prefix app
+        run: npm ci --prefix app | npm run build --prefix app
       - name: ci function
         run: npm --prefix functions ci
       - name: build functions
