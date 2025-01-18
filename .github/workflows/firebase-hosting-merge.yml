@@ -8,23 +8,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: index出力
-        uses: w9jds/firebase-action@master
-        with:
-          args: firestore:indexes --project "todolist-37a07" > firestore.indexes.json
-        env:
-          PROJECT_ID: todolist-37a07
-          GCP_SA_KEY: ${{ secrets.GCP_SA_DEV }}
-          PROJECT_PATH: ./
-      - name: Deploy Firestore rules and index
-        uses: w9jds/firebase-action@master
-        with:
-          args: deploy --only firestore --force
-        env:
-          PROJECT_ID: cyclictodo
-          GCP_SA_KEY: ${{ secrets.GCP_SA }}
-          PROJECT_PATH: ./
-      - run: npm ci
       - name: Build
         env:
           VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
@@ -40,7 +23,7 @@ jobs:
           VITE_GOOGLE_CALENDER_apiKey: ${{ secrets.VITE_GOOGLE_CALENDER_apiKey }}
           VITE_GOOGLE_CALENDER_scope: ${{ secrets.VITE_GOOGLE_CALENDER_scope }}
           VITE_GOOGLE_CALENDER_discoveryDocs: ${{ secrets.VITE_GOOGLE_CALENDER_discoveryDocs }}
-        run: npm run build
+        run: npm ci | npm run build --prefix app
       - name: ci function
         run: npm --prefix functions ci
       - name: build functions

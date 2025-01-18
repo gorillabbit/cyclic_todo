@@ -1,5 +1,6 @@
 {
   "projects": {
-    "default": "cyclictodo"
+    "dev": "todolist-37a07",
+    "prd": "cyclictodo"
   }
 }
