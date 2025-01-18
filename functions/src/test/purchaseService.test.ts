@@ -4,7 +4,7 @@ import { Accounts } from '../../../entity/entities/Accounts';
 import { Tabs } from '../../../entity/entities/Tabs';
 import { Methods } from '../../../entity/entities/Methods';
 import { Assets } from '../../../entity/entities/Assets';
-import { v4 as uuid_v4 } from 'uuid';
+import { v4 as uuidV4 } from 'uuid';
 import AppDataSource from '../db';
 import { getPurchases } from '..';
 
@@ -31,13 +31,13 @@ describe('getPurchases Integration Test', () => {
 
             // Create test account
             testAccounts = new Accounts();
-            testAccounts.id = `test-account-${uuid_v4()}`.substring(0, 20);
+            testAccounts.id = `test-account-${uuidV4()}`.substring(0, 20);
             testAccounts.name = 'Test Accounts';
             await accountRepository.save(testAccounts);
 
             // Create test tab
             testTabs = new Tabs();
-            testTabs.id = `test-tab-${uuid_v4()}`.substring(0, 20);
+            testTabs.id = `test-tab-${uuidV4()}`.substring(0, 20);
             testTabs.name = 'Test Tabs';
             testTabs.userId = testAccounts.id;
             testTabs.createUserUid = testAccounts.id;
@@ -45,7 +45,7 @@ describe('getPurchases Integration Test', () => {
 
             // Create test asset
             testAssets = new Assets();
-            testAssets.id = `test-asset-${uuid_v4()}`.substring(0, 20);
+            testAssets.id = `test-asset-${uuidV4()}`.substring(0, 20);
             testAssets.name = 'Test Assets';
             testAssets.userId = testAccounts.id;
             testAssets.tabId = testTabs.id;
@@ -53,17 +53,16 @@ describe('getPurchases Integration Test', () => {
 
             // Create test method
             testMethods = new Methods();
-            testMethods.id = `test-method-${uuid_v4()}`.substring(0, 20);
+            testMethods.id = `test-method-${uuidV4()}`.substring(0, 20);
             testMethods.label = 'Test Methods';
             testMethods.tabId = testTabs.id;
             testMethods.userId = testAccounts.id;
             testMethods.assetId = testAssets.id;
             await methodRepository.save(testMethods);
-            console.log('testMethods', testMethods);
 
             // Create test purchase
             testPurchases = new Purchases();
-            testPurchases.id = `test-purchase-${uuid_v4()}`.substring(0, 20);
+            testPurchases.id = `test-purchase-${uuidV4()}`.substring(0, 20);
             testPurchases.userId = testAccounts.id;
             testPurchases.tabId = testTabs.id;
             testPurchases.method = testMethods.id;
@@ -73,7 +72,6 @@ describe('getPurchases Integration Test', () => {
             testPurchases.date = new Date();
             testPurchases.description = 'Test Description';
             await purchaseRepository.save(testPurchases);
-            console.log('testPurchases', testPurchases);
         } catch (error) {
             console.error('Failed to initialize test data:', error);
             throw error;
