@@ -3,7 +3,7 @@ import globals from "globals";
 import jestPlugin from "eslint-plugin-jest";
 
 const ignoreConfig = {
-  ignores: ["**/*/build/**/*"],
+  ignores: ["build/**/*"],
 };
 
 export default [
