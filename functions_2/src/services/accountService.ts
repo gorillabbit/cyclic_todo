@@ -1,4 +1,4 @@
-import AppDataSource from '../db';
+import AppDataSource from '../../../functions/db';
 import { Accounts } from '../../../entity/entities/Accounts';
 import { DeepPartial } from 'typeorm/common/DeepPartial';
 import { errorQueryHandler } from './serviceUtils';

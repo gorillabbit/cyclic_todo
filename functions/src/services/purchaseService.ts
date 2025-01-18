@@ -1,6 +1,6 @@
-import AppDataSource from '../db';
 import { Purchases } from '../../../entity/entities/Purchases';
 import { QueryFailedError } from 'typeorm';
+import AppDataSource from '../db';
 
 interface GetPurchasesParams {
     userId?: string;

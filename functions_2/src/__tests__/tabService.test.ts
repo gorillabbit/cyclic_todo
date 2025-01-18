@@ -1,5 +1,5 @@
 import { getTabsService } from '../services/tabService';
-import AppDataSource from '../db';
+import AppDataSource from '../../../functions/db';
 import { Tabs } from '../../../entity/entities/Tabs';
 import { Accounts } from '../../../entity/entities/Accounts';
 import { v4 as uuid_v4 } from 'uuid';

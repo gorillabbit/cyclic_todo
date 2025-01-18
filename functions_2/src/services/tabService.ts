@@ -1,4 +1,4 @@
-import AppDataSource from '../db';
+import AppDataSource from '../../../functions/db';
 import { Tabs } from '../../../entity/entities/Tabs';
 import { DeepPartial, QueryFailedError } from 'typeorm';
 

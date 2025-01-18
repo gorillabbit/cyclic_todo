@@ -1,5 +1,5 @@
 import { getPurchases } from '../index';
-import AppDataSource from '../db';
+import AppDataSource from '../../../functions/db';
 import { Purchases } from '../../../entity/entities/Purchases';
 import { Accounts } from '../../../entity/entities/Accounts';
 import { Tabs } from '../../../entity/entities/Tabs';

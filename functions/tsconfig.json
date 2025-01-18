@@ -1,20 +1,17 @@
 {
   "compilerOptions": {
-    "module": "ESNext",
+    "module": "NodeNext",
+    "esModuleInterop": true,
+    "moduleResolution": "nodenext",
     "noImplicitReturns": true,
-    "moduleResolution": "node",
     "noUnusedLocals": true,
-    "outDir": "build",
+    "outDir": "lib",
     "sourceMap": true,
     "strict": true,
-    "target": "ES2020",
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
+    "target": "es2017"
   },
   "compileOnSave": true,
   "include": [
     "src"
-  ],
+  ]
 }

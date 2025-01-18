@@ -1,5 +1,5 @@
 import { getAssetsService } from '../services/assetService';
-import AppDataSource from '../db';
+import AppDataSource from '../../../functions/db';
 import { Assets } from '../../../entity/entities/Assets';
 import { v4 as uuid_v4 } from 'uuid';
 import { Accounts } from '../../../entity/entities/Accounts';

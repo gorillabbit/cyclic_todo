@@ -1,4 +1,4 @@
-import AppDataSource from '../db';
+import AppDataSource from '../../../functions/db';
 import { Methods } from '../../../entity/entities/Methods';
 import { QueryFailedError } from 'typeorm';
 

@@ -1,5 +1,5 @@
 import { getMethodsService } from '../services/methodService';
-import AppDataSource from '../db';
+import AppDataSource from '../../../functions/db';
 import { Methods } from '../../../entity/entities/Methods';
 import { v4 as uuid_v4 } from 'uuid';
 import { Accounts } from '../../../entity/entities/Accounts';
