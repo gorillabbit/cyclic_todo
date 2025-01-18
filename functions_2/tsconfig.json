@@ -17,6 +17,7 @@
   "include": [
     "src",
     "../functions/db.ts",
-    "../functions/src/services/purchaseService.ts"
+    "../functions/src/services/purchaseService.ts",
+    "../functions/src/test/purchaseService.test.ts"
   ],
 }

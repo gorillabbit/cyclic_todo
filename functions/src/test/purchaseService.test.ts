@@ -1,11 +1,12 @@
-import { getPurchases } from '../index';
-import AppDataSource from '../../../functions/db';
+
 import { Purchases } from '../../../entity/entities/Purchases';
 import { Accounts } from '../../../entity/entities/Accounts';
 import { Tabs } from '../../../entity/entities/Tabs';
 import { Methods } from '../../../entity/entities/Methods';
 import { Assets } from '../../../entity/entities/Assets';
 import { v4 as uuid_v4 } from 'uuid';
+import AppDataSource from '../db';
+import { getPurchases } from '..';
 
 describe('getPurchases Integration Test', () => {
     let testPurchases: Purchases;
@@ -58,6 +59,7 @@ describe('getPurchases Integration Test', () => {
             testMethods.userId = testAccounts.id;
             testMethods.assetId = testAssets.id;
             await methodRepository.save(testMethods);
+            console.log('testMethods', testMethods);
 
             // Create test purchase
             testPurchases = new Purchases();
@@ -71,6 +73,7 @@ describe('getPurchases Integration Test', () => {
             testPurchases.date = new Date();
             testPurchases.description = 'Test Description';
             await purchaseRepository.save(testPurchases);
+            console.log('testPurchases', testPurchases);
         } catch (error) {
             console.error('Failed to initialize test data:', error);
             throw error;
