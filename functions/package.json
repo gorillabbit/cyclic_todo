@@ -19,6 +19,7 @@
     "cors": "2.8.5",
     "dotenv": "^16.4.7",
     "eslint-config-google": "^0.14.0",
+    "eslint-plugin-jest": "^28.11.0",
     "firebase-admin": "13.0.2",
     "firebase-functions": "6.2.0",
     "mysql2": "3.12.0",
