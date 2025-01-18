@@ -52,10 +52,7 @@ jobs:
           DB_USER: ${{ secrets.DB_USER }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           DB_NAME: ${{ secrets.DB_NAME }}
-        run: |
-          npm --prefix functions ci
-          npm --prefix functions run build
-          npm --prefix functions test
+        run: npm --prefix functions test
       - name: Deploy Firebase Functions
         uses: w9jds/firebase-action@master
         with:
