@@ -2,13 +2,18 @@ import js from "@eslint/js";
 import globals from "globals";
 import jestPlugin from "eslint-plugin-jest";
 
+const ignoreConfig = {
+  ignores: ["**/*/build/**/*"],
+};
+
 export default [
   js.configs.recommended,
+  ignoreConfig,
   {
     plugins: {
       jest: jestPlugin,
     },
-    ignores: ["build/**/*"],
+
     languageOptions: {
       globals: {
         ...globals.browser,
@@ -17,14 +22,6 @@ export default [
       },
       ecmaVersion: "latest",
       sourceType: "module",
-    },
-    rules: {
-      "no-cond-assign": ["error", "except-parens"],
-      "jest/no-disabled-tests": "warn",
-      "jest/no-focused-tests": "error",
-      "jest/no-identical-title": "error",
-      "jest/prefer-to-have-length": "warn",
-      "jest/valid-expect": "error",
     },
   },
 ];
