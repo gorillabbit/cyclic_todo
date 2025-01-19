@@ -16,7 +16,7 @@
   },
   "main": "lib/functions/src/index.js",
   "dependencies": {
-    "firebase-admin": "13.0.0",
+    "firebase-admin": "13.0.2",
     "firebase-functions": "6.2.0",
     "mysql": "2.18.1",
     "typeorm": "0.3.20",
