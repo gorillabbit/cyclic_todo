@@ -28,6 +28,7 @@ module.exports = {
     indent: ["error", 4],
     "@typescript-eslint/explicit-function-return-type": "warn",
     "@typescript-eslint/strict-boolean-expressions": "warn",
+    "@typescript-eslint/no-explicit-any": "warn",
     "object-curly-spacing": ["error", "always"],
     "max-len": ["error", { code: 100 }],
   },
