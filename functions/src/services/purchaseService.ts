@@ -1,6 +1,6 @@
-import { Purchases } from '../../../entity/entities/Purchases';
+import { Purchases } from '../../../entity/entities/Purchases.js';
 import { QueryFailedError } from 'typeorm';
-import AppDataSource from '../db';
+import AppDataSource from '../db.js';
 
 interface GetPurchasesParams {
     userId?: string;

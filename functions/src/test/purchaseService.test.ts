@@ -1,12 +1,12 @@
 
-import { Purchases } from '../../../entity/entities/Purchases';
-import { Accounts } from '../../../entity/entities/Accounts';
-import { Tabs } from '../../../entity/entities/Tabs';
-import { Methods } from '../../../entity/entities/Methods';
-import { Assets } from '../../../entity/entities/Assets';
+import { Purchases } from '../../../entity/entities/Purchases.js';
+import { Accounts } from '../../../entity/entities/Accounts.js';
+import { Tabs } from '../../../entity/entities/Tabs.js';
+import { Methods } from '../../../entity/entities/Methods.js';
+import { Assets } from '../../../entity/entities/Assets.js';
 import { v4 as uuidV4 } from 'uuid';
-import AppDataSource from '../db';
-import { getPurchases } from '..';
+import AppDataSource from '../db.js';
+import { getPurchases } from '../index.js';
 
 describe('getPurchases Integration Test', () => {
     let testPurchases: Purchases;

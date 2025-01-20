@@ -8,8 +8,8 @@
  */
 
 import { onRequest } from 'firebase-functions/v2/https';
-import { initializeDatabase } from './db';
-import { getPurchasesService } from './services/purchaseService';
+import { initializeDatabase } from './db.js';
+import { getPurchasesService } from './services/purchaseService.js';
 
 // Start writing functions
 // https://firebase.google.com/docs/functions/typescript
