@@ -22,7 +22,7 @@
 		"site": "cyclictodo",
 		"rewrites": [
 			{
-				"source": "/api/purchase",
+				"source": "/api/purchases",
 				"function": "getPurchases"
 			}
 		]
