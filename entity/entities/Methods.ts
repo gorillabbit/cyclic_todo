@@ -6,13 +6,13 @@ import {
   ManyToOne,
   OneToMany,
 } from "typeorm";
-import { Assets } from "./Assets";
-import { Tabs } from "./Tabs";
-import { Accounts } from "./Accounts";
-import { PurchaseSchedules } from "./PurchaseSchedules";
-import { PurchaseTemplates } from "./PurchaseTemplates";
-import { Purchases } from "./Purchases";
-import { TransferTemplates } from "./TransferTemplates";
+import { Accounts } from "./Accounts.js";
+import { Assets } from "./Assets.js";
+import { Purchases } from "./Purchases.js";
+import { PurchaseSchedules } from "./PurchaseSchedules.js";
+import { PurchaseTemplates } from "./PurchaseTemplates.js";
+import { Tabs } from "./Tabs.js";
+import { TransferTemplates } from "./TransferTemplates.js";
 
 @Index("fk_methods_user", ["userId"], {})
 @Index("fk_methods_tab", ["tabId"], {})

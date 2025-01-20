@@ -1,8 +1,7 @@
 import { Column, Entity, Index, JoinColumn, ManyToOne } from "typeorm";
-import { Methods } from "./Methods";
-import { Tabs } from "./Tabs";
-import { Accounts } from "./Accounts";
-
+import { Accounts } from "./Accounts.js";
+import { Methods } from "./Methods.js";
+import { Tabs } from "./Tabs.js";
 @Index("fk_purchase_templates_user", ["userId"], {})
 @Index("fk_purchase_templates_tab", ["tabId"], {})
 @Index("fk_purchase_templates_method", ["method"], {})

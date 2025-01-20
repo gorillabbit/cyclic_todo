@@ -1,7 +1,7 @@
 import { Column, Entity, Index, JoinColumn, ManyToOne } from "typeorm";
-import { Logs } from "./Logs";
-import { Tabs } from "./Tabs";
-import { Accounts } from "./Accounts";
+import { Tabs } from "./Tabs.js";
+import { Accounts } from "./Accounts.js";
+import { Logs } from "./Logs.js";
 
 @Index("fk_logsCompleteLogs_user", ["userId"], {})
 @Index("fk_logsCompleteLogs_log", ["logId"], {})

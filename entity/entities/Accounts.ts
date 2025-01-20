@@ -1,14 +1,15 @@
 import { Column, Entity, OneToMany } from "typeorm";
-import { Assets } from "./Assets";
-import { Logs } from "./Logs";
-import { LogsCompleteLogs } from "./LogsCompleteLogs";
-import { Methods } from "./Methods";
-import { PurchaseSchedules } from "./PurchaseSchedules";
-import { PurchaseTemplates } from "./PurchaseTemplates";
-import { Purchases } from "./Purchases";
-import { Tabs } from "./Tabs";
-import { Tasks } from "./Tasks";
-import { TransferTemplates } from "./TransferTemplates";
+import { Assets } from "./Assets.js";
+import { Logs } from "./Logs.js";
+import { LogsCompleteLogs } from "./LogsCompleteLogs.js";
+import { Methods } from "./Methods.js";
+import { Purchases } from "./Purchases.js";
+import { PurchaseSchedules } from "./PurchaseSchedules.js";
+import { PurchaseTemplates } from "./PurchaseTemplates.js";
+import { Tabs } from "./Tabs.js";
+import { Tasks } from "./Tasks.js";
+import { TransferTemplates } from "./TransferTemplates.js";
+
 
 @Entity("accounts", { schema: "cyclictodo" })
 export class Accounts {

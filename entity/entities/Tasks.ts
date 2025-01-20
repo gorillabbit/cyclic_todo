@@ -1,7 +1,6 @@
 import { Column, Entity, Index, JoinColumn, ManyToOne } from "typeorm";
-import { Tabs } from './Tabs'
-import { Accounts } from './Accounts'
-
+import { Accounts } from "./Accounts.js";
+import { Tabs } from "./Tabs.js";
 
 @Index("fk_tasks_user", ["userId",], {})
 @Index("fk_tasks_tab", ["tabId",], {})

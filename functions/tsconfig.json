@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "target": "es2022",
     "module": "NodeNext",
     "esModuleInterop": true,
     "moduleResolution": "nodenext",
@@ -8,12 +9,12 @@
     "outDir": "lib",
     "sourceMap": true,
     "strict": true,
-    "target": "es2022",
     "experimentalDecorators": true,
     "skipLibCheck": true
   },
   "compileOnSave": true,
   "include": [
-    "src"
+    "src",
+    "../entity/entities"
   ]
 }

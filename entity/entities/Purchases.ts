@@ -1,8 +1,8 @@
 import { Column, Entity, Index, JoinColumn, ManyToOne } from "typeorm";
-import { Assets } from "./Assets";
-import { Methods } from "./Methods";
-import { Tabs } from "./Tabs";
-import { Accounts } from "./Accounts";
+import { Accounts } from "./Accounts.js";
+import { Assets } from "./Assets.js";
+import { Methods } from "./Methods.js";
+import { Tabs } from "./Tabs.js";
 
 @Index("fk_purchases_user", ["userId"], {})
 @Index("fk_purchases_tab", ["tabId"], {})

@@ -6,10 +6,10 @@ import {
   ManyToOne,
   OneToMany,
 } from "typeorm";
-import { Tabs } from "./Tabs";
-import { Accounts } from "./Accounts";
-import { Methods } from "./Methods";
-import { Purchases } from "./Purchases";
+import { Accounts } from "./Accounts.js";
+import { Methods } from "./Methods.js";
+import { Purchases } from "./Purchases.js";
+import { Tabs } from "./Tabs.js";
 
 @Index("fk_assets_user", ["userId"], {})
 @Index("fk_assets_tab", ["tabId"], {})

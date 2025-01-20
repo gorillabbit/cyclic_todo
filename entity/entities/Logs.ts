@@ -6,9 +6,9 @@ import {
   ManyToOne,
   OneToMany,
 } from "typeorm";
-import { Tabs } from "./Tabs";
-import { Accounts } from "./Accounts";
-import { LogsCompleteLogs } from "./LogsCompleteLogs";
+import { Accounts } from "./Accounts.js";
+import { LogsCompleteLogs } from "./LogsCompleteLogs.js";
+import { Tabs } from "./Tabs.js";
 
 @Index("fk_logs_user", ["userId"], {})
 @Index("fk_logs_tab", ["tabId"], {})
