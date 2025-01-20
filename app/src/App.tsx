@@ -14,6 +14,7 @@ import { db } from './firebase';
 import HomePage from './pages/HomePage';
 import KiyakuPage from './pages/KiyakuPage';
 import ja from 'date-fns/locale/ja';
+import { getPurchases } from './utilities/apiClient';
 
 const App = memo(() => {
 	const theme = createTheme({
@@ -28,6 +29,10 @@ const App = memo(() => {
 		},
 	});
 	const [Account, setAccount] = useState<AccountType>();
+
+	getPurchases('userId', 'tabId').then((data) => {
+		console.log(data);
+	});
 
 	const auth = getAuth();
 	useEffect(() => {
