@@ -50,3 +50,14 @@ log.txt
 */output/*.json
 ormconfig.json
 メモ.md
+tsconfig.tsbuildinfo
+
+# Compiled JavaScript files
+lib
+
+# TypeScript v1 declaration files
+typings/
+
+# Node.js dependency directory
+node_modules/
+*.local

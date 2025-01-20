@@ -8,7 +8,7 @@ import {
     TextField,
     Tooltip,
 } from '@mui/material';
-import { ChangeEvent, memo, useState } from 'react';
+import { ChangeEvent, JSX, memo, useState } from 'react';
 import { updateDocAccount, db } from '../firebase';
 import {
     collection,

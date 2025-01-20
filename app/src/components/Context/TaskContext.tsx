@@ -6,39 +6,37 @@ import { useTab } from '../../hooks/useData.js';
 import { dbNames } from '../../firebase.js';
 
 type TaskContextType = {
-    taskList: TaskType[];
+	taskList: TaskType[];
 };
 
 // Contextを作成（初期値は空のTaskListとダミーのsetTaskList関数）
 export const TaskContext = createContext<TaskContextType>({
-    taskList: [],
+	taskList: [],
 });
 
-export const TaskProvider = memo(
-    ({ children }: { children: ReactNode }): JSX.Element => {
-        const { tabId } = useTab();
-        const tasksQueryConstraints = useMemo(
-            () => [
-                orderBy('dueDate'),
-                orderBy('dueTime'),
-                where('tabId', '==', tabId),
-            ],
-            [tabId]
-        );
+export const TaskProvider = memo(({ children }: { children: ReactNode }) => {
+	const { tabId } = useTab();
+	const tasksQueryConstraints = useMemo(
+		() => [
+			orderBy('dueDate'),
+			orderBy('dueTime'),
+			where('tabId', '==', tabId),
+		],
+		[tabId]
+	);
 
-        const { documents: taskList } = useFirestoreQuery<TaskType>(
-            dbNames.task,
-            tasksQueryConstraints
-        );
+	const { documents: taskList } = useFirestoreQuery<TaskType>(
+		dbNames.task,
+		tasksQueryConstraints
+	);
 
-        return (
-            <TaskContext.Provider
-                value={{
-                    taskList,
-                }}
-            >
-                {children}
-            </TaskContext.Provider>
-        );
-    }
-);
+	return (
+		<TaskContext.Provider
+			value={{
+				taskList,
+			}}
+		>
+			{children}
+		</TaskContext.Provider>
+	);
+});
