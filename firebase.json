@@ -19,7 +19,13 @@
 	"hosting": {
 		"public": "app/lib",
 		"ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
-		"site": "cyclictodo"
+		"site": "cyclictodo",
+		"rewrites": [
+			{
+				"source": "/api/**",
+				"function": "api"
+			}
+		]
 	},
 	"emulators": {
 		"singleProjectMode": true
