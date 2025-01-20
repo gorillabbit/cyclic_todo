@@ -1,21 +1,21 @@
-import { InputBaseComponentProps } from "@mui/material";
-import { InputPurchaseScheduleType, MethodType, WeekDay } from "../types";
-import { db, dbNames, deleteDocPurchase } from "../firebase";
-import { addMonths, nextDay, addDays } from "date-fns";
+import { InputBaseComponentProps } from '@mui/material';
+import { InputPurchaseScheduleType, MethodType, WeekDay } from '../types';
+import { db, dbNames, deleteDocPurchase } from '../firebase';
+import { addMonths, nextDay, addDays } from 'date-fns';
 import {
-  doc,
-  collection,
-  getDoc,
-  updateDoc,
-  setDoc,
-  addDoc,
-  query,
-  orderBy,
-  getDocs,
-  writeBatch,
-} from "firebase/firestore";
-import { getPayLaterDate } from "./dateUtilities";
-import { PurchaseDataType, PurchaseRawDataType } from "../types/purchaseTypes";
+    doc,
+    collection,
+    getDoc,
+    updateDoc,
+    setDoc,
+    addDoc,
+    query,
+    orderBy,
+    getDocs,
+    writeBatch,
+} from 'firebase/firestore';
+import { getPayLaterDate } from './dateUtilities';
+import { PurchaseDataType, PurchaseRawDataType } from '../types/purchaseTypes';
 
 /**
  * 収支を合計する(収入は+、支出は-で表現されるので支出の合計は-になる)
@@ -23,11 +23,11 @@ import { PurchaseDataType, PurchaseRawDataType } from "../types/purchaseTypes";
  * @returns
  */
 export const sumSpentAndIncome = (purchasesList: PurchaseDataType[]) =>
-  purchasesList.reduce((acc, purchase) => acc + Number(purchase.difference), 0);
+    purchasesList.reduce((acc, purchase) => acc + Number(purchase.difference), 0);
 
 export const numericProps: InputBaseComponentProps = {
-  inputMode: "numeric",
-  pattern: "[0-9]*",
+    inputMode: 'numeric',
+    pattern: '[0-9]*',
 };
 
 /**
@@ -36,12 +36,12 @@ export const numericProps: InputBaseComponentProps = {
  * @returns boolean
  */
 export const isLaterPayment = (purchase: PurchaseDataType): boolean =>
-  purchase.method.timing === "翌月"
+    purchase.method.timing === '翌月'
 
 export const is今月の支払いwithout後払いの支払い = (purchase: PurchaseDataType, currentMonth: Date): boolean => {
-  const is購入が今月 = purchase.date.getMonth() === currentMonth.getMonth()
-  const is後払いではない = purchase.category !== "後支払い"
-  return is購入が今月 && is後払いではない
+    const is購入が今月 = purchase.date.getMonth() === currentMonth.getMonth()
+    const is後払いではない = purchase.category !== '後支払い'
+    return is購入が今月 && is後払いではない
 }
 
 /**
@@ -50,13 +50,13 @@ export const is今月の支払いwithout後払いの支払い = (purchase: Purch
  * @returns
  */
 export const validatedNum = (value: string): string => {
-  const numValue = Number(value);
-  if (numValue < 0) {
-    return "0未満は入力できません";
-  } else if (Number.isNaN(numValue)) {
-    return "不適切な入力です";
-  }
-  return "";
+    const numValue = Number(value);
+    if (numValue < 0) {
+        return '0未満は入力できません';
+    } else if (Number.isNaN(numValue)) {
+        return '不適切な入力です';
+    }
+    return '';
 };
 
 /**
@@ -66,14 +66,14 @@ export const validatedNum = (value: string): string => {
  * @returns フィルタリングされたpurchasesList
  */
 export const filterPurchasesByIncomeType = (
-  purchasesList: PurchaseDataType[],
-  income: "income" | "spent"
+    purchasesList: PurchaseDataType[],
+    income: 'income' | 'spent'
 ) => {
-  if (income === "income") {
-    return purchasesList.filter((purchases) => purchases.difference < 0);
-  } else {
-    return purchasesList.filter((purchases) => purchases.difference >= 0);
-  }
+    if (income === 'income') {
+        return purchasesList.filter((purchases) => purchases.difference < 0);
+    } else {
+        return purchasesList.filter((purchases) => purchases.difference >= 0);
+    }
 };
 
 /**
@@ -82,36 +82,36 @@ export const filterPurchasesByIncomeType = (
  * @param purchaseSchedule
  */
 export const deleteScheduledPurchases = async (
-  purchaseList: PurchaseDataType[],
-  purchaseScheduleId: string
+    purchaseList: PurchaseDataType[],
+    purchaseScheduleId: string
 ) => {
-  let update = purchaseList;
-  for (const purchase of update) {
-    if (purchase.parentScheduleId === purchaseScheduleId) {
-      update = await deletePurchaseAndUpdateLater(purchase.id, purchaseList);
+    let update = purchaseList;
+    for (const purchase of update) {
+        if (purchase.parentScheduleId === purchaseScheduleId) {
+            update = await deletePurchaseAndUpdateLater(purchase.id, purchaseList);
+        }
     }
-  }
-  return update;
+    return update;
 };
 
 const weekDays: Record<WeekDay, Day> = {
-  日曜日: 0,
-  月曜日: 1,
-  火曜日: 2,
-  水曜日: 3,
-  木曜日: 4,
-  金曜日: 5,
-  土曜日: 6,
+    日曜日: 0,
+    月曜日: 1,
+    火曜日: 2,
+    水曜日: 3,
+    木曜日: 4,
+    金曜日: 5,
+    土曜日: 6,
 };
 
 export const weekDaysString: WeekDay[] = [
-  "日曜日",
-  "月曜日",
-  "火曜日",
-  "水曜日",
-  "木曜日",
-  "金曜日",
-  "土曜日",
+    '日曜日',
+    '月曜日',
+    '火曜日',
+    '水曜日',
+    '木曜日',
+    '金曜日',
+    '土曜日',
 ];
 
 const today = new Date();
@@ -122,21 +122,21 @@ const today = new Date();
  * @returns
  */
 const listMonthlyDaysUntil = (dayOfMonth: number, endDate: Date) => {
-  // 現在の日付が指定された日より後の場合、最初の日付を次の月に設定
-  let startMonth = today.getMonth();
-  if (today.getDate() > dayOfMonth) {
-    startMonth += 1;
-  }
+    // 現在の日付が指定された日より後の場合、最初の日付を次の月に設定
+    let startMonth = today.getMonth();
+    if (today.getDate() > dayOfMonth) {
+        startMonth += 1;
+    }
 
-  // 指定された日と月から最初の日付を設定
-  let currentDate = new Date(today.getFullYear(), startMonth, dayOfMonth);
+    // 指定された日と月から最初の日付を設定
+    let currentDate = new Date(today.getFullYear(), startMonth, dayOfMonth);
 
-  const dates = [];
-  while (currentDate <= endDate) {
-    dates.push(currentDate);
-    currentDate = addMonths(currentDate, 1);
-  }
-  return dates;
+    const dates = [];
+    while (currentDate <= endDate) {
+        dates.push(currentDate);
+        currentDate = addMonths(currentDate, 1);
+    }
+    return dates;
 };
 
 /**
@@ -146,17 +146,17 @@ const listMonthlyDaysUntil = (dayOfMonth: number, endDate: Date) => {
  * @returns
  */
 const listWeeklyDaysUntil = (weekDayName: WeekDay, endDate: Date): Date[] => {
-  // 今日の日付から次の指定曜日を求める
-  const dayOfWeek = weekDays[weekDayName];
-  let currentDate = nextDay(today, dayOfWeek);
-  const dates = [];
+    // 今日の日付から次の指定曜日を求める
+    const dayOfWeek = weekDays[weekDayName];
+    let currentDate = nextDay(today, dayOfWeek);
+    const dates = [];
 
-  // 指定された終了日まで繰り返し
-  while (currentDate <= endDate) {
-    dates.push(currentDate);
-    currentDate = addDays(currentDate, 7);
-  }
-  return dates;
+    // 指定された終了日まで繰り返し
+    while (currentDate <= endDate) {
+        dates.push(currentDate);
+        currentDate = addDays(currentDate, 7);
+    }
+    return dates;
 };
 
 /**
@@ -167,24 +167,24 @@ const listWeeklyDaysUntil = (weekDayName: WeekDay, endDate: Date): Date[] => {
  * @returns {PurchaseDataType[]} 並び替えられたオブジェクトの配列
  */
 export const sortObjectsByParameter = (
-  objects: PurchaseDataType[],
-  parameter: keyof PurchaseDataType,
-  ascending: boolean = true
+    objects: PurchaseDataType[],
+    parameter: keyof PurchaseDataType,
+    ascending: boolean = true
 ): PurchaseDataType[] => {
-  return objects.sort((a, b) => {
-    if (parameter === "method") {
-      if (a.method.label < b.method.label) return ascending ? -1 : 1;
-      if (a.method.label > b.method.label) return ascending ? 1 : -1;
-      return 0;
-    }
-    const aVal = a[parameter]; // このように代入しないと、型のチェックは行われない。Typescriptの型は変数に対して行われる式に対しては行われない
-    const bVal = b[parameter];
-    if (aVal && bVal) {
-      if (aVal < bVal) return ascending ? -1 : 1;
-      if (aVal > bVal) return ascending ? 1 : -1;
-    }
-    return 0;
-  });
+    return objects.sort((a, b) => {
+        if (parameter === 'method') {
+            if (a.method.label < b.method.label) return ascending ? -1 : 1;
+            if (a.method.label > b.method.label) return ascending ? 1 : -1;
+            return 0;
+        }
+        const aVal = a[parameter]; // このように代入しないと、型のチェックは行われない。Typescriptの型は変数に対して行われる式に対しては行われない
+        const bVal = b[parameter];
+        if (aVal && bVal) {
+            if (aVal < bVal) return ascending ? -1 : 1;
+            if (aVal > bVal) return ascending ? 1 : -1;
+        }
+        return 0;
+    });
 };
 
 /**
@@ -195,93 +195,93 @@ export const sortObjectsByParameter = (
  * @returns 
  */
 export const getLastBalance = (
-  assetId: string,
-  date: Date,
-  updatePurchases: PurchaseDataType[]
+    assetId: string,
+    date: Date,
+    updatePurchases: PurchaseDataType[]
 ): number => {
-  const lastPurchase = updatePurchases.filter((p) => p.assetId === assetId)
-    .sort((a, b) => b.payDate.getTime() - a.payDate.getTime())
-    .find((purchase) => purchase.payDate <= date);
-  // NaNに対応するために??ではなく三項演算子を使う
-  return Number(lastPurchase?.balance) ? Number(lastPurchase?.balance) : 0
+    const lastPurchase = updatePurchases.filter((p) => p.assetId === assetId)
+        .sort((a, b) => b.payDate.getTime() - a.payDate.getTime())
+        .find((purchase) => purchase.payDate <= date);
+    // NaNに対応するために??ではなく三項演算子を使う
+    return Number(lastPurchase?.balance) ? Number(lastPurchase?.balance) : 0
 };
 
 // ある時点より後の支払いすべてを更新する
 export const updateAllLaterPurchases = (
-  assetId: string,
-  payDate: Date,
-  difference: number,
-  updatePurchases: PurchaseDataType[]
+    assetId: string,
+    payDate: Date,
+    difference: number,
+    updatePurchases: PurchaseDataType[]
 ) => {
-  if (difference === 0) return updatePurchases;
-  const filteredPurchases = updatePurchases.filter((p) => p.assetId === assetId);
-  const restPurchases = updatePurchases.filter((p) => p.assetId !== assetId);
-  return [...filteredPurchases.map((p) => ({
-    ...p,
-    balance:
+    if (difference === 0) return updatePurchases;
+    const filteredPurchases = updatePurchases.filter((p) => p.assetId === assetId);
+    const restPurchases = updatePurchases.filter((p) => p.assetId !== assetId);
+    return [...filteredPurchases.map((p) => ({
+        ...p,
+        balance:
       p.payDate > payDate
-        ? Number(p.balance) + Number(difference)
-        : Number(p.balance),
-  })), ...restPurchases]
+          ? Number(p.balance) + Number(difference)
+          : Number(p.balance),
+    })), ...restPurchases]
 };
 
 export const deletePurchaseAndUpdateLater = async (
-  purchaseId: string,
-  updatePurchases: PurchaseDataType[]
+    purchaseId: string,
+    updatePurchases: PurchaseDataType[]
 ) => {
-  const docSnap = await getDoc(doc(db, dbNames.purchase, purchaseId));
-  const purchase = docSnap.data() as PurchaseRawDataType;
-  deleteDocPurchase(purchaseId);
-  const filteredPurchase = updatePurchases.filter((p) => p.id !== purchaseId);
-  return updateAllLaterPurchases(
-    purchase.assetId,
-    purchase.payDate.toDate(),
-    Number(-purchase.difference),
-    filteredPurchase
-  );
+    const docSnap = await getDoc(doc(db, dbNames.purchase, purchaseId));
+    const purchase = docSnap.data() as PurchaseRawDataType;
+    deleteDocPurchase(purchaseId);
+    const filteredPurchase = updatePurchases.filter((p) => p.id !== purchaseId);
+    return updateAllLaterPurchases(
+        purchase.assetId,
+        purchase.payDate.toDate(),
+        Number(-purchase.difference),
+        filteredPurchase
+    );
 };
 
 export const addPurchaseAndUpdateLater = (
-  purchase: PurchaseDataType,
-  updatePurchases: PurchaseDataType[]
+    purchase: PurchaseDataType,
+    updatePurchases: PurchaseDataType[]
 ) => {
-  const difference = Number(purchase.difference)
-  const purchases = updateAllLaterPurchases(
-    purchase.assetId,
-    purchase.payDate,
-    difference,
-    updatePurchases
-  );
-  const lastBalance = getLastBalance(purchase.assetId, purchase.date, purchases);
-  const newDocRef = doc(collection(db, dbNames.purchase));
-  return {
-    purchases: [
-      ...purchases,
-      {
-        ...purchase,
-        id: purchase.id ? purchase.id : newDocRef.id,
-        balance: lastBalance + difference,
-      },
-    ],
-    id: newDocRef.id,
-  };
+    const difference = Number(purchase.difference)
+    const purchases = updateAllLaterPurchases(
+        purchase.assetId,
+        purchase.payDate,
+        difference,
+        updatePurchases
+    );
+    const lastBalance = getLastBalance(purchase.assetId, purchase.date, purchases);
+    const newDocRef = doc(collection(db, dbNames.purchase));
+    return {
+        purchases: [
+            ...purchases,
+            {
+                ...purchase,
+                id: purchase.id ? purchase.id : newDocRef.id,
+                balance: lastBalance + difference,
+            },
+        ],
+        id: newDocRef.id,
+    };
 };
 
 export const updatePurchaseAndUpdateLater = async (
-  purchase: PurchaseDataType,
-  updatePurchases: PurchaseDataType[]
+    purchase: PurchaseDataType,
+    updatePurchases: PurchaseDataType[]
 ) => {
-  // purchaseIdで指定した支払いを取得して、その支払いの差額を計算して、引く
-  // その後のcurrentPurchase以外の支払いを更新する
-  const currentPurchases = updatePurchases.find((p) => p.id === purchase.id);
-  if (!currentPurchases) return { purchases: updatePurchases };
-  const updatedLaterPurchases = updateAllLaterPurchases(
-    currentPurchases.assetId,
-    currentPurchases.payDate,
-    -currentPurchases.difference,
-    updatePurchases.filter((p) => p.id !== purchase.id)
-  );
-  return addPurchaseAndUpdateLater(purchase, updatedLaterPurchases);
+    // purchaseIdで指定した支払いを取得して、その支払いの差額を計算して、引く
+    // その後のcurrentPurchase以外の支払いを更新する
+    const currentPurchases = updatePurchases.find((p) => p.id === purchase.id);
+    if (!currentPurchases) return { purchases: updatePurchases };
+    const updatedLaterPurchases = updateAllLaterPurchases(
+        currentPurchases.assetId,
+        currentPurchases.payDate,
+        -currentPurchases.difference,
+        updatePurchases.filter((p) => p.id !== purchase.id)
+    );
+    return addPurchaseAndUpdateLater(purchase, updatedLaterPurchases);
 };
 
 /**
@@ -290,65 +290,65 @@ export const updatePurchaseAndUpdateLater = async (
  * @param purchaseSchedule
  */
 export const addScheduledPurchase = (
-  purchaseScheduleId: string,
-  purchaseSchedule: InputPurchaseScheduleType,
-  updatePurchases: PurchaseDataType[]
+    purchaseScheduleId: string,
+    purchaseSchedule: InputPurchaseScheduleType,
+    updatePurchases: PurchaseDataType[]
 ) => {
-  const { price, income, method, cycle, date, endDate, day } = purchaseSchedule;
-  const difference = income ? price : -price;
-  const purchaseBase = {
-    userId: purchaseSchedule.userId,
-    title: purchaseSchedule.title,
-    method,
-    category: purchaseSchedule.category,
-    description: purchaseSchedule.description,
-    isUncertain: purchaseSchedule.isUncertain,
-    tabId: purchaseSchedule.tabId,
-    parentScheduleId: purchaseScheduleId,
-    assetId: method.assetId,
-    balance: 0,
-    difference,
-    id: "",
-  };
+    const { price, income, method, cycle, date, endDate, day } = purchaseSchedule;
+    const difference = income ? price : -price;
+    const purchaseBase = {
+        userId: purchaseSchedule.userId,
+        title: purchaseSchedule.title,
+        method,
+        category: purchaseSchedule.category,
+        description: purchaseSchedule.description,
+        isUncertain: purchaseSchedule.isUncertain,
+        tabId: purchaseSchedule.tabId,
+        parentScheduleId: purchaseScheduleId,
+        assetId: method.assetId,
+        balance: 0,
+        difference,
+        id: '',
+    };
 
-  const purchaseList: PurchaseDataType[] = [];
-  const getDays = () => {
-    if (cycle === "毎月" && date) return listMonthlyDaysUntil(date, endDate);
-    if (cycle === "毎週" && day) return listWeeklyDaysUntil(day, endDate);
-    return [];
-  };
-  getDays().forEach((dateDay) => {
-    purchaseList.push({
-      ...purchaseBase,
-      date: dateDay,
-      payDate: method.timing === "即時" ? dateDay : getPayLaterDate(dateDay, method.timingDate),
+    const purchaseList: PurchaseDataType[] = [];
+    const getDays = () => {
+        if (cycle === '毎月' && date) return listMonthlyDaysUntil(date, endDate);
+        if (cycle === '毎週' && day) return listWeeklyDaysUntil(day, endDate);
+        return [];
+    };
+    getDays().forEach((dateDay) => {
+        purchaseList.push({
+            ...purchaseBase,
+            date: dateDay,
+            payDate: method.timing === '即時' ? dateDay : getPayLaterDate(dateDay, method.timingDate),
+        });
     });
-  });
-  let newUpdatePurchases = updatePurchases;
-  for (const purchase of purchaseList) {
-    newUpdatePurchases = addPurchaseAndUpdateLater(
-      purchase,
-      newUpdatePurchases
-    ).purchases;
-  }
+    let newUpdatePurchases = updatePurchases;
+    for (const purchase of purchaseList) {
+        newUpdatePurchases = addPurchaseAndUpdateLater(
+            purchase,
+            newUpdatePurchases
+        ).purchases;
+    }
 
-  return newUpdatePurchases;
+    return newUpdatePurchases;
 };
 
 export const updateAndAddPurchases = (updatePurchases: PurchaseDataType[]) => {
-  updatePurchases.forEach(async (purchase) => {
-    if (purchase.id) {
-      const docRef = doc(db, dbNames.purchase, purchase.id);
-      const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) {
-        updateDoc(docRef, { ...purchase });
-      } else {
-        setDoc(docRef, purchase);
-      }
-    } else {
-      addDoc(collection(db, dbNames.purchase), purchase);
-    }
-  });
+    updatePurchases.forEach(async (purchase) => {
+        if (purchase.id) {
+            const docRef = doc(db, dbNames.purchase, purchase.id);
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+                updateDoc(docRef, { ...purchase });
+            } else {
+                setDoc(docRef, purchase);
+            }
+        } else {
+            addDoc(collection(db, dbNames.purchase), purchase);
+        }
+    });
 };
 
 interface oldPurchases extends PurchaseRawDataType {
@@ -356,49 +356,49 @@ interface oldPurchases extends PurchaseRawDataType {
   income?: boolean;
 }
 export const updateDocuments = async () => {
-  const q = query(collection(db, dbNames.purchase), orderBy("payDate", "asc"));
-  const data = await getDocs(q);
+    const q = query(collection(db, dbNames.purchase), orderBy('payDate', 'asc'));
+    const data = await getDocs(q);
 
-  if (data.empty) return console.error("データがありません");
+    if (data.empty) return console.error('データがありません');
 
-  const batch = writeBatch(db);
-  const lastPurchases: Record<string, number> = {};
-  const purchases = await Promise.all(
-    data.docs.map(async (doc) => {
-      return { ...{ id: doc.id, ...doc.data() } as oldPurchases, doc };
-    })
-  );
+    const batch = writeBatch(db);
+    const lastPurchases: Record<string, number> = {};
+    const purchases = await Promise.all(
+        data.docs.map(async (doc) => {
+            return { ...{ id: doc.id, ...doc.data() } as oldPurchases, doc };
+        })
+    );
 
-  purchases
-    .forEach((data) => {
-      console.log(data)
-      if (!data.tabId) return;
-      const assetId = String(data.method.assetId);
-      const lastBalances = lastPurchases[assetId];
-      if (!lastBalances) lastPurchases[assetId] = 0;
-      const difference =
+    purchases
+        .forEach((data) => {
+            console.log(data)
+            if (!data.tabId) return;
+            const assetId = String(data.method.assetId);
+            const lastBalances = lastPurchases[assetId];
+            if (!lastBalances) lastPurchases[assetId] = 0;
+            const difference =
         data.difference ?? (data.income ? data.price : -(data.price ?? 0));
-      const balance =
+            const balance =
         Number(lastBalances ? lastBalances : 0) +
         Number(difference);
 
-      const docRef = doc(db, dbNames.purchase, data.id);
-      batch.update(docRef, {
-        difference,
-        balance,
-        assetId: data.method.assetId,
-        timestamp: new Date()
-      });
+            const docRef = doc(db, dbNames.purchase, data.id);
+            batch.update(docRef, {
+                difference,
+                balance,
+                assetId: data.method.assetId,
+                timestamp: new Date()
+            });
 
-      lastPurchases[assetId] = balance;
-    });
-  await batch.commit();
-  window.location.reload();
-  console.log("データを更新しました");
+            lastPurchases[assetId] = balance;
+        });
+    await batch.commit();
+    window.location.reload();
+    console.log('データを更新しました');
 }
 
 export const getPayDate = (purchase: { method: MethodType, date: Date }) => {
-  const { method, date } = purchase;
-  const { timing, timingDate } = method;
-  return timing === "即時" ? date : getPayLaterDate(date, timingDate);
+    const { method, date } = purchase;
+    const { timing, timingDate } = method;
+    return timing === '即時' ? date : getPayLaterDate(date, timingDate);
 }

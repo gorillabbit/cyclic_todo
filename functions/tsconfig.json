@@ -2,8 +2,8 @@
   "compilerOptions": {
     "target": "es2022",
     "module": "NodeNext",
-    "esModuleInterop": true,
     "moduleResolution": "nodenext",
+    "esModuleInterop": true,
     "noImplicitReturns": true,
     "noUnusedLocals": true,
     "outDir": "lib",

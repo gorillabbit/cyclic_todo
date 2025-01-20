@@ -1,5 +1,5 @@
-import { Timestamp } from "firebase/firestore";
-import { defaultMethodList, MethodListType } from "../types";
+import { Timestamp } from 'firebase/firestore';
+import { defaultMethodList, MethodListType } from '../types';
 
 interface PurchaseBaseType {
   userId: string;
@@ -13,15 +13,15 @@ interface PurchaseBaseType {
   isGroup?: boolean;
 }
 const defaultPurchaseBase: PurchaseBaseType = {
-  userId: "",
-  title: "",
-  date: new Date(),
-  payDate: new Date(),
-  method: defaultMethodList,
-  category: "",
-  description: "",
-  isUncertain: false,
-  isGroup: false,
+    userId: '',
+    title: '',
+    date: new Date(),
+    payDate: new Date(),
+    method: defaultMethodList,
+    category: '',
+    description: '',
+    isUncertain: false,
+    isGroup: false,
 };
 
 export interface InputFieldPurchaseType extends PurchaseBaseType {
@@ -29,9 +29,9 @@ export interface InputFieldPurchaseType extends PurchaseBaseType {
   income: boolean;
 }
 export const defaultInputFieldPurchase: InputFieldPurchaseType = {
-  ...defaultPurchaseBase,
-  price: 0,
-  income: false,
+    ...defaultPurchaseBase,
+    price: 0,
+    income: false,
 };
 export interface PurchaseDataType extends PurchaseBaseType {
   id: string;
@@ -43,15 +43,15 @@ export interface PurchaseDataType extends PurchaseBaseType {
 }
 
 export const defaultPurchaseData: PurchaseDataType = {
-  ...defaultPurchaseBase,
-  difference: 0,
-  balance: 0,
-  parentScheduleId: "",
-  assetId: "",
-  id: "",
-  tabId: "",
+    ...defaultPurchaseBase,
+    difference: 0,
+    balance: 0,
+    parentScheduleId: '',
+    assetId: '',
+    id: '',
+    tabId: '',
 };
-export interface PurchaseRawDataType extends Omit<PurchaseDataType, "date" | "payDate"> {
+export interface PurchaseRawDataType extends Omit<PurchaseDataType, 'date' | 'payDate'> {
   id: string;
   date: Timestamp;
   payDate: Timestamp;

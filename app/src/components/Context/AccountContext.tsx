@@ -1,30 +1,30 @@
-import { createContext } from "react";
-import { AccountType, defaultAccount } from "../../types";
+import { createContext } from 'react';
+import { AccountType, defaultAccount } from '../../types';
 
 interface AccountContextProp {
-  Account: AccountType | undefined;
-  children: React.ReactNode;
+    Account: AccountType | undefined;
+    children: React.ReactNode;
 }
 
 type AccountContextType = {
-  Account: AccountType | undefined;
+    Account: AccountType | undefined;
 };
 
 export const AccountContext = createContext<AccountContextType>({
-  Account: defaultAccount,
+    Account: defaultAccount,
 });
 
 export const AccountProvider: React.FC<AccountContextProp> = ({
-  Account,
-  children,
+    Account,
+    children,
 }) => {
-  return (
-    <AccountContext.Provider
-      value={{
-        Account: Account,
-      }}
-    >
-      {children}
-    </AccountContext.Provider>
-  );
+    return (
+        <AccountContext.Provider
+            value={{
+                Account: Account,
+            }}
+        >
+            {children}
+        </AccountContext.Provider>
+    );
 };

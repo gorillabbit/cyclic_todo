@@ -1,14 +1,14 @@
-import { Timestamp } from "firebase/firestore";
+import { Timestamp } from 'firebase/firestore';
 
 // 曜日を表す型を定義
 export type WeekDay =
-  | "日曜日"
-  | "月曜日"
-  | "火曜日"
-  | "水曜日"
-  | "木曜日"
-  | "金曜日"
-  | "土曜日";
+  | '日曜日'
+  | '月曜日'
+  | '火曜日'
+  | '水曜日'
+  | '木曜日'
+  | '金曜日'
+  | '土曜日';
 
 export interface TaskInputType {
   userId: string;
@@ -84,47 +84,47 @@ export interface AccountType extends AccountInputType {
 }
 
 export interface AccountLinkType
-  extends Pick<AccountType, "id" | "email" | "name" | "icon"> { }
+  extends Pick<AccountType, 'id' | 'email' | 'name' | 'icon'> { }
 
 export const defaultAccountInput: AccountInputType = {
-  email: "",
-  name: "",
-  icon: "",
-  linkedAccounts: [],
-  sendRequest: [],
-  receiveRequest: [],
-  useTabIds: [],
+    email: '',
+    name: '',
+    icon: '',
+    linkedAccounts: [],
+    sendRequest: [],
+    receiveRequest: [],
+    useTabIds: [],
 };
 
 export const defaultAccount: AccountType = {
-  ...defaultAccountInput,
-  id: "",
+    ...defaultAccountInput,
+    id: '',
 };
 
 export interface MethodType {
   userId: string;
   label: string;
   assetId: string;
-  timing: "即時" | "翌月";
+  timing: '即時' | '翌月';
   timingDate: number;
   tabId: string;
 }
 
 export const defaultMethod: MethodType = {
-  userId: "",
-  label: "",
-  assetId: "",
-  timing: "即時",
-  timingDate: 1,
-  tabId: "",
+    userId: '',
+    label: '',
+    assetId: '',
+    timing: '即時',
+    timingDate: 1,
+    tabId: '',
 };
 
 export interface MethodListType extends MethodType {
   id: string;
 }
 export const defaultMethodList: MethodListType = {
-  ...defaultMethod,
-  id: "",
+    ...defaultMethod,
+    id: '',
 };
 
 export interface InputAssetType {
@@ -159,7 +159,7 @@ export interface InputPurchaseScheduleRowType
   id: string;
 }
 export interface PurchaseScheduleType
-  extends Omit<InputPurchaseScheduleType, "endDate"> {
+  extends Omit<InputPurchaseScheduleType, 'endDate'> {
   endDate: Timestamp;
 }
 export interface PurchaseScheduleListType extends PurchaseScheduleType {
@@ -176,15 +176,15 @@ export interface InputTransferType {
   tabId: string;
 }
 export const defaultTransferInput: InputTransferType = {
-  userId: "",
-  price: 0,
-  date: new Date(),
-  from: defaultMethodList,
-  to: defaultMethodList,
-  description: "",
-  tabId: "",
+    userId: '',
+    price: 0,
+    date: new Date(),
+    from: defaultMethodList,
+    to: defaultMethodList,
+    description: '',
+    tabId: '',
 };
-export interface TransferType extends Omit<InputTransferType, "date"> {
+export interface TransferType extends Omit<InputTransferType, 'date'> {
   id: string;
   date: Timestamp;
 }
@@ -192,7 +192,7 @@ export interface TransferType extends Omit<InputTransferType, "date"> {
 export interface InputTabType {
   createUserUid: string;
   name: string;
-  type: "task" | "purchase";
+  type: 'task' | 'purchase';
   sharedAccounts: AccountLinkType[];
 }
 export interface TabType extends InputTabType {
