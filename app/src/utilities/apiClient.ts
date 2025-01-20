@@ -1,4 +1,4 @@
-export const getPurchases = async (userId?: string, tabId?: string) => {
+export const getPurchases = async (userId?: string, tabId?: string): Promise<unknown> => {
     try {
         const params = new URLSearchParams();
         if (userId) params.append('userId', userId);
