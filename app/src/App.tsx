@@ -14,7 +14,7 @@ import { db } from './firebase';
 import HomePage from './pages/HomePage';
 import KiyakuPage from './pages/KiyakuPage';
 import ja from 'date-fns/locale/ja';
-import { getPurchases } from './utilities/apiClient';
+import { getAccounts, getPurchases } from './utilities/apiClient';
 
 const App = memo(() => {
     const theme = createTheme({
@@ -38,6 +38,9 @@ const App = memo(() => {
                 return;
             }
             // リアルタイムでドキュメントのスナップショットを取得
+            getAccounts(user.uid).then((data) => {
+                console.log(data);
+            });
             const unsubscribeFromDoc = onSnapshot(doc(db, 'Accounts', user.uid), (accountDoc) => {
                 setAccount(
                     accountDoc.exists()
