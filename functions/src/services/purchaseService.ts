@@ -1,6 +1,7 @@
 import { Purchases } from '../../../entity/entities/Purchases.js';
 import { QueryFailedError } from 'typeorm';
 import AppDataSource from '../db.js';
+import * as functions from 'firebase-functions';
 
 interface GetPurchasesParams {
     userId?: string;
@@ -32,3 +33,8 @@ export const getPurchasesService = async ({ userId, tabId }: GetPurchasesParams)
         throw err;
     }
 };
+
+export const getPurchases = functions.https.onCall(async (request) => {
+    const { userId, tabId } = request.data;
+    return await getPurchasesService({ userId, tabId });
+});

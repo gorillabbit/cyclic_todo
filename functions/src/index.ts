@@ -1,23 +1,19 @@
-/**
- * Import function triggers from their respective submodules:
- *
- * import {onCall} from 'firebase-functions/v2/https';
- * import {onDocumentWritten} from 'firebase-functions/v2/firestore';
- *
- * See a full list of supported triggers at https://firebase.google.com/docs/functions
- */
-
+import express from 'express';
 import { onRequest } from 'firebase-functions/v2/https';
 import { initializeDatabase } from './db.js';
 import { getPurchasesService } from './services/purchaseService.js';
 
-// Start writing functions
-// https://firebase.google.com/docs/functions/typescript
+// Create Express app
+const app = express();
 
-// export const helloWorld = onRequest((request, response) => {
-//   logger.info('Hello logs!', {structuredData: true});
-//   response.send('Hello from Firebase!');
-// });
+// Middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+    res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
 
 // Initialize database connection
 if (process.env.NODE_ENV !== 'test') {
@@ -27,8 +23,8 @@ if (process.env.NODE_ENV !== 'test') {
     });
 }
 
-// API: /api/purchases - GET
-export const getPurchases = onRequest(async (req, res) => {
+// Mount existing purchase endpoint
+app.get('/api/purchases', async (req, res) => {
     try {
         const { userId, tabId } = req.query;
         const purchases = await getPurchasesService({
@@ -41,3 +37,6 @@ export const getPurchases = onRequest(async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
+
+// Export Express app wrapped with Firebase onRequest handler
+export const api = onRequest(app);
