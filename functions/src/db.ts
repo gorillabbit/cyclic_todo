@@ -1,6 +1,4 @@
 import { DataSource } from 'typeorm';
-import 'reflect-metadata';
-import 'dotenv/config';
 import { Purchases } from '../../entity/entities/Purchases.js';
 import { Accounts } from '../../entity/entities/Accounts.js';
 import { Tabs } from '../../entity/entities/Tabs.js';
@@ -16,7 +14,7 @@ import { TransferTemplates } from '../../entity/entities/TransferTemplates.js';
 const AppDataSource = new DataSource({
     type: 'mysql',
     host: process.env.DB_HOST,
-    port: parseInt(process.env.DB_PORT || '3306'),
+    port: parseInt((process.env.DB_PORT ?? '') || '3306'),
     username: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
@@ -41,7 +39,7 @@ const AppDataSource = new DataSource({
 
 let isInitialized = false;
 
-export const initializeDatabase = async () => {
+export const initializeDatabase = async (): Promise<void> => {
     if (isInitialized) return;
 
     try {
@@ -49,7 +47,7 @@ export const initializeDatabase = async () => {
         isInitialized = true;
         console.log('Database connection initialized');
     } catch (err) {
-        console.error('Error during Data Source initialization', err);
+        console.error(err);
         throw err;
     }
 };
