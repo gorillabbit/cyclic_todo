@@ -17,10 +17,8 @@ const TaskList = () => {
                 .filter((task) => task.completed)
                 .sort((a, b) => {
                     // タイムスタンプを比較して並び替え
-                    const dateA =
-                        a.toggleCompletionTimestamp?.toDate() ?? new Date(0);
-                    const dateB =
-                        b.toggleCompletionTimestamp?.toDate() ?? new Date(0);
+                    const dateA = a.toggleCompletionTimestamp?.toDate() ?? new Date(0);
+                    const dateB = b.toggleCompletionTimestamp?.toDate() ?? new Date(0);
                     return dateA.getTime() - dateB.getTime();
                 }),
         [taskList]
@@ -29,10 +27,7 @@ const TaskList = () => {
     return (
         <Box>
             <Typography variant="h5">タスク一覧</Typography>
-            <Masonry
-                sx={{ margin: '2px' }}
-                columns={{ xs: 2, sm: 3, md: 4, lg: 5, xl: 6 }}
-            >
+            <Masonry sx={{ margin: '2px' }} columns={{ xs: 2, sm: 3, md: 4, lg: 5, xl: 6 }}>
                 {uncompletedTaskList.map((task) => (
                     <Task key={task.id} task={task} tasklist={taskList} />
                 ))}
@@ -46,10 +41,7 @@ const TaskList = () => {
                 {showCompleted ? '完了タスクを非表示' : '完了タスクを表示'}
             </Button>
             {showCompleted && (
-                <Masonry
-                    sx={{ margin: '2px' }}
-                    columns={{ xs: 2, sm: 3, md: 4, lg: 5, xl: 6 }}
-                >
+                <Masonry sx={{ margin: '2px' }} columns={{ xs: 2, sm: 3, md: 4, lg: 5, xl: 6 }}>
                     {completedTaskList.map((task) => (
                         <Task key={task.id} task={task} tasklist={taskList} />
                     ))}

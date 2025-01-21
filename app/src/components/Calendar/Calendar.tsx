@@ -38,9 +38,7 @@ const Calendar = () => {
             events.push({
                 title: log.text,
                 start: completeLogs.pop()?.timestamp?.toDate() ?? '',
-                end: log.duration
-                    ? completeLogs.pop()?.timestamp?.toDate() ?? ''
-                    : '',
+                end: log.duration ? (completeLogs.pop()?.timestamp?.toDate() ?? '') : '',
                 display: 'list-item',
                 color: '#257e4a',
                 extendedProps: { source: 'logList', id: log.id },
@@ -68,9 +66,7 @@ const Calendar = () => {
             },
             {
                 title: task.text + ' 完了',
-                start: task.completed
-                    ? task.toggleCompletionTimestamp?.toDate()
-                    : '',
+                start: task.completed ? task.toggleCompletionTimestamp?.toDate() : '',
                 color: '#c43b31',
                 extendedProps,
             },
@@ -117,14 +113,12 @@ const Calendar = () => {
     };
 
     useEffect(() => {
-        gapi.auth2
-            .getAuthInstance()
-            ?.isSignedIn.listen((isSignedIn: boolean) => {
-                setIsSignedIn(isSignedIn);
-                if (isSignedIn) {
-                    listUpcomingEvents();
-                }
-            });
+        gapi.auth2.getAuthInstance()?.isSignedIn.listen((isSignedIn: boolean) => {
+            setIsSignedIn(isSignedIn);
+            if (isSignedIn) {
+                listUpcomingEvents();
+            }
+        });
     }, [isSignedIn]);
 
     const isSmall = useIsSmall();
@@ -163,12 +157,7 @@ const Calendar = () => {
     return (
         <>
             <FullCalendar
-                plugins={[
-                    dayGridPlugin,
-                    timeGridPlugin,
-                    bootstrap5Plugin,
-                    interactionPlugin,
-                ]}
+                plugins={[dayGridPlugin, timeGridPlugin, bootstrap5Plugin, interactionPlugin]}
                 themeSystem="bootstrap5"
                 initialView="week"
                 nowIndicator={true}
@@ -183,11 +172,7 @@ const Calendar = () => {
                     center: isSmall ? '' : 'title',
                     right: 'dayGridMonth,week,timeGridDay',
                 }}
-                events={[
-                    ...googleCalendarEvents,
-                    ...logEvents.flat(),
-                    ...taskEvents.flat(),
-                ]}
+                events={[...googleCalendarEvents, ...logEvents.flat(), ...taskEvents.flat()]}
                 {...(isSmall && calendarView === 'dayGridMonth'
                     ? { eventContent: EventContent }
                     : {})}
@@ -221,21 +206,11 @@ const Calendar = () => {
             <Dialog open={openEventDialog} onClose={handleCloseEventDialog}>
                 <DialogContent>
                     {clickedEvent.source === 'taskList' && (
-                        <Task
-                            task={
-                                taskList.filter(
-                                    (task) => task.id === clickedEvent.id
-                                )[0]
-                            }
-                        />
+                        <Task task={taskList.filter((task) => task.id === clickedEvent.id)[0]} />
                     )}
                     {clickedEvent.source === 'logList' && (
                         <Log
-                            log={
-                                logList.filter(
-                                    (log) => log.id === clickedEvent.id
-                                )[0]
-                            }
+                            log={logList.filter((log) => log.id === clickedEvent.id)[0]}
                             logsCompleteLogs={logsCompleteLogsList}
                             openDialog
                         />

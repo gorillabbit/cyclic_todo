@@ -6,10 +6,7 @@ interface ToggleButtonsProps {
 }
 
 const ToggleButtons = ({ isTask, setIsTask }: ToggleButtonsProps) => (
-    <ToggleButtonGroup
-        value={isTask ? 'タスク' : 'ログ'}
-        onChange={() => setIsTask(!isTask)}
-    >
+    <ToggleButtonGroup value={isTask ? 'タスク' : 'ログ'} onChange={() => setIsTask(!isTask)}>
         <ToggleButton value="タスク">タスク</ToggleButton>
         <ToggleButton value="ログ">ログ</ToggleButton>
     </ToggleButtonGroup>

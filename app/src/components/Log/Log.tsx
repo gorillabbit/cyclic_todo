@@ -36,15 +36,13 @@ const Log: React.FC<LogProps> = ({ log, logsCompleteLogs, openDialog }) => {
     const [isOpen, setIsOpen] = useState<boolean>(Boolean(openDialog));
 
     const completeLogs = logsCompleteLogs.filter(
-        (logsCompleteLog: LogsCompleteLogsType) =>
-            logsCompleteLog.logId === log.id
+        (logsCompleteLog: LogsCompleteLogsType) => logsCompleteLog.logId === log.id
     );
     const finishLogs = completeLogs.filter(
         (completeLog: LogsCompleteLogsType) => completeLog.type === 'finish'
     );
     const lastCompletedLog = finishLogs[0];
-    const isLastCompletedAvailable =
-        !!lastCompletedLog && !!lastCompletedLog.timestamp;
+    const isLastCompletedAvailable = !!lastCompletedLog && !!lastCompletedLog.timestamp;
     const lastCompleted =
         isLastCompletedAvailable && lastCompletedLog.timestamp
             ? format(lastCompletedLog.timestamp.toDate(), 'yyyy-MM-dd HH:mm')
@@ -83,12 +81,7 @@ const Log: React.FC<LogProps> = ({ log, logsCompleteLogs, openDialog }) => {
 
                     <LogHeader lastCompleted={lastCompleted} log={log} />
                     <Box m={2} textAlign="left">
-                        <Box
-                            display="flex"
-                            justifyContent="center"
-                            alignItems="center"
-                            gap={1}
-                        >
+                        <Box display="flex" justifyContent="center" alignItems="center" gap={1}>
                             {log.icon && <></>}
                             <Typography
                                 variant="h5"
@@ -106,33 +99,20 @@ const Log: React.FC<LogProps> = ({ log, logsCompleteLogs, openDialog }) => {
                                             ml: 1,
                                             cursor: 'pointer',
                                         }}
-                                        onClick={() =>
-                                            setIsOpenEditDialog(true)
-                                        }
+                                        onClick={() => setIsOpenEditDialog(true)}
                                     />
                                 )}
                             </Typography>
                         </Box>
-                        {log.description && (
-                            <BodyTypography text={log.description} />
-                        )}
+                        {log.description && <BodyTypography text={log.description} />}
                         <BodyTypography
                             visibility={isStarted ? 'visible' : 'hidden'}
-                            text={
-                                isStarted ? (
-                                    <Stopwatch log={log} />
-                                ) : (
-                                    <div>blank</div>
-                                )
-                            }
+                            text={isStarted ? <Stopwatch log={log} /> : <div>blank</div>}
                         />
                         <Box>
                             <AvatarGroup>
                                 {log.accessibleAccounts?.map((account) => (
-                                    <Tooltip
-                                        key={account.name}
-                                        title={account.name}
-                                    >
+                                    <Tooltip key={account.name} title={account.name}>
                                         <Avatar
                                             src={account.icon}
                                             alt={account.name}
@@ -146,9 +126,7 @@ const Log: React.FC<LogProps> = ({ log, logsCompleteLogs, openDialog }) => {
                         {!log.archived && (
                             <LogFeature
                                 log={log}
-                                isLastCompletedAvailable={
-                                    isLastCompletedAvailable
-                                }
+                                isLastCompletedAvailable={isLastCompletedAvailable}
                                 lastCompleted={lastCompleted}
                                 finishLogs={finishLogs}
                                 isOpen={isOpen}
@@ -169,19 +147,13 @@ const Log: React.FC<LogProps> = ({ log, logsCompleteLogs, openDialog }) => {
                             <LogCompleteButton log={log} />
                         )}
                         {log.archived && !isSharedLog && (
-                            <LogDeleteButton
-                                log={log}
-                                completeLogs={completeLogs}
-                            />
+                            <LogDeleteButton log={log} completeLogs={completeLogs} />
                         )}
                         <LogArchiveButton log={log} />
                     </Box>
                 </Card>
             </Box>
-            <Dialog
-                open={isOpenEditDialog}
-                onClose={() => setIsOpenEditDialog(false)}
-            >
+            <Dialog open={isOpenEditDialog} onClose={() => setIsOpenEditDialog(false)}>
                 <DialogContent>
                     <LogInputForm
                         openDialog={true}

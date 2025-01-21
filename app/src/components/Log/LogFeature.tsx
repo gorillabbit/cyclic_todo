@@ -15,9 +15,7 @@ interface LogFeatureProp {
 
 const updateDisplayFeature = (log: LogType, feature: string) => {
     if (log.displayFeature.includes(feature)) {
-        const newDisplayFeature = log.displayFeature.filter(
-            (item: string) => item !== feature
-        );
+        const newDisplayFeature = log.displayFeature.filter((item: string) => item !== feature);
         updateDocLog(log.id, { displayFeature: [...newDisplayFeature] });
     } else {
         updateDocLog(log.id, {
@@ -33,13 +31,11 @@ const LogFeature: React.FC<LogFeatureProp> = ({
     finishLogs,
     isOpen,
 }) => {
-    const [intervalFromLastCompleted, setIntervalFromLastCompleted] =
-        useState<string>('');
+    const [intervalFromLastCompleted, setIntervalFromLastCompleted] = useState<string>('');
 
     useEffect(() => {
         if (isLastCompletedAvailable) {
-            const lastLogCompleted =
-                checkLastLogCompleted(lastCompleted) || '0分';
+            const lastLogCompleted = checkLastLogCompleted(lastCompleted) || '0分';
             setIntervalFromLastCompleted(lastLogCompleted);
             const timerId = setInterval(() => {
                 setIntervalFromLastCompleted(lastLogCompleted);
@@ -98,9 +94,7 @@ const LogFeature: React.FC<LogFeatureProp> = ({
                             key={mapItem.label}
                             label={mapItem.label}
                             isSelected={displayFeature.includes(mapItem.title)}
-                            onClick={() =>
-                                updateDisplayFeature(log, mapItem.title)
-                            }
+                            onClick={() => updateDisplayFeature(log, mapItem.title)}
                         />
                     )
             )}

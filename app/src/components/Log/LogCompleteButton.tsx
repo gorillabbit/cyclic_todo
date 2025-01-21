@@ -21,9 +21,7 @@ const logComplete = (log: LogType, memo?: string) => {
 const LogCompleteButton: React.FC<LogCompleteButtonProps> = ({ log }) => {
     const [isOpenMemoDialog, setIsOpenMemoDialog] = useState<boolean>(false);
 
-    const handleLogComplete = (
-        event: React.MouseEvent<HTMLButtonElement, MouseEvent>
-    ) => {
+    const handleLogComplete = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         event.stopPropagation();
         if (log.availableMemo) {
             setIsOpenMemoDialog(true);

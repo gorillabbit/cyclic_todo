@@ -10,14 +10,7 @@ import {
 } from '@mui/material';
 import { ChangeEvent, JSX, memo, useState } from 'react';
 import { updateDocAccount, db } from '../firebase';
-import {
-    collection,
-    doc,
-    getDoc,
-    getDocs,
-    query,
-    where,
-} from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, query, where } from 'firebase/firestore';
 import { AccountLinkType, AccountType } from '../types';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import CancelIcon from '@mui/icons-material/Cancel';
@@ -28,10 +21,8 @@ const validateEmail = (email: string, account: AccountType): string => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!regex.test(email)) return '無効なメールアドレスです';
     if (email === account.email) return '自分のメールアドレスです';
-    if (account.linkedAccounts.some((l) => l.email === email))
-        return 'すでにリンクされています';
-    if (account.sendRequest.includes(email))
-        return 'すでにリンク依頼を出しています';
+    if (account.linkedAccounts.some((l) => l.email === email)) return 'すでにリンクされています';
+    if (account.sendRequest.includes(email)) return 'すでにリンク依頼を出しています';
     if (account.receiveRequest.some((r) => r.email === email))
         return 'すでにリンク依頼を受けています';
     return '';
@@ -44,9 +35,7 @@ const AccountShareButton = () => {
     const [error, setError] = useState<string>();
     if (!Account) return null;
 
-    const handleChange = (
-        e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-    ) => {
+    const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { value } = e.target;
         setEmail(value);
         setError(validateEmail(value, Account));
@@ -64,27 +53,21 @@ const AccountShareButton = () => {
 
         const q = query(AccountCollection, where('email', '==', email));
         const targetAccountDoc = await getDocs(q);
-        if (targetAccountDoc.empty)
-            return setError('入力対象はアカウントを持っていません');
+        if (targetAccountDoc.empty) return setError('入力対象はアカウントを持っていません');
 
         updateDocAccount(Account.id, {
             sendRequest: [...Account.sendRequest, email],
         });
         const targetDoc = targetAccountDoc.docs[0];
         updateDocAccount(targetDoc.id, {
-            receiveRequest: [
-                ...targetDoc.data().receiveRequest,
-                AccountToLink(Account),
-            ],
+            receiveRequest: [...targetDoc.data().receiveRequest, AccountToLink(Account)],
         });
         setEmail('');
     };
 
     const refuseRequest = (receivedRequest: AccountLinkType) => {
         updateDocAccount(Account.id, {
-            receiveRequest: Account.receiveRequest.filter(
-                (r) => r.id !== receivedRequest.id
-            ),
+            receiveRequest: Account.receiveRequest.filter((r) => r.id !== receivedRequest.id),
         });
         getAccountDoc(receivedRequest.id).then((doc) => {
             updateDocAccount(doc.id, {
@@ -97,9 +80,7 @@ const AccountShareButton = () => {
         // 自分の方で受け取ったリクエストをリンクに加える、リクエストを削除する
         updateDocAccount(Account.id, {
             linkedAccounts: [...Account.linkedAccounts, receiveRequest],
-            receiveRequest: Account.receiveRequest.filter(
-                (r) => r.id !== receiveRequest.id
-            ),
+            receiveRequest: Account.receiveRequest.filter((r) => r.id !== receiveRequest.id),
         });
         getAccountDoc(receiveRequest.id).then((doc) => {
             updateDocAccount(doc.id, {
@@ -120,24 +101,18 @@ const AccountShareButton = () => {
             updateDocAccount(targetDoc.id, {
                 receiveRequest: targetDoc
                     .data()
-                    .receiveRequest.filter(
-                        (r: AccountLinkType) => r.email !== Account.email
-                    ),
+                    .receiveRequest.filter((r: AccountLinkType) => r.email !== Account.email),
             });
         });
     };
 
     const unlinkAccount = (linkedAccount: AccountLinkType) => {
         updateDocAccount(Account.id, {
-            linkedAccounts: Account.linkedAccounts.filter(
-                (a) => a.id !== linkedAccount.id
-            ),
+            linkedAccounts: Account.linkedAccounts.filter((a) => a.id !== linkedAccount.id),
         });
         getAccountDoc(linkedAccount.id).then((doc) => {
             updateDocAccount(doc.id, {
-                linkedAccounts: doc.linkedAccounts.filter(
-                    (a) => a.email !== Account.email
-                ),
+                linkedAccounts: doc.linkedAccounts.filter((a) => a.email !== Account.email),
             });
         });
     };
@@ -179,11 +154,7 @@ const AccountShareButton = () => {
 
     return (
         <>
-            <Button
-                sx={{ m: 1 }}
-                variant="contained"
-                onClick={() => setOpen(true)}
-            >
+            <Button sx={{ m: 1 }} variant="contained" onClick={() => setOpen(true)}>
                 共有
             </Button>
             <Dialog open={open} onClose={() => setOpen(false)}>
@@ -208,9 +179,7 @@ const AccountShareButton = () => {
                                 <Tooltip title="承認する">
                                     <Box
                                         sx={{ cursor: 'pointer' }}
-                                        onClick={() =>
-                                            acceptRequest(receiveRequest)
-                                        }
+                                        onClick={() => acceptRequest(receiveRequest)}
                                     >
                                         <CheckCircleOutlineIcon />
                                     </Box>
@@ -241,16 +210,10 @@ const AccountShareButton = () => {
                             helperText={error}
                         />
                         <Box>
-                            <Button
-                                color="error"
-                                onClick={() => setOpen(false)}
-                            >
+                            <Button color="error" onClick={() => setOpen(false)}>
                                 閉じる
                             </Button>
-                            <Button
-                                disabled={!!error}
-                                onClick={sendLinkRequests}
-                            >
+                            <Button disabled={!!error} onClick={sendLinkRequests}>
                                 リンク申請
                             </Button>
                         </Box>

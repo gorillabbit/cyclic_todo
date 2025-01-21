@@ -93,10 +93,7 @@ const PurchaseRowButtons = ({
         setOpenDialog(true);
     }, [setOpenDialog]);
 
-    const handleEditPriceButtonClick = useCallback(
-        () => setIsEditPrice(true),
-        [setIsEditPrice]
-    );
+    const handleEditPriceButtonClick = useCallback(() => setIsEditPrice(true), [setIsEditPrice]);
 
     const deleteAction = useCallback(async () => {
         let updates = updatePurchases;

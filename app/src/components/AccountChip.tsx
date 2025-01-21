@@ -9,10 +9,7 @@ const AccountChip = () => {
     const { Account } = useAccount();
 
     return Account ? (
-        <Chip
-            avatar={<Avatar src={''} alt="アイコン" />}
-            onDelete={() => signOut(auth)}
-        />
+        <Chip avatar={<Avatar src={''} alt="アイコン" />} onDelete={() => signOut(auth)} />
     ) : (
         <Link to="/login">ログイン</Link>
     );

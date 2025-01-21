@@ -14,14 +14,7 @@ type TableHeadCellProps = {
 type PlainTableHeadCellProps = TableHeadCellProps;
 
 const PlainTableHeadCell = memo(
-    ({
-        label,
-        value,
-        orderBy,
-        setOrderBy,
-        isAsc,
-        setIsAsc,
-    }: PlainTableHeadCellProps) => (
+    ({ label, value, orderBy, setOrderBy, isAsc, setIsAsc }: PlainTableHeadCellProps) => (
         <TableCell
             sortDirection={orderBy === value ? (isAsc ? 'asc' : 'desc') : false}
             sx={{ p: 0 }}

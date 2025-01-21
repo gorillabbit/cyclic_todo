@@ -24,9 +24,7 @@ const MethodSelector = ({
             sx={{ minWidth: 150 }}
             options={methodList}
             onChange={(_e, v) => handleInput(inputName ?? 'method', v)}
-            isOptionEqualToValue={(option, value) =>
-                option.label === value?.label
-            }
+            isOptionEqualToValue={(option, value) => option.label === value?.label}
             renderInput={(params) => (
                 <TextField
                     {...params}

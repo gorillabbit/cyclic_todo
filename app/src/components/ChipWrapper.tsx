@@ -8,11 +8,7 @@ interface ChipWrapperProps {
     onClick?: () => void;
 }
 
-const ChipWrapper: React.FC<ChipWrapperProps> = ({
-    label,
-    isSelected,
-    onClick,
-}) => {
+const ChipWrapper: React.FC<ChipWrapperProps> = ({ label, isSelected, onClick }) => {
     return (
         <Chip
             label={label}

@@ -13,12 +13,7 @@ const ChildTasks: React.FC<ChildTaskProps> = ({ tasks, setTaskList }) => {
         <Box border="solid 2px #ffffff">
             子task
             {tasks.map((子task) => (
-                <Task
-                    type="子task"
-                    key={子task.id}
-                    task={子task}
-                    setTaskList={setTaskList}
-                />
+                <Task type="子task" key={子task.id} task={子task} setTaskList={setTaskList} />
             ))}
         </Box>
     );

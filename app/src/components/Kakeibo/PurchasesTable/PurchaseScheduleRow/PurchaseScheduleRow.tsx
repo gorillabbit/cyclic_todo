@@ -1,8 +1,5 @@
 import { memo, useCallback, useState } from 'react';
-import {
-	InputPurchaseScheduleRowType,
-	PurchaseScheduleListType,
-} from '../../../../types';
+import { InputPurchaseScheduleRowType, PurchaseScheduleListType } from '../../../../types';
 import DeleteConfirmDialog from '../../DeleteConfirmDialog';
 import { deleteDocPurchaseSchedule } from '../../../../firebase';
 import EditPurchaseScheduleRow from './EditPurchaseScheduleRow';
@@ -12,81 +9,78 @@ import { deleteScheduledPurchases } from '../../../../utilities/purchaseUtilitie
 import { usePurchase } from '../../../../hooks/useData';
 
 type PlainPurchaseScheduleRowProps = {
-	purchaseSchedule: PurchaseScheduleListType;
-	isEdit: boolean;
-	setIsEdit: React.Dispatch<React.SetStateAction<boolean>>;
-	openDialog: boolean;
-	setOpenDialog: React.Dispatch<React.SetStateAction<boolean>>;
-	editFormData: InputPurchaseScheduleRowType;
-	setEditFormData: React.Dispatch<
-		React.SetStateAction<InputPurchaseScheduleRowType>
-	>;
-	deleteAction: () => void;
-	isSmall: boolean;
+    purchaseSchedule: PurchaseScheduleListType;
+    isEdit: boolean;
+    setIsEdit: React.Dispatch<React.SetStateAction<boolean>>;
+    openDialog: boolean;
+    setOpenDialog: React.Dispatch<React.SetStateAction<boolean>>;
+    editFormData: InputPurchaseScheduleRowType;
+    setEditFormData: React.Dispatch<React.SetStateAction<InputPurchaseScheduleRowType>>;
+    deleteAction: () => void;
+    isSmall: boolean;
 };
 
 const PlainPurchaseScheduleRow = memo(
-	({
-		purchaseSchedule,
-		isEdit,
-		setIsEdit,
-		openDialog,
-		setOpenDialog,
-		editFormData,
-		setEditFormData,
-		deleteAction,
-		isSmall,
-	}: PlainPurchaseScheduleRowProps) => (
-		<>
-			{isEdit ? (
-				<EditPurchaseScheduleRow
-					{...{ setIsEdit, editFormData, setEditFormData, isSmall }}
-				/>
-			) : (
-				<NormalPurchaseScheduleRow
-					{...{ editFormData, setIsEdit, setOpenDialog, isSmall }}
-				/>
-			)}
-			<DeleteConfirmDialog
-				target={purchaseSchedule.title}
-				{...{ openDialog, setOpenDialog, deleteAction }}
-			/>
-		</>
-	)
+    ({
+        purchaseSchedule,
+        isEdit,
+        setIsEdit,
+        openDialog,
+        setOpenDialog,
+        editFormData,
+        setEditFormData,
+        deleteAction,
+        isSmall,
+    }: PlainPurchaseScheduleRowProps) => (
+        <>
+            {isEdit ? (
+                <EditPurchaseScheduleRow
+                    {...{ setIsEdit, editFormData, setEditFormData, isSmall }}
+                />
+            ) : (
+                <NormalPurchaseScheduleRow
+                    {...{ editFormData, setIsEdit, setOpenDialog, isSmall }}
+                />
+            )}
+            <DeleteConfirmDialog
+                target={purchaseSchedule.title}
+                {...{ openDialog, setOpenDialog, deleteAction }}
+            />
+        </>
+    )
 );
 
 const PurchaseScheduleRow = ({
-	purchaseSchedule,
+    purchaseSchedule,
 }: {
-	purchaseSchedule: PurchaseScheduleListType;
+    purchaseSchedule: PurchaseScheduleListType;
 }) => {
-	const isSmall = useIsSmall();
-	const [isEdit, setIsEdit] = useState<boolean>(false);
-	const [openDialog, setOpenDialog] = useState<boolean>(false);
-	const [editFormData, setEditFormData] =
-		useState<InputPurchaseScheduleRowType>({
-			...purchaseSchedule,
-			endDate: purchaseSchedule.endDate.toDate(),
-		});
-	const { purchaseList } = usePurchase();
+    const isSmall = useIsSmall();
+    const [isEdit, setIsEdit] = useState<boolean>(false);
+    const [openDialog, setOpenDialog] = useState<boolean>(false);
+    const [editFormData, setEditFormData] = useState<InputPurchaseScheduleRowType>({
+        ...purchaseSchedule,
+        endDate: purchaseSchedule.endDate.toDate(),
+    });
+    const { purchaseList } = usePurchase();
 
-	const deleteAction = useCallback(() => {
-		deleteScheduledPurchases(purchaseList, purchaseSchedule.id);
-		deleteDocPurchaseSchedule(purchaseSchedule.id);
-	}, [purchaseList, purchaseSchedule]);
+    const deleteAction = useCallback(() => {
+        deleteScheduledPurchases(purchaseList, purchaseSchedule.id);
+        deleteDocPurchaseSchedule(purchaseSchedule.id);
+    }, [purchaseList, purchaseSchedule]);
 
-	const plainProps = {
-		purchaseSchedule,
-		isEdit,
-		setIsEdit,
-		openDialog,
-		setOpenDialog,
-		editFormData,
-		setEditFormData,
-		deleteAction,
-		isSmall,
-	};
-	return <PlainPurchaseScheduleRow {...plainProps} />;
+    const plainProps = {
+        purchaseSchedule,
+        isEdit,
+        setIsEdit,
+        openDialog,
+        setOpenDialog,
+        editFormData,
+        setEditFormData,
+        deleteAction,
+        isSmall,
+    };
+    return <PlainPurchaseScheduleRow {...plainProps} />;
 };
 
 export default PurchaseScheduleRow;

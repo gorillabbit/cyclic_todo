@@ -7,9 +7,7 @@ const config = {
     clientId: import.meta.env.VITE_GOOGLE_CALENDER_CLIENT_ID,
     apiKey: import.meta.env.VITE_GOOGLE_CALENDER_API_KEY,
     scope: import.meta.env.VITE_GOOGLE_CALENDER_SCOPES,
-    discoveryDocs: [
-        'https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest',
-    ],
+    discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest'],
 };
 
 const CalendarSignInButton = () => {
@@ -32,10 +30,7 @@ const CalendarSignInButton = () => {
         gapi.auth2.getAuthInstance().signOut();
     };
     return (
-        <Button
-            variant="contained"
-            onClick={isSignedIn ? handleSignOutClick : handleSignInClick}
-        >
+        <Button variant="contained" onClick={isSignedIn ? handleSignOutClick : handleSignInClick}>
             <img
                 src={googleCalendarIcon}
                 alt="googleCalendarアイコン"

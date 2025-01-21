@@ -15,10 +15,7 @@ const deleteLog = (log: LogType, completeLogs: LogsCompleteLogsType[]) => {
     });
 };
 
-const LogDeleteButton: React.FC<LogDeleteButtonProps> = ({
-    log,
-    completeLogs,
-}) => {
+const LogDeleteButton: React.FC<LogDeleteButtonProps> = ({ log, completeLogs }) => {
     return (
         <Button
             fullWidth

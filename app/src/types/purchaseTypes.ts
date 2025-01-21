@@ -2,15 +2,15 @@ import { Timestamp } from 'firebase/firestore';
 import { defaultMethodList, MethodListType } from '../types';
 
 interface PurchaseBaseType {
-  userId: string;
-  title: string;
-  date: Date; // 商品を買った日
-  payDate: Date; // お金を支払った日
-  method: MethodListType;
-  category: string;
-  description: string;
-  isUncertain?: boolean;
-  isGroup?: boolean;
+    userId: string;
+    title: string;
+    date: Date; // 商品を買った日
+    payDate: Date; // お金を支払った日
+    method: MethodListType;
+    category: string;
+    description: string;
+    isUncertain?: boolean;
+    isGroup?: boolean;
 }
 const defaultPurchaseBase: PurchaseBaseType = {
     userId: '',
@@ -25,8 +25,8 @@ const defaultPurchaseBase: PurchaseBaseType = {
 };
 
 export interface InputFieldPurchaseType extends PurchaseBaseType {
-  price: number;
-  income: boolean;
+    price: number;
+    income: boolean;
 }
 export const defaultInputFieldPurchase: InputFieldPurchaseType = {
     ...defaultPurchaseBase,
@@ -34,12 +34,12 @@ export const defaultInputFieldPurchase: InputFieldPurchaseType = {
     income: false,
 };
 export interface PurchaseDataType extends PurchaseBaseType {
-  id: string;
-  tabId: string;
-  assetId: string;
-  difference: number;
-  balance: number;
-  parentScheduleId?: string;
+    id: string;
+    tabId: string;
+    assetId: string;
+    difference: number;
+    balance: number;
+    parentScheduleId?: string;
 }
 
 export const defaultPurchaseData: PurchaseDataType = {
@@ -52,11 +52,11 @@ export const defaultPurchaseData: PurchaseDataType = {
     tabId: '',
 };
 export interface PurchaseRawDataType extends Omit<PurchaseDataType, 'date' | 'payDate'> {
-  id: string;
-  date: Timestamp;
-  payDate: Timestamp;
+    id: string;
+    date: Timestamp;
+    payDate: Timestamp;
 }
 
 export interface TemplateButtonType extends InputFieldPurchaseType {
-  id: string;
+    id: string;
 }

@@ -27,9 +27,7 @@ type PlainLoginPageProps = {
         password: string;
         name: string;
     };
-    handleInputChange: (
-        e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
-    ) => void;
+    handleInputChange: (e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => void;
     handleLogin: () => void;
     handleSignIn: () => void;
     handleGoogleLogin: () => void;
@@ -54,13 +52,7 @@ const PlainLoginPage = memo(
         setAgreeWithTerms,
     }: PlainLoginPageProps) => {
         return (
-            <Box
-                display="flex"
-                flexDirection="column"
-                alignItems="center"
-                m={1}
-                gap={1}
-            >
+            <Box display="flex" flexDirection="column" alignItems="center" m={1} gap={1}>
                 <Box>ログインページ</Box>
                 <ToggleButtonGroup
                     value={toggleButton}
@@ -104,9 +96,7 @@ const PlainLoginPage = memo(
                             control={
                                 <Checkbox
                                     value={agreeWithTerms}
-                                    onChange={() =>
-                                        setAgreeWithTerms(!agreeWithTerms)
-                                    }
+                                    onChange={() => setAgreeWithTerms(!agreeWithTerms)}
                                 />
                             }
                             label="利用規約に同意する"
@@ -115,12 +105,8 @@ const PlainLoginPage = memo(
                     </>
                 )}
                 {error && <Box color="red">{error}</Box>}
-                {toggleButton === 'login' && (
-                    <Button onClick={handleLogin}>ログイン</Button>
-                )}
-                {toggleButton === 'signIn' && (
-                    <Button onClick={handleSignIn}>新規登録</Button>
-                )}
+                {toggleButton === 'login' && <Button onClick={handleLogin}>ログイン</Button>}
+                {toggleButton === 'signIn' && <Button onClick={handleSignIn}>新規登録</Button>}
                 <Button onClick={handleGoogleLogin}>Googleでログイン</Button>
             </Box>
         );
@@ -168,9 +154,7 @@ const LoginPage = () => {
                 successLogin();
             })
             .catch((error) => {
-                setError(
-                    'ログインに失敗しました:' + error.code + error.message
-                );
+                setError('ログインに失敗しました:' + error.code + error.message);
             });
     }, [Fields.email, Fields.password, auth, successLogin]);
 
@@ -211,10 +195,7 @@ const LoginPage = () => {
                     email: Fields.email,
                     name: Fields.name,
                 };
-                await setDoc(
-                    doc(accountRef, userCredential.user.uid),
-                    newAccount
-                );
+                await setDoc(doc(accountRef, userCredential.user.uid), newAccount);
                 createDefaultTabs({
                     ...newAccount,
                     id: userCredential.user.uid,
@@ -233,9 +214,7 @@ const LoginPage = () => {
         const provider = new GoogleAuthProvider();
         signInWithPopup(auth, provider)
             .then(async (result) => {
-                const accountDoc = await getDoc(
-                    doc(accountRef, result.user.uid)
-                );
+                const accountDoc = await getDoc(doc(accountRef, result.user.uid));
                 if (!accountDoc.exists()) {
                     const newAccount = {
                         ...defaultAccountInput,
@@ -252,9 +231,7 @@ const LoginPage = () => {
                 successLogin();
             })
             .catch((error) => {
-                setError(
-                    'Googleログインに失敗しました:' + error.code + error.message
-                );
+                setError('Googleログインに失敗しました:' + error.code + error.message);
             });
     }, [accountRef, auth, createDefaultTabs, successLogin]);
 

@@ -14,10 +14,7 @@ export const AccountContext = createContext<AccountContextType>({
     Account: defaultAccount,
 });
 
-export const AccountProvider: React.FC<AccountContextProp> = ({
-    Account,
-    children,
-}) => {
+export const AccountProvider: React.FC<AccountContextProp> = ({ Account, children }) => {
     return (
         <AccountContext.Provider
             value={{

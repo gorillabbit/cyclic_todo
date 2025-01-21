@@ -36,13 +36,16 @@ export const numericProps: InputBaseComponentProps = {
  * @returns boolean
  */
 export const isLaterPayment = (purchase: PurchaseDataType): boolean =>
-    purchase.method.timing === '翌月'
+    purchase.method.timing === '翌月';
 
-export const is今月の支払いwithout後払いの支払い = (purchase: PurchaseDataType, currentMonth: Date): boolean => {
-    const is購入が今月 = purchase.date.getMonth() === currentMonth.getMonth()
-    const is後払いではない = purchase.category !== '後支払い'
-    return is購入が今月 && is後払いではない
-}
+export const is今月の支払いwithout後払いの支払い = (
+    purchase: PurchaseDataType,
+    currentMonth: Date
+): boolean => {
+    const is購入が今月 = purchase.date.getMonth() === currentMonth.getMonth();
+    const is後払いではない = purchase.category !== '後支払い';
+    return is購入が今月 && is後払いではない;
+};
 
 /**
  * 数値が0以下、NaNかどうか
@@ -189,21 +192,22 @@ export const sortObjectsByParameter = (
 
 /**
  * assetIdが同じ支払いのうち、dateが指定された日付より前の最後の支払いの残高を取得する
- * @param assetId 
- * @param date 
- * @param updatePurchases 
- * @returns 
+ * @param assetId
+ * @param date
+ * @param updatePurchases
+ * @returns
  */
 export const getLastBalance = (
     assetId: string,
     date: Date,
     updatePurchases: PurchaseDataType[]
 ): number => {
-    const lastPurchase = updatePurchases.filter((p) => p.assetId === assetId)
+    const lastPurchase = updatePurchases
+        .filter((p) => p.assetId === assetId)
         .sort((a, b) => b.payDate.getTime() - a.payDate.getTime())
         .find((purchase) => purchase.payDate <= date);
     // NaNに対応するために??ではなく三項演算子を使う
-    return Number(lastPurchase?.balance) ? Number(lastPurchase?.balance) : 0
+    return Number(lastPurchase?.balance) ? Number(lastPurchase?.balance) : 0;
 };
 
 // ある時点より後の支払いすべてを更新する
@@ -216,13 +220,14 @@ export const updateAllLaterPurchases = (
     if (difference === 0) return updatePurchases;
     const filteredPurchases = updatePurchases.filter((p) => p.assetId === assetId);
     const restPurchases = updatePurchases.filter((p) => p.assetId !== assetId);
-    return [...filteredPurchases.map((p) => ({
-        ...p,
-        balance:
-      p.payDate > payDate
-          ? Number(p.balance) + Number(difference)
-          : Number(p.balance),
-    })), ...restPurchases]
+    return [
+        ...filteredPurchases.map((p) => ({
+            ...p,
+            balance:
+                p.payDate > payDate ? Number(p.balance) + Number(difference) : Number(p.balance),
+        })),
+        ...restPurchases,
+    ];
 };
 
 export const deletePurchaseAndUpdateLater = async (
@@ -245,7 +250,7 @@ export const addPurchaseAndUpdateLater = (
     purchase: PurchaseDataType,
     updatePurchases: PurchaseDataType[]
 ) => {
-    const difference = Number(purchase.difference)
+    const difference = Number(purchase.difference);
     const purchases = updateAllLaterPurchases(
         purchase.assetId,
         purchase.payDate,
@@ -321,15 +326,13 @@ export const addScheduledPurchase = (
         purchaseList.push({
             ...purchaseBase,
             date: dateDay,
-            payDate: method.timing === '即時' ? dateDay : getPayLaterDate(dateDay, method.timingDate),
+            payDate:
+                method.timing === '即時' ? dateDay : getPayLaterDate(dateDay, method.timingDate),
         });
     });
     let newUpdatePurchases = updatePurchases;
     for (const purchase of purchaseList) {
-        newUpdatePurchases = addPurchaseAndUpdateLater(
-            purchase,
-            newUpdatePurchases
-        ).purchases;
+        newUpdatePurchases = addPurchaseAndUpdateLater(purchase, newUpdatePurchases).purchases;
     }
 
     return newUpdatePurchases;
@@ -352,8 +355,8 @@ export const updateAndAddPurchases = (updatePurchases: PurchaseDataType[]) => {
 };
 
 interface oldPurchases extends PurchaseRawDataType {
-  price?: number;
-  income?: boolean;
+    price?: number;
+    income?: boolean;
 }
 export const updateDocuments = async () => {
     const q = query(collection(db, dbNames.purchase), orderBy('payDate', 'asc'));
@@ -365,40 +368,36 @@ export const updateDocuments = async () => {
     const lastPurchases: Record<string, number> = {};
     const purchases = await Promise.all(
         data.docs.map(async (doc) => {
-            return { ...{ id: doc.id, ...doc.data() } as oldPurchases, doc };
+            return { ...({ id: doc.id, ...doc.data() } as oldPurchases), doc };
         })
     );
 
-    purchases
-        .forEach((data) => {
-            console.log(data)
-            if (!data.tabId) return;
-            const assetId = String(data.method.assetId);
-            const lastBalances = lastPurchases[assetId];
-            if (!lastBalances) lastPurchases[assetId] = 0;
-            const difference =
-        data.difference ?? (data.income ? data.price : -(data.price ?? 0));
-            const balance =
-        Number(lastBalances ? lastBalances : 0) +
-        Number(difference);
+    purchases.forEach((data) => {
+        console.log(data);
+        if (!data.tabId) return;
+        const assetId = String(data.method.assetId);
+        const lastBalances = lastPurchases[assetId];
+        if (!lastBalances) lastPurchases[assetId] = 0;
+        const difference = data.difference ?? (data.income ? data.price : -(data.price ?? 0));
+        const balance = Number(lastBalances ? lastBalances : 0) + Number(difference);
 
-            const docRef = doc(db, dbNames.purchase, data.id);
-            batch.update(docRef, {
-                difference,
-                balance,
-                assetId: data.method.assetId,
-                timestamp: new Date()
-            });
-
-            lastPurchases[assetId] = balance;
+        const docRef = doc(db, dbNames.purchase, data.id);
+        batch.update(docRef, {
+            difference,
+            balance,
+            assetId: data.method.assetId,
+            timestamp: new Date(),
         });
+
+        lastPurchases[assetId] = balance;
+    });
     await batch.commit();
     window.location.reload();
     console.log('データを更新しました');
-}
+};
 
-export const getPayDate = (purchase: { method: MethodType, date: Date }) => {
+export const getPayDate = (purchase: { method: MethodType; date: Date }) => {
     const { method, date } = purchase;
     const { timing, timingDate } = method;
     return timing === '即時' ? date : getPayLaterDate(date, timingDate);
-}
+};

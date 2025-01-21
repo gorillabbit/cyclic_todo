@@ -62,20 +62,20 @@ export const formatTimeJa = (time: number | Date) => {
 export const calculateNext期日 = (task: TaskType, 更新元date: Date) => {
     const 周期日数 = parseInt(task.周期日数);
     switch (task.周期単位) {
-    case '日':
-        更新元date.setDate(更新元date.getDate() + 周期日数);
-        break;
-    case '週':
-        更新元date.setDate(更新元date.getDate() + 周期日数 * 7);
-        break;
-    case '月':
-        更新元date.setMonth(更新元date.getMonth() + 周期日数);
-        break;
-    case '年':
-        更新元date.setFullYear(更新元date.getFullYear() + 周期日数);
-        break;
-    default:
-        break;
+        case '日':
+            更新元date.setDate(更新元date.getDate() + 周期日数);
+            break;
+        case '週':
+            更新元date.setDate(更新元date.getDate() + 周期日数 * 7);
+            break;
+        case '月':
+            更新元date.setMonth(更新元date.getMonth() + 周期日数);
+            break;
+        case '年':
+            更新元date.setFullYear(更新元date.getFullYear() + 周期日数);
+            break;
+        default:
+            break;
     }
     return formatDateJa(更新元date);
 };

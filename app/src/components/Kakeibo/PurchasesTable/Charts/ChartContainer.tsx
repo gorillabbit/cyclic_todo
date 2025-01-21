@@ -65,9 +65,7 @@ const DoughnutContainer = ({
         [monthlyPurchases]
     );
 
-    const currentMonthSpentList = PurchasesWithoutTransfer.filter(
-        (p) => p.difference < 0
-    );
+    const currentMonthSpentList = PurchasesWithoutTransfer.filter((p) => p.difference < 0);
 
     // 今月使った金額を示す。カードの支払は含まない
     const currentMonthNetSpentList = currentMonthSpentList.filter((spent) =>
@@ -82,16 +80,12 @@ const DoughnutContainer = ({
     const currentMonthPayment = sumSpentAndIncome(currentMonthPaymentList);
 
     // 今月の支払金額(支払い方法ごと)
-    const currentMonthPaymentCategoryList = currentMonthPaymentList.map(
-        (p) => ({
-            ...p,
-            category: p.method.label,
-        })
-    );
+    const currentMonthPaymentCategoryList = currentMonthPaymentList.map((p) => ({
+        ...p,
+        category: p.method.label,
+    }));
 
-    const currentMonthIncomeList = PurchasesWithoutTransfer.filter(
-        (p) => p.difference > 0
-    );
+    const currentMonthIncomeList = PurchasesWithoutTransfer.filter((p) => p.difference > 0);
     const currentMonthIncome = sumSpentAndIncome(currentMonthIncomeList);
 
     const plainProps = {

@@ -1,0 +1,10 @@
+# Ignore build output
+lib/
+build/
+dist/
+node_modules/
+
+# Ignore configuration files
+.eslintcache
+.env
+.env.*

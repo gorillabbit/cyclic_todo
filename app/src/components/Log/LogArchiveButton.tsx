@@ -7,10 +7,7 @@ interface LogDeleteButtonProps {
     log: LogType;
 }
 
-const archiveLog = (
-    log: LogType,
-    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
-) => {
+const archiveLog = (log: LogType, event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     event.stopPropagation();
     updateDocLog(log.id, { archived: !log.archived });
 };

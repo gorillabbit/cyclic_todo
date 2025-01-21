@@ -6,19 +6,12 @@ const EventContent = (eventInfo: {
     backgroundColor?: string;
 }) => {
     return (
-        <Tooltip
-            title={eventInfo.timeText + ' ' + eventInfo.event._def.title}
-            disableInteractive
-        >
+        <Tooltip title={eventInfo.timeText + ' ' + eventInfo.event._def.title} disableInteractive>
             <Box width="100%" display="flex" justifyContent="center">
                 <Box
                     width={10}
                     height={10}
-                    bgcolor={
-                        eventInfo.backgroundColor
-                            ? eventInfo.backgroundColor
-                            : '#3788d8'
-                    }
+                    bgcolor={eventInfo.backgroundColor ? eventInfo.backgroundColor : '#3788d8'}
                     borderRadius="50%"
                 />
             </Box>

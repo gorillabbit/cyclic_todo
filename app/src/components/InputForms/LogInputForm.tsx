@@ -23,11 +23,7 @@ interface LogInputFormProp {
 
 const auth = getAuth();
 
-const LogInputForm: React.FC<LogInputFormProp> = ({
-    propLog,
-    openDialog,
-    setIsOpenEditDialog,
-}) => {
+const LogInputForm: React.FC<LogInputFormProp> = ({ propLog, openDialog, setIsOpenEditDialog }) => {
     const { Account } = useAccount();
     const { tabId } = useTab();
     const defaultNewLog: InputLogType = {
@@ -56,19 +52,13 @@ const LogInputForm: React.FC<LogInputFormProp> = ({
         ],
     };
 
-    const [newLog, setNewLog] = useState<InputLogType | LogType>(
-        propLog ?? defaultNewLog
+    const [newLog, setNewLog] = useState<InputLogType | LogType>(propLog ?? defaultNewLog);
+    const [newAccessibleAccountIds, setNewAccessibleAccountIds] = useState<string[]>(
+        propLog?.accessibleAccounts?.map((account) => account.id) ?? []
     );
-    const [newAccessibleAccountIds, setNewAccessibleAccountIds] = useState<
-        string[]
-    >(propLog?.accessibleAccounts?.map((account) => account.id) ?? []);
 
     const handleNewLogInput = (name: string, value: unknown) => {
-        if (
-            name === 'intervalNum' &&
-            typeof value === 'string' &&
-            parseInt(value, 10) <= 0
-        ) {
+        if (name === 'intervalNum' && typeof value === 'string' && parseInt(value, 10) <= 0) {
             alert('0以下は入力できません。');
             return;
         }
@@ -126,16 +116,12 @@ const LogInputForm: React.FC<LogInputFormProp> = ({
                             label="説明"
                             value={newLog.description}
                             multiline
-                            onChange={(e) =>
-                                handleNewLogInput('description', e.target.value)
-                            }
+                            onChange={(e) => handleNewLogInput('description', e.target.value)}
                             placeholder="説明を入力"
                         />
                         <StyledCheckbox
                             value={newLog.duration}
-                            handleCheckbox={() =>
-                                handleNewLogInput('duration', !newLog.duration)
-                            }
+                            handleCheckbox={() => handleNewLogInput('duration', !newLog.duration)}
                         >
                             スパン
                         </StyledCheckbox>
@@ -158,10 +144,7 @@ const LogInputForm: React.FC<LogInputFormProp> = ({
                                         value={newLog.voiceAnnounceNum}
                                         type="number"
                                         onChange={(e) =>
-                                            handleNewLogInput(
-                                                'voiceAnnounceNum',
-                                                e.target.value
-                                            )
+                                            handleNewLogInput('voiceAnnounceNum', e.target.value)
                                         }
                                         sx={{ maxWidth: 100 }}
                                     />
@@ -170,10 +153,7 @@ const LogInputForm: React.FC<LogInputFormProp> = ({
                                     <Select
                                         value={newLog.voiceAnnounceUnit}
                                         onChange={(e) =>
-                                            handleNewLogInput(
-                                                'voiceAnnounceUnit',
-                                                e.target.value
-                                            )
+                                            handleNewLogInput('voiceAnnounceUnit', e.target.value)
                                         }
                                     >
                                         <MenuItem value="秒">秒</MenuItem>
@@ -189,9 +169,7 @@ const LogInputForm: React.FC<LogInputFormProp> = ({
                         )}
                         <StyledCheckbox
                             value={newLog.interval}
-                            handleCheckbox={() =>
-                                handleNewLogInput('interval', !newLog.interval)
-                            }
+                            handleCheckbox={() => handleNewLogInput('interval', !newLog.interval)}
                         >
                             標準間隔
                         </StyledCheckbox>
@@ -202,20 +180,14 @@ const LogInputForm: React.FC<LogInputFormProp> = ({
                                     value={newLog.intervalNum}
                                     type="number"
                                     onChange={(e) =>
-                                        handleNewLogInput(
-                                            'intervalNum',
-                                            e.target.value
-                                        )
+                                        handleNewLogInput('intervalNum', e.target.value)
                                     }
                                     sx={{ maxWidth: 100 }}
                                 />
                                 <Select
                                     value={newLog.intervalUnit}
                                     onChange={(e) =>
-                                        handleNewLogInput(
-                                            'intervalUnit',
-                                            e.target.value
-                                        )
+                                        handleNewLogInput('intervalUnit', e.target.value)
                                     }
                                 >
                                     <MenuItem value="秒">秒</MenuItem>
@@ -231,10 +203,7 @@ const LogInputForm: React.FC<LogInputFormProp> = ({
                         <StyledCheckbox
                             value={newLog.availableMemo}
                             handleCheckbox={() =>
-                                handleNewLogInput(
-                                    'availableMemo',
-                                    !newLog.availableMemo
-                                )
+                                handleNewLogInput('availableMemo', !newLog.availableMemo)
                             }
                         >
                             完了時メモ
@@ -248,31 +217,20 @@ const LogInputForm: React.FC<LogInputFormProp> = ({
                                         multiple
                                         value={newAccessibleAccountIds}
                                         label="共有アカウント"
-                                        onChange={(e) =>
-                                            handleMultipleSelect(e.target.value)
-                                        }
+                                        onChange={(e) => handleMultipleSelect(e.target.value)}
                                     >
-                                        {Account.linkedAccounts.map(
-                                            (account) => (
-                                                <MenuItem
-                                                    key={account.id}
-                                                    value={account.id}
-                                                >
-                                                    {account.name}
-                                                </MenuItem>
-                                            )
-                                        )}
+                                        {Account.linkedAccounts.map((account) => (
+                                            <MenuItem key={account.id} value={account.id}>
+                                                {account.name}
+                                            </MenuItem>
+                                        ))}
                                     </Select>
                                 </FormControl>
                             )}
                     </>
                 )}
             </FormGroup>
-            <Button
-                sx={{ my: 1 }}
-                variant="contained"
-                onClick={propLog ? editLog : addLog}
-            >
+            <Button sx={{ my: 1 }} variant="contained" onClick={propLog ? editLog : addLog}>
                 {propLog ? '変更' : '追加'}
             </Button>
         </Box>

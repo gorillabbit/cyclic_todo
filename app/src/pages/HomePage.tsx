@@ -20,14 +20,7 @@ type PlainHomePageProps = {
 };
 
 const PlainHomePage = memo(
-    ({
-        tabValue,
-        setTabValue,
-        pinnedTabNum,
-        setPinnedTab,
-        tabs,
-        Account,
-    }: PlainHomePageProps) => {
+    ({ tabValue, setTabValue, pinnedTabNum, setPinnedTab, tabs, Account }: PlainHomePageProps) => {
         return (
             <>
                 {Account && (
@@ -46,12 +39,8 @@ const PlainHomePage = memo(
                                 <TabProvider key={tab.id} tab={tab}>
                                     {tabValue === index && (
                                         <>
-                                            {tab.type === 'task' && (
-                                                <TaskPage />
-                                            )}
-                                            {tab.type === 'purchase' && (
-                                                <PurchasePage />
-                                            )}
+                                            {tab.type === 'task' && <TaskPage />}
+                                            {tab.type === 'purchase' && <PurchasePage />}
                                         </>
                                     )}
                                 </TabProvider>
@@ -76,9 +65,7 @@ const HomePage = memo(() => {
         const getTabsByAccount = async (account: AccountType) => {
             const dataPromises = account.useTabIds.map(async (id) => {
                 const docSnap = await getDoc(doc(db, 'Tabs', id));
-                return docSnap.exists()
-                    ? { id: docSnap.id, ...docSnap.data() }
-                    : null;
+                return docSnap.exists() ? { id: docSnap.id, ...docSnap.data() } : null;
             });
             const data = await Promise.all(dataPromises);
             return data.filter((tab) => tab !== null) as TabType[];

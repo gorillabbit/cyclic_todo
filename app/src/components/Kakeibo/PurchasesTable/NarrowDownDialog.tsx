@@ -19,9 +19,7 @@ import { Timestamp } from 'firebase/firestore';
 type NarrowDownDialogProps = {
     setOpenNarrowDown: React.Dispatch<React.SetStateAction<boolean>>;
     openNarrowDown: boolean;
-    setFilterObject: React.Dispatch<
-        React.SetStateAction<Partial<PurchaseDataType>>
-    >;
+    setFilterObject: React.Dispatch<React.SetStateAction<Partial<PurchaseDataType>>>;
     filterObject: Partial<PurchaseDataType>;
 };
 
@@ -61,21 +59,14 @@ const NarrowDownDialog = ({
     };
 
     return (
-        <Dialog
-            open={openNarrowDown}
-            onClose={handleCancelButton}
-            fullWidth
-            maxWidth="sm"
-        >
+        <Dialog open={openNarrowDown} onClose={handleCancelButton} fullWidth maxWidth="sm">
             <DialogTitle>絞り込み</DialogTitle>
             <DialogContent>
                 <Box display="flex" flexDirection="column" gap={1}>
                     <TextField
                         label="商品名"
                         value={filterObject.title}
-                        onChange={(e) =>
-                            handleFilterApply('title', e.target.value)
-                        }
+                        onChange={(e) => handleFilterApply('title', e.target.value)}
                     />
                     <CategorySelector
                         newCategory={filterObject.category ?? ''}
@@ -89,16 +80,12 @@ const NarrowDownDialog = ({
                     <TextField
                         label="メモ"
                         value={filterObject.description}
-                        onChange={(e) =>
-                            handleFilterApply('description', e.target.value)
-                        }
+                        onChange={(e) => handleFilterApply('description', e.target.value)}
                     />
                     <TextField
                         label="金額"
                         value={filterObject.difference}
-                        onChange={(e) =>
-                            handleFilterApply('difference', e.target.value)
-                        }
+                        onChange={(e) => handleFilterApply('difference', e.target.value)}
                     />
                     {/* TODO undefinedを扱うのでエラーになるのをどうにかする */}
                     <DatePicker
@@ -108,28 +95,22 @@ const NarrowDownDialog = ({
                         slotProps={{
                             field: {
                                 clearable: true,
-                                onClear: () =>
-                                    handleFilterApply('date', undefined),
+                                onClear: () => handleFilterApply('date', undefined),
                             },
                         }}
                     />
                     <Autocomplete
                         value={
-                            assetLabelList.find(
-                                (a) => a.id === filterObject.assetId
-                            ) ?? defaultAsset
+                            assetLabelList.find((a) => a.id === filterObject.assetId) ??
+                            defaultAsset
                         }
                         sx={{ minWidth: 150 }}
                         options={assetLabelList}
                         autoSelect
                         clearOnEscape
-                        isOptionEqualToValue={(option, value) =>
-                            option.label === value.label
-                        }
+                        isOptionEqualToValue={(option, value) => option.label === value.label}
                         onChange={(_e, v) => handleFilterApply('asset', v)}
-                        renderInput={(params) => (
-                            <TextField {...params} label="資産" />
-                        )}
+                        renderInput={(params) => <TextField {...params} label="資産" />}
                     />
                 </Box>
             </DialogContent>

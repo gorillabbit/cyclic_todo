@@ -12,14 +12,7 @@ import { Box } from '@mui/material';
 import { PurchaseDataType } from '../../../../types/purchaseTypes';
 import { generateColor, makeCategorySet } from './ChartUtils';
 
-ChartJS.register(
-    CategoryScale,
-    LinearScale,
-    BarElement,
-    Title,
-    Tooltip,
-    Legend
-);
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 interface DoughnutChartProps {
     purchaseList: PurchaseDataType[];
@@ -27,9 +20,7 @@ interface DoughnutChartProps {
 }
 
 const useChartData = (purchaseList: PurchaseDataType[]) => {
-    const sortedPurchaseList = purchaseList.sort((a, b) =>
-        a.category.localeCompare(b.category)
-    );
+    const sortedPurchaseList = purchaseList.sort((a, b) => a.category.localeCompare(b.category));
     const categories = makeCategorySet(sortedPurchaseList);
 
     const totalData = categories.map((category, index) => ({
@@ -61,10 +52,7 @@ const useChartData = (purchaseList: PurchaseDataType[]) => {
     return combinedData;
 };
 
-const StackedBarChart: React.FC<DoughnutChartProps> = ({
-    purchaseList,
-    title,
-}) => {
+const StackedBarChart: React.FC<DoughnutChartProps> = ({ purchaseList, title }) => {
     const combinedData = useChartData(purchaseList);
 
     const options = {

@@ -62,11 +62,7 @@ const addDocOperation = async (collectionName: string, data: any) => {
     }
 };
 
-const updateDocOperation = async (
-    collectionName: string,
-    id: string,
-    feature: any
-) => {
+const updateDocOperation = async (collectionName: string, id: string, feature: any) => {
     try {
         return await updateDoc(doc(db, collectionName, id), feature);
     } catch (e) {
@@ -101,8 +97,7 @@ export const addDocTask = (task: TaskInputType) =>
     addDocOperation(dbNames.task, { ...task, completed: false });
 export const updateDocTask = (id: string, feature: Partial<TaskType>) =>
     updateDocOperation(dbNames.task, id, feature);
-export const deleteDocTask = (id: string) =>
-    deleteDocOperation(dbNames.task, id);
+export const deleteDocTask = (id: string) => deleteDocOperation(dbNames.task, id);
 
 export const addDocLog = (doc: InputLogType) =>
     addDocOperation(dbNames.log, { ...doc, reviewed: false });
@@ -119,8 +114,7 @@ export const addDocAccount = (account: AccountInputType) =>
     addDocOperation(dbNames.account, account);
 export const updateDocAccount = (id: string, updates: Partial<AccountType>) =>
     updateDocOperation(dbNames.account, id, updates);
-export const deleteDocAccount = (id: string) =>
-    deleteDocOperation(dbNames.account, id);
+export const deleteDocAccount = (id: string) => deleteDocOperation(dbNames.account, id);
 
 /**
  *
@@ -132,13 +126,9 @@ export const addDocPurchase = (v: PurchaseDataType) =>
         ...defaultPurchaseData,
         ...v,
     });
-export const updateDocPurchase = (
-    id: string,
-    updates: Partial<PurchaseDataType>
-) => updateDocOperation(dbNames.purchase, id, updates);
-export const batchAddDocPurchase = (
-    purchaseList: (PurchaseDataType & { id?: string })[]
-) => {
+export const updateDocPurchase = (id: string, updates: Partial<PurchaseDataType>) =>
+    updateDocOperation(dbNames.purchase, id, updates);
+export const batchAddDocPurchase = (purchaseList: (PurchaseDataType & { id?: string })[]) => {
     const batch = writeBatch(db);
     purchaseList.forEach((obj) => {
         if (obj.id) {
@@ -151,9 +141,7 @@ export const batchAddDocPurchase = (
     });
     batch.commit().catch((error) => console.error('バッチ書き込み失敗:', error));
 };
-export const bulkUpdateDocPurchase = async (
-    purchaseList: PurchaseDataType[]
-) => {
+export const bulkUpdateDocPurchase = async (purchaseList: PurchaseDataType[]) => {
     const batch = writeBatch(db);
     purchaseList.forEach((obj: PurchaseDataType) => {
         const { id, ...updateFields } = obj; // id を取り除いて残りのフィールドを取得
@@ -167,20 +155,17 @@ export const bulkUpdateDocPurchase = async (
     }
 };
 
-export const deleteDocPurchase = (id: string) =>
-    deleteDocOperation(dbNames.purchase, id);
+export const deleteDocPurchase = (id: string) => deleteDocOperation(dbNames.purchase, id);
 
 export const addDocPurchaseTemplate = (v: InputFieldPurchaseType & { tabId: string }) =>
     addDocOperation(dbNames.purchaseTemplate, v);
 export const deleteDocPurchaseTemplate = (id: string) =>
     deleteDocOperation(dbNames.purchaseTemplate, id);
 
-export const addDocAsset = (asset: InputAssetType) =>
-    addDocOperation(dbNames.asset, asset);
+export const addDocAsset = (asset: InputAssetType) => addDocOperation(dbNames.asset, asset);
 export const updateDocAsset = (id: string, updates: Partial<AssetType>) =>
     updateDocOperation(dbNames.asset, id, updates);
-export const deleteDocAsset = (id: string) =>
-    deleteDocOperation(dbNames.asset, id);
+export const deleteDocAsset = (id: string) => deleteDocOperation(dbNames.asset, id);
 
 export const addDocPurchaseSchedule = (v: InputPurchaseScheduleType) =>
     addDocOperation(dbNames.purchaseSchedule, v);
@@ -191,20 +176,17 @@ export const updateDocPurchaseSchedule = (
 export const deleteDocPurchaseSchedule = (id: string) =>
     deleteDocOperation(dbNames.purchaseSchedule, id);
 
-export const addDocMethod = (v: MethodType) =>
-    addDocOperation(dbNames.method, v);
+export const addDocMethod = (v: MethodType) => addDocOperation(dbNames.method, v);
 export const updateDocMethod = (id: string, updates: MethodListType) =>
     updateDocOperation(dbNames.method, id, updates);
-export const deleteDocMethod = (id: string) =>
-    deleteDocOperation(dbNames.method, id);
+export const deleteDocMethod = (id: string) => deleteDocOperation(dbNames.method, id);
 
 export const addDocTransferTemplate = (v: InputTransferType & { tabId: string }) =>
     addDocOperation(dbNames.transferTemplate, v);
 export const deleteDocTransferTemplate = (id: string) =>
     deleteDocOperation(dbNames.transferTemplate, id);
 
-export const addDocTab = (tab: InputTabType) =>
-    addDocOperation(dbNames.tab, tab);
+export const addDocTab = (tab: InputTabType) => addDocOperation(dbNames.tab, tab);
 export const updateDocTab = (id: string, updates: Partial<InputTabType>) =>
     updateDocOperation(dbNames.tab, id, updates);
 export const deleteDocTab = (id: string) => deleteDocOperation(dbNames.tab, id);

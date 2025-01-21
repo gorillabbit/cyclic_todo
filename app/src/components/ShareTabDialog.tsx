@@ -51,13 +51,10 @@ const PlainShareTabDialog = memo(
                                         onChange={handleCheckbox}
                                         value={index}
                                         checked={
-                                            tabSharedAccounts.includes(
-                                                account.id
-                                            ) || checked.includes(index)
+                                            tabSharedAccounts.includes(account.id) ||
+                                            checked.includes(index)
                                         }
-                                        disabled={tabSharedAccounts.includes(
-                                            account.id
-                                        )}
+                                        disabled={tabSharedAccounts.includes(account.id)}
                                     />
                                 }
                                 label={account.name}
@@ -85,33 +82,25 @@ const ShareTabDialog = () => {
     const { tab } = useTab();
     const [checked, setChecked] = useState<number[]>([]);
 
-    const handleCheckbox = useCallback(
-        (e: React.ChangeEvent<HTMLInputElement>) => {
-            setChecked((prev) =>
-                e.target.checked
-                    ? [...prev, Number(e.target.value)]
-                    : prev.filter((num) => num !== Number(e.target.value))
-            );
-        },
-        []
-    );
+    const handleCheckbox = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+        setChecked((prev) =>
+            e.target.checked
+                ? [...prev, Number(e.target.value)]
+                : prev.filter((num) => num !== Number(e.target.value))
+        );
+    }, []);
 
     const handleShareButton = useCallback(() => {
         if (!Account) return;
         checked.forEach((index) => {
-            getDoc(doc(db, 'Accounts', Account.linkedAccounts[index].id)).then(
-                (docSnap) => {
-                    if (!docSnap.exists()) return;
-                    updateDocAccount(docSnap.id, {
-                        useTabIds: [...docSnap.data().useTabIds, tab.id],
-                    });
-                }
-            );
+            getDoc(doc(db, 'Accounts', Account.linkedAccounts[index].id)).then((docSnap) => {
+                if (!docSnap.exists()) return;
+                updateDocAccount(docSnap.id, {
+                    useTabIds: [...docSnap.data().useTabIds, tab.id],
+                });
+            });
             updateDocTab(tab.id, {
-                sharedAccounts: [
-                    ...tab.sharedAccounts,
-                    Account.linkedAccounts[index],
-                ],
+                sharedAccounts: [...tab.sharedAccounts, Account.linkedAccounts[index]],
             });
         });
         setOpen(false);

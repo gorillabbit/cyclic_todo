@@ -43,14 +43,11 @@ const MonthlyStackedBarChart = () => {
                 result[month][incomeCategory] =
                     (result[month][incomeCategory] || 0) + differenceNumber;
 
-                result[month].incomeTotal =
-                    (result[month].incomeTotal || 0) + differenceNumber;
+                result[month].incomeTotal = (result[month].incomeTotal || 0) + differenceNumber;
             } else {
-                result[month][category] =
-                    (result[month][category] || 0) + differenceNumber;
+                result[month][category] = (result[month][category] || 0) + differenceNumber;
 
-                result[month].spentTotal =
-                    (result[month].spentTotal || 0) + differenceNumber;
+                result[month].spentTotal = (result[month].spentTotal || 0) + differenceNumber;
             }
         });
 
@@ -60,10 +57,7 @@ const MonthlyStackedBarChart = () => {
         }));
     };
 
-    const transformedSpent = useMemo(
-        () => processData(pastPurchase),
-        [pastPurchase]
-    );
+    const transformedSpent = useMemo(() => processData(pastPurchase), [pastPurchase]);
 
     const spentPurchases = pastPurchase.filter((p) => p.difference < 0);
     const spentCategories = makeCategorySet(spentPurchases);

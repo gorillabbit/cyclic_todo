@@ -29,9 +29,13 @@ const Stopwatch: React.FC<{ log: LogType }> = ({ log }) => {
             setElapsedTime((prevTime) => prevTime + 1);
         }, 1000);
 
-        const announceInterval = setInterval(() => {
-            setAnnounceCount((prev) => prev + 1);
-        }, UnitTimeMap[(log.voiceAnnounceUnit ?? '秒') as keyof typeof UnitTimeMap] * (log.voiceAnnounceNum ?? 60));
+        const announceInterval = setInterval(
+            () => {
+                setAnnounceCount((prev) => prev + 1);
+            },
+            UnitTimeMap[(log.voiceAnnounceUnit ?? '秒') as keyof typeof UnitTimeMap] *
+                (log.voiceAnnounceNum ?? 60)
+        );
 
         return () => {
             clearInterval(interval);
@@ -45,9 +49,7 @@ const Stopwatch: React.FC<{ log: LogType }> = ({ log }) => {
                 /\b0[^\d\s]+\s*/g,
                 ''
             );
-            window.speechSynthesis.speak(
-                new SpeechSynthesisUtterance(shortedElapsedTime)
-            );
+            window.speechSynthesis.speak(new SpeechSynthesisUtterance(shortedElapsedTime));
         }
     }, [announceCount, elapsedTime, log.availableVoiceAnnounce]);
 

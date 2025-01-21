@@ -1,11 +1,4 @@
-import {
-    query,
-    collection,
-    onSnapshot,
-    QueryConstraint,
-    where,
-    getDocs,
-} from 'firebase/firestore';
+import { query, collection, onSnapshot, QueryConstraint, where, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useMemo, useState, useCallback, useEffect } from 'react';
 import { getAuth, onAuthStateChanged, User } from 'firebase/auth';

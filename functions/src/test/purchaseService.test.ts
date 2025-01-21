@@ -8,7 +8,7 @@ function createTestRequest(data: any): functions.https.CallableRequest {
     return {
         data,
         rawRequest: {} as any,
-        acceptsStreaming: false
+        acceptsStreaming: false,
     };
 }
 
@@ -21,7 +21,7 @@ describe('getPurchases', () => {
         const wrapped = testEnv.wrap(getPurchases);
         const testData = createTestRequest({
             userId: 'test-user-id',
-            tabId: 'test-tab-id'
+            tabId: 'test-tab-id',
         });
 
         const result = await wrapped(testData);
@@ -43,7 +43,7 @@ describe('getPurchases', () => {
     it('should handle database errors', async () => {
         const wrapped = testEnv.wrap(getPurchases);
         const testData = createTestRequest({
-            userId: 'error-user-id'
+            userId: 'error-user-id',
         });
 
         await expect(wrapped(testData)).rejects.toThrow('Database operation failed');

@@ -6,33 +6,29 @@ import { useTab } from '../../hooks/useData.js';
 import { dbNames } from '../../firebase.js';
 
 type AssetContextType = {
-	assetList: AssetListType[];
+    assetList: AssetListType[];
 };
 
 // Contextを作成（初期値は空のassetListとダミーのsetAssetList関数）
 export const AssetContext = createContext<AssetContextType>({
-	assetList: [],
+    assetList: [],
 });
 
 export const AssetProvider = memo(({ children }: { children: ReactNode }) => {
-	const { tabId } = useTab();
-	const assetQueryConstraints = useMemo(
-		() => [orderBy('timestamp'), where('tabId', '==', tabId)],
-		[tabId]
-	);
-	const { documents: assetList } = useFirestoreQuery<AssetListType>(
-		dbNames.asset,
-		assetQueryConstraints,
-		true
-	);
+    const { tabId } = useTab();
+    const assetQueryConstraints = useMemo(
+        () => [orderBy('timestamp'), where('tabId', '==', tabId)],
+        [tabId]
+    );
+    const { documents: assetList } = useFirestoreQuery<AssetListType>(
+        dbNames.asset,
+        assetQueryConstraints,
+        true
+    );
 
-	const context = useMemo(() => {
-		return { assetList };
-	}, [assetList]);
+    const context = useMemo(() => {
+        return { assetList };
+    }, [assetList]);
 
-	return (
-		<AssetContext.Provider value={context}>
-			{children}
-		</AssetContext.Provider>
-	);
+    return <AssetContext.Provider value={context}>{children}</AssetContext.Provider>;
 });

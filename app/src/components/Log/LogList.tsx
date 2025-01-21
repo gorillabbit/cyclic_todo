@@ -11,27 +11,16 @@ const LogList = () => {
 
     return (
         <>
-            <Masonry
-                sx={{ margin: '2px' }}
-                columns={{ xs: 2, sm: 3, md: 4, lg: 5, xl: 6 }}
-            >
+            <Masonry sx={{ margin: '2px' }} columns={{ xs: 2, sm: 3, md: 4, lg: 5, xl: 6 }}>
                 {logList
                     .filter((log) => log.archived !== true)
                     .map((log) => (
-                        <Log
-                            log={log}
-                            logsCompleteLogs={logsCompleteLogsList}
-                            key={log.id}
-                        />
+                        <Log log={log} logsCompleteLogs={logsCompleteLogsList} key={log.id} />
                     ))}
                 {sharedLogList
                     .filter((log) => log.archived !== true)
                     .map((log) => (
-                        <Log
-                            log={log}
-                            logsCompleteLogs={logsCompleteLogsList}
-                            key={log.id}
-                        />
+                        <Log log={log} logsCompleteLogs={logsCompleteLogsList} key={log.id} />
                     ))}
             </Masonry>
             <Button
@@ -40,23 +29,14 @@ const LogList = () => {
                 onClick={() => setShowArchived(!showArchived)}
                 sx={{ marginY: 2 }}
             >
-                {showArchived
-                    ? 'アーカイブログを非表示'
-                    : 'アーカイブログを表示'}
+                {showArchived ? 'アーカイブログを非表示' : 'アーカイブログを表示'}
             </Button>
             {showArchived && ( // 状態変数に応じてarchivedログのリストを表示
-                <Masonry
-                    sx={{ margin: '2px' }}
-                    columns={{ xs: 2, sm: 3, md: 4, lg: 5, xl: 6 }}
-                >
+                <Masonry sx={{ margin: '2px' }} columns={{ xs: 2, sm: 3, md: 4, lg: 5, xl: 6 }}>
                     {mergerLogList
                         .filter((log) => log.archived === true)
                         .map((log) => (
-                            <Log
-                                log={log}
-                                logsCompleteLogs={logsCompleteLogsList}
-                                key={log.id}
-                            />
+                            <Log log={log} logsCompleteLogs={logsCompleteLogsList} key={log.id} />
                         ))}
                 </Masonry>
             )}

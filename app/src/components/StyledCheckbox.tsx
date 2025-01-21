@@ -6,11 +6,7 @@ interface StyledCheckboxProps {
     children: string;
 }
 
-const StyledCheckbox: React.FC<StyledCheckboxProps> = ({
-    value,
-    handleCheckbox,
-    children,
-}) => {
+const StyledCheckbox: React.FC<StyledCheckboxProps> = ({ value, handleCheckbox, children }) => {
     return (
         <Button
             sx={{

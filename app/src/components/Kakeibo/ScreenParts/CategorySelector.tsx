@@ -7,11 +7,7 @@ type CategorySelectorProps = {
     isSmall?: boolean;
 };
 
-const CategorySelector = ({
-    newCategory,
-    handleInput,
-    isSmall,
-}: CategorySelectorProps) => {
+const CategorySelector = ({ newCategory, handleInput, isSmall }: CategorySelectorProps) => {
     const { categorySet } = usePurchase();
     const handleChange = (v: string | null) => {
         handleInput('category', v || ''); // nullだとグラフがバグるので空文字に変換
@@ -26,11 +22,7 @@ const CategorySelector = ({
             clearOnEscape
             onChange={(_e, v) => handleChange(v)}
             renderInput={(params) => (
-                <TextField
-                    {...params}
-                    label="カテゴリー"
-                    size={isSmall ? 'small' : 'medium'}
-                />
+                <TextField {...params} label="カテゴリー" size={isSmall ? 'small' : 'medium'} />
             )}
         />
     );

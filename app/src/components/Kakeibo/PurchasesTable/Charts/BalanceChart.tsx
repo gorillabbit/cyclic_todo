@@ -61,9 +61,7 @@ const BalanceChart = () => {
                 <Tooltip
                     filterNull
                     cursor={{ stroke: 'red', strokeWidth: 0.5 }}
-                    labelFormatter={(label) =>
-                        new Date(label).toLocaleDateString()
-                    }
+                    labelFormatter={(label) => new Date(label).toLocaleDateString()}
                 />
                 <Brush />
                 <CartesianGrid stroke="#eee" strokeDasharray="5 5" />

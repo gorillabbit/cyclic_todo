@@ -7,10 +7,7 @@ interface LogStartButtonProps {
     log: LogType;
 }
 
-const logStart = (
-    log: LogType,
-    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
-) => {
+const logStart = (log: LogType, event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     event.stopPropagation();
     const logsCompleteLogs = {
         logId: log.id,

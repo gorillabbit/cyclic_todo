@@ -6,14 +6,7 @@ import { getBackgroundColor } from '../../utilities/taskUtilities';
 import { Timestamp } from 'firebase/firestore';
 import TaskDetail from './TaskDetail';
 import { TaskType } from '../../types';
-import {
-    Box,
-    Button,
-    Card,
-    Dialog,
-    DialogContent,
-    Typography,
-} from '@mui/material';
+import { Box, Button, Card, Dialog, DialogContent, Typography } from '@mui/material';
 import ChildTasks from './ChildTask';
 import { getAuth } from 'firebase/auth';
 import { BodyTypography } from '../TypographyWrapper';
@@ -36,11 +29,7 @@ const toggleCompletion = (task: TaskType) => {
         toggleCompletionTimestamp: new Timestamp(getUnixTime(new Date()), 0),
     });
 
-    if (
-        task.completed === false &&
-        task.is周期的 === '完了後に追加' &&
-        auth.currentUser
-    ) {
+    if (task.completed === false && task.is周期的 === '完了後に追加' && auth.currentUser) {
         const newTask = {
             userId: auth.currentUser.uid,
             text: task.text,
@@ -74,12 +63,8 @@ const Task = ({ task, setTaskList, tasklist }: TaskProps) => {
         color: task.completed ? '#5f5f5f' : '',
     };
 
-    const 子tasks = tasklist?.filter(
-        (listTask) => listTask.親taskId === task.id
-    );
-    const 親tasks = tasklist?.filter(
-        (listTask) => listTask.id === task.親taskId
-    );
+    const 子tasks = tasklist?.filter((listTask) => listTask.親taskId === task.id);
+    const 親tasks = tasklist?.filter((listTask) => listTask.id === task.親taskId);
 
     const is完了後追加 = task.is周期的 === '完了後に追加';
     const [open, setOpen] = useState(false);
@@ -87,17 +72,9 @@ const Task = ({ task, setTaskList, tasklist }: TaskProps) => {
 
     return (
         <>
-            <Card
-                sx={tasklistStyle}
-                onClick={() => setOpen((prevOpen) => !prevOpen)}
-            >
+            <Card sx={tasklistStyle} onClick={() => setOpen((prevOpen) => !prevOpen)}>
                 <Box m={2} textAlign="left">
-                    <Box
-                        display="flex"
-                        justifyContent="center"
-                        alignItems="center"
-                        gap={1}
-                    >
+                    <Box display="flex" justifyContent="center" alignItems="center" gap={1}>
                         <Typography
                             variant="h5"
                             textAlign="center"
@@ -114,9 +91,7 @@ const Task = ({ task, setTaskList, tasklist }: TaskProps) => {
                             />
                         </Typography>
                     </Box>
-                    {task.description && (
-                        <BodyTypography text={task.description} />
-                    )}
+                    {task.description && <BodyTypography text={task.description} />}
                     {task.is周期的 !== '周期なし' && (
                         <BodyTypography
                             text={
@@ -165,10 +140,7 @@ const Task = ({ task, setTaskList, tasklist }: TaskProps) => {
                     </Button>
                 </Box>
             </Card>
-            <Dialog
-                open={isOpenEditDialog}
-                onClose={() => setIsOpenEditDialog(false)}
-            >
+            <Dialog open={isOpenEditDialog} onClose={() => setIsOpenEditDialog(false)}>
                 <DialogContent>
                     <TaskInputForm
                         openDialog
