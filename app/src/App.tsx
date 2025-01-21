@@ -39,7 +39,7 @@ const App = memo(() => {
             }
             // リアルタイムでドキュメントのスナップショットを取得
             getAccounts(user.uid).then((data) => {
-                console.log(data);
+                console.log('account', data);
             });
             const unsubscribeFromDoc = onSnapshot(doc(db, 'Accounts', user.uid), (accountDoc) => {
                 setAccount(
