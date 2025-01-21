@@ -42,14 +42,6 @@ jobs:
             - name: Firebase CLIのインストール
               run: npm install -g firebase-tools
 
-            - name: 環境変数の設定
-              run:
-                  firebase functions:secrets:set DB_HOST="${{ secrets.DB_HOST }}" \
-                  DB_PORT="${{ secrets.DB_PORT }}" \
-                  DB_USER="${{ secrets.DB_USER }}" \
-                  DB_PASSWORD="${{ secrets.DB_PASSWORD }}" \
-                  DB_NAME="${{ secrets.DB_NAME }}" \
-
             - name: Firebase Functionsのデプロイ
               uses: w9jds/firebase-action@master
               with:
