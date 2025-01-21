@@ -22,8 +22,8 @@
 		"site": "cyclictodo",
 		"rewrites": [
 			{
-				"source": "/api/purchases",
-				"function": "getPurchases"
+				"source": "/api/**",
+				"function": "api"
 			}
 		]
 	},
