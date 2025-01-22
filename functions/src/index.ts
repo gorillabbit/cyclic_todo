@@ -1,8 +1,9 @@
 import express from 'express';
 import { onRequest } from 'firebase-functions/v2/https';
 import { initializeDatabase } from './db.js';
-import { getPurchasesService } from './services/purchaseService.js';
-import { getAccountsService } from './services/accountService.js';
+import { Accounts } from '../../entity/entities/Accounts.js';
+import { BaseService } from './services/serviceUtils.js';
+import { Purchases } from '../../entity/entities/Purchases.js';
 
 // Create Express app
 const app = express();
@@ -12,39 +13,79 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Initialize database connection
-if (process.env.NODE_ENV !== 'test') {
-    initializeDatabase().catch((err) => {
-        console.error('Failed to initialize database:', err);
-        process.exit(1);
-    });
+initializeDatabase().catch((err) => {
+    console.error('Failed to initialize database:', err);
+    process.exit(1);
+});
+
+
+class AccountService extends BaseService<Accounts> {
+    constructor() {
+        super(Accounts);
+    }
 }
 
-// Mount existing purchase endpoint
-app.get('/api/purchases', async (req, res) => {
+const accountService = new AccountService();
+app.get('/api/account', async (req, res) => {
     try {
-        const { userId, tabId } = req.query;
-        const purchases = await getPurchasesService({
-            userId: userId?.toString(),
-            tabId: tabId?.toString(),
-        });
-        res.status(200).json(purchases);
-    } catch (err) {
-        console.error('Error fetching purchases:', err);
-        res.status(500).json({ error: 'Internal Server Error' });
+        const result = await accountService.getAll(req.body);
+        res.status(200).send(result);
+    } catch (error) {
+        res.status(500).send({ error: error });
     }
 });
 
-// Mount existing purchase endpoint
-app.get('/api/accounts', async (req, res) => {
+app.post('/api/account', async (req, res) => {
     try {
-        const { userId } = req.query;
-        const purchases = await getAccountsService({
-            userId: userId?.toString(),
-        });
-        res.status(200).json(purchases);
-    } catch (err) {
-        console.error('Error fetching purchases:', err);
-        res.status(500).json({ error: 'Internal Server Error' });
+        const result = await accountService.create(req.body);
+        res.status(200).send(result);
+    } catch (error) {
+        res.status(500).send({ error: error });
+    }
+});
+
+app.put('/api/account', async (req, res) => {
+    const { purchaseId, updateData } = req.body;
+    try {
+        const result = await accountService.update(purchaseId, updateData);
+        res.status(200).send(result);
+    } catch (error) {
+        res.status(500).send({ error: error });
+    }
+});
+
+class PurchaseService extends BaseService<Purchases> {
+    constructor() {
+        super(Purchases);
+    }
+}
+
+const purchaseService = new PurchaseService();
+app.get('api/purchase', async (req, res) => {
+    try {
+        const result = await purchaseService.getAll(req.body);
+        res.status(200).send(result);
+    } catch (error) {
+        res.status(500).send({ error: error });
+    }
+});
+
+app.post('/api/purchase', async (req, res) => {
+    try {
+        const result = await purchaseService.create(req.body);
+        res.status(200).send(result);
+    } catch (error) {
+        res.status(500).send({ error: error });
+    }
+});
+
+app.put('/api/purchase', async (req, res) => {
+    const { purchaseId, updateData } = req.body;
+    try {
+        const result = await purchaseService.update(purchaseId, updateData);
+        res.status(200).send(result);
+    } catch (error) {
+        res.status(500).send({ error: error });
     }
 });
 

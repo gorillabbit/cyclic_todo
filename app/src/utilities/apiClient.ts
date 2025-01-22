@@ -1,10 +1,12 @@
+const baseUrl = import.meta.env.VITE_FIREBASE_FUNCTIONS_URL
+
 export const getPurchases = async (userId?: string, tabId?: string): Promise<unknown> => {
     try {
         const params = new URLSearchParams();
         if (userId != null && userId !== '') params.append('userId', userId);
         if (tabId != null && tabId !== '') params.append('tabId', tabId);
 
-        const response = await fetch(`/api/purchases?${params.toString()}`);
+        const response = await fetch(`${baseUrl}/purchase?${params.toString()}`);
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -15,12 +17,12 @@ export const getPurchases = async (userId?: string, tabId?: string): Promise<unk
     }
 };
 
-export const getAccounts = async (userId?: string): Promise<unknown> => {
+export const getAccounts = async (id?: string): Promise<unknown> => {
     try {
         const params = new URLSearchParams();
-        if (userId != null && userId !== '') params.append('userId', userId);
+        if (id != null && id !== '') params.append('id', id);
 
-        const response = await fetch(`/api/accounts?${params.toString()}`);
+        const response = await fetch(`${baseUrl}/account?${params.toString()}`);
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
