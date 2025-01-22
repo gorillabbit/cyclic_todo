@@ -24,7 +24,7 @@ export abstract class BaseService<T extends ObjectLiteral> {
 
     async getAll(
         filters: Record<string, unknown> = {},
-        order: Record<string, 'ASC' | 'DESC'> = { timestamp: 'DESC' }
+        order: Record<string, 'ASC' | 'DESC'> = {}
     ): Promise<T[]> {
         try {
             const entityName = this.getEntityName();
