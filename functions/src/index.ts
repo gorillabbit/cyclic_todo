@@ -61,7 +61,7 @@ class PurchaseService extends BaseService<Purchases> {
 }
 
 const purchaseService = new PurchaseService();
-app.get('api/purchase', async (req, res) => {
+app.get('/api/purchase', async (req, res) => {
     try {
         const result = await purchaseService.getAll(req.body);
         res.status(200).send(result);
