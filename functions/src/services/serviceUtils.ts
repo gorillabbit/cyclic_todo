@@ -7,7 +7,6 @@ import {
 } from 'typeorm';
 import AppDataSource from '../db.js';
 
-
 export abstract class BaseService<T extends ObjectLiteral> {
     protected repository: Repository<T>;
 
@@ -28,20 +27,35 @@ export abstract class BaseService<T extends ObjectLiteral> {
         order: Record<string, 'ASC' | 'DESC'> = { timestamp: 'DESC' }
     ): Promise<T[]> {
         try {
-            const queryBuilder = this.repository.createQueryBuilder('entity');
+            const entityName = this.getEntityName();
+            const queryBuilder = this.repository.createQueryBuilder(entityName.toLowerCase());
       
             for (const [key, value] of Object.entries(filters)) {
                 queryBuilder.andWhere(`${key} = :value`, { value });
             }
 
             for (const [field, direction] of Object.entries(order)) {
-                queryBuilder.addOrderBy(field, direction);
+                queryBuilder.addOrderBy(`${field}`, direction);
             }
 
             return await queryBuilder.getMany();
         } catch (err) {
             return this.handleError('getAll', err);
         }
+    }
+
+    private getEntityName(): string {
+        const target = this.repository.metadata.target;
+        
+        if (typeof target === 'function') {
+            return (target as Function).name;
+        }
+        
+        if (typeof target === 'string') {
+            return target;
+        }
+        
+        throw new Error('Unsupported entity type');
     }
 
     async create(entityData: DeepPartial<T>): Promise<T> {

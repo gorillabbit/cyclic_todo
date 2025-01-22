@@ -57,7 +57,7 @@ export const initializeDatabase = async (): Promise<void> => {
     try {
         await AppDataSource.initialize();
         isInitialized = true;
-        console.log('Database connection initialized');
+        console.log('DB接続が初期化されました');
     } catch (err) {
         console.error(err);
         throw err;
