@@ -31,6 +31,8 @@ jobs:
                   VITE_GOOGLE_CALENDER_apiKey: ${{ secrets.VITE_GOOGLE_CALENDER_apiKey }}
                   VITE_GOOGLE_CALENDER_scope: ${{ secrets.VITE_GOOGLE_CALENDER_scope }}
                   VITE_GOOGLE_CALENDER_discoveryDocs: ${{ secrets.VITE_GOOGLE_CALENDER_discoveryDocs }}
+                  VITE_FIREBASE_FUNCTIONS_URL: ${{ secrets.VITE_FIREBASE_FUNCTIONS_URL }}
+
               run: npm run build --prefix app
 
             - name: エンティティの依存関係をインストール
