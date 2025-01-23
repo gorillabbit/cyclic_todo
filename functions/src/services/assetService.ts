@@ -4,7 +4,7 @@ import { BaseService } from './serviceUtils.js';
 
 class AssetService extends BaseService<Assets> {
     constructor() {
-        super(Assets);
+        super(Assets, 'assets');
     }
 }
 

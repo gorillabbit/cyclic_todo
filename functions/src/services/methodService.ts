@@ -4,7 +4,7 @@ import { BaseService } from './serviceUtils.js';
 
 class MethodService extends BaseService<Methods> {
     constructor() {
-        super(Methods);
+        super(Methods, 'methods');
     }
 }
 
