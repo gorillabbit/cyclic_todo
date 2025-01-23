@@ -42,7 +42,7 @@
     },
     "devDependencies": {
         "@types/cors": "2.8.17",
-        "@types/node": "22.10.7",
+        "@types/node": "22.10.9",
         "@types/react": "19.0.7",
         "@types/react-dom": "19.0.3",
         "@vitejs/plugin-react-swc": "3.7.2",
