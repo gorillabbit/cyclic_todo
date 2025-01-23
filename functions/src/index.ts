@@ -21,7 +21,7 @@ initializeDatabase().catch((err) => {
 
 class AccountService extends BaseService<Accounts> {
     constructor() {
-        super(Accounts);
+        super(Accounts, 'accounts');
     }
 }
 
@@ -56,7 +56,7 @@ app.put('/api/account', async (req, res) => {
 
 class PurchaseService extends BaseService<Purchases> {
     constructor() {
-        super(Purchases);
+        super(Purchases, 'purchases');
     }
 }
 

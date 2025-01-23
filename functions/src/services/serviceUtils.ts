@@ -9,9 +9,11 @@ import AppDataSource from '../db.js';
 
 export abstract class BaseService<T extends ObjectLiteral> {
     protected repository: Repository<T>;
+    protected entityName: string;
 
-    constructor(entity: EntityTarget<T>) {
-        this.repository = AppDataSource.getRepository<T>(entity as EntityTarget<T>);
+    constructor(entity: EntityTarget<T>, entityName: string) {
+        this.repository = AppDataSource.getRepository<T>(entity);
+        this.entityName = entityName;
     }
 
     protected async handleError(methodName: string, err: unknown): Promise<never> {
@@ -26,9 +28,13 @@ export abstract class BaseService<T extends ObjectLiteral> {
         filters: Record<string, unknown> = {},
         order: Record<string, 'ASC' | 'DESC'> = {}
     ): Promise<T[]> {
+        console.log(1);
+        
         try {
-            const entityName = this.getEntityName();
-            const queryBuilder = this.repository.createQueryBuilder(entityName.toLowerCase());
+            const queryBuilder = this.repository.createQueryBuilder(this.entityName);
+
+            console.log('filters:', filters);
+            console.log('order:', order);
       
             for (const [key, value] of Object.entries(filters)) {
                 queryBuilder.andWhere(`${key} = :value`, { value });
@@ -37,25 +43,12 @@ export abstract class BaseService<T extends ObjectLiteral> {
             for (const [field, direction] of Object.entries(order)) {
                 queryBuilder.addOrderBy(`${field}`, direction);
             }
+            console.log(queryBuilder.getQuery());
 
             return await queryBuilder.getMany();
         } catch (err) {
             return this.handleError('getAll', err);
         }
-    }
-
-    private getEntityName(): string {
-        const target = this.repository.metadata.target;
-        
-        if (typeof target === 'function') {
-            return (target as Function).name;
-        }
-        
-        if (typeof target === 'string') {
-            return target;
-        }
-        
-        throw new Error('Unsupported entity type');
     }
 
     async create(entityData: DeepPartial<T>): Promise<T> {
@@ -76,6 +69,17 @@ export abstract class BaseService<T extends ObjectLiteral> {
             return await this.repository.save(merged);
         } catch (err) {
             return this.handleError('update', err);
+        }
+    }
+
+    async delete(id: string): Promise<void> {
+        try {
+            const result = await this.repository.delete(id);
+            if (result.affected === 0) {
+                throw new Error('Entity not found');
+            }
+        } catch (err) {
+            return this.handleError('delete', err);
         }
     }
 }

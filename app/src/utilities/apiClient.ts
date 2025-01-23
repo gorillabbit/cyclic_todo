@@ -3,8 +3,8 @@ const baseUrl = import.meta.env.VITE_FIREBASE_FUNCTIONS_URL
 export const getPurchases = async (userId?: string, tabId?: string): Promise<unknown> => {
     try {
         const params = new URLSearchParams();
-        if (userId != null && userId !== '') params.append('userId', userId);
-        if (tabId != null && tabId !== '') params.append('tabId', tabId);
+        if (userId != null && userId !== '') params.append('user_id', userId);
+        if (tabId != null && tabId !== '') params.append('tab_id', tabId);
 
         const response = await fetch(`${baseUrl}/purchase?${params.toString()}`);
         if (!response.ok) {
