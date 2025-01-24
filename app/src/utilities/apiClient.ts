@@ -1,3 +1,5 @@
+import { AccountType, AccountLinkType } from '../types';
+
 const baseUrl = import.meta.env.VITE_FIREBASE_FUNCTIONS_URL
 
 export const getPurchases = async (userId?: string, tabId?: string): Promise<unknown> => {
@@ -10,23 +12,58 @@ export const getPurchases = async (userId?: string, tabId?: string): Promise<unk
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
-        return await response.json();
+        const accounts: AccountType[] = await response.json();
+        return accounts.map((account: AccountType): AccountLinkType => ({
+            id: account.id,
+            email: account.email,
+            name: account.name,
+            icon: account.icon
+        }));
     } catch (error) {
         console.error('Error fetching purchases:', error);
         throw error;
     }
 };
 
-export const getAccounts = async (id?: string): Promise<unknown> => {
+type FilterParam = {
+    // "AccountType" に存在するキーのみ受け付ける (keyof AccountType)
+    field: keyof AccountType;
+    // 値は文字列か文字列配列を想定（number があるなら number も考慮）
+    value: string | string[];
+  };
+  /**
+   * AccountTypeに存在するパラメーター名と値(単一or配列)をまとめてクエリにする
+   */
+export const getAccounts = async (
+    filters: FilterParam[]
+): Promise<AccountType[]> => {
     try {
         const params = new URLSearchParams();
-        if (id != null && id !== '') params.append('id', id);
-
-        const response = await fetch(`${baseUrl}/account?${params.toString()}`);
+  
+        filters.forEach(({ field, value }) => {
+            if (Array.isArray(value)) {
+                // 配列なら、その要素それぞれを同じキーで追加
+                // e.g. ?id=id1&id=id2&id=id3
+                value.forEach((v) => params.append(field, v));
+            } else {
+                // 単一値なら set でOK (重複したキーは上書きになるので注意)
+                // もし複数同じキーを追加したい場合は append にする
+                params.set(field, value);
+            }
+        });
+  
+        // 生成したクエリを付与して fetch
+        const response = await fetch(`${baseUrl}/account?${params.toString()}`, {
+            method: 'GET',
+        });
+  
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
-        return await response.json();
+  
+        // JSON をパースして返す
+        const accounts: AccountType[] = await response.json();
+        return accounts;
     } catch (error) {
         console.error('Error fetching accounts:', error);
         throw error;

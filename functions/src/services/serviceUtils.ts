@@ -28,22 +28,26 @@ export abstract class BaseService<T extends ObjectLiteral> {
         filters: Record<string, unknown> = {},
         order: Record<string, 'ASC' | 'DESC'> = {}
     ): Promise<T[]> {
-        console.log(1);
-        
         try {
             const queryBuilder = this.repository.createQueryBuilder(this.entityName);
 
             console.log('filters:', filters);
-            console.log('order:', order);
       
+            // 同じキーで複数値がある場合はOR条件で処理
             for (const [key, value] of Object.entries(filters)) {
-                queryBuilder.andWhere(`${key} = :value`, { value });
+                if (Array.isArray(value)) {
+                    queryBuilder.andWhere(`${key} IN (:...${key})`, { [key]: value });
+                } else if (typeof value === 'string' && value.includes(',')) {
+                    const values = value.split(',').map(v => v.trim());
+                    queryBuilder.andWhere(`${key} IN (:...${key})`, { [key]: values });
+                } else {
+                    queryBuilder.andWhere(`${key} = :${key}`, { [key]: value });
+                }
             }
 
             for (const [field, direction] of Object.entries(order)) {
                 queryBuilder.addOrderBy(`${field}`, direction);
             }
-            console.log(queryBuilder.getQuery());
 
             return await queryBuilder.getMany();
         } catch (err) {

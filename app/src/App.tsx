@@ -6,15 +6,13 @@ import Header from './components/Header';
 import { memo, useEffect, useState } from 'react';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { AccountProvider } from './components/Context/AccountContext';
-import { doc, onSnapshot } from 'firebase/firestore';
 import { AccountType } from './types';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
-import { db } from './firebase';
 import HomePage from './pages/HomePage';
 import KiyakuPage from './pages/KiyakuPage';
 import ja from 'date-fns/locale/ja';
-import { getAccounts, getPurchases } from './utilities/apiClient';
+import { getAccounts } from './utilities/apiClient';
 
 const App = memo(() => {
     const theme = createTheme({
@@ -26,10 +24,6 @@ const App = memo(() => {
     });
     const [Account, setAccount] = useState<AccountType>();
 
-    getPurchases('userId', 'tabId').then((data) => {
-        console.log(data);
-    });
-
     const auth = getAuth();
     useEffect(() => {
         const unsubscribeFromAuth = onAuthStateChanged(auth, (user) => {
@@ -38,27 +32,16 @@ const App = memo(() => {
                 return;
             }
             // リアルタイムでドキュメントのスナップショットを取得
-            getAccounts(user.uid).then((data) => {
+            getAccounts([{ field: 'id', value: user.uid }]).then((data) => {
                 console.log('account', data);
+                setAccount(data[0] as AccountType);
             });
-            const unsubscribeFromDoc = onSnapshot(doc(db, 'Accounts', user.uid), (accountDoc) => {
-                setAccount(
-                    accountDoc.exists()
-                        ? ({
-                              id: accountDoc.id,
-                              ...accountDoc.data(),
-                          } as AccountType)
-                        : undefined
-                );
-            });
-
-            // クリーンアップ: アカウントドキュメントのスナップショットのリスナーを解除
-            return () => unsubscribeFromDoc();
         });
 
         // クリーンアップ: 認証状態のリスナーを解除
         return () => unsubscribeFromAuth();
     }, [auth, setAccount]);
+
     return (
         <BrowserRouter>
             <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ja}>

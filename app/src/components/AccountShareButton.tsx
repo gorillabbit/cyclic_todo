@@ -8,7 +8,7 @@ import {
     TextField,
     Tooltip,
 } from '@mui/material';
-import { ChangeEvent, JSX, memo, useState } from 'react';
+import { ChangeEvent, JSX, memo, useState, useEffect } from 'react';
 import { updateDocAccount, db } from '../firebase';
 import { collection, doc, getDoc, getDocs, query, where } from 'firebase/firestore';
 import { AccountLinkType, AccountType } from '../types';
@@ -16,24 +16,61 @@ import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import CancelIcon from '@mui/icons-material/Cancel';
 import { AccountToLink } from '../utilities/tabUtilities';
 import { useAccount } from '../hooks/useData';
+import { getAccounts } from '../utilities/apiClient';
 
+// TODO: メアドがlinkedAccountsなどになくなったので機能していない
 const validateEmail = (email: string, account: AccountType): string => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!regex.test(email)) return '無効なメールアドレスです';
     if (email === account.email) return '自分のメールアドレスです';
-    if (account.linkedAccounts.some((l) => l.email === email)) return 'すでにリンクされています';
+    if (account.linkedAccounts.some((l) => l === email)) return 'すでにリンクされています';
     if (account.sendRequest.includes(email)) return 'すでにリンク依頼を出しています';
-    if (account.receiveRequest.some((r) => r.email === email))
-        return 'すでにリンク依頼を受けています';
+    if (account.receiveRequest.some((r) => r === email)) return 'すでにリンク依頼を受けています';
     return '';
 };
 
 const AccountShareButton = () => {
     const [open, setOpen] = useState<boolean>(false);
     const [email, setEmail] = useState<string>('');
-    const { Account } = useAccount();
     const [error, setError] = useState<string>();
-    if (!Account) return null;
+    const [linkedAccounts, setLinkedAccounts] = useState<AccountLinkType[]>([]);
+    const [receiveRequests, setReceiveRequests] = useState<AccountLinkType[]>([]);
+
+    const { Account } = useAccount();
+    if (!Account) return <>アカウントがありません</>;
+
+    useEffect(() => {
+        const fetchAccounts = async () => {
+            try {
+                const data = await getAccounts([{ field: 'id', value: Account.linkedAccounts }]);
+                setLinkedAccounts(
+                    data.map((account) => ({
+                        id: account.id,
+                        email: account.email,
+                        name: account.name,
+                        icon: account.icon,
+                    }))
+                );
+                const receiveRequests = await getAccounts([
+                    { field: 'id', value: Account.receiveRequest },
+                ]);
+                setReceiveRequests(
+                    receiveRequests.map((account) => ({
+                        id: account.id,
+                        email: account.email,
+                        name: account.name,
+                        icon: account.icon,
+                    }))
+                );
+            } catch (error) {
+                console.error('アカウント取得エラー:', error);
+            }
+        };
+
+        if (Account?.linkedAccounts?.length) {
+            fetchAccounts();
+        }
+    }, [Account?.linkedAccounts, Account?.receiveRequest]);
 
     const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { value } = e.target;
@@ -67,7 +104,7 @@ const AccountShareButton = () => {
 
     const refuseRequest = (receivedRequest: AccountLinkType) => {
         updateDocAccount(Account.id, {
-            receiveRequest: Account.receiveRequest.filter((r) => r.id !== receivedRequest.id),
+            receiveRequest: Account.receiveRequest.filter((r) => r !== receivedRequest.id),
         });
         getAccountDoc(receivedRequest.id).then((doc) => {
             updateDocAccount(doc.id, {
@@ -79,18 +116,19 @@ const AccountShareButton = () => {
     const acceptRequest = async (receiveRequest: AccountLinkType) => {
         // 自分の方で受け取ったリクエストをリンクに加える、リクエストを削除する
         updateDocAccount(Account.id, {
-            linkedAccounts: [...Account.linkedAccounts, receiveRequest],
-            receiveRequest: Account.receiveRequest.filter((r) => r.id !== receiveRequest.id),
+            linkedAccounts: [...Account.linkedAccounts, receiveRequest.id],
+            receiveRequest: Account.receiveRequest.filter((r) => r !== receiveRequest.id),
         });
         getAccountDoc(receiveRequest.id).then((doc) => {
             updateDocAccount(doc.id, {
-                linkedAccounts: [...doc.linkedAccounts, AccountToLink(Account)],
+                linkedAccounts: [...doc.linkedAccounts, Account.id],
                 sendRequest: doc.sendRequest.filter((r) => r !== Account.email),
             });
         });
     };
 
     const cancelRequest = (request: string) => {
+        if (!Account) return;
         updateDocAccount(Account.id, {
             sendRequest: Account.sendRequest.filter((r) => r !== request),
         });
@@ -108,11 +146,11 @@ const AccountShareButton = () => {
 
     const unlinkAccount = (linkedAccount: AccountLinkType) => {
         updateDocAccount(Account.id, {
-            linkedAccounts: Account.linkedAccounts.filter((a) => a.id !== linkedAccount.id),
+            linkedAccounts: Account.linkedAccounts.filter((a) => a !== linkedAccount.id),
         });
         getAccountDoc(linkedAccount.id).then((doc) => {
             updateDocAccount(doc.id, {
-                linkedAccounts: doc.linkedAccounts.filter((a) => a.email !== Account.email),
+                linkedAccounts: doc.linkedAccounts.filter((a) => a !== Account.id),
             });
         });
     };
@@ -159,7 +197,7 @@ const AccountShareButton = () => {
             </Button>
             <Dialog open={open} onClose={() => setOpen(false)}>
                 <DialogContent>
-                    {Account.linkedAccounts.map((linkedAccount) => (
+                    {linkedAccounts.map((linkedAccount) => (
                         <ChipWrapper
                             key={linkedAccount.id}
                             tooltipTitle={linkedAccount.email}
@@ -170,7 +208,7 @@ const AccountShareButton = () => {
                         />
                     ))}
 
-                    {Account.receiveRequest.map((receiveRequest) => (
+                    {receiveRequests.map((receiveRequest) => (
                         <ChipWrapper
                             key={receiveRequest.id}
                             tooltipTitle={receiveRequest.email}
@@ -190,7 +228,7 @@ const AccountShareButton = () => {
                         />
                     ))}
 
-                    {Account.sendRequest.map((sendRequest) => (
+                    {Account?.sendRequest?.map((sendRequest) => (
                         <ChipWrapper
                             key={sendRequest}
                             tooltipTitle=""
