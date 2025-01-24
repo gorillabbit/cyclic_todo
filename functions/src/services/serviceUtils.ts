@@ -30,8 +30,6 @@ export abstract class BaseService<T extends ObjectLiteral> {
     ): Promise<T[]> {
         try {
             const queryBuilder = this.repository.createQueryBuilder(this.entityName);
-
-            console.log('filters:', filters);
       
             // 同じキーで複数値がある場合はOR条件で処理
             for (const [key, value] of Object.entries(filters)) {
