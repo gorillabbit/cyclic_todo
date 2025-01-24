@@ -1,6 +1,6 @@
-DROP DATABASE IF EXISTS cyclictodo;
-CREATE DATABASE cyclictodo;
-use cyclictodo;
+DROP DATABASE IF EXISTS cyclictodo_test;
+CREATE DATABASE cyclictodo_test;
+use cyclictodo_test;
 
 DROP TABLE IF EXISTS accounts;
 CREATE TABLE accounts (

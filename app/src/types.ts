@@ -66,9 +66,9 @@ export interface AccountInputType {
     email: string;
     name: string;
     icon: string;
-    linkedAccounts: AccountLinkType[];
+    linkedAccounts: string[];
     sendRequest: string[];
-    receiveRequest: AccountLinkType[];
+    receiveRequest: string[];
     useTabIds: string[];
 }
 
