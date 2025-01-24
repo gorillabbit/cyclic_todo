@@ -80,7 +80,7 @@ def process_file(file_name, input_folder, output_folder, model):
         data = json.load(in_file)
 
     if not isinstance(data, list):
-        print(f"Skipping {file_name}: Unsupported format (expected list).")
+        print(f"処理スキップ: {file_name} Unsupported format (expected list).")
         return
 
     transformed_data = [transform_object(item) for item in data]
@@ -88,7 +88,7 @@ def process_file(file_name, input_folder, output_folder, model):
 
     with open(output_file, "w", encoding="utf-8") as outfile:
         json.dump(valid_data, outfile, ensure_ascii=False, indent=2)
-    print(f"Processed and saved: {output_file}")
+    print(f"処理完了: {output_file}")
 
 
 def transform_json_files(input_folder, output_folder, models):
@@ -96,11 +96,11 @@ def transform_json_files(input_folder, output_folder, models):
     os.makedirs(output_folder, exist_ok=True)
 
     for file_name in filter(lambda f: f.endswith(".json"), os.listdir(input_folder)):
-        table_name = snake_to_camel(os.path.splitext(file_name)[0])
+        table_name = os.path.splitext(file_name)[0]
         model = models.get(table_name)
 
         if not model:
-            print(f"Skipping {file_name}: No model found for table {table_name}.")
+            print(f"処理スキップ: {file_name}: No model found for table {table_name}.")
             continue
 
         process_file(file_name, input_folder, output_folder, model)
@@ -108,8 +108,8 @@ def transform_json_files(input_folder, output_folder, models):
 
 # Main execution
 if __name__ == "__main__":
-    input_folder = "../scripts/data"  # Input folder containing JSON files
-    output_folder = "../scripts/output"  # Output folder to save transformed JSON files
+    input_folder = "./data"  # Input folder containing JSON files
+    output_folder = "./output"  # Output folder to save transformed JSON files
 
     # Dynamically import models from models.py
     models_module = import_module("models")

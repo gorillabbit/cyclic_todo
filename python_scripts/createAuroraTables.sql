@@ -1,6 +1,7 @@
-DROP DATABASE IF EXISTS cyclictodo;
-CREATE DATABASE cyclictodo;
-use cyclictodo;
+-- {DB_NAME} というプレースホルダを使う
+DROP DATABASE IF EXISTS {DB_NAME};
+CREATE DATABASE {DB_NAME};
+USE {DB_NAME};
 
 DROP TABLE IF EXISTS accounts;
 CREATE TABLE accounts (
@@ -18,7 +19,7 @@ DROP TABLE IF EXISTS tabs;
 CREATE TABLE tabs (
     id CHAR(20) NOT NULL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
-    create_user_uid CHAR(20) NOT NULL,
+    create_user_uid CHAR(28) NOT NULL,
     shared_accounts JSON NOT NULL,
     type VARCHAR(50) NOT NULL,
     timestamp DATETIME NOT NULL,

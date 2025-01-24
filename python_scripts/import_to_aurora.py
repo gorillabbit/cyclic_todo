@@ -1,3 +1,4 @@
+import argparse
 import pymysql
 import json
 from pathlib import Path
@@ -8,35 +9,31 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-def get_database_connection():
-    """Create and return a MySQL database connection."""
-    return pymysql.connect(
-        host=os.getenv("MYSQL_HOST"),
-        user=os.getenv("MYSQL_USER"),
-        password=os.getenv("MYSQL_PASSWORD"),
-        database=os.getenv("MYSQL_DATABASE"),
+def get_database_connection(env: str) -> pymysql.connections.Connection:
+    """env が 'test' ならテスト用の環境変数、'prod' なら本番用の環境変数を取得"""
+    host = os.getenv("MYSQL_HOST")
+    user = os.getenv("MYSQL_USER")
+    password = os.getenv("MYSQL_PASSWORD")
+    if env == "test":
+        database = os.getenv("MYSQL_DATABASE_TEST")
+        print("[INFO] Connecting to TEST database...")
+    else:
+        database = os.getenv("MYSQL_DATABASE")
+        print("[INFO] Connecting to PRODUCTION database...")
+
+    print(f"[DEBUG] host={host}, user={user}, db={database}")
+
+    conn = pymysql.connect(
+        host=host or "localhost",
+        user=user or "root",
+        password=password or "",
+        database=database,
         autocommit=False,
     )
+    return conn
 
 
-def execute_sql_file(file_path, connection):
-    """Execute SQL statements from a file."""
-    if not file_path.exists():
-        print(f"SQL file not found: {file_path}")
-        return
-
-    with open(file_path, "r", encoding="utf-8") as file:
-        sql_statements = file.read()
-
-    with connection.cursor() as cursor:
-        for statement in sql_statements.split(";"):
-            statement = statement.strip()
-            if statement:
-                cursor.execute(statement)
-    print(f"Executed SQL statements from {file_path}")
-
-
-def extract_table_order(sql_file_path):
+def extract_table_order(sql_file_path: Path):
     """Extract table names in the order they are created in the SQL file."""
     if not sql_file_path.exists():
         print(f"SQL file not found: {sql_file_path}")
@@ -63,13 +60,14 @@ def process_json_value(value):
     elif isinstance(value, int):
         return str(value)  # int をそのまま文字列に変換
     elif isinstance(value, str):
-        # 文字列を適切にエスケープ
+        # 文字列を適切にエスケープ (json.dumps を利用)
         return json.dumps(value)
     return value
 
 
-def import_data(collection_name, connection):
+def import_data(collection_name: str, connection: pymysql.connections.Connection):
     """Import JSON data into the specified MySQL table."""
+    # scripts/output/ から {collection_name}.json を読み込む想定
     file_path = (
         Path(__file__).resolve().parents[1] / f"scripts/output/{collection_name}.json"
     )
@@ -86,7 +84,6 @@ def import_data(collection_name, connection):
                 columns = ", ".join(item.keys())
                 values = [process_json_value(v) for v in item.values()]
 
-                # SQL 文を生成
                 placeholders = ", ".join(values)
                 sql = (
                     f"INSERT INTO {collection_name} ({columns}) VALUES ({placeholders})"
@@ -100,13 +97,12 @@ def import_data(collection_name, connection):
         print(f"Imported {collection_name} to Aurora.")
 
 
-def import_all_collections():
+def import_all_collections(env: str = "prod"):
     """Create tables and import data for all specified collections."""
-    connection = get_database_connection()
+    connection = get_database_connection(env)
     try:
         # Execute the SQL file to create tables
         sql_file_path = Path(__file__).resolve().parent / "createAuroraTables.sql"
-        execute_sql_file(sql_file_path, connection)
 
         collections = extract_table_order(sql_file_path)
         if not collections:
@@ -120,7 +116,18 @@ def import_all_collections():
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        description="Create tables and import JSON data into Aurora (prod or test)."
+    )
+    parser.add_argument(
+        "--env",
+        choices=["prod", "test"],
+        default="prod",
+        help="Which environment to use (default: prod).",
+    )
+    args = parser.parse_args()
+
     try:
-        import_all_collections()
+        import_all_collections(args.env)
     except Exception as e:
         print(f"Error during import: {e}")
