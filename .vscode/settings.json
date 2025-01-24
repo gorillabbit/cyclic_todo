@@ -1,0 +1,10 @@
+{
+  "python.analysis.typeCheckingMode": "basic",
+  "python.defaultInterpreterPath": "./python_scripts/venv/bin/python",
+  "python.analysis.autoImportCompletions": true,
+  "cSpell.words": [
+    "cyclictodo",
+    "kiyaku",
+    "tinyint"
+  ]
+}
