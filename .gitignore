@@ -39,6 +39,8 @@ build
 
 service_account_prd.json
 service_account.json
+service_account_prod.json
+service_account_test.json
 
 # Compiled JavaScript files
 functions/lib/*
