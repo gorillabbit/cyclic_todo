@@ -31,9 +31,7 @@ const App = memo(() => {
                 setAccount(undefined);
                 return;
             }
-            // リアルタイムでドキュメントのスナップショットを取得
             getAccounts([{ field: 'id', value: user.uid }]).then((data) => {
-                console.log('account', data);
                 setAccount(data[0] as AccountType);
             });
         });
