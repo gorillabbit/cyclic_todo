@@ -10,7 +10,13 @@
         "sourceMap": true,
         "strict": true,
         "experimentalDecorators": true,
-        "skipLibCheck": true
+        "skipLibCheck": true,
+        "baseUrl": ".",
+        "paths": {
+            "@entity/*": [
+                "../entity/entities/*"
+            ]
+        }
     },
     "compileOnSave": true,
     "include": [
