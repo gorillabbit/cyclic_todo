@@ -37,9 +37,9 @@ const AccountShareButton = () => {
     const [receiveRequests, setReceiveRequests] = useState<AccountLinkType[]>([]);
 
     const { Account } = useAccount();
-    if (!Account) return <>アカウントがありません</>;
 
     useEffect(() => {
+        if (!Account) return;
         const fetchAccounts = async () => {
             try {
                 const data = await getAccounts([{ field: 'id', value: Account.linkedAccounts }]);
@@ -74,6 +74,7 @@ const AccountShareButton = () => {
 
     const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { value } = e.target;
+        if (!Account) return;
         setEmail(value);
         setError(validateEmail(value, Account));
     };
@@ -86,6 +87,7 @@ const AccountShareButton = () => {
     };
 
     const sendLinkRequests = async () => {
+        if (!Account) return;
         if (!email) return setError('メールアドレスが入力されていません');
 
         const q = query(AccountCollection, where('email', '==', email));
@@ -103,6 +105,7 @@ const AccountShareButton = () => {
     };
 
     const refuseRequest = (receivedRequest: AccountLinkType) => {
+        if (!Account) return;
         updateDocAccount(Account.id, {
             receiveRequest: Account.receiveRequest.filter((r) => r !== receivedRequest.id),
         });
@@ -114,7 +117,7 @@ const AccountShareButton = () => {
     };
 
     const acceptRequest = async (receiveRequest: AccountLinkType) => {
-        // 自分の方で受け取ったリクエストをリンクに加える、リクエストを削除する
+        if (!Account) return;
         updateDocAccount(Account.id, {
             linkedAccounts: [...Account.linkedAccounts, receiveRequest.id],
             receiveRequest: Account.receiveRequest.filter((r) => r !== receiveRequest.id),
@@ -145,6 +148,7 @@ const AccountShareButton = () => {
     };
 
     const unlinkAccount = (linkedAccount: AccountLinkType) => {
+        if (!Account) return;
         updateDocAccount(Account.id, {
             linkedAccounts: Account.linkedAccounts.filter((a) => a !== linkedAccount.id),
         });
