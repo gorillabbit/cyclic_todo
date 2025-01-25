@@ -91,6 +91,17 @@ const dbInitPromise: Promise<void> = (async (): Promise<void> => {
         }
     });
 
+    app.delete('/api/purchase/:id', async (req, res) => {
+        try {
+            const { id } = req.params;
+            await purchaseService.delete(id);
+            res.status(204).send();
+        } catch (error) {
+            res.status(500).send({ error });
+        }
+    });
+
+
     const methodService = new MethodService();
 
     app.get('/api/method', async (req, res) => {
