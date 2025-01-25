@@ -64,6 +64,29 @@ export class PurchaseService extends BaseService<Purchases> {
     }
 
     /**
+     * 既存レコード削除 → 同一 userId, assetId を持つレコードの残高を再計算
+     */
+    override async delete(id: string): Promise<void> {
+        return AppDataSource.manager.transaction(async (manager: EntityManager) => {
+            const repo = manager.getRepository(Purchases);
+
+            // 1. 削除対象取得（userId/assetId取得のため）
+            const existing = await repo.findOne({ where: { id } });
+            if (!existing) return;
+
+            // 2. 削除実行
+            await repo.delete(id);
+
+            // 3. 再計算
+            if (!existing.userId || !existing.assetId) {
+                return;
+            }
+
+            await this.reCalcBalances(manager, existing.userId, existing.assetId);
+        });
+    }
+
+    /**
      * 指定した userId + assetId の Purchases 全件を取得し、
      * date (昇順), id (昇順) の順で並べて `difference` を積み上げ、
      * `balance` を更新する。
