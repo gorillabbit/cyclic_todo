@@ -32,7 +32,34 @@ const dbInitPromise: Promise<void> = (async (): Promise<void> => {
         }
     });
 
-    // ほかの /api/account の POST, PUT など…
+    app.post('/api/account', async (req, res) => {
+        try {
+            const result = await accountService.create(req.body);
+            res.status(201).send(result);
+        } catch (error) {
+            res.status(500).send({ error });
+        }
+    });
+
+    app.put('/api/account/:id', async (req, res) => {
+        try {
+            const { id } = req.params;
+            const result = await accountService.update(id, req.body);
+            res.status(200).send(result);
+        } catch (error) {
+            res.status(500).send({ error });
+        }
+    });
+
+    app.delete('/api/account/:id', async (req, res) => {
+        try {
+            const { id } = req.params;
+            await accountService.delete(id);
+            res.status(204).send();
+        } catch (error) {
+            res.status(500).send({ error });
+        }
+    });
 
     class PurchaseService extends BaseService<Purchases> {
         constructor() {
@@ -50,7 +77,25 @@ const dbInitPromise: Promise<void> = (async (): Promise<void> => {
         }
     });
 
-    // ほかの /api/purchase の POST, PUT など…
+    app.put('/api/purchase/:id', async (req, res) => {
+        try {
+            const { id } = req.params;
+            const updateData = req.body;
+            const result = await purchaseService.update(id, updateData);
+            res.status(200).send(result);
+        } catch (error) {
+            res.status(500).send({ error });
+        }
+    });
+
+    app.post('/api/purchase', async (req, res) => {
+        try {
+            const result = await purchaseService.create(req.body);
+            res.status(201).send(result);
+        } catch (error) {
+            res.status(500).send({ error });
+        }
+    });
 
     // ← この関数内でやりたい初期化やルーティング設定をすべて終える
 })().catch((error) => {

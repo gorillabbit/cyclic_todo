@@ -1,9 +1,8 @@
-import { ReactNode, createContext, memo, useCallback, useEffect, useMemo, useState } from 'react';
-import { orderBy, where } from 'firebase/firestore';
-import { useFirestoreQuery } from '../../utilities/firebaseUtilities';
-import { useTab } from '../../hooks/useData.js';
-import { PurchaseDataType, PurchaseRawDataType } from '../../types/purchaseTypes.js';
-import { dbNames } from '../../firebase.js';
+import { memo, ReactNode, useMemo, useState, useCallback, useEffect, createContext } from 'react';
+import { useTab } from '../../hooks/useData';
+import { PurchaseDataType } from '../../types/purchaseTypes';
+import { getPurchases } from '../../utilities/apiClient';
+import { parseDateFieldsDeep } from '../../utilities/parseJsonUtils.js';
 
 type PurchaseContextType = {
     purchaseList: PurchaseDataType[];
@@ -20,23 +19,13 @@ export const PurchaseContext = createContext<PurchaseContextType>({
 
 export const PurchaseProvider = memo(({ children }: { children: ReactNode }) => {
     const { tabId } = useTab();
-    const purchaseQueryConstraints = useMemo(
-        () => [orderBy('date'), where('tabId', '==', tabId)],
-        [tabId]
-    );
-    const { documents: purchaseRawList } = useFirestoreQuery<PurchaseRawDataType>(
-        dbNames.purchase,
-        purchaseQueryConstraints,
-        true
-    );
+    const [purchaseList, _setPurchaseList] = useState<PurchaseDataType[]>([]);
 
-    const categoryList = purchaseRawList.map((purchase) => purchase.category);
+    const categoryList = purchaseList.map((purchase) => purchase.category);
     const categorySet = categoryList.filter(
         (item, index) => categoryList.indexOf(item) === index && !!item
     );
     categorySet.push('');
-
-    const [purchaseList, _setPurchaseList] = useState<PurchaseDataType[]>([]);
 
     const setPurchaseList = useCallback((purchaseList: PurchaseDataType[]) => {
         const orderedPurchaseList = purchaseList.sort(
@@ -46,16 +35,12 @@ export const PurchaseProvider = memo(({ children }: { children: ReactNode }) => 
     }, []);
 
     useEffect(() => {
-        _setPurchaseList(
-            purchaseRawList.map((purchase) => {
-                return {
-                    ...purchase,
-                    date: purchase.date.toDate(),
-                    payDate: purchase.payDate.toDate(),
-                };
-            })
-        );
-    }, [purchaseRawList]);
+        getPurchases('', tabId).then((data) => {
+            const purchases = parseDateFieldsDeep(data, ['date', 'payDate', 'timestamp']);
+            console.log('data:', purchases);
+            _setPurchaseList(purchases);
+        });
+    }, []);
 
     const context = useMemo(() => {
         return {

@@ -1,8 +1,11 @@
-import { AccountType, AccountLinkType } from '../types';
+import { AccountType } from '../types';
+import { PurchaseDataType } from '../types/purchaseTypes';
 
-const baseUrl = import.meta.env.VITE_FIREBASE_FUNCTIONS_URL
+const baseUrl = import.meta.env.VITE_FIREBASE_FUNCTIONS_URL;
 
-export const getPurchases = async (userId?: string, tabId?: string): Promise<unknown> => {
+// GET関数
+export const getPurchases = async (
+    userId?: string, tabId?: string): Promise<PurchaseDataType[]> => {
     try {
         const params = new URLSearchParams();
         if (userId != null && userId !== '') params.append('user_id', userId);
@@ -12,19 +15,34 @@ export const getPurchases = async (userId?: string, tabId?: string): Promise<unk
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
-        const accounts: AccountType[] = await response.json();
-        return accounts.map((account: AccountType): AccountLinkType => ({
-            id: account.id,
-            email: account.email,
-            name: account.name,
-            icon: account.icon
-        }));
+        return await response.json();
     } catch (error) {
         console.error('Error fetching purchases:', error);
         throw error;
     }
 };
 
+// PUT関数
+export const createPurchase = async (data: PurchaseDataType): Promise<void> => {
+    try {
+        const response = await fetch(`${baseUrl}/purchase`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+    } catch (error) {
+        console.error('Error updating purchase:', error);
+        throw error;
+    }
+};
+
+// 既存のアカウント取得関数
 type FilterParam = {
     // "AccountType" に存在するキーのみ受け付ける (keyof AccountType)
     field: keyof AccountType;
