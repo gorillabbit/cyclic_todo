@@ -34,7 +34,7 @@ export abstract class BaseService<T extends ObjectLiteral> {
 
     protected async handleError(methodName: string, err: unknown): Promise<never> {
         if (err instanceof QueryFailedError) {
-            const errorMessage = `Database error in ${methodName}: ${err.message}`;
+            const errorMessage = `DBエラー ${methodName}: ${err.message}`;
             console.error(errorMessage);
             throw new DatabaseError(errorMessage, { cause: err });
         }
