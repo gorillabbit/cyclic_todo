@@ -1,11 +1,13 @@
 import express from 'express';
 import { onRequest } from 'firebase-functions/v2/https';
 import { initializeDatabase } from './db.js';
-import { Accounts } from '../../entity/entities/Accounts.js';
-import { BaseService } from './services/serviceUtils.js';
-import { Methods } from '../../entity/entities/Methods.js';
-import { Assets } from '../../entity/entities/Assets.js';
 import { PurchaseService } from './services/purchaseService.js';
+import { MethodService } from './services/methodService.js';
+import { AccountService } from './services/accountService.js';
+import { AssetService } from './services/assetService.js';
+import { LogService } from './services/logService.js';
+import { TabService } from './services/tabService.js';
+import { TaskService } from './services/taskService.js';
 
 // 1) まずは Express アプリを作成
 const app = express();
@@ -18,11 +20,6 @@ const dbInitPromise: Promise<void> = (async (): Promise<void> => {
     await initializeDatabase();
 
     // 初期化が完了したので、サービスやルーティングを設定する
-    class AccountService extends BaseService<Accounts> {
-        constructor() {
-            super(Accounts, 'accounts');
-        }
-    }
     const accountService = new AccountService();
 
     app.get('/api/account', async (req, res) => {
@@ -94,11 +91,6 @@ const dbInitPromise: Promise<void> = (async (): Promise<void> => {
         }
     });
 
-    class MethodService extends BaseService<Methods> {
-        constructor() {
-            super(Methods, 'methods');
-        }
-    }
     const methodService = new MethodService();
 
     app.get('/api/method', async (req, res) => {
@@ -139,11 +131,6 @@ const dbInitPromise: Promise<void> = (async (): Promise<void> => {
         }
     });
 
-    class AssetService extends BaseService<Assets> {
-        constructor() {
-            super(Assets, 'assets');
-        }
-    }
     const assetService = new AssetService();
 
     app.get('/api/asset', async (req, res) => {
@@ -184,7 +171,117 @@ const dbInitPromise: Promise<void> = (async (): Promise<void> => {
         }
     });
 
-    // ← この関数内でやりたい初期化やルーティング設定をすべて終える
+    // Log endpoints
+    const logService = new LogService();
+    app.get('/api/logs', async (req, res) => {
+        try {
+            const result = await logService.getAll(req.query);
+            res.status(200).send(result);
+        } catch (error) {
+            res.status(500).send({ error });
+        }
+    });
+    app.post('/api/logs', async (req, res) => {
+        try {
+            const result = await logService.create(req.body);
+            res.status(201).send(result);
+        } catch (error) {
+            res.status(500).send({ error });
+        }
+    });
+    app.put('/api/logs/:id', async (req, res) => {
+        try {
+            const { id } = req.params;
+            const result = await logService.update(id, req.body);
+            res.status(200).send(result);
+        } catch (error) {
+            res.status(500).send({ error });
+        }
+    });
+    app.delete('/api/logs/:id', async (req, res) => {
+        try {
+            const { id } = req.params;
+            await logService.delete(id);
+            res.status(204).send();
+        } catch (error) {
+            res.status(500).send({ error });
+        }
+    });
+
+    // Tab endpoints
+    const tabService = new TabService();
+    app.get('/api/tabs', async (req, res) => {
+        try {
+            const result = await tabService.getAll(req.query);
+            res.status(200).send(result);
+        } catch (error) {
+            res.status(500).send({ error });
+        }
+    });
+    app.post('/api/tabs', async (req, res) => {
+        try {
+            const result = await tabService.create(req.body);
+            res.status(201).send(result);
+        } catch (error) {
+            res.status(500).send({ error });
+        }
+    });
+    app.put('/api/tabs/:id', async (req, res) => {
+        try {
+            const { id } = req.params;
+            const result = await tabService.update(id, req.body);
+            res.status(200).send(result);
+        } catch (error) {
+            res.status(500).send({ error });
+        }
+    });
+    app.delete('/api/tabs/:id', async (req, res) => {
+        try {
+            const { id } = req.params;
+            await tabService.delete(id);
+            res.status(204).send();
+        } catch (error) {
+            res.status(500).send({ error });
+        }
+    });
+
+    // Task endpoints
+    const taskService = new TaskService();
+    app.get('/api/tasks', async (req, res) => {
+        try {
+            const result = await taskService.getAll(req.query);
+            res.status(200).send(result);
+        } catch (error) {
+            res.status(500).send({ error });
+        }
+    });
+    app.post('/api/tasks', async (req, res) => {
+        try {
+            const result = await taskService.create(req.body);
+            res.status(201).send(result);
+        } catch (error) {
+            res.status(500).send({ error });
+        }
+    });
+    app.put('/api/tasks/:id', async (req, res) => {
+        try {
+            const { id } = req.params;
+            const result = await taskService.update(id, req.body);
+            res.status(200).send(result);
+        } catch (error) {
+            res.status(500).send({ error });
+        }
+    });
+    app.delete('/api/tasks/:id', async (req, res) => {
+        try {
+            const { id } = req.params;
+            await taskService.delete(id);
+            res.status(204).send();
+        } catch (error) {
+            res.status(500).send({ error });
+        }
+    });
+
 })().catch((error) => {
     console.error('Failed to initialize database:', error);
 });
