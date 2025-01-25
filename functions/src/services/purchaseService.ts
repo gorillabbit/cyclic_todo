@@ -1,7 +1,8 @@
 import { DeepPartial, EntityManager } from 'typeorm';
 import AppDataSource from '../db.js';
 import { BaseService } from './serviceUtils.js';
-import { Purchases } from '@entity/Purchases.js';
+import { Purchases } from '../../../entity/entities/Purchases.js';
+
 /**
  * Purchases 専用サービスクラス
  * create / update をオーバーライドし、トランザクション内で

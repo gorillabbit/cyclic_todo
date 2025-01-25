@@ -8,6 +8,7 @@ type PurchaseContextType = {
     purchaseList: PurchaseDataType[];
     categorySet: string[];
     setPurchaseList: (purchaseList: PurchaseDataType[]) => void;
+    fetchPurchases: () => Promise<void>;
 };
 
 // Contextを作成（初期値は空のPurchaseListとダミーのsetPurchaseList関数）
@@ -15,6 +16,7 @@ export const PurchaseContext = createContext<PurchaseContextType>({
     purchaseList: [],
     categorySet: [],
     setPurchaseList: () => {},
+    fetchPurchases: async () => {},
 });
 
 export const PurchaseProvider = memo(({ children }: { children: ReactNode }) => {
@@ -34,20 +36,24 @@ export const PurchaseProvider = memo(({ children }: { children: ReactNode }) => 
         _setPurchaseList(orderedPurchaseList);
     }, []);
 
+    const fetchPurchases = useCallback(async () => {
+        const data = await getPurchases(tabId);
+        const purchases = parseDateFieldsDeep(data, ['date', 'payDate', 'timestamp']);
+        _setPurchaseList(purchases);
+    }, [tabId]);
+
     useEffect(() => {
-        getPurchases(tabId).then((data) => {
-            const purchases = parseDateFieldsDeep(data, ['date', 'payDate', 'timestamp']);
-            _setPurchaseList(purchases);
-        });
-    }, []);
+        fetchPurchases();
+    }, [fetchPurchases, tabId]);
 
     const context = useMemo(() => {
         return {
             purchaseList,
             categorySet,
             setPurchaseList,
+            fetchPurchases,
         };
-    }, [categorySet, purchaseList, setPurchaseList]);
+    }, [categorySet, purchaseList, setPurchaseList, fetchPurchases]);
 
     return <PurchaseContext.Provider value={context}>{children}</PurchaseContext.Provider>;
 });

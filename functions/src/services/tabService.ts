@@ -1,7 +1,8 @@
 import { DeepPartial, EntityManager } from 'typeorm';
 import AppDataSource from '../db.js';
 import { BaseService } from './serviceUtils.js';
-import { Tabs } from '@entity/Tabs.js';
+import { Tabs } from '../../../entity/entities/Tabs.js';
+
 export class TabService extends BaseService<Tabs> {
     constructor() {
         super(Tabs, 'tabs');
