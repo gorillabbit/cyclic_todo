@@ -4,7 +4,6 @@ import EditPurchaseRow from './EditPurchaseRow';
 import NormalPurchaseRow from './NormalPurchaseRow';
 import EditPricePurchaseRow from './EditPricePurchaseRow';
 import { PurchaseDataType } from '../../../../types/purchaseTypes';
-import { usePurchase } from '../../../../hooks/useData';
 
 type PlainPurchasesRowProps = {
     setOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -19,7 +18,6 @@ type PlainPurchasesRowProps = {
     isEditPrice: boolean;
     setIsEditPrice: React.Dispatch<React.SetStateAction<boolean>>;
     index: number;
-    purchaseList: PurchaseDataType[];
 };
 
 const PlainPurchasesRow = memo(
@@ -36,7 +34,6 @@ const PlainPurchasesRow = memo(
         isEditPrice,
         setIsEditPrice,
         index,
-        purchaseList,
     }: PlainPurchasesRowProps) => (
         <>
             {isEdit ? (
@@ -45,7 +42,6 @@ const PlainPurchasesRow = memo(
                     editFormData={editFormData}
                     setEditFormData={setEditFormData}
                     isSmall={isSmall}
-                    updatePurchases={purchaseList}
                 />
             ) : isEditPrice ? (
                 <EditPricePurchaseRow
@@ -53,7 +49,6 @@ const PlainPurchasesRow = memo(
                     editFormData={editFormData}
                     setEditFormData={setEditFormData}
                     isSmall={isSmall}
-                    updatePurchases={purchaseList}
                 />
             ) : (
                 <NormalPurchaseRow
@@ -65,7 +60,6 @@ const PlainPurchasesRow = memo(
                     setIsEdit={setIsEdit}
                     setIsEditPrice={setIsEditPrice}
                     index={index}
-                    updatePurchases={purchaseList}
                 />
             )}
             {isGroup && (
@@ -141,8 +135,6 @@ const PurchasesRow = ({
     const isGroup = groupPurchases.length > 0;
     const [editFormData, setEditFormData] = useState<PurchaseDataType>(purchase);
 
-    const { purchaseList } = usePurchase();
-
     const plainProps = {
         groupPurchases,
         isGroup,
@@ -156,7 +148,6 @@ const PurchasesRow = ({
         isEditPrice,
         setIsEditPrice,
         index,
-        purchaseList,
     };
     return <PlainPurchasesRow {...plainProps} />;
 };

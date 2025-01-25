@@ -4,11 +4,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import DeleteConfirmDialog from '../../DeleteConfirmDialog';
 import { PurchaseDataType } from '../../../../types/purchaseTypes';
-import {
-    deletePurchaseAndUpdateLater,
-    updateAndAddPurchases,
-} from '../../../../utilities/purchaseUtilities';
-import { usePurchase } from '../../../../hooks/useData';
+import { deletePurchase } from '../../../../utilities/apiClient';
 
 type PlainPurchaseRowButtonsProps = {
     purchase: PurchaseDataType;
@@ -75,15 +71,12 @@ const PurchaseRowButtons = ({
     setIsEdit,
     setIsEditPrice,
     isUncertain,
-    updatePurchases,
 }: {
     purchase: PurchaseDataType;
     setIsEdit: (value: React.SetStateAction<boolean>) => void;
     setIsEditPrice: React.Dispatch<React.SetStateAction<boolean>>;
     isUncertain: boolean | undefined;
-    updatePurchases: PurchaseDataType[];
 }) => {
-    const { setPurchaseList } = usePurchase();
     const [openDialog, setOpenDialog] = useState<boolean>(false);
     const handleEditClick = useCallback(() => {
         setIsEdit(true);
@@ -96,11 +89,8 @@ const PurchaseRowButtons = ({
     const handleEditPriceButtonClick = useCallback(() => setIsEditPrice(true), [setIsEditPrice]);
 
     const deleteAction = useCallback(async () => {
-        let updates = updatePurchases;
-        updates = await deletePurchaseAndUpdateLater(purchase.id, updates);
-        updateAndAddPurchases(updates);
-        setPurchaseList(updates);
-    }, [purchase.id, setPurchaseList, updatePurchases]);
+        deletePurchase(purchase.id);
+    }, [purchase.id]);
 
     const plainProps = {
         purchase,

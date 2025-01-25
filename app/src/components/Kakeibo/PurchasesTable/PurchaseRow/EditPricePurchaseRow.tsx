@@ -1,16 +1,12 @@
 import { TextField, IconButton, TableRow, TableCell } from '@mui/material';
 import { memo, useCallback, useState } from 'react';
 import DoneIcon from '@mui/icons-material/Done';
-import {
-    numericProps,
-    updateAndAddPurchases,
-    updatePurchaseAndUpdateLater,
-} from '../../../../utilities/purchaseUtilities';
+import { numericProps } from '../../../../utilities/purchaseUtilities';
 import TableCellWrapper from '../../TableCellWrapper';
 import { PurchaseDataType } from '../../../../types/purchaseTypes';
-import { usePurchase } from '../../../../hooks/useData';
 import { ErrorType } from '../../../../types';
 import { getHasError, validateEditPurchase } from '../../KakeiboSchemas';
+import { updatePurchase } from '../../../../utilities/apiClient';
 
 type UnderHalfRowProps = {
     handleEditFormChange: (name: string, value: string | number) => void;
@@ -107,29 +103,23 @@ const EditPricePurchaseRow = ({
     editFormData,
     setEditFormData,
     isSmall,
-    updatePurchases,
 }: {
     setIsEditPrice: React.Dispatch<React.SetStateAction<boolean>>;
     editFormData: PurchaseDataType;
     setEditFormData: React.Dispatch<React.SetStateAction<PurchaseDataType>>;
     isSmall: boolean;
-    updatePurchases: PurchaseDataType[];
 }) => {
     // 編集内容を保存する関数
-    const { setPurchaseList } = usePurchase();
     const handleSaveClick = useCallback(async () => {
-        const certainPurchase = {
+        updatePurchase(editFormData.id, {
             ...editFormData,
             difference: Number(editFormData.difference),
             isUncertain: false,
-        };
-        const update = (await updatePurchaseAndUpdateLater(certainPurchase, updatePurchases))
-            .purchases;
-        updateAndAddPurchases(update);
-        setPurchaseList(update);
+        });
+
         setEditFormData((prev) => ({ ...prev, isUncertain: false }));
         setIsEditPrice(false);
-    }, [editFormData, setEditFormData, setIsEditPrice, setPurchaseList, updatePurchases]);
+    }, [editFormData, setEditFormData, setIsEditPrice]);
 
     const [errors, setErrors] = useState<ErrorType>({});
     const hasError = getHasError(errors);

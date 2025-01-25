@@ -158,7 +158,7 @@ const TransferInput = () => {
             ...basePurchase,
             title: `【送】${purchaseTitle}`,
             method: from,
-            payDate: getPayDate({ date, method: from }),
+            payDate: getPayDate(fromMethod, date),
             assetId: fromMethod.assetId,
             difference: -price,
         };
@@ -168,7 +168,7 @@ const TransferInput = () => {
             ...basePurchase,
             title: `【受】${purchaseTitle}`,
             method: to,
-            payDate: getPayDate({ date, method: to }),
+            payDate: getPayDate(toMethod, date),
             assetId: toMethod.assetId,
             difference: price,
         };

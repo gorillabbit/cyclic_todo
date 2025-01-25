@@ -3,17 +3,14 @@ import { DatePicker } from '@mui/x-date-pickers';
 import { memo, useCallback, useState } from 'react';
 import DoneIcon from '@mui/icons-material/Done';
 import { ErrorType, MethodListType } from '../../../../types';
-import { useMethod, usePurchase } from '../../../../hooks/useData';
+import { useMethod } from '../../../../hooks/useData';
 import TableCellWrapper from '../../TableCellWrapper';
 import { PurchaseDataType } from '../../../../types/purchaseTypes';
-import {
-    getPayDate,
-    updateAndAddPurchases,
-    updatePurchaseAndUpdateLater,
-} from '../../../../utilities/purchaseUtilities';
+import { getPayDate } from '../../../../utilities/purchaseUtilities';
 import { getHasError, validateEditPurchase } from '../../KakeiboSchemas';
 import MethodSelector from '../../ScreenParts/MethodSelector';
 import CategorySelector from '../../ScreenParts/CategorySelector';
+import { updatePurchase } from '../../../../utilities/apiClient';
 
 type UnderHalfRowProps = {
     editFormData: PurchaseDataType;
@@ -146,15 +143,12 @@ const EditPurchaseRow = ({
     editFormData,
     setEditFormData,
     isSmall,
-    updatePurchases,
 }: {
     setIsEdit: React.Dispatch<React.SetStateAction<boolean>>;
     editFormData: PurchaseDataType;
     setEditFormData: React.Dispatch<React.SetStateAction<PurchaseDataType>>;
     isSmall: boolean;
-    updatePurchases: PurchaseDataType[];
 }) => {
-    const { setPurchaseList } = usePurchase();
     const { methodList } = useMethod();
 
     // 編集内容を保存する関数
@@ -163,21 +157,13 @@ const EditPurchaseRow = ({
         if (!method) {
             return console.error('支払い方法が見つかりません');
         }
-        const 更新後purchase = (
-            await updatePurchaseAndUpdateLater(
-                {
-                    ...editFormData,
-                    assetId: method.assetId,
-                    payDate: getPayDate(editFormData),
-                },
-                updatePurchases
-            )
-        ).purchases;
-        // 編集が完了したあとにそれとわかる何かを表示するスナックバーなど。
-        updateAndAddPurchases(更新後purchase);
-        setPurchaseList(更新後purchase);
+        updatePurchase(editFormData.id, {
+            ...editFormData,
+            assetId: method.assetId,
+            payDate: getPayDate(method, editFormData.date),
+        });
         setIsEdit(false);
-    }, [editFormData, setIsEdit, setPurchaseList, updatePurchases]);
+    }, [editFormData, setIsEdit]);
 
     const [errors, setErrors] = useState<ErrorType>({});
     const hasError = getHasError(errors);

@@ -12,7 +12,6 @@ type UnderHalfRowProps = {
     editFormData: PurchaseDataType;
     setIsEdit: (value: React.SetStateAction<boolean>) => void;
     setIsEditPrice: React.Dispatch<React.SetStateAction<boolean>>;
-    updatePurchases: PurchaseDataType[];
     assetName: string | undefined;
     method: { timing: string; label: string } | undefined;
 };
@@ -23,7 +22,6 @@ const UnderHalfRow = memo(
         isGroup,
         setIsEdit,
         setIsEditPrice,
-        updatePurchases,
         assetName,
         method,
     }: UnderHalfRowProps) => (
@@ -48,7 +46,6 @@ const UnderHalfRow = memo(
                         setIsEdit={setIsEdit}
                         setIsEditPrice={setIsEditPrice}
                         isUncertain={editFormData.isUncertain}
-                        updatePurchases={updatePurchases}
                     />
                 )}
             </TableCellWrapper>
@@ -73,7 +70,6 @@ const PlainNormalPurchaseRow = memo(
         setIsEdit,
         setIsEditPrice,
         rowColor,
-        updatePurchases,
         assetName,
         method,
     }: PlainNormalPurchaseRowProps) => (
@@ -107,7 +103,6 @@ const PlainNormalPurchaseRow = memo(
                         setIsEditPrice={setIsEditPrice}
                         editFormData={editFormData}
                         isGroup={isGroup}
-                        updatePurchases={updatePurchases}
                         assetName={assetName}
                         method={method}
                     />
@@ -121,7 +116,6 @@ const PlainNormalPurchaseRow = memo(
                         setIsEditPrice={setIsEditPrice}
                         editFormData={editFormData}
                         isGroup={isGroup}
-                        updatePurchases={updatePurchases}
                         assetName={assetName}
                         method={method}
                     />
@@ -136,7 +130,6 @@ const NormalPurchaseRow = (props: {
     editFormData: PurchaseDataType;
     setIsEdit: (value: React.SetStateAction<boolean>) => void;
     setIsEditPrice: React.Dispatch<React.SetStateAction<boolean>>;
-    updatePurchases: PurchaseDataType[];
     setOpen: React.Dispatch<React.SetStateAction<boolean>>;
     open: boolean;
     isSmall: boolean;

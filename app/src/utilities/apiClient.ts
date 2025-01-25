@@ -22,14 +22,12 @@ const fetchData = async <T>(
 
         Object.entries(params).forEach(([key, value]) => {
             if (Array.isArray(value)) {
-                // 配列の場合、各要素をクエリパラメータとして追加
                 value.forEach((v) => {
                     if (v != null && v !== '') {
                         urlParams.append(key, v);
                     }
                 });
             } else if (value != null && value !== '') {
-                // 配列でない場合、そのまま追加
                 urlParams.append(key, value);
             }
         });
@@ -108,11 +106,24 @@ export const updateData = async <T extends CreateDataType>(
     return sendData(`${endpoint}/${id}`, 'PUT', data);
 };
 
+// データ削除共通関数
+export const deleteData = async (
+    endpoint: string,
+    id: string
+): Promise<void> => {
+    return sendData(`${endpoint}/${id}`, 'DELETE', {});
+};
+
 // 購入データ更新（既存コードとの互換性のため保持）
 export const updatePurchase = async (
     id: string, data: Partial<PurchaseDataType>
 ): Promise<void> => {
     return updateData('/purchase', id, data);
+};
+
+// 購入データ削除
+export const deletePurchase = async (id: string): Promise<void> => {
+    return deleteData('/purchase', id);
 };
 
 // メソッド更新
@@ -133,7 +144,6 @@ export const updateTab = async (id: string, data: Partial<TabListType>): Promise
 export const getPurchases = async (
     tabId?: string
 ): Promise<PurchaseDataType[]> => {
-    console.log(tabId);
     return fetchData<PurchaseDataType[]>('/purchase', {
         tab_id: tabId
     });
@@ -209,14 +219,10 @@ export const getTransferTemplates = async (
 
 // 既存のアカウント取得関数
 type FilterParam = {
-    // "AccountType" に存在するキーのみ受け付ける (keyof AccountType)
     field: keyof AccountType;
-    // 値は文字列か文字列配列を想定（number があるなら number も考慮）
     value: string | string[];
   };
-  /**
-   * AccountTypeに存在するパラメーター名と値(単一or配列)をまとめてクエリにする
-   */
+
 export const getAccounts = async (
     filters: FilterParam[]
 ): Promise<AccountType[]> => {
@@ -240,7 +246,6 @@ export const getTabs = async (
 
     filters.forEach(({ field, value }) => {
         if (Array.isArray(value)) {
-            // 配列の場合、同じキーで複数の値を持つ形式にする
             params[field] = value;
         } else {
             params[field] = value;
