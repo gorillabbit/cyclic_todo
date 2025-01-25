@@ -149,8 +149,8 @@ export interface InputPurchaseScheduleType {
 export interface InputPurchaseScheduleRowType extends InputPurchaseScheduleType {
     id: string;
 }
-export interface PurchaseScheduleType extends Omit<InputPurchaseScheduleType, 'endDate'> {
-    endDate: Timestamp;
+export interface PurchaseScheduleType extends InputPurchaseScheduleType {
+    id: string;
 }
 export interface PurchaseScheduleListType extends PurchaseScheduleType {
     id: string;

@@ -6,7 +6,7 @@ import { addDocPurchaseTemplate } from '../../../firebase';
 import { ErrorType, MethodListType } from '../../../types';
 import { getPayDate, numericProps } from '../../../utilities/purchaseUtilities';
 import TemplateButtons from './TemplateButtonsContainer';
-import { useTab, useAccount, useMethod } from '../../../hooks/useData';
+import { useTab, useAccount, useMethod, usePurchase } from '../../../hooks/useData';
 import { defaultInputFieldPurchase, InputFieldPurchaseType } from '../../../types/purchaseTypes';
 import { set } from 'date-fns';
 import { getHasError, validatePurchase } from '../KakeiboSchemas';
@@ -161,6 +161,7 @@ const PurchaseInput = () => {
 
     // useTabを関数内で呼び出すと、Invalid hook call. Hooks can only be called inside of the body of a function component.というエラーが出る。
     const { tabId } = useTab();
+    const { fetchPurchases } = usePurchase();
     const addPurchase = useCallback(async () => {
         if (isError()) {
             return;
@@ -188,8 +189,9 @@ const PurchaseInput = () => {
             title: newPurchase.title,
             method: newPurchase.method,
         };
-        createPurchase(purchaseData);
+        await createPurchase(purchaseData);
         setNewPurchase(defaultInputFieldPurchase);
+        fetchPurchases();
     }, [Account, defaultInputFieldPurchase, newPurchase]);
 
     const addTemplate = useCallback(() => {

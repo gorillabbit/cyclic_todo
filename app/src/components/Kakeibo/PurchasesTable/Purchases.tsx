@@ -16,11 +16,7 @@ import PurchasesRow from './PurchaseRow/PurchasesRow';
 import AssetsList from '../Asset/AssetsList';
 import { addMonths } from 'date-fns';
 import { useIsSmall } from '../../../hooks/useWindowSize';
-import {
-    isLaterPayment,
-    sortObjectsByParameter,
-    updateDocuments,
-} from '../../../utilities/purchaseUtilities';
+import { isLaterPayment, sortObjectsByParameter } from '../../../utilities/purchaseUtilities';
 import TableHeadCell from './TableHeadCell';
 import { useMethod, usePurchase } from '../../../hooks/useData';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
@@ -88,7 +84,7 @@ const PlainPurchases = memo(
                     <IconButton onClick={handleNextMonthButton}>
                         <ArrowForwardIosIcon />
                     </IconButton>
-                    <Button onClick={updateDocuments}>再計算</Button>
+                    <Button onClick={() => console.log('未実装')}>再計算</Button>
                     <Button onClick={() => setOpenNarrowDown(true)}>絞り込み</Button>
                 </Box>
                 <Table size="small">

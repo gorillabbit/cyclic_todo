@@ -3,7 +3,7 @@ import { DatePicker } from '@mui/x-date-pickers';
 import { memo, useCallback, useState } from 'react';
 import DoneIcon from '@mui/icons-material/Done';
 import { ErrorType, MethodListType } from '../../../../types';
-import { useMethod } from '../../../../hooks/useData';
+import { useMethod, usePurchase } from '../../../../hooks/useData';
 import TableCellWrapper from '../../TableCellWrapper';
 import { PurchaseDataType } from '../../../../types/purchaseTypes';
 import { getPayDate } from '../../../../utilities/purchaseUtilities';
@@ -150,6 +150,7 @@ const EditPurchaseRow = ({
     isSmall: boolean;
 }) => {
     const { methodList } = useMethod();
+    const { fetchPurchases } = usePurchase();
 
     // 編集内容を保存する関数
     const handleSaveClick = useCallback(async () => {
@@ -157,12 +158,13 @@ const EditPurchaseRow = ({
         if (!method) {
             return console.error('支払い方法が見つかりません');
         }
-        updatePurchase(editFormData.id, {
+        await updatePurchase(editFormData.id, {
             ...editFormData,
             assetId: method.assetId,
             payDate: getPayDate(method, editFormData.date),
         });
         setIsEdit(false);
+        fetchPurchases();
     }, [editFormData, setIsEdit]);
 
     const [errors, setErrors] = useState<ErrorType>({});

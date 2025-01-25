@@ -7,6 +7,7 @@ import { PurchaseDataType } from '../../../../types/purchaseTypes';
 import { ErrorType } from '../../../../types';
 import { getHasError, validateEditPurchase } from '../../KakeiboSchemas';
 import { updatePurchase } from '../../../../utilities/apiClient';
+import { usePurchase } from '../../../../hooks/useData';
 
 type UnderHalfRowProps = {
     handleEditFormChange: (name: string, value: string | number) => void;
@@ -109,9 +110,10 @@ const EditPricePurchaseRow = ({
     setEditFormData: React.Dispatch<React.SetStateAction<PurchaseDataType>>;
     isSmall: boolean;
 }) => {
+    const { fetchPurchases } = usePurchase();
     // 編集内容を保存する関数
     const handleSaveClick = useCallback(async () => {
-        updatePurchase(editFormData.id, {
+        await updatePurchase(editFormData.id, {
             ...editFormData,
             difference: Number(editFormData.difference),
             isUncertain: false,
@@ -119,6 +121,7 @@ const EditPricePurchaseRow = ({
 
         setEditFormData((prev) => ({ ...prev, isUncertain: false }));
         setIsEditPrice(false);
+        fetchPurchases();
     }, [editFormData, setEditFormData, setIsEditPrice]);
 
     const [errors, setErrors] = useState<ErrorType>({});

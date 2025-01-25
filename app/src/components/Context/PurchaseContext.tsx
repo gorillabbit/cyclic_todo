@@ -1,4 +1,4 @@
-import { memo, ReactNode, useMemo, useState, useCallback, useEffect, createContext } from 'react';
+import { memo, ReactNode, useMemo, useState, useEffect, createContext } from 'react';
 import { useTab } from '../../hooks/useData';
 import { PurchaseDataType } from '../../types/purchaseTypes';
 import { getPurchases } from '../../utilities/apiClient';
@@ -21,7 +21,7 @@ export const PurchaseContext = createContext<PurchaseContextType>({
 
 export const PurchaseProvider = memo(({ children }: { children: ReactNode }) => {
     const { tabId } = useTab();
-    const [purchaseList, _setPurchaseList] = useState<PurchaseDataType[]>([]);
+    const [purchaseList, setPurchaseList] = useState<PurchaseDataType[]>([]);
 
     const categoryList = purchaseList.map((purchase) => purchase.category);
     const categorySet = categoryList.filter(
@@ -29,22 +29,16 @@ export const PurchaseProvider = memo(({ children }: { children: ReactNode }) => 
     );
     categorySet.push('');
 
-    const setPurchaseList = useCallback((purchaseList: PurchaseDataType[]) => {
-        const orderedPurchaseList = purchaseList.sort(
-            (a, b) => b.date.getTime() - a.date.getTime()
-        );
-        _setPurchaseList(orderedPurchaseList);
-    }, []);
-
-    const fetchPurchases = useCallback(async () => {
-        const data = await getPurchases(tabId);
+    const fetchPurchases = async () => {
+        const data = await getPurchases([{ field: 'tabId', value: tabId }]);
         const purchases = parseDateFieldsDeep(data, ['date', 'payDate', 'timestamp']);
-        _setPurchaseList(purchases);
-    }, [tabId]);
+        const orderedPurchaseList = purchases.sort((a, b) => b.date.getTime() - a.date.getTime());
+        setPurchaseList(orderedPurchaseList);
+    };
 
     useEffect(() => {
         fetchPurchases();
-    }, [fetchPurchases, tabId]);
+    }, [tabId]);
 
     const context = useMemo(() => {
         return {

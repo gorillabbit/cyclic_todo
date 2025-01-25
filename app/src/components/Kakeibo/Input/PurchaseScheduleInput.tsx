@@ -1,19 +1,15 @@
 import { Box, Button, FormGroup, InputAdornment, MenuItem, Select, TextField } from '@mui/material';
 import StyledCheckbox from '../../StyledCheckbox';
 import { useState, useCallback, useMemo } from 'react';
-import { addDocPurchaseSchedule } from '../../../firebase';
 import { ErrorType, InputPurchaseScheduleType, MethodListType } from '../../../types';
 import { addYears } from 'date-fns';
 import { DatePicker } from '@mui/x-date-pickers';
-import {
-    addScheduledPurchase,
-    updateAndAddPurchases,
-    weekDaysString,
-} from '../../../utilities/purchaseUtilities';
+import { addScheduledPurchase, weekDaysString } from '../../../utilities/purchaseUtilities';
 import { useAccount, usePurchase, useTab } from '../../../hooks/useData';
 import { getHasError, validatePurchaseSchedule } from '../KakeiboSchemas';
 import MethodSelector from '../ScreenParts/MethodSelector';
 import CategorySelector from '../ScreenParts/CategorySelector';
+import { createPurchaseSchedule } from '../../../utilities/apiClient';
 
 const defaultNewPurchase: InputPurchaseScheduleType = {
     userId: '',
@@ -61,7 +57,7 @@ const PurchaseScheduleInput = () => {
     );
 
     const { Account } = useAccount();
-    const { purchaseList, setPurchaseList } = usePurchase();
+    const { fetchPurchases } = usePurchase();
     const addPurchaseSchedule = useCallback(async () => {
         const isError = validateAndSetErrors(newPurchaseSchedule);
         if (isError) {
@@ -71,17 +67,13 @@ const PurchaseScheduleInput = () => {
             return console.error('ログインしてください');
         }
 
-        const addedSchedule = await addDocPurchaseSchedule({
+        const addedSchedule = await createPurchaseSchedule({
             ...newPurchaseSchedule,
             userId: Account.id,
         });
-        const result = addScheduledPurchase(addedSchedule.id, newPurchaseSchedule, purchaseList);
-        if (!result) {
-            return console.error('エラーが発生しました');
-        }
-        updateAndAddPurchases(result);
-        setPurchaseList(result);
+        await addScheduledPurchase(addedSchedule.id, newPurchaseSchedule);
         setNewPurchaseSchedule(defaultNewPurchase);
+        fetchPurchases();
     }, [newPurchaseSchedule]);
 
     return (

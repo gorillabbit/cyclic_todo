@@ -10,16 +10,12 @@ import {
     ErrorType,
     TransferType,
 } from '../../../types';
-import {
-    addPurchaseAndUpdateLater,
-    getPayDate,
-    numericProps,
-    updateAndAddPurchases,
-} from '../../../utilities/purchaseUtilities';
+import { getPayDate, numericProps } from '../../../utilities/purchaseUtilities';
 import TransferTemplateButtonsContainer from './TransferTemplateButtonContainer';
 import { useMethod, usePurchase, useTab } from '../../../hooks/useData';
 import { getHasError, validateTransfer } from '../KakeiboSchemas';
 import MethodSelector from '../ScreenParts/MethodSelector';
+import { createPurchase } from '../../../utilities/apiClient';
 
 type PlainTransferInputProps = {
     handleNewTransferInput: (name: string, value: string | Date | MethodListType | null) => void;
@@ -108,7 +104,7 @@ const TransferInput = () => {
         ...defaultTransferInput,
         tabId,
     });
-    const { purchaseList, setPurchaseList } = usePurchase();
+    const { fetchPurchases } = usePurchase();
 
     const [errors, setErrors] = useState<ErrorType>({});
 
@@ -162,7 +158,6 @@ const TransferInput = () => {
             assetId: fromMethod.assetId,
             difference: -price,
         };
-        const addedFromPurchase = addPurchaseAndUpdateLater(fromPurchase, purchaseList).purchases;
 
         const toPurchase = {
             ...basePurchase,
@@ -172,14 +167,12 @@ const TransferInput = () => {
             assetId: toMethod.assetId,
             difference: price,
         };
-        const addedFromAndToPurchase = addPurchaseAndUpdateLater(
-            toPurchase,
-            addedFromPurchase
-        ).purchases;
-        updateAndAddPurchases(addedFromAndToPurchase);
-        setPurchaseList(addedFromAndToPurchase);
+
+        await createPurchase(fromPurchase);
+        await createPurchase(toPurchase);
         setNewTransfer(defaultTransferInput);
-    }, [currentUser, purchaseList, setPurchaseList, tabId, newTransfer]);
+        fetchPurchases();
+    }, [currentUser, tabId, newTransfer]);
 
     const addTemplate = useCallback(() => {
         // TODO ここの処理をaddTransferと共通化できないか考える

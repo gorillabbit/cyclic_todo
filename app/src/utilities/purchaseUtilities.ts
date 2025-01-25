@@ -1,22 +1,10 @@
 import { InputBaseComponentProps } from '@mui/material';
 import { InputPurchaseScheduleType, MethodListType, WeekDay } from '../types';
-import { db, dbNames, deleteDocPurchase } from '../firebase';
 import { addMonths, nextDay, addDays } from 'date-fns';
-import {
-    doc,
-    collection,
-    getDoc,
-    updateDoc,
-    setDoc,
-    addDoc,
-    query,
-    orderBy,
-    getDocs,
-    writeBatch,
-} from 'firebase/firestore';
 import { getPayLaterDate } from './dateUtilities';
-import { PurchaseDataType, PurchaseRawDataType } from '../types/purchaseTypes';
+import { PurchaseDataType } from '../types/purchaseTypes';
 import { useMethod } from '../hooks/useData';
+import { createPurchase, deletePurchase, getPurchases } from './apiClient';
 
 /**
  * 収支を合計する(収入は+、支出は-で表現されるので支出の合計は-になる)
@@ -86,16 +74,14 @@ export const filterPurchasesByIncomeType = (
  * @param purchaseSchedule
  */
 export const deleteScheduledPurchases = async (
-    purchaseList: PurchaseDataType[],
     purchaseScheduleId: string
-):Promise<PurchaseDataType[]> => {
-    let update = purchaseList;
-    for (const purchase of update) {
-        if (purchase.parentScheduleId === purchaseScheduleId) {
-            update = await deletePurchaseAndUpdateLater(purchase.id, purchaseList);
-        }
+):Promise<void> => {
+    const targetPurchases =await getPurchases(
+        [{ field: 'parentScheduleId', value: purchaseScheduleId }]
+    );
+    for (const purchase of targetPurchases) {
+        await deletePurchase(purchase.id);
     }
-    return update;
 };
 
 const weekDays: Record<WeekDay, Day> = {
@@ -212,107 +198,19 @@ export const getLastBalance = (
     return Number(lastPurchase?.balance) ? Number(lastPurchase?.balance) : 0;
 };
 
-// ある時点より後の支払いすべてを更新する
-export const updateAllLaterPurchases = (
-    assetId: string,
-    payDate: Date,
-    difference: number,
-    updatePurchases: PurchaseDataType[]
-):PurchaseDataType[] => {
-    if (difference === 0) return updatePurchases;
-    const filteredPurchases = updatePurchases.filter((p) => p.assetId === assetId);
-    const restPurchases = updatePurchases.filter((p) => p.assetId !== assetId);
-    return [
-        ...filteredPurchases.map((p) => ({
-            ...p,
-            balance:
-                p.payDate > payDate ? Number(p.balance) + Number(difference) : Number(p.balance),
-        })),
-        ...restPurchases,
-    ];
-};
-
-export const deletePurchaseAndUpdateLater = async (
-    purchaseId: string,
-    updatePurchases: PurchaseDataType[]
-):Promise<PurchaseDataType[]> => {
-    const docSnap = await getDoc(doc(db, dbNames.purchase, purchaseId));
-    const purchase = docSnap.data() as PurchaseRawDataType;
-    deleteDocPurchase(purchaseId);
-    const filteredPurchase = updatePurchases.filter((p) => p.id !== purchaseId);
-    return updateAllLaterPurchases(
-        purchase.assetId,
-        purchase.payDate.toDate(),
-        Number(-purchase.difference),
-        filteredPurchase
-    );
-};
-
-export const addPurchaseAndUpdateLater = (
-    purchase: PurchaseDataType,
-    updatePurchases: PurchaseDataType[]
-):{
-    purchases: PurchaseDataType[];
-    id: string;
-} => {
-    const difference = Number(purchase.difference);
-    const purchases = updateAllLaterPurchases(
-        purchase.assetId,
-        purchase.payDate,
-        difference,
-        updatePurchases
-    );
-    const lastBalance = getLastBalance(purchase.assetId, purchase.date, purchases);
-    const newDocRef = doc(collection(db, dbNames.purchase));
-    return {
-        purchases: [
-            ...purchases,
-            {
-                ...purchase,
-                id: purchase.id ? purchase.id : newDocRef.id,
-                balance: lastBalance + difference,
-            },
-        ],
-        id: newDocRef.id,
-    };
-};
-
-export const updatePurchaseAndUpdateLater = async (
-    purchase: PurchaseDataType,
-    updatePurchases: PurchaseDataType[]
-):Promise<{
-    purchases: PurchaseDataType[];
-    id: string;
-} | {
-    purchases: PurchaseDataType[];
-}> => {
-    // purchaseIdで指定した支払いを取得して、その支払いの差額を計算して、引く
-    // その後のcurrentPurchase以外の支払いを更新する
-    const currentPurchases = updatePurchases.find((p) => p.id === purchase.id);
-    if (!currentPurchases) return { purchases: updatePurchases };
-    const updatedLaterPurchases = updateAllLaterPurchases(
-        currentPurchases.assetId,
-        currentPurchases.payDate,
-        -currentPurchases.difference,
-        updatePurchases.filter((p) => p.id !== purchase.id)
-    );
-    return addPurchaseAndUpdateLater(purchase, updatedLaterPurchases);
-};
-
 /**
  * 未来の予定を追加する
  * @param docRef
  * @param purchaseSchedule
  */
-export const addScheduledPurchase = (
+export const addScheduledPurchase = async (
     purchaseScheduleId: string,
     purchaseSchedule: InputPurchaseScheduleType,
-    updatePurchases: PurchaseDataType[]
-):PurchaseDataType[] | undefined => {
+):Promise<PurchaseDataType[] | undefined> => {
     const { methodList } = useMethod();
     const { price, income, method, cycle, date, endDate, day } = purchaseSchedule;
     const currentMethod = methodList.find((m) => m.id === method);
-    if (!currentMethod) return;
+    if (currentMethod === undefined) return;
     const difference = income ? price : -price;
     const purchaseBase = {
         userId: purchaseSchedule.userId,
@@ -326,12 +224,12 @@ export const addScheduledPurchase = (
         assetId: currentMethod.assetId,
         balance: 0,
         difference,
-        id: '',
+        id: new Date().getTime().toString(),
     };
 
     const purchaseList: PurchaseDataType[] = [];
     const getDays = ():Date[] => {
-        if (cycle === '毎月' && date) return listMonthlyDaysUntil(date, endDate);
+        if (cycle === '毎月' && date !== undefined) return listMonthlyDaysUntil(date, endDate);
         if (cycle === '毎週' && day) return listWeeklyDaysUntil(day, endDate);
         return [];
     };
@@ -342,72 +240,11 @@ export const addScheduledPurchase = (
             dateDay : 
             getPayLaterDate(dateDay, currentMethod.timingDate),
     }));
-    let newUpdatePurchases = updatePurchases;
     for (const purchase of purchaseList) {
-        newUpdatePurchases = addPurchaseAndUpdateLater(purchase, newUpdatePurchases).purchases;
+        await createPurchase(purchase);
     }
 
-    return newUpdatePurchases;
-};
-
-export const updateAndAddPurchases = (updatePurchases: PurchaseDataType[]):void => {
-    updatePurchases.forEach(async (purchase) => {
-        if (purchase.id) {
-            const docRef = doc(db, dbNames.purchase, purchase.id);
-            const docSnap = await getDoc(docRef);
-            if (docSnap.exists()) {
-                updateDoc(docRef, { ...purchase });
-            } else {
-                setDoc(docRef, purchase);
-            }
-        } else {
-            addDoc(collection(db, dbNames.purchase), purchase);
-        }
-    });
-};
-
-interface oldPurchases extends PurchaseRawDataType {
-    price?: number;
-    income?: boolean;
-}
-export const updateDocuments = async ():Promise<void> => {
-    const q = query(collection(db, dbNames.purchase), orderBy('payDate', 'asc'));
-    const data = await getDocs(q);
-
-    if (data.empty) return console.error('データがありません');
-
-    const batch = writeBatch(db);
-    const lastPurchases: Record<string, number> = {};
-    const purchases = await Promise.all(
-        data.docs.map(async (doc) => {
-            return { ...({ id: doc.id, ...doc.data() } as oldPurchases), doc };
-        })
-    );
-    const { methodList } = useMethod();
-
-    purchases.forEach((data) => {
-        console.log(data);
-        if (!data.tabId) return;
-        const assetId = methodList.find((m) => m.id === data.method)?.assetId;
-        if (!assetId) return;
-        const lastBalances = lastPurchases[assetId];
-        if (!lastBalances) lastPurchases[assetId] = 0;
-        const difference = data.difference ?? (data.income ? data.price : -(data.price ?? 0));
-        const balance = Number(lastBalances ? lastBalances : 0) + Number(difference);
-
-        const docRef = doc(db, dbNames.purchase, data.id);
-        batch.update(docRef, {
-            difference,
-            balance,
-            assetId: assetId,
-            timestamp: new Date(),
-        });
-
-        lastPurchases[assetId] = balance;
-    });
-    await batch.commit();
-    window.location.reload();
-    console.log('データを更新しました');
+    return
 };
 
 export const getPayDate = (method: MethodListType, date:Date): Date => {

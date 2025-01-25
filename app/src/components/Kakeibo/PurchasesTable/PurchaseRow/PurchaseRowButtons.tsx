@@ -5,6 +5,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import DeleteConfirmDialog from '../../DeleteConfirmDialog';
 import { PurchaseDataType } from '../../../../types/purchaseTypes';
 import { deletePurchase } from '../../../../utilities/apiClient';
+import { usePurchase } from '../../../../hooks/useData';
 
 type PlainPurchaseRowButtonsProps = {
     purchase: PurchaseDataType;
@@ -78,6 +79,7 @@ const PurchaseRowButtons = ({
     isUncertain: boolean | undefined;
 }) => {
     const [openDialog, setOpenDialog] = useState<boolean>(false);
+    const { fetchPurchases } = usePurchase();
     const handleEditClick = useCallback(() => {
         setIsEdit(true);
     }, [setIsEdit]);
@@ -89,7 +91,8 @@ const PurchaseRowButtons = ({
     const handleEditPriceButtonClick = useCallback(() => setIsEditPrice(true), [setIsEditPrice]);
 
     const deleteAction = useCallback(async () => {
-        deletePurchase(purchase.id);
+        await deletePurchase(purchase.id);
+        fetchPurchases();
     }, [purchase.id]);
 
     const plainProps = {

@@ -11,18 +11,17 @@ import { DatePicker } from '@mui/x-date-pickers';
 import { memo, useCallback } from 'react';
 import DoneIcon from '@mui/icons-material/Done';
 import { InputPurchaseScheduleRowType, MethodListType } from '../../../../types';
-import { updateDocPurchaseSchedule } from '../../../../firebase';
 import {
     addScheduledPurchase,
     deleteScheduledPurchases,
     numericProps,
-    updateAndAddPurchases,
     weekDaysString,
 } from '../../../../utilities/purchaseUtilities';
 import { usePurchase } from '../../../../hooks/useData';
 import TableCellWrapper from '../../TableCellWrapper';
 import MethodSelector from '../../ScreenParts/MethodSelector';
 import CategorySelector from '../../ScreenParts/CategorySelector';
+import { updatePurchaseSchedule } from '../../../../utilities/apiClient';
 
 type PlainEditPurchaseScheduleRowProps = {
     editFormData: InputPurchaseScheduleRowType;
@@ -209,39 +208,25 @@ const EditPurchaseScheduleRow = ({
     editFormData,
     setEditFormData,
     isSmall,
-    method,
 }: {
     setIsEdit: React.Dispatch<React.SetStateAction<boolean>>;
     editFormData: InputPurchaseScheduleRowType;
     setEditFormData: React.Dispatch<React.SetStateAction<InputPurchaseScheduleRowType>>;
     isSmall: boolean;
-    method: MethodListType;
 }) => {
-    const { purchaseList, setPurchaseList } = usePurchase();
+    const { purchaseList, setPurchaseList, fetchPurchases } = usePurchase();
 
     // 編集内容を保存する関数
     const handleSaveClick = useCallback(async () => {
-        const update = purchaseList.filter((purchase) => purchase.assetId === method.assetId);
         const { id, ...editFormDataWithoutId } = editFormData;
         // アップデートし、編集を閉じる
-        const updateCurrentPurchaseSchedule = (feature: Partial<InputPurchaseScheduleRowType>) => {
-            updateDocPurchaseSchedule(id, {
-                ...editFormData,
-                ...feature,
-            });
-            setIsEdit(false);
-        };
-        updateCurrentPurchaseSchedule({});
+        updatePurchaseSchedule(id, editFormData);
         // まず子タスクをすべて削除し、その後で新たな予定タスクを追加する
-        const update2 = await deleteScheduledPurchases(update, id);
+        await deleteScheduledPurchases(editFormData.id);
         // idが含まれると、子タスクのidがそれになってしまう
 
-        const update3 = addScheduledPurchase(id, editFormDataWithoutId, update2);
-        if (!update3) {
-            return console.error('予定タスクの追加に失敗しました');
-        }
-        updateAndAddPurchases(update3);
-        setPurchaseList(update3);
+        addScheduledPurchase(id, editFormDataWithoutId);
+        fetchPurchases();
     }, [editFormData, purchaseList, setIsEdit, setPurchaseList]);
 
     const handleEditFormChange = useCallback(
