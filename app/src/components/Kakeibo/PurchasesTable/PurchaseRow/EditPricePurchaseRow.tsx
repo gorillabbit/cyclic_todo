@@ -119,7 +119,7 @@ const EditPricePurchaseRow = ({
             is_uncertain: false,
         });
 
-        setEditFormData((prev) => ({ ...prev, isUncertain: false }));
+        setEditFormData((prev) => ({ ...prev, is_uncertain: false }));
         setIsEditPrice(false);
         fetchPurchases();
     }, [editFormData, setEditFormData, setIsEditPrice]);

@@ -45,7 +45,7 @@ const UnderHalfRow = memo(
                         purchase={editFormData}
                         setIsEdit={setIsEdit}
                         setIsEditPrice={setIsEditPrice}
-                        isUncertain={editFormData.is_uncertain}
+                        is_uncertain={editFormData.is_uncertain}
                     />
                 )}
             </TableCellWrapper>

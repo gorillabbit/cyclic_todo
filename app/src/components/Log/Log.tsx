@@ -53,7 +53,7 @@ const Log: React.FC<LogProps> = ({ log, logsCompleteLogs, openDialog }) => {
     const [isOpenEditDialog, setIsOpenEditDialog] = useState<boolean>(false);
 
     const auth = getAuth();
-    const isSharedLog = log.userId !== auth.currentUser?.uid;
+    const isSharedLog = log.user_id !== auth.currentUser?.uid;
 
     return (
         <>

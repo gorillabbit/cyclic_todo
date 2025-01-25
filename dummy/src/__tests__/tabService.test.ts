@@ -27,8 +27,8 @@ describe('getTabsService Integration Test', () => {
             testTab = new Tabs();
             testTab.id = `test-tab-${uuid_v4()}`.substring(0, 20);
             testTab.name = 'Test Tab';
-            testTab.userId = testAccounts.id;
-            testTab.createUserUid = testAccounts.id;
+            testTab.user_id = testAccounts.id;
+            testTab.create_user_uid = testAccounts.id;
             await tabRepository.save(testTab);
         } catch (error) {
             console.error('Failed to initialize test data:', error);
@@ -53,18 +53,18 @@ describe('getTabsService Integration Test', () => {
     });
 
     it('should return empty array when no tabs exist for user', async () => {
-        const result = await getTabsService({ userId: 'non-existent-user' });
+        const result = await getTabsService({ user_id: 'non-existent-user' });
         expect(result).toEqual([]);
     });
 
     it('should return tabs for user', async () => {
-        const result = await getTabsService({ userId: testAccounts.id });
+        const result = await getTabsService({ user_id: testAccounts.id });
         expect(result).toEqual(
             expect.arrayContaining([
                 expect.objectContaining({
                     id: testTab.id,
                     name: 'Test Tab',
-                    userId: testAccounts.id
+                    user_id: testAccounts.id
                 })
             ])
         );
@@ -74,7 +74,7 @@ describe('getTabsService Integration Test', () => {
         // Force database connection to close to simulate error
         await AppDataSource.destroy();
 
-        await expect(getTabsService({ userId: 'test-user' }))
+        await expect(getTabsService({ user_id: 'test-user' }))
             .rejects.toThrow();
     });
 });

@@ -14,7 +14,7 @@ export class PurchaseService extends BaseService<Purchases> {
     }
 
     /**
-   * 新規登録 → 同一 userId, assetId を持つレコードの残高を再計算
+   * 新規登録 → 同一 user_id, asset_id を持つレコードの残高を再計算
    */
     override async create(entityData: DeepPartial<Purchases>): Promise<Purchases> {
         return AppDataSource.manager.transaction(async (manager: EntityManager) => {
@@ -25,12 +25,12 @@ export class PurchaseService extends BaseService<Purchases> {
             const savedPurchase = await repo.save(newPurchase);
 
             // 2. 再計算
-            //    userId, assetId がない場合は要件に合わせて何もせず終了など
-            if (!savedPurchase.userId || !savedPurchase.assetId) {
+            //    user_id, asset_id がない場合は要件に合わせて何もせず終了など
+            if (!savedPurchase.user_id || !savedPurchase.asset_id) {
                 return savedPurchase;
             }
 
-            await this.reCalcBalances(manager, savedPurchase.userId, savedPurchase.assetId);
+            await this.reCalcBalances(manager, savedPurchase.user_id, savedPurchase.asset_id);
 
             // 3. 再計算後の状態を取り直して返す
             return await repo.findOneOrFail({ where: { id: savedPurchase.id } });
@@ -38,7 +38,7 @@ export class PurchaseService extends BaseService<Purchases> {
     }
 
     /**
-     * 既存レコード更新 → 同一 userId, assetId を持つレコードの残高を再計算
+     * 既存レコード更新 → 同一 user_id, asset_id を持つレコードの残高を再計算
      */
     override async update(id: string, updateData: DeepPartial<Purchases>): Promise<Purchases> {
         return AppDataSource.manager.transaction(async (manager: EntityManager) => {
@@ -52,11 +52,11 @@ export class PurchaseService extends BaseService<Purchases> {
             const savedPurchase = await repo.save(merged);
 
             // 2. 再計算
-            if (!savedPurchase.userId || !savedPurchase.assetId) {
+            if (!savedPurchase.user_id || !savedPurchase.asset_id) {
                 return savedPurchase;
             }
 
-            await this.reCalcBalances(manager, savedPurchase.userId, savedPurchase.assetId);
+            await this.reCalcBalances(manager, savedPurchase.user_id, savedPurchase.asset_id);
 
             // 3. 再計算後の状態を取り直して返す
             return await repo.findOneOrFail({ where: { id: savedPurchase.id } });
@@ -64,13 +64,13 @@ export class PurchaseService extends BaseService<Purchases> {
     }
 
     /**
-     * 既存レコード削除 → 同一 userId, assetId を持つレコードの残高を再計算
+     * 既存レコード削除 → 同一 user_id, asset_id を持つレコードの残高を再計算
      */
     override async delete(id: string): Promise<void> {
         return AppDataSource.manager.transaction(async (manager: EntityManager) => {
             const repo = manager.getRepository(Purchases);
 
-            // 1. 削除対象取得（userId/assetId取得のため）
+            // 1. 削除対象取得（user_id/asset_id取得のため）
             const existing = await repo.findOne({ where: { id } });
             if (!existing) return;
 
@@ -78,27 +78,27 @@ export class PurchaseService extends BaseService<Purchases> {
             await repo.delete(id);
 
             // 3. 再計算
-            if (!existing.userId || !existing.assetId) {
+            if (!existing.user_id || !existing.asset_id) {
                 return;
             }
 
-            await this.reCalcBalances(manager, existing.userId, existing.assetId);
+            await this.reCalcBalances(manager, existing.user_id, existing.asset_id);
         });
     }
 
     /**
-     * 指定した userId + assetId の Purchases 全件を取得し、
+     * 指定した user_id + asset_id の Purchases 全件を取得し、
      * date (昇順), id (昇順) の順で並べて `difference` を積み上げ、
      * `balance` を更新する。
      */
     private async reCalcBalances(
-        manager: EntityManager, userId: string, assetId: string
+        manager: EntityManager, user_id: string, asset_id: string
     ): Promise<void> {
         const repo = manager.getRepository(Purchases);
 
         // "date" で昇順に並べ、同日に複数ある場合は "id" で昇順に
         const list = await repo.find({
-            where: { userId, assetId },
+            where: { user_id, asset_id },
             order: { date: 'ASC', id: 'ASC' },
         });
 

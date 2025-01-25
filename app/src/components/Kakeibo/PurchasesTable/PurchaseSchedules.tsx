@@ -63,9 +63,12 @@ const PlainPurchaseSchedules = memo(
 );
 
 const PurchaseSchedules = () => {
-    const { tabId } = useTab();
+    const { tab_id } = useTab();
     const [isOpen, setIsOpen] = useState(false);
-    const purchaseScheduleQueryConstraints = useMemo(() => [where('tabId', '==', tabId)], [tabId]);
+    const purchaseScheduleQueryConstraints = useMemo(
+        () => [where('tab_id', '==', tab_id)],
+        [tab_id]
+    );
     const { documents: purchaseScheduleList } = useFirestoreQuery<PurchaseScheduleListType>(
         dbNames.purchaseSchedule,
         purchaseScheduleQueryConstraints,

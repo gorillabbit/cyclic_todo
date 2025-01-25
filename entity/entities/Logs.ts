@@ -10,8 +10,8 @@ import { Accounts } from "./Accounts.js";
 import { LogsCompleteLogs } from "./LogsCompleteLogs.js";
 import { Tabs } from "./Tabs.js";
 
-@Index("fk_logs_user", ["userId"], {})
-@Index("fk_logs_tab", ["tabId"], {})
+@Index("fk_logs_user", ["user_id"], {})
+@Index("fk_logs_tab", ["tab_id"], {})
 @Entity("logs", { schema: "cyclictodo" })
 export class Logs {
   @Column("char", { primary: true, name: "id", length: 20 })
@@ -21,7 +21,7 @@ export class Logs {
   availableVoiceAnnounce!: boolean;
 
   @Column("char", { name: "tab_id", length: 20 })
-  tabId!: string;
+  tab_id!: string;
 
   @Column("int", { name: "interval_num" })
   intervalNum!: number;
@@ -42,7 +42,7 @@ export class Logs {
   description!: string | null;
 
   @Column("char", { name: "user_id", length: 20 })
-  userId!: string;
+  user_id!: string;
 
   @Column("tinyint", { name: "duration", width: 1 })
   duration!: boolean;

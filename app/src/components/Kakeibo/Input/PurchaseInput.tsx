@@ -160,7 +160,7 @@ const PurchaseInput = () => {
     }, [Account, newPurchase]);
 
     // useTabを関数内で呼び出すと、Invalid hook call. Hooks can only be called inside of the body of a function component.というエラーが出る。
-    const { tabId } = useTab();
+    const { tab_id } = useTab();
     const { fetchPurchases } = usePurchase();
     const addPurchase = useCallback(async () => {
         if (isError()) {
@@ -176,11 +176,11 @@ const PurchaseInput = () => {
         }
 
         const purchaseData = {
-            tab_id: tabId,
+            tab_id: tab_id,
             user_id: Account?.id || '',
             pay_date: getPayDate(method, newPurchase.date),
             difference,
-            asset_id: method.assetId,
+            asset_id: method.asset_id,
             balance: 0,
             id: new Date().getTime().toString(),
             date: newPurchase.date,
@@ -201,7 +201,7 @@ const PurchaseInput = () => {
         addDocPurchaseTemplate({
             ...newPurchase,
             user_id: Account?.id || '',
-            tabId,
+            tab_id,
         });
     }, [Account, newPurchase]);
 

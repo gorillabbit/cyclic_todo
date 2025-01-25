@@ -160,7 +160,7 @@ const EditPurchaseRow = ({
         }
         await updatePurchase(editFormData.id, {
             ...editFormData,
-            asset_id: method.assetId,
+            asset_id: method.asset_id,
             pay_date: getPayDate(method, editFormData.date),
         });
         setIsEdit(false);

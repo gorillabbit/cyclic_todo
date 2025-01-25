@@ -33,25 +33,25 @@ describe('getMethodsService Integration Test', () => {
             testTabs = new Tabs();
             testTabs.id = `test-tab-${uuid_v4()}`.substring(0, 20);
             testTabs.name = 'Test Tabs';
-            testTabs.userId = testAccounts.id;
-            testTabs.createUserUid = testAccounts.id;
+            testTabs.user_id = testAccounts.id;
+            testTabs.create_user_uid = testAccounts.id;
             await tabRepository.save(testTabs);
 
             testAssets = new Assets();
             testAssets.id = `test-asset-${uuid_v4()}`.substring(0, 20);
             testAssets.name = 'Test Assets';
-            testAssets.userId = testAccounts.id;
-            testAssets.tabId = testTabs.id;
+            testAssets.user_id = testAccounts.id;
+            testAssets.tab_id = testTabs.id;
             await assetRepository.save(testAssets);
 
             // Create test method
             testMethod = new Methods();
             testMethod.id = `test-method-${uuid_v4()}`.substring(0, 20);
-            testMethod.timingDate = 15;
-            testMethod.tabId = testTabs.id;
-            testMethod.assetId = testAssets.id;
+            testMethod.timing_date = 15;
+            testMethod.tab_id = testTabs.id;
+            testMethod.asset_id = testAssets.id;
             testMethod.timing = 'monthly';
-            testMethod.userId = testAccounts.id;
+            testMethod.user_id = testAccounts.id;
             testMethod.label = 'Test Method';
             await methodRepository.save(testMethod);
         } catch (error) {
@@ -77,21 +77,21 @@ describe('getMethodsService Integration Test', () => {
     });
 
     it('should return empty array when no methods exist for user', async () => {
-        const result = await getMethodsService({ userId: 'non-existent-user' });
+        const result = await getMethodsService({ user_id: 'non-existent-user' });
         expect(result).toEqual([]);
     });
 
     it('should return methods for user', async () => {
-        const result = await getMethodsService({ userId: testAccounts.id });
+        const result = await getMethodsService({ user_id: testAccounts.id });
         expect(result).toEqual(
             expect.arrayContaining([
                 expect.objectContaining({
                     id: testMethod.id,
-                    timingDate: 15,
-                    tabId: testTabs.id,
-                    assetId: testAssets.id,
+                    timing_date: 15,
+                    tab_id: testTabs.id,
+                    asset_id: testAssets.id,
                     timing: 'monthly',
-                    userId: testAccounts.id,
+                    user_id: testAccounts.id,
                     label: 'Test Method'
                 })
             ])
@@ -102,7 +102,7 @@ describe('getMethodsService Integration Test', () => {
         // Force database connection to close to simulate error
         await AppDataSource.destroy();
 
-        await expect(getMethodsService({ userId: 'test-user' }))
+        await expect(getMethodsService({ user_id: 'test-user' }))
             .rejects.toThrow();
     });
 });

@@ -116,7 +116,7 @@ export const deleteDocAccount = (id: string) => deleteDocOperation(dbNames.accou
 
 export const deleteDocPurchase = (id: string) => deleteDocOperation(dbNames.purchase, id);
 
-export const addDocPurchaseTemplate = (v: InputFieldPurchaseType & { tabId: string }) =>
+export const addDocPurchaseTemplate = (v: InputFieldPurchaseType & { tab_id: string }) =>
     addDocOperation(dbNames.purchaseTemplate, v);
 export const deleteDocPurchaseTemplate = (id: string) =>
     deleteDocOperation(dbNames.purchaseTemplate, id);
@@ -140,7 +140,7 @@ export const updateDocMethod = (id: string, updates: MethodListType) =>
     updateDocOperation(dbNames.method, id, updates);
 export const deleteDocMethod = (id: string) => deleteDocOperation(dbNames.method, id);
 
-export const addDocTransferTemplate = (v: InputTransferType & { tabId: string }) =>
+export const addDocTransferTemplate = (v: InputTransferType & { tab_id: string }) =>
     addDocOperation(dbNames.transferTemplate, v);
 export const deleteDocTransferTemplate = (id: string) =>
     deleteDocOperation(dbNames.transferTemplate, id);

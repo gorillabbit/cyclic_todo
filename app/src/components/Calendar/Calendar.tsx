@@ -52,21 +52,21 @@ const Calendar = () => {
         const extendedProps = { source: 'taskList', id: task.id };
         return [
             {
-                title: task.text + ' 期日',
-                start: task.hasDue
+                title: task.task_text + ' 期日',
+                start: task.has_due
                     ? parse(
-                          (task.dueDate as string) + (task.dueTime as string),
+                          (task.due_date as string) + (task.dueTime as string),
                           'yyyy年MM月dd日HH時mm分',
                           new Date()
                       )
                     : '',
                 color: '#c43b31',
-                allDay: task.hasDue && !task.hasDueTime,
+                allDay: task.has_due && !task.has_due_time,
                 extendedProps,
             },
             {
-                title: task.text + ' 完了',
-                start: task.completed ? task.toggleCompletionTimestamp?.toDate() : '',
+                title: task.task_text + ' 完了',
+                start: task.completed ? task.toggle_completion_timestamp?.toDate() : '',
                 color: '#c43b31',
                 extendedProps,
             },

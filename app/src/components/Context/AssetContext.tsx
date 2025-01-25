@@ -13,11 +13,11 @@ export const AssetContext = createContext<AssetContextType>({
 });
 
 export const AssetProvider = memo(({ children }: { children: ReactNode }) => {
-    const { tabId } = useTab();
+    const { tab_id } = useTab();
     const [assetList, setAssetList] = useState<AssetListType[]>([]);
 
     useEffect(() => {
-        getAssets(tabId).then((assets) => {
+        getAssets(tab_id).then((assets) => {
             setAssetList(assets);
         });
     }, []);

@@ -53,27 +53,27 @@ const PlainMethodList = memo(({ open, filteredMethodList, addMethod }: PlainMeth
 const MethodList = memo(
     ({
         open,
-        assetId,
+        asset_id,
         filteredMethodList,
     }: {
         open: boolean;
-        assetId: string;
+        asset_id: string;
         filteredMethodList: MethodListType[];
     }) => {
         const auth = getAuth();
-        const { tabId } = useTab();
+        const { tab_id } = useTab();
         const addMethod = useCallback(() => {
             if (auth.currentUser) {
-                const userId = auth.currentUser.uid;
+                const user_id = auth.currentUser.uid;
                 const newMethod: MethodType = {
                     ...defaultMethod,
-                    userId,
-                    tabId,
-                    assetId,
+                    user_id,
+                    tab_id,
+                    asset_id,
                 };
                 addDocMethod(newMethod);
             }
-        }, [assetId, auth.currentUser, tabId]);
+        }, [asset_id, auth.currentUser, tab_id]);
         const plainProps = {
             open,
             filteredMethodList,

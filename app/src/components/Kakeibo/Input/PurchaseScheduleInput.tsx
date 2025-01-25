@@ -12,7 +12,7 @@ import CategorySelector from '../ScreenParts/CategorySelector';
 import { createPurchaseSchedule } from '../../../utilities/apiClient';
 
 const defaultNewPurchase: InputPurchaseScheduleType = {
-    userId: '',
+    user_id: '',
     title: '',
     cycle: '毎月',
     date: 1,
@@ -22,17 +22,17 @@ const defaultNewPurchase: InputPurchaseScheduleType = {
     price: 0,
     income: false,
     description: '',
-    endDate: addYears(new Date(), 1),
-    isUncertain: false,
-    tabId: '',
+    end_date: addYears(new Date(), 1),
+    is_uncertain: false,
+    tab_id: '',
 };
 
 const PurchaseScheduleInput = () => {
-    const { tabId } = useTab();
+    const { tab_id } = useTab();
 
     const [newPurchaseSchedule, setNewPurchaseSchedule] = useState<InputPurchaseScheduleType>({
         ...defaultNewPurchase,
-        tabId,
+        tab_id,
     });
 
     const [errors, setErrors] = useState<ErrorType>({});
@@ -69,7 +69,7 @@ const PurchaseScheduleInput = () => {
 
         const addedSchedule = await createPurchaseSchedule({
             ...newPurchaseSchedule,
-            userId: Account.id,
+            user_id: Account.id,
         });
         await addScheduledPurchase(addedSchedule.id, newPurchaseSchedule);
         setNewPurchaseSchedule(defaultNewPurchase);
@@ -129,9 +129,9 @@ const PurchaseScheduleInput = () => {
                     )}
                     <DatePicker
                         label="期日"
-                        value={newPurchaseSchedule.endDate}
+                        value={newPurchaseSchedule.end_date}
                         sx={{ maxWidth: 150 }}
-                        onChange={(value) => handleNewPurchaseScheduleInput('endDate', value)}
+                        onChange={(value) => handleNewPurchaseScheduleInput('end_date', value)}
                     />
                     <CategorySelector
                         newCategory={newPurchaseSchedule.category}
@@ -151,11 +151,11 @@ const PurchaseScheduleInput = () => {
                         収入
                     </StyledCheckbox>
                     <StyledCheckbox
-                        value={newPurchaseSchedule.isUncertain}
+                        value={newPurchaseSchedule.is_uncertain}
                         handleCheckbox={() =>
                             handleNewPurchaseScheduleInput(
-                                'isUncertain',
-                                !newPurchaseSchedule.isUncertain
+                                'is_uncertain',
+                                !newPurchaseSchedule.is_uncertain
                             )
                         }
                     >

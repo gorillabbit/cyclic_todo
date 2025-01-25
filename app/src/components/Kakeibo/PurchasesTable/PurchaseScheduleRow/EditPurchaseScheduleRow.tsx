@@ -91,8 +91,8 @@ const PlainEditPurchaseScheduleRow = memo(
                 </TableCell>
                 <TableCellWrapper>
                     <DatePicker
-                        name="endDate"
-                        value={editFormData.endDate}
+                        name="end_date"
+                        value={editFormData.end_date}
                         onChange={handleDateFormChange}
                         slotProps={{ textField: { size: 'small' } }}
                         sx={{ maxWidth: 190 }}
@@ -241,7 +241,7 @@ const EditPurchaseScheduleRow = ({
         (value: Date | null | undefined) => {
             setEditFormData((prev) => ({
                 ...prev,
-                endDate: value ?? new Date(),
+                end_date: value ?? new Date(),
             }));
         },
         [setEditFormData]

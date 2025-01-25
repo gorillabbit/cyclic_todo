@@ -2,8 +2,8 @@ import { Column, Entity, Index, JoinColumn, ManyToOne } from "typeorm";
 import { Accounts } from "./Accounts.js";
 import { Tabs } from "./Tabs.js";
 
-@Index("fk_tasks_user", ["userId",], {})
-@Index("fk_tasks_tab", ["tabId",], {})
+@Index("fk_tasks_user", ["user_id",], {})
+@Index("fk_tasks_tab", ["tab_id",], {})
 @Entity("tasks", { schema: "cyclictodo" })
 export class Tasks {
 
@@ -20,10 +20,10 @@ export class Tasks {
     周期日数!: number | null;
 
     @Column("varchar", { name: "due_date", nullable: true, length: 20 })
-    dueDate!: string | null;
+    due_date!: string | null;
 
     @Column("tinyint", { name: "has_due_time", nullable: true, width: 1 })
-    hasDueTime!: boolean | null;
+    has_due_time!: boolean | null;
 
     @Column("text", { name: "icon", nullable: true })
     icon!: string | null;
@@ -38,22 +38,22 @@ export class Tasks {
     dueTime!: string | null;
 
     @Column("char", { name: "user_id", length: 20 })
-    userId!: string;
+    user_id!: string;
 
     @Column("tinyint", { name: "has_due", nullable: true, width: 1 })
-    hasDue!: boolean | null;
+    has_due!: boolean | null;
 
     @Column("datetime", { name: "timestamp", nullable: true })
     timestamp!: Date | null;
 
     @Column("datetime", { name: "toggle_completion_timestamp", nullable: true })
-    toggleCompletionTimestamp!: Date | null;
+    toggle_completion_timestamp!: Date | null;
 
     @Column("tinyint", { name: "completed", nullable: true, width: 1 })
     completed!: boolean | null;
 
     @Column("char", { name: "tab_id", length: 20 })
-    tabId!: string;
+    tab_id!: string;
 
     @ManyToOne(() => Tabs, tabs => tabs.tasks, { onDelete: "NO ACTION", onUpdate: "NO ACTION" })
     @JoinColumn([{ name: "tab_id", referencedColumnName: "id" },

@@ -64,7 +64,7 @@ const UnderHalfRow = memo(
 
 type PlainAssetRowProps = UnderHalfRowProps & {
     assetNameInput: string;
-    assetId: string;
+    asset_id: string;
     handleAssetInput: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
     open: boolean;
     setOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -97,7 +97,7 @@ const PlainAssetRow = memo(
         setOpenDialog,
         deleteAction,
         isSmall,
-        assetId,
+        asset_id,
         lastBalance,
         monthEndBalance,
         isOpen,
@@ -165,7 +165,7 @@ const PlainAssetRow = memo(
                 </TableRow>
             )}
 
-            <MethodList open={open} assetId={assetId} filteredMethodList={filteredMethodList} />
+            <MethodList open={open} asset_id={asset_id} filteredMethodList={filteredMethodList} />
             <DeleteConfirmDialog
                 target={assetNameInput}
                 openDialog={openDialog}
@@ -177,21 +177,21 @@ const PlainAssetRow = memo(
 );
 
 const AssetRow = memo(({ asset, isOpen }: { asset: AssetListType; isOpen: boolean }) => {
-    const assetId = asset.id;
+    const asset_id = asset.id;
     const assetName = asset.name;
     const { purchaseList } = usePurchase();
     const [updatePurchases, setUpdatePurchases] = useState<PurchaseDataType[]>([]);
 
     useEffect(() => {
-        setUpdatePurchases(purchaseList.filter((p) => p.asset_id === assetId));
-    }, [purchaseList, assetId]);
+        setUpdatePurchases(purchaseList.filter((p) => p.asset_id === asset_id));
+    }, [purchaseList, asset_id]);
 
     const [balanceInput, setBalanceInput] = useState<number | undefined>(undefined);
     const [open, setOpen] = useState(false);
     const [openDialog, setOpenDialog] = useState<boolean>(false);
     const [assetNameInput, setAssetNameInput] = useState<string>(assetName);
-    const lastBalance = getLastBalance(assetId, new Date(), updatePurchases);
-    const monthEndBalance = getLastBalance(assetId, getFutureMonthFirstDay(), updatePurchases);
+    const lastBalance = getLastBalance(asset_id, new Date(), updatePurchases);
+    const monthEndBalance = getLastBalance(asset_id, getFutureMonthFirstDay(), updatePurchases);
     const isSmall = useIsSmall();
 
     const handleAssetInput = useCallback(
@@ -218,43 +218,43 @@ const AssetRow = memo(({ asset, isOpen }: { asset: AssetListType; isOpen: boolea
     );
 
     const { Account } = useAccount();
-    const userId = Account?.id;
-    const { tabId } = useTab();
+    const user_id = Account?.id;
+    const { tab_id } = useTab();
 
     // 編集内容を保存する関数
     const saveChanges = useCallback(() => {
-        if (isBalanceChanged && balanceInput && userId) {
+        if (isBalanceChanged && balanceInput && user_id) {
             createPurchase({
                 id: new Date().getTime().toString(),
-                asset_id: assetId,
+                asset_id: asset_id,
                 balance: balanceInput,
                 date: new Date(),
                 pay_date: new Date(),
                 difference: balanceInput - lastBalance,
-                user_id: userId,
-                tab_id: tabId,
+                user_id: user_id,
+                tab_id: tab_id,
                 title: `${asset.name}残高調整`,
                 method: '',
                 category: '',
                 description: '',
             });
         }
-        updateAsset(assetId, { name: assetNameInput });
+        updateAsset(asset_id, { name: assetNameInput });
     }, [
         asset.name,
-        assetId,
+        asset_id,
         assetNameInput,
         balanceInput,
         isBalanceChanged,
         lastBalance,
-        tabId,
-        userId,
+        tab_id,
+        user_id,
     ]);
 
     const { methodList } = useMethod();
     const filteredMethodList = useMemo(
-        () => methodList.filter((method) => method.assetId === assetId),
-        [methodList, assetId]
+        () => methodList.filter((method) => method.asset_id === asset_id),
+        [methodList, asset_id]
     );
 
     const removeAsset = useCallback(() => {
@@ -262,11 +262,11 @@ const AssetRow = memo(({ asset, isOpen }: { asset: AssetListType; isOpen: boolea
     }, []);
 
     const deleteAction = useCallback(() => {
-        deleteAsset(assetId);
+        deleteAsset(asset_id);
         if (filteredMethodList.length > 0) {
             filteredMethodList.forEach((method) => deleteMethod(method.id));
         }
-    }, [assetId, filteredMethodList]);
+    }, [asset_id, filteredMethodList]);
 
     const plainProps = {
         open,
@@ -286,7 +286,7 @@ const AssetRow = memo(({ asset, isOpen }: { asset: AssetListType; isOpen: boolea
         isSmall,
         lastBalance,
         monthEndBalance,
-        assetId,
+        asset_id,
         isOpen,
     };
 

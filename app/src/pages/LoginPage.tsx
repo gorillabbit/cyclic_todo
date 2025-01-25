@@ -158,25 +158,25 @@ const LoginPage = () => {
     }, [Fields.email, Fields.password, auth, successLogin]);
 
     const createDefaultTabs = useCallback(async (account: AccountType) => {
-        const tabIds: string[] = [];
+        const tab_ids: string[] = [];
 
         const taskTabDoc = await addDocTab({
-            createUserUid: account.id,
+            create_user_uid: account.id,
             name: 'タスク/ログ',
             type: 'task',
-            sharedAccounts: [account],
+            shared_accounts: [account],
         });
-        tabIds.push(taskTabDoc.id);
+        tab_ids.push(taskTabDoc.id);
 
         const purchaseTabDoc = await addDocTab({
-            createUserUid: account.id,
+            create_user_uid: account.id,
             name: '家計簿',
             type: 'purchase',
-            sharedAccounts: [account],
+            shared_accounts: [account],
         });
-        tabIds.push(purchaseTabDoc.id);
+        tab_ids.push(purchaseTabDoc.id);
 
-        await updateDocAccount(account.id, { useTabIds: tabIds });
+        await updateDocAccount(account.id, { use_tab_ids: tab_ids });
     }, []);
 
     const accountRef = collection(db, 'Accounts');

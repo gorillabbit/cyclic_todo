@@ -2,8 +2,8 @@ import { Column, Entity, Index, JoinColumn, ManyToOne } from "typeorm";
 import { Accounts } from "./Accounts.js";
 import { Methods } from "./Methods.js";
 import { Tabs } from "./Tabs.js";
-@Index("fk_purchase_templates_user", ["userId"], {})
-@Index("fk_purchase_templates_tab", ["tabId"], {})
+@Index("fk_purchase_templates_user", ["user_id"], {})
+@Index("fk_purchase_templates_tab", ["tab_id"], {})
 @Index("fk_purchase_templates_method", ["method"], {})
 @Entity("purchase_templates", { schema: "cyclictodo" })
 export class PurchaseTemplates {
@@ -17,7 +17,7 @@ export class PurchaseTemplates {
   income!: boolean;
 
   @Column("char", { name: "tab_id", length: 20 })
-  tabId!: string;
+  tab_id!: string;
 
   @Column("char", { name: "method", length: 20 })
   method!: string;
@@ -29,7 +29,7 @@ export class PurchaseTemplates {
   title!: string;
 
   @Column("char", { name: "user_id", length: 20 })
-  userId!: string;
+  user_id!: string;
 
   @Column("int", { name: "price" })
   price!: number;
@@ -40,7 +40,7 @@ export class PurchaseTemplates {
     width: 1,
     default: () => "'0'",
   })
-  isUncertain!: boolean | null;
+  is_uncertain!: boolean | null;
 
   @Column("tinyint", {
     name: "is_group",

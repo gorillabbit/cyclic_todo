@@ -31,12 +31,14 @@ const PlainNormalPurchaseScheduleRow = memo(
                     (editFormData.date ? editFormData.date + '日' : editFormData.day)
                 }
             />
-            <TableCellWrapper label={editFormData.endDate.toLocaleString().split(' ')[0]} />
+            <TableCellWrapper label={editFormData.end_date.toLocaleString().split(' ')[0]} />
             <TableCellWrapper label={editFormData.title} />
             <TableCellWrapper label={editFormData.price} />
             <TableCellWrapper label={editFormData.category} />
             <TableCellWrapper label={editFormData.method} />
-            <TableCellWrapper>{editFormData.isUncertain && <Chip label="未確" />}</TableCellWrapper>
+            <TableCellWrapper>
+                {editFormData.is_uncertain && <Chip label="未確" />}
+            </TableCellWrapper>
             <TableCellWrapper label={editFormData.description} />
             <TableCellWrapper>
                 <>

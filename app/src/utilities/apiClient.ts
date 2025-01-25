@@ -172,18 +172,18 @@ const fetchData = async <T>(
 };
 
 export const getMethods = async (
-    tabId?: string
+    tab_id?: string
 ): Promise<MethodListType[]> => {
     return fetchData<MethodListType[]>('/method', {
-        tab_id: tabId
+        tab_id: tab_id
     });
 };
 
 export const getAssets = async (
-    tabId?: string
+    tab_id?: string
 ): Promise<AssetListType[]> => {
     return fetchData<AssetListType[]>('/asset', {
-        tab_id: tabId
+        tab_id: tab_id
     });
 };
 
@@ -197,45 +197,45 @@ export const getAccountDetails = async (
 
 // タスク取得関数
 export const getTasks = async (
-    userId?: string,
-    tabId?: string
+    user_id?: string,
+    tab_id?: string
 ): Promise<TaskType[]> => {
     return fetchData<TaskType[]>('/task', {
-        user_id: userId,
-        tab_id: tabId
+        user_id: user_id,
+        tab_id: tab_id
     });
 };
 
 // ログ取得関数
 export const getLogs = async (
-    userId?: string,
-    tabId?: string
+    user_id?: string,
+    tab_id?: string
 ): Promise<LogType[]> => {
     return fetchData<LogType[]>('/log', {
-        user_id: userId,
-        tab_id: tabId
+        user_id: user_id,
+        tab_id: tab_id
     });
 };
 
 // 購入スケジュール取得関数
 export const getPurchaseSchedules = async (
-    userId?: string,
-    tabId?: string
+    user_id?: string,
+    tab_id?: string
 ): Promise<PurchaseScheduleType[]> => {
     return fetchData<PurchaseScheduleType[]>('/purchase-schedules', {
-        user_id: userId,
-        tab_id: tabId
+        user_id: user_id,
+        tab_id: tab_id
     });
 };
 
 // 振替テンプレート取得関数
 export const getTransferTemplates = async (
-    userId?: string,
-    tabId?: string
+    user_id?: string,
+    tab_id?: string
 ): Promise<TransferType[]> => {
     return fetchData<TransferType[]>('/transfer-templates', {
-        user_id: userId,
-        tab_id: tabId
+        user_id: user_id,
+        tab_id: tab_id
     });
 };
 

@@ -17,22 +17,22 @@ import { useAccount, useTab } from '../hooks/useData';
 type PlainShareTabDialogProps = {
     open: boolean;
     setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-    linkedAccounts: string[];
+    linked_accounts: string[];
     checked: number[];
     handleCheckbox: (e: React.ChangeEvent<HTMLInputElement>) => void;
     handleShareButton: () => void;
-    tabSharedAccounts: string[];
+    tabshared_accounts: string[];
 };
 
 const PlainShareTabDialog = memo(
     ({
         open,
         setOpen,
-        linkedAccounts,
+        linked_accounts,
         checked,
         handleCheckbox,
         handleShareButton,
-        tabSharedAccounts,
+        tabshared_accounts,
     }: PlainShareTabDialogProps) => (
         <>
             <Button onClick={() => setOpen(true)}>共有</Button>
@@ -43,17 +43,17 @@ const PlainShareTabDialog = memo(
                         このタブを共有するユーザーを選択してください
                     </DialogContentText>
                     <FormGroup>
-                        {linkedAccounts?.map((account, index) => (
+                        {linked_accounts?.map((account, index) => (
                             <FormControlLabel
                                 control={
                                     <Checkbox
                                         onChange={handleCheckbox}
                                         value={index}
                                         checked={
-                                            tabSharedAccounts.includes(account) ||
+                                            tabshared_accounts.includes(account) ||
                                             checked.includes(index)
                                         }
-                                        disabled={tabSharedAccounts.includes(account)}
+                                        disabled={tabshared_accounts.includes(account)}
                                     />
                                 }
                                 label={account}
@@ -92,32 +92,32 @@ const ShareTabDialog = () => {
     const handleShareButton = useCallback(() => {
         if (!Account) return;
         checked.forEach((index) => {
-            getDoc(doc(db, 'Accounts', Account.linkedAccounts[index])).then((docSnap) => {
+            getDoc(doc(db, 'Accounts', Account.linked_accounts[index])).then((docSnap) => {
                 if (!docSnap.exists()) return;
                 updateDocAccount(docSnap.id, {
-                    useTabIds: [...docSnap.data().useTabIds, tab.id],
+                    use_tab_ids: [...docSnap.data().use_tab_ids, tab.id],
                 });
             });
             // updateDocTab(tab.id, {
-            //     sharedAccounts: [...tab.sharedAccounts, Account.linkedAccounts[index]],
+            //     shared_accounts: [...tab.shared_accounts, Account.linked_accounts[index]],
             // });
         });
         setOpen(false);
     }, [Account, checked, tab]);
 
-    const tabSharedAccounts = tab.sharedAccounts.map((account) => account.id);
+    const tabshared_accounts = tab.shared_accounts.map((account) => account.id);
 
-    const linkedAccounts = Account?.linkedAccounts ?? [];
+    const linked_accounts = Account?.linked_accounts ?? [];
     return (
         <PlainShareTabDialog
             {...{
                 open,
                 setOpen,
-                linkedAccounts,
+                linked_accounts,
                 checked,
                 handleCheckbox,
                 handleShareButton,
-                tabSharedAccounts,
+                tabshared_accounts,
             }}
         />
     );

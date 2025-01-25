@@ -9,13 +9,13 @@ interface UpdateTabParams extends Partial<Tabs> {
 
 interface DeleteTabParams extends Pick<Tabs, 'id'> { }
 
-export const getTabsService = async ({ userId, id }: GetTabsParams) => {
+export const getTabsService = async ({ user_id, id }: GetTabsParams) => {
     try {
         const tabRepository = AppDataSource.getRepository(Tabs);
         const queryBuilder = tabRepository.createQueryBuilder('tab');
 
-        if (userId) {
-            queryBuilder.andWhere('user_id = :userId', { userId });
+        if (user_id) {
+            queryBuilder.andWhere('user_id = :user_id', { user_id });
         }
 
         if (id) {
@@ -34,15 +34,15 @@ export const getTabsService = async ({ userId, id }: GetTabsParams) => {
     }
 };
 
-export const createTabService = async ({ id, name, userId, createUserUid, ...optionalFields }: DeepPartial<Tabs>) => {
+export const createTabService = async ({ id, name, user_id, create_user_uid, ...optionalFields }: DeepPartial<Tabs>) => {
     try {
         const tabRepository = AppDataSource.getRepository(Tabs);
 
         const newTab = tabRepository.create({
             id,
             name,
-            userId,
-            createUserUid,
+            user_id,
+            create_user_uid,
             ...optionalFields
         });
 

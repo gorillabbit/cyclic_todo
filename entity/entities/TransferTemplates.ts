@@ -3,8 +3,8 @@ import { Accounts } from "./Accounts.js";
 import { Methods } from "./Methods.js";
 import { Tabs } from "./Tabs.js";
 
-@Index("fk_transfer_templates_user", ["userId"], {})
-@Index("fk_transfer_templates_tab", ["tabId"], {})
+@Index("fk_transfer_templates_user", ["user_id"], {})
+@Index("fk_transfer_templates_tab", ["tab_id"], {})
 @Index("fk_transfer_templates_from", ["fromMethod"], {})
 @Index("fk_transfer_templates_to", ["toMethod"], {})
 @Entity("transfer_templates", { schema: "cyclictodo" })
@@ -16,7 +16,7 @@ export class TransferTemplates {
   date!: Date;
 
   @Column("char", { name: "tab_id", length: 20 })
-  tabId!: string;
+  tab_id!: string;
 
   @Column("int", { name: "price" })
   price!: number;
@@ -31,7 +31,7 @@ export class TransferTemplates {
   toMethod!: string | null;
 
   @Column("char", { name: "user_id", length: 20 })
-  userId!: string;
+  user_id!: string;
 
   @Column("datetime", { name: "timestamp" })
   timestamp!: Date;

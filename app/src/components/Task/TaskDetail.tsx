@@ -5,8 +5,8 @@ import { TaskType } from '../../types';
 function TaskDetails({ task }: { task: TaskType }) {
     // 完了タイムスタンプのフォーマット
     const completionTimestamp =
-        task.completed && task.toggleCompletionTimestamp
-            ? format(task.toggleCompletionTimestamp.toDate(), 'yyyy-MM-dd HH:mm')
+        task.completed && task.toggle_completion_timestamp
+            ? format(task.toggle_completion_timestamp.toDate(), 'yyyy-MM-dd HH:mm')
             : null;
 
     return (

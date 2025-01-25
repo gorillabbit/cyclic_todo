@@ -25,9 +25,9 @@ const auth = getAuth();
 
 const LogInputForm: React.FC<LogInputFormProp> = ({ propLog, openDialog, setIsOpenEditDialog }) => {
     const { Account } = useAccount();
-    const { tabId } = useTab();
+    const { tab_id } = useTab();
     const defaultNewLog: InputLogType = {
-        userId: '',
+        user_id: '',
         text: '',
         duration: false,
         interval: false,
@@ -41,7 +41,7 @@ const LogInputForm: React.FC<LogInputFormProp> = ({ propLog, openDialog, setIsOp
         displayFeature: [],
         description: '',
         archived: false,
-        tabId,
+        tab_id,
         accessibleAccounts: [],
     };
 
@@ -64,16 +64,16 @@ const LogInputForm: React.FC<LogInputFormProp> = ({ propLog, openDialog, setIsOp
         }
     };
 
-    const newAccessibleAccounts = Account?.linkedAccounts.filter((account) =>
+    const newAccessibleAccounts = Account?.linked_accounts.filter((account) =>
         newAccessibleAccountIds.includes(account)
     );
 
     const addLog = () => {
         if (newLog && auth.currentUser) {
-            const userId = auth.currentUser.uid;
+            const user_id = auth.currentUser.uid;
             addDocLog({
                 ...newLog,
-                userId,
+                user_id,
                 accessibleAccounts: newAccessibleAccounts ?? [],
             });
             setNewLog(defaultNewLog);
@@ -202,7 +202,7 @@ const LogInputForm: React.FC<LogInputFormProp> = ({ propLog, openDialog, setIsOp
                             完了時メモ
                         </StyledCheckbox>
                         {Account &&
-                            Account.linkedAccounts.length > 0 &&
+                            Account.linked_accounts.length > 0 &&
                             newLog.accessibleAccounts && (
                                 <FormControl sx={{ minWidth: 300 }}>
                                     <InputLabel>共有アカウント</InputLabel>
@@ -212,7 +212,7 @@ const LogInputForm: React.FC<LogInputFormProp> = ({ propLog, openDialog, setIsOp
                                         label="共有アカウント"
                                         onChange={(e) => handleMultipleSelect(e.target.value)}
                                     >
-                                        {Account.linkedAccounts.map((account) => (
+                                        {Account.linked_accounts.map((account) => (
                                             <MenuItem key={account} value={account}>
                                                 {account}
                                             </MenuItem>

@@ -54,10 +54,10 @@ export const updateAccountService = async ({ id, ...updateFields }: UpdateAccoun
         if (updateFields.name !== undefined) updateData.name = updateFields.name;
         if (updateFields.icon !== undefined) updateData.icon = updateFields.icon;
         if (updateFields.email !== undefined) updateData.email = updateFields.email;
-        if (updateFields.receiveRequest !== undefined) updateData.receiveRequest = updateFields.receiveRequest;
-        if (updateFields.linkedAccounts !== undefined) updateData.linkedAccounts = updateFields.linkedAccounts;
-        if (updateFields.sendRequest !== undefined) updateData.sendRequest = updateFields.sendRequest;
-        if (updateFields.useTabIds !== undefined) updateData.useTabIds = updateFields.useTabIds;
+        if (updateFields.receive_request !== undefined) updateData.receive_request = updateFields.receive_request;
+        if (updateFields.linked_accounts !== undefined) updateData.linked_accounts = updateFields.linked_accounts;
+        if (updateFields.send_request !== undefined) updateData.send_request = updateFields.send_request;
+        if (updateFields.use_tab_ids !== undefined) updateData.use_tab_ids = updateFields.use_tab_ids;
 
         await accountRepository.update(id, updateData);
         return await accountRepository.findOneBy({ id });

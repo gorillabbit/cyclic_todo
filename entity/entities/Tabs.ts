@@ -17,8 +17,8 @@ import { PurchaseTemplates } from "./PurchaseTemplates.js";
 import { Tasks } from "./Tasks.js";
 import { TransferTemplates } from "./TransferTemplates.js";
 
-@Index("fk_tabs_user", ["userId"], {})
-@Index("fk_tabs_create_user", ["createUserUid"], {})
+@Index("fk_tabs_user", ["user_id"], {})
+@Index("fk_tabs_create_user", ["create_user_uid"], {})
 @Entity("tabs", { schema: "cyclictodo" })
 export class Tabs {
   @Column("char", { primary: true, name: "id", length: 20 })
@@ -28,10 +28,10 @@ export class Tabs {
   name!: string;
 
   @Column("char", { name: "create_user_uid", length: 20 })
-  createUserUid!: string;
+  create_user_uid!: string;
 
   @Column("json", { name: "shared_accounts" })
-  sharedAccounts!: object;
+  shared_accounts!: object;
 
   @Column("varchar", { name: "type", length: 50 })
   type!: string;
@@ -40,7 +40,7 @@ export class Tabs {
   timestamp!: Date;
 
   @Column("char", { name: "user_id", length: 20 })
-  userId!: string;
+  user_id!: string;
 
   @OneToMany(() => Assets, (assets) => assets.tab)
   assets!: Assets[];

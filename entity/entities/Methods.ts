@@ -14,28 +14,28 @@ import { PurchaseTemplates } from "./PurchaseTemplates.js";
 import { Tabs } from "./Tabs.js";
 import { TransferTemplates } from "./TransferTemplates.js";
 
-@Index("fk_methods_user", ["userId"], {})
-@Index("fk_methods_tab", ["tabId"], {})
-@Index("fk_methods_asset", ["assetId"], {})
+@Index("fk_methods_user", ["user_id"], {})
+@Index("fk_methods_tab", ["tab_id"], {})
+@Index("fk_methods_asset", ["asset_id"], {})
 @Entity("methods", { schema: "cyclictodo" })
 export class Methods {
   @Column("char", { primary: true, name: "id", length: 20 })
   id!: string;
 
   @Column("int", { name: "timing_date" })
-  timingDate!: number;
+  timing_date!: number;
 
   @Column("char", { name: "tab_id", length: 20 })
-  tabId!: string;
+  tab_id!: string;
 
   @Column("char", { name: "asset_id", length: 20 })
-  assetId!: string;
+  asset_id!: string;
 
   @Column("varchar", { name: "timing", length: 50 })
   timing!: string;
 
   @Column("char", { name: "user_id", length: 20 })
-  userId!: string;
+  user_id!: string;
 
   @Column("datetime", { name: "timestamp", nullable: true })
   timestamp!: Date | null;

@@ -11,21 +11,21 @@ import { Methods } from "./Methods.js";
 import { Purchases } from "./Purchases.js";
 import { Tabs } from "./Tabs.js";
 
-@Index("fk_assets_user", ["userId"], {})
-@Index("fk_assets_tab", ["tabId"], {})
+@Index("fk_assets_user", ["user_id"], {})
+@Index("fk_assets_tab", ["tab_id"], {})
 @Entity("assets", { schema: "cyclictodo" })
 export class Assets {
   @Column("char", { primary: true, name: "id", length: 20 })
   id!: string;
 
   @Column("char", { name: "tab_id", length: 20 })
-  tabId!: string;
+  tab_id!: string;
 
   @Column("varchar", { name: "name", nullable: true, length: 255 })
   name!: string | null;
 
   @Column("char", { name: "user_id", length: 20 })
-  userId!: string;
+  user_id!: string;
 
   @Column("datetime", { name: "timestamp", nullable: true })
   timestamp!: Date | null;

@@ -27,10 +27,10 @@ const TemplateButtonsContainer = ({
 }: {
     setNewPurchase: (value: React.SetStateAction<InputFieldPurchaseType>) => void;
 }) => {
-    const { tabId } = useTab();
+    const { tab_id } = useTab();
     const purchaseTemplatesQueryConstraints = useMemo(
-        () => [orderBy('timestamp', 'desc'), where('tabId', '==', tabId)],
-        [tabId]
+        () => [orderBy('timestamp', 'desc'), where('tab_id', '==', tab_id)],
+        [tab_id]
     );
     const { documents: templates } = useFirestoreQuery<TemplateButtonType>(
         dbNames.purchaseTemplate,

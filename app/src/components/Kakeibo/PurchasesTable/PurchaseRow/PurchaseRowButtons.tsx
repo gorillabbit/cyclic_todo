@@ -12,7 +12,7 @@ type PlainPurchaseRowButtonsProps = {
     handleEditClick: () => void;
     handleDeleteButton: () => void;
     handleEditPriceButtonClick: () => void;
-    isUncertain: boolean | undefined;
+    is_uncertain: boolean | undefined;
     openDialog: boolean;
     setOpenDialog: React.Dispatch<React.SetStateAction<boolean>>;
     deleteAction: () => void;
@@ -24,7 +24,7 @@ const PlainPurchaseRowButtons = memo(
         handleEditClick,
         handleDeleteButton,
         handleEditPriceButtonClick,
-        isUncertain,
+        is_uncertain,
         openDialog,
         setOpenDialog,
         deleteAction,
@@ -52,7 +52,7 @@ const PlainPurchaseRowButtons = memo(
             >
                 <DeleteIcon />
             </IconButton>
-            {isUncertain && (
+            {is_uncertain && (
                 <Button sx={{ p: 0.5 }} onClick={handleEditPriceButtonClick}>
                     金額確定
                 </Button>
@@ -71,12 +71,12 @@ const PurchaseRowButtons = ({
     purchase,
     setIsEdit,
     setIsEditPrice,
-    isUncertain,
+    is_uncertain,
 }: {
     purchase: PurchaseDataType;
     setIsEdit: (value: React.SetStateAction<boolean>) => void;
     setIsEditPrice: React.Dispatch<React.SetStateAction<boolean>>;
-    isUncertain: boolean | undefined;
+    is_uncertain: boolean | undefined;
 }) => {
     const [openDialog, setOpenDialog] = useState<boolean>(false);
     const { fetchPurchases } = usePurchase();
@@ -99,7 +99,7 @@ const PurchaseRowButtons = ({
         purchase,
         handleEditClick,
         handleDeleteButton,
-        isUncertain,
+        is_uncertain,
         handleEditPriceButtonClick,
         openDialog,
         setOpenDialog,

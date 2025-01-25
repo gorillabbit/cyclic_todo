@@ -4,8 +4,8 @@ import { Methods } from "./Methods.js";
 import { Tabs } from "./Tabs.js";
 
 
-@Index("fk_purchase_schedules_user", ["userId"], {})
-@Index("fk_purchase_schedules_tab", ["tabId"], {})
+@Index("fk_purchase_schedules_user", ["user_id"], {})
+@Index("fk_purchase_schedules_tab", ["tab_id"], {})
 @Index("fk_purchase_schedules_method", ["method"], {})
 @Entity("purchase_schedules", { schema: "cyclictodo" })
 export class PurchaseSchedules {
@@ -19,13 +19,13 @@ export class PurchaseSchedules {
   income!: boolean;
 
   @Column("char", { name: "tab_id", length: 20 })
-  tabId!: string;
+  tab_id!: string;
 
   @Column("char", { name: "method", length: 20 })
   method!: string;
 
   @Column("datetime", { name: "end_date" })
-  endDate!: Date;
+  end_date!: Date;
 
   @Column("text", { name: "description" })
   description!: string;
@@ -34,7 +34,7 @@ export class PurchaseSchedules {
   title!: string;
 
   @Column("char", { name: "user_id", length: 20 })
-  userId!: string;
+  user_id!: string;
 
   @Column("varchar", { name: "cycle", length: 50 })
   cycle!: string;
@@ -43,7 +43,7 @@ export class PurchaseSchedules {
   price!: number;
 
   @Column("tinyint", { name: "is_uncertain", nullable: true, width: 1 })
-  isUncertain!: boolean | null;
+  is_uncertain!: boolean | null;
 
   @Column("varchar", { name: "category", length: 100 })
   category!: string;

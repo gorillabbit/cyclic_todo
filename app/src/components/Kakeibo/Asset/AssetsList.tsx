@@ -63,7 +63,7 @@ const PlainAssetsList = memo((props: PlainAssetsListProps) => (
 
 const AssetTable = memo(() => {
     const { assetList } = useAsset();
-    const { tabId } = useTab();
+    const { tab_id } = useTab();
     const { Account } = useAccount();
     const [isOpen, setIsOpen] = useState(false);
 
@@ -71,12 +71,12 @@ const AssetTable = memo(() => {
     const addAsset = useCallback(() => {
         if (!Account) return;
         const newAssetLog = {
-            userId: Account.id,
-            tabId,
+            user_id: Account.id,
+            tab_id,
             name: '',
         };
         addDocAsset(newAssetLog);
-    }, [Account, tabId]);
+    }, [Account, tab_id]);
 
     const plainProps = {
         assetList,

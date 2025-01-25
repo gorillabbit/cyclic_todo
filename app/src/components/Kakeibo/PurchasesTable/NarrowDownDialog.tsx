@@ -34,16 +34,16 @@ const NarrowDownDialog = ({
         id: '',
         label: '未選択',
         timestamp: new Timestamp(0, 0),
-        userId: '',
+        user_id: '',
         name: '',
-        tabId: '',
+        tab_id: '',
     };
     assetLabelList.unshift(defaultAsset);
 
     const handleFilterApply = (name: string, value: any) => {
         if (name === 'asset') {
             value = value ? value.id : '';
-            name = 'assetId';
+            name = 'asset_id';
         }
         if (name === 'date' && !value) value = undefined;
         setFilterObject((prev) => ({

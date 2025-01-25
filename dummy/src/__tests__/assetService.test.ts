@@ -30,8 +30,8 @@ describe('getAssetsService Integration Test', () => {
             testTabs = new Tabs();
             testTabs.id = `test-tab-${uuid_v4()}`.substring(0, 20);
             testTabs.name = 'Test Tabs';
-            testTabs.userId = testAccounts.id;
-            testTabs.createUserUid = testAccounts.id;
+            testTabs.user_id = testAccounts.id;
+            testTabs.create_user_uid = testAccounts.id;
             await tabRepository.save(testTabs);
 
 
@@ -39,8 +39,8 @@ describe('getAssetsService Integration Test', () => {
             testAsset = new Assets();
             testAsset.id = `test-asset-${uuid_v4()}`.substring(0, 20);
             testAsset.name = 'Test Asset';
-            testAsset.userId = testAccounts.id;
-            testAsset.tabId = testTabs.id;
+            testAsset.user_id = testAccounts.id;
+            testAsset.tab_id = testTabs.id;
             await assetRepository.save(testAsset);
         } catch (error) {
             console.error('Failed to initialize test data:', error);
@@ -65,19 +65,19 @@ describe('getAssetsService Integration Test', () => {
     });
 
     it('should return empty array when no assets exist for user', async () => {
-        const result = await getAssetsService({ userId: 'non-existent-user' });
+        const result = await getAssetsService({ user_id: 'non-existent-user' });
         expect(result).toEqual([]);
     });
 
     it('should return assets for user', async () => {
-        const result = await getAssetsService({ userId: testAccounts.id });
+        const result = await getAssetsService({ user_id: testAccounts.id });
         expect(result).toEqual(
             expect.arrayContaining([
                 expect.objectContaining({
                     id: testAsset.id,
                     name: 'Test Asset',
-                    userId: testAccounts.id,
-                    tabId: testTabs.id
+                    user_id: testAccounts.id,
+                    tab_id: testTabs.id
                 })
             ])
         );
@@ -87,7 +87,7 @@ describe('getAssetsService Integration Test', () => {
         // Force database connection to close to simulate error
         await AppDataSource.destroy();
 
-        await expect(getAssetsService({ userId: 'test-user' }))
+        await expect(getAssetsService({ user_id: 'test-user' }))
             .rejects.toThrow();
     });
 });

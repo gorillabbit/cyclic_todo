@@ -61,7 +61,7 @@ const HomePage = memo(() => {
 
     useEffect(() => {
         if (!Account) return;
-        getTabs([{ field: 'id', value: Account.useTabIds }]).then((result) => setTabs(result));
+        getTabs([{ field: 'id', value: Account.use_tab_ids }]).then((result) => setTabs(result));
     }, [Account]);
 
     const plainProps = {

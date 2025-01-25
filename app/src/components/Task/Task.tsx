@@ -26,25 +26,25 @@ const auth = getAuth();
 const toggleCompletion = (task: TaskType) => {
     updateDocTask(task.id, {
         completed: !task.completed,
-        toggleCompletionTimestamp: new Timestamp(getUnixTime(new Date()), 0),
+        toggle_completion_timestamp: new Timestamp(getUnixTime(new Date()), 0),
     });
 
     if (task.completed === false && task.is周期的 === '完了後に追加' && auth.currentUser) {
         const newTask = {
-            userId: auth.currentUser.uid,
-            text: task.text,
-            dueDate: calculateNext期日(task, new Date()),
+            user_id: auth.currentUser.uid,
+            task_text: task.task_text,
+            due_date: calculateNext期日(task, new Date()),
             dueTime: task.dueTime,
             is周期的: '完了後に追加',
             周期日数: task.周期日数,
             周期単位: task.周期単位,
             親taskId: task.親taskId ?? task.id,
             completed: false,
-            hasDue: false,
-            hasDueTime: false,
+            has_due: false,
+            has_due_time: false,
             icon: '',
             description: '',
-            tabId: task.tabId,
+            tab_id: task.tab_id,
         };
         addDocTask(newTask);
     }
@@ -52,10 +52,10 @@ const toggleCompletion = (task: TaskType) => {
 
 const Task = ({ task, setTaskList, tasklist }: TaskProps) => {
     const backgroundColor = getBackgroundColor(
-        task.hasDue
-            ? task.hasDueTime
-                ? task.dueDate + ' ' + task.dueTime
-                : task.dueDate + ' 23時59分'
+        task.has_due
+            ? task.has_due_time
+                ? task.due_date + ' ' + task.dueTime
+                : task.due_date + ' 23時59分'
             : ''
     );
     const tasklistStyle = {
@@ -80,7 +80,7 @@ const Task = ({ task, setTaskList, tasklist }: TaskProps) => {
                             textAlign="center"
                             sx={{ wordBreak: 'break-word' }}
                         >
-                            {task.text}
+                            {task.task_text}
                             <EditIcon
                                 color="action"
                                 sx={{
@@ -102,11 +102,11 @@ const Task = ({ task, setTaskList, tasklist }: TaskProps) => {
                             }
                         />
                     )}
-                    {task.hasDue && (
+                    {task.has_due && (
                         <BodyTypography
                             text={
-                                (task.dueDate ? '期日 ' : '') +
-                                task.dueDate?.toString() +
+                                (task.due_date ? '期日 ' : '') +
+                                task.due_date?.toString() +
                                 task.dueTime?.toString()
                             }
                         />

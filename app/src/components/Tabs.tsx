@@ -131,11 +131,11 @@ const HeaderTabs = ({
         addDocTab({
             name: addTabName,
             type: addTabType,
-            createUserUid: Account.id,
-            sharedAccounts: [Account],
+            create_user_uid: Account.id,
+            shared_accounts: [Account],
         }).then((result) => {
             updateDocAccount(Account.id, {
-                useTabIds: [...Account.useTabIds, result.id],
+                use_tab_ids: [...Account.use_tab_ids, result.id],
             });
         });
         setOpenDialog(false);

@@ -20,7 +20,7 @@ export const PurchaseContext = createContext<PurchaseContextType>({
 });
 
 export const PurchaseProvider = memo(({ children }: { children: ReactNode }) => {
-    const { tabId } = useTab();
+    const { tab_id } = useTab();
     const [purchaseList, setPurchaseList] = useState<PurchaseDataType[]>([]);
 
     const categoryList = purchaseList.map((purchase) => purchase.category);
@@ -30,7 +30,7 @@ export const PurchaseProvider = memo(({ children }: { children: ReactNode }) => 
     categorySet.push('');
 
     const fetchPurchases = async () => {
-        const data = await getPurchases([{ field: 'tab_id', value: tabId }]);
+        const data = await getPurchases([{ field: 'tab_id', value: tab_id }]);
         const purchases = parseDateFieldsDeep(data, ['date', 'payDate', 'timestamp']);
         const orderedPurchaseList = purchases.sort((a, b) => b.date.getTime() - a.date.getTime());
         setPurchaseList(orderedPurchaseList);
@@ -38,7 +38,7 @@ export const PurchaseProvider = memo(({ children }: { children: ReactNode }) => 
 
     useEffect(() => {
         fetchPurchases();
-    }, [tabId]);
+    }, [tab_id]);
 
     const context = useMemo(() => {
         return {

@@ -25,13 +25,13 @@ const TaskInputForm = ({
     propTask,
     setIsOpenEditDialog,
 }: TaskInputFormProp) => {
-    const { tabId } = useTab();
+    const { tab_id } = useTab();
     const defaultNewTask: TaskInputType = propTask ?? {
-        userId: '',
-        text: '',
-        hasDue: date ? true : false,
-        dueDate: '',
-        hasDueTime: date ? true : false,
+        user_id: '',
+        task_text: '',
+        has_due: date ? true : false,
+        due_date: '',
+        has_due_time: date ? true : false,
         dueTime: '',
         is周期的: '周期なし',
         周期日数: '1',
@@ -39,13 +39,13 @@ const TaskInputForm = ({
         completed: false,
         icon: '',
         description: '',
-        tabId,
+        tab_id,
     };
 
-    const [newDueDate, setNewDueDate] = useState<Date>(
+    const [newdue_date, setNewdue_date] = useState<Date>(
         date ??
-            (propTask?.dueDate
-                ? parse(propTask?.dueDate, 'yyyy年MM月dd日', new Date())
+            (propTask?.due_date
+                ? parse(propTask?.due_date, 'yyyy年MM月dd日', new Date())
                 : new Date())
     );
     const [newDueTime, setNewDueTime] = useState<Date>(
@@ -66,24 +66,24 @@ const TaskInputForm = ({
 
     const handleDateChange = (name: string, value: Date | null) => {
         if (value) {
-            if (name === 'dueDate') setNewDueDate(value);
+            if (name === 'due_date') setNewdue_date(value);
             if (name === 'dueTime') setNewDueTime(value);
         }
     };
 
     const validateTask = (task: TaskInputType) => ({
         ...task,
-        dueDate: format(newDueDate, 'yyyy年MM月dd日'),
+        due_date: format(newdue_date, 'yyyy年MM月dd日'),
         dueTime: newDueTime ? format(newDueTime, 'HH時mm分') : '',
     });
 
     // タスクの追加
     const addTask = () => {
-        if (newTask.text === '') return alert('タスクを入力してください。');
+        if (newTask.task_text === '') return alert('タスクを入力してください。');
         if (auth.currentUser) {
             const validatedTask = validateTask(newTask);
-            const userId = auth.currentUser.uid;
-            addDocTask({ ...validatedTask, userId });
+            const user_id = auth.currentUser.uid;
+            addDocTask({ ...validatedTask, user_id });
             setNewTask(defaultNewTask);
         }
         buttonAction?.();
@@ -102,10 +102,10 @@ const TaskInputForm = ({
                     autoFocus
                     fullWidth
                     label="タスク"
-                    value={newTask.text}
+                    value={newTask.task_text}
                     onChange={(e) => handleNewTaskInput('text', e.target.value)}
                 />
-                {(newTask.text || openDialog) && (
+                {(newTask.task_text || openDialog) && (
                     <>
                         <TextField
                             fullWidth
@@ -115,31 +115,31 @@ const TaskInputForm = ({
                             onChange={(e) => handleNewTaskInput('description', e.target.value)}
                         />
                         <StyledCheckbox
-                            value={newTask.hasDue}
-                            handleCheckbox={() => handleNewTaskInput('hasDue', !newTask.hasDue)}
+                            value={newTask.has_due}
+                            handleCheckbox={() => handleNewTaskInput('has_due', !newTask.has_due)}
                         >
                             期日
                         </StyledCheckbox>
-                        {newTask.hasDue && (
+                        {newTask.has_due && (
                             <DatePicker
                                 label="期日-年月日"
-                                value={newDueDate}
-                                onChange={(value) => handleDateChange('dueDate', value)}
+                                value={newdue_date}
+                                onChange={(value) => handleDateChange('due_date', value)}
                                 sx={{ maxWidth: 150 }}
                             />
                         )}
 
-                        {newTask.hasDue && newDueDate && (
+                        {newTask.has_due && newdue_date && (
                             <>
                                 <StyledCheckbox
-                                    value={newTask.hasDueTime}
+                                    value={newTask.has_due_time}
                                     handleCheckbox={() =>
-                                        handleNewTaskInput('hasDueTime', !newTask.hasDueTime)
+                                        handleNewTaskInput('has_due_time', !newTask.has_due_time)
                                     }
                                 >
                                     時刻
                                 </StyledCheckbox>
-                                {newTask.hasDueTime && (
+                                {newTask.has_due_time && (
                                     <TimePicker
                                         ampm={false}
                                         label="期日-時刻"

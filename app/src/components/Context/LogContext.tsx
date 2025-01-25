@@ -20,14 +20,14 @@ export const LogContext = createContext<LogContextType>({
 
 export const LogProvider = memo(({ children }: { children: ReactNode }) => {
     const { Account } = useAccount();
-    const { tabId } = useTab();
+    const { tab_id } = useTab();
 
-    const logQueryConstraints = useMemo(() => [where('tabId', '==', tabId)], [tabId]);
+    const logQueryConstraints = useMemo(() => [where('tab_id', '==', tab_id)], [tab_id]);
     const { documents: logList } = useFirestoreQuery<LogType>(dbNames.log, logQueryConstraints);
 
     const logsCompleteLogsQueryConstraints = useMemo(
-        () => [orderBy('timestamp', 'desc'), where('tabId', '==', tabId)],
-        [tabId]
+        () => [orderBy('timestamp', 'desc'), where('tab_id', '==', tab_id)],
+        [tab_id]
     );
     const { documents: logsCompleteLogsList } = useFirestoreQuery<LogsCompleteLogsType>(
         dbNames.logsCompleteLog,
@@ -38,10 +38,10 @@ export const LogProvider = memo(({ children }: { children: ReactNode }) => {
     const sharedLogsQueryConstraints = useMemo(
         () => [
             where('accessibleAccountsEmails', 'array-contains', Account?.email ?? ''),
-            where('tabId', '==', tabId),
-            where('userId', '!=', Account?.id ?? ''),
+            where('tab_id', '==', tab_id),
+            where('user_id', '!=', Account?.id ?? ''),
         ],
-        [Account?.email, Account?.id, tabId]
+        [Account?.email, Account?.id, tab_id]
     );
     const { documents: sharedLogList } = useFirestoreQuery<LogType>(
         dbNames.log,

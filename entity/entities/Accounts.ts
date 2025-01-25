@@ -17,10 +17,10 @@ export class Accounts {
   id!: string;
 
   @Column("json", { name: "receive_request", nullable: true })
-  receiveRequest!: object | null;
+  receive_request!: object | null;
 
   @Column("json", { name: "linked_accounts", nullable: true })
-  linkedAccounts!: object | null;
+  linked_accounts!: object | null;
 
   @Column("varchar", { name: "name", length: 255 })
   name!: string;
@@ -29,13 +29,13 @@ export class Accounts {
   icon!: string;
 
   @Column("json", { name: "send_request", nullable: true })
-  sendRequest!: object | null;
+  send_request!: object | null;
 
   @Column("varchar", { name: "email", length: 255 })
   email!: string;
 
   @Column("json", { name: "use_tab_ids", nullable: true })
-  useTabIds!: object | null;
+  use_tab_ids!: object | null;
 
   @OneToMany(() => Assets, (assets) => assets.user)
   assets!: Assets[];

@@ -4,9 +4,9 @@ import { Assets } from "./Assets.js";
 import { Methods } from "./Methods.js";
 import { Tabs } from "./Tabs.js";
 
-@Index("fk_purchases_user", ["userId"], {})
-@Index("fk_purchases_tab", ["tabId"], {})
-@Index("fk_purchases_asset", ["assetId"], {})
+@Index("fk_purchases_user", ["user_id"], {})
+@Index("fk_purchases_tab", ["tab_id"], {})
+@Index("fk_purchases_asset", ["asset_id"], {})
 @Index("fk_purchases_method", ["method"], {})
 @Entity("purchases", { schema: "cyclictodo" })
 export class Purchases {
@@ -25,7 +25,7 @@ export class Purchases {
   income!: boolean | null;
 
   @Column("char", { name: "tab_id", length: 20 })
-  tabId!: string;
+  tab_id!: string;
 
   @Column("char", { name: "method", length: 20 })
   method!: string;
@@ -43,7 +43,7 @@ export class Purchases {
   category!: string | null;
 
   @Column("char", { name: "user_id", length: 20 })
-  userId!: string;
+  user_id!: string;
 
   @Column("char", { name: "child_purchase_id", nullable: true, length: 20 })
   childPurchaseId!: string | null;
@@ -52,7 +52,7 @@ export class Purchases {
   difference!: number | null;
 
   @Column("char", { name: "asset_id", length: 20 })
-  assetId!: string;
+  asset_id!: string;
 
   @Column("datetime", { name: "pay_date", nullable: true })
   payDate!: Date | null;

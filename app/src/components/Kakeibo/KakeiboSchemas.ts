@@ -16,9 +16,9 @@ const dateNumber = z
     });
 const method = z.object({
     label: z.string().min(1, { message: '支払い方法を選択してください' }),
-    assetId: z.string(),
+    asset_id: z.string(),
     timing: z.enum(['即時', '翌月']),
-    timingDate: dateNumber,
+    timing_date: dateNumber,
 });
 const difference = z
     .union([z.string(), z.number()])
@@ -46,7 +46,7 @@ const purchaseScheduleSchema = z.object({
     price,
     date: dateNumber,
     method,
-    endDate: date,
+    end_date: date,
 });
 
 const transferSchema = z

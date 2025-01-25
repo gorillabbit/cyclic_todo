@@ -13,7 +13,7 @@ const logStart = (log: LogType, event: React.MouseEvent<HTMLButtonElement, Mouse
         logId: log.id,
         type: 'start',
         memo: '',
-        tabId: log.tabId,
+        tab_id: log.tab_id,
     };
     addDocLogsCompleteLog(logsCompleteLogs);
 };

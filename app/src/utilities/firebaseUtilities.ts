@@ -7,7 +7,7 @@ import { getAuth, onAuthStateChanged, User } from 'firebase/auth';
 export const useFirestoreQuery = <T>(
     collectionName: string,
     queryConstraints: QueryConstraint[],
-    noUserId?: boolean // 一部のuserIdが無い情報を取得するときに使う
+    nouser_id?: boolean // 一部のuser_idが無い情報を取得するときに使う
 ) => {
     const [documents, setDocuments] = useState<T[]>([]);
     const [authUser, setAuthUser] = useState(() => getAuth().currentUser);
@@ -19,14 +19,14 @@ export const useFirestoreQuery = <T>(
 
     // Memoize the Firestore query
     const firestoreQuery = useMemo(() => {
-        if (!authUser && !noUserId) return null;
+        if (!authUser && !nouser_id) return null;
 
         return query(
             collection(db, collectionName),
-            ...(noUserId ? [] : [where('userId', '==', authUser?.uid)]),
+            ...(nouser_id ? [] : [where('user_id', '==', authUser?.uid)]),
             ...queryConstraints
         );
-    }, [authUser, collectionName, noUserId, queryConstraints]);
+    }, [authUser, collectionName, nouser_id, queryConstraints]);
 
     // Subscribe to auth state changes once
     useEffect(() => {

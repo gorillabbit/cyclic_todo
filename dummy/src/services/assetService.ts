@@ -3,21 +3,21 @@ import { Assets } from '../../../entity/entities/Assets';
 import { QueryFailedError } from 'typeorm';
 
 interface GetAssetsParams {
-    userId?: string;
-    assetId?: string;
+    user_id?: string;
+    asset_id?: string;
 }
 
-export const getAssetsService = async ({ userId, assetId }: GetAssetsParams) => {
+export const getAssetsService = async ({ user_id, asset_id }: GetAssetsParams) => {
     try {
         const assetRepository = AppDataSource.getRepository(Assets);
         const queryBuilder = assetRepository.createQueryBuilder('asset');
 
-        if (userId) {
-            queryBuilder.andWhere('user_id = :userId', { userId });
+        if (user_id) {
+            queryBuilder.andWhere('user_id = :user_id', { user_id });
         }
 
-        if (assetId) {
-            queryBuilder.andWhere('id = :assetId', { assetId });
+        if (asset_id) {
+            queryBuilder.andWhere('id = :asset_id', { asset_id });
         }
 
         return await queryBuilder

@@ -13,11 +13,11 @@ export const MethodContext = createContext<MethodContextType>({
 });
 
 export const MethodProvider = memo(({ children }: { children: ReactNode }) => {
-    const { tabId } = useTab();
+    const { tab_id } = useTab();
     const [methodList, setMethodList] = useState<MethodListType[]>([]);
 
     useEffect(() => {
-        getMethods(tabId).then((methods) => {
+        getMethods(tab_id).then((methods) => {
             setMethodList(methods);
             console.log('methods:', methods);
         });

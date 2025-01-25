@@ -4,21 +4,21 @@ import { Timestamp } from 'firebase/firestore';
 export type WeekDay = '日曜日' | '月曜日' | '火曜日' | '水曜日' | '木曜日' | '金曜日' | '土曜日';
 
 export interface TaskInputType {
-    userId: string;
-    text: string;
-    hasDue: boolean;
-    dueDate: string;
-    hasDueTime: boolean;
+    user_id: string;
+    task_text: string;
+    has_due: boolean;
+    due_date: string;
+    has_due_time: boolean;
     dueTime: string;
     completed: boolean;
     is周期的: string;
     周期日数: string;
     周期単位: string;
     親taskId?: string;
-    toggleCompletionTimestamp?: Timestamp;
+    toggle_completion_timestamp?: Timestamp;
     icon: string;
     description: string;
-    tabId: string;
+    tab_id: string;
 }
 
 export interface TaskType extends TaskInputType {
@@ -29,7 +29,7 @@ export interface LogsCompleteLogsInputType {
     timestamp?: Timestamp;
     type?: string;
     memo: string;
-    tabId: string;
+    tab_id: string;
 }
 
 export interface LogsCompleteLogsType extends LogsCompleteLogsInputType {
@@ -37,7 +37,7 @@ export interface LogsCompleteLogsType extends LogsCompleteLogsInputType {
 }
 
 export interface InputLogType {
-    userId: string;
+    user_id: string;
     text: string;
     親logId?: string;
     timestamp?: Timestamp;
@@ -55,7 +55,7 @@ export interface InputLogType {
     description: string;
     archived: boolean;
     accessibleAccounts: string[];
-    tabId: string;
+    tab_id: string;
 }
 
 export interface LogType extends InputLogType {
@@ -66,10 +66,10 @@ export interface AccountInputType {
     email: string;
     name: string;
     icon: string;
-    linkedAccounts: string[];
-    sendRequest: string[];
-    receiveRequest: string[];
-    useTabIds: string[];
+    linked_accounts: string[];
+    send_request: string[];
+    receive_request: string[];
+    use_tab_ids: string[];
 }
 
 export interface AccountType extends AccountInputType {
@@ -82,10 +82,10 @@ export const defaultAccountInput: AccountInputType = {
     email: '',
     name: '',
     icon: '',
-    linkedAccounts: [],
-    sendRequest: [],
-    receiveRequest: [],
-    useTabIds: [],
+    linked_accounts: [],
+    send_request: [],
+    receive_request: [],
+    use_tab_ids: [],
 };
 
 export const defaultAccount: AccountType = {
@@ -94,21 +94,21 @@ export const defaultAccount: AccountType = {
 };
 
 export interface MethodType {
-    userId: string;
+    user_id: string;
     label: string;
-    assetId: string;
+    asset_id: string;
     timing: '即時' | '翌月';
-    timingDate: number;
-    tabId: string;
+    timing_date: number;
+    tab_id: string;
 }
 
 export const defaultMethod: MethodType = {
-    userId: '',
+    user_id: '',
     label: '',
-    assetId: '',
+    asset_id: '',
     timing: '即時',
-    timingDate: 1,
-    tabId: '',
+    timing_date: 1,
+    tab_id: '',
 };
 
 export interface MethodListType extends MethodType {
@@ -120,9 +120,9 @@ export const defaultMethodList: MethodListType = {
 };
 
 export interface InputAssetType {
-    userId: string;
+    user_id: string;
     name: string;
-    tabId: string;
+    tab_id: string;
 }
 export interface AssetType extends InputAssetType {
     timestamp: Timestamp;
@@ -132,7 +132,7 @@ export interface AssetListType extends AssetType {
 }
 
 export interface InputPurchaseScheduleType {
-    userId: string;
+    user_id: string;
     title: string;
     price: number;
     date?: number;
@@ -142,9 +142,9 @@ export interface InputPurchaseScheduleType {
     category: string;
     income: boolean;
     description: string;
-    endDate: Date;
-    isUncertain: boolean;
-    tabId: string;
+    end_date: Date;
+    is_uncertain: boolean;
+    tab_id: string;
 }
 export interface InputPurchaseScheduleRowType extends InputPurchaseScheduleType {
     id: string;
@@ -157,22 +157,22 @@ export interface PurchaseScheduleListType extends PurchaseScheduleType {
 }
 
 export interface InputTransferType {
-    userId: string;
+    user_id: string;
     price: number;
     date: Date;
     from: string;
     to: string;
     description: string;
-    tabId: string;
+    tab_id: string;
 }
 export const defaultTransferInput: InputTransferType = {
-    userId: '',
+    user_id: '',
     price: 0,
     date: new Date(),
     from: '',
     to: '',
     description: '',
-    tabId: '',
+    tab_id: '',
 };
 export interface TransferType extends Omit<InputTransferType, 'date'> {
     id: string;
@@ -180,10 +180,10 @@ export interface TransferType extends Omit<InputTransferType, 'date'> {
 }
 
 export interface InputTabType {
-    createUserUid: string;
+    create_user_uid: string;
     name: string;
     type: 'task' | 'purchase';
-    sharedAccounts: AccountLinkType[];
+    shared_accounts: AccountLinkType[];
 }
 export interface TabType extends InputTabType {
     id: string;

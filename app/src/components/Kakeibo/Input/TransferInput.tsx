@@ -98,11 +98,11 @@ const PlainTransferInput = memo(
 
 const TransferInput = () => {
     const { currentUser } = getAuth();
-    const { tabId } = useTab();
+    const { tab_id } = useTab();
     const { methodList } = useMethod();
     const [newTransfer, setNewTransfer] = useState<InputTransferType>({
         ...defaultTransferInput,
-        tabId,
+        tab_id,
     });
     const { fetchPurchases } = usePurchase();
 
@@ -145,7 +145,7 @@ const TransferInput = () => {
             category: '送受金',
             date,
             description,
-            tab_id: tabId,
+            tab_id: tab_id,
             id: '',
             balance: 0,
         };
@@ -155,7 +155,7 @@ const TransferInput = () => {
             title: `【送】${purchaseTitle}`,
             method: from,
             pay_date: getPayDate(fromMethod, date),
-            asset_id: fromMethod.assetId,
+            asset_id: fromMethod.asset_id,
             difference: -price,
         };
 
@@ -164,7 +164,7 @@ const TransferInput = () => {
             title: `【受】${purchaseTitle}`,
             method: to,
             pay_date: getPayDate(toMethod, date),
-            asset_id: toMethod.assetId,
+            asset_id: toMethod.asset_id,
             difference: price,
         };
 
@@ -172,7 +172,7 @@ const TransferInput = () => {
         await createPurchase(toPurchase);
         setNewTransfer(defaultTransferInput);
         fetchPurchases();
-    }, [currentUser, tabId, newTransfer]);
+    }, [currentUser, tab_id, newTransfer]);
 
     const addTemplate = useCallback(() => {
         // TODO ここの処理をaddTransferと共通化できないか考える
@@ -184,8 +184,8 @@ const TransferInput = () => {
         }
         addDocTransferTemplate({
             ...newTransfer,
-            userId: currentUser.uid,
-            tabId,
+            user_id: currentUser.uid,
+            tab_id,
         });
     }, [currentUser, newTransfer]);
 

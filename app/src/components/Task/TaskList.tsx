@@ -17,8 +17,8 @@ const TaskList = () => {
                 .filter((task) => task.completed)
                 .sort((a, b) => {
                     // タイムスタンプを比較して並び替え
-                    const dateA = a.toggleCompletionTimestamp?.toDate() ?? new Date(0);
-                    const dateB = b.toggleCompletionTimestamp?.toDate() ?? new Date(0);
+                    const dateA = a.toggle_completion_timestamp?.toDate() ?? new Date(0);
+                    const dateB = b.toggle_completion_timestamp?.toDate() ?? new Date(0);
                     return dateA.getTime() - dateB.getTime();
                 }),
         [taskList]

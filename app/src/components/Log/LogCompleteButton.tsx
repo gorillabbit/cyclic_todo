@@ -13,7 +13,7 @@ const logComplete = (log: LogType, memo?: string) => {
         logId: log.id,
         type: 'finish',
         memo: memo ?? '',
-        tabId: log.tabId,
+        tab_id: log.tab_id,
     };
     addDocLogsCompleteLog(logsCompleteLogs);
 };

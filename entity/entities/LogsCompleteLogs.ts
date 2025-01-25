@@ -3,9 +3,9 @@ import { Tabs } from "./Tabs.js";
 import { Accounts } from "./Accounts.js";
 import { Logs } from "./Logs.js";
 
-@Index("fk_logsCompleteLogs_user", ["userId"], {})
+@Index("fk_logsCompleteLogs_user", ["user_id"], {})
 @Index("fk_logsCompleteLogs_log", ["logId"], {})
-@Index("fk_logsCompleteLogs_tab", ["tabId"], {})
+@Index("fk_logsCompleteLogs_tab", ["tab_id"], {})
 @Entity("logs_complete_logs", { schema: "cyclictodo" })
 export class LogsCompleteLogs {
   @Column("char", { primary: true, name: "id", length: 20 })
@@ -27,10 +27,10 @@ export class LogsCompleteLogs {
   timestamp!: Date;
 
   @Column("char", { name: "user_id", length: 20 })
-  userId!: string;
+  user_id!: string;
 
   @Column("char", { name: "tab_id", length: 20 })
-  tabId!: string;
+  tab_id!: string;
 
   @ManyToOne(() => Logs, (logs) => logs.logsCompleteLogs, {
     onDelete: "NO ACTION",

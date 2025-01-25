@@ -108,10 +108,10 @@ const today = new Date();
 /**
  * 指定日まで毎月の予定日を取得する
  * @param dayOfMonth
- * @param endDate
+ * @param end_date
  * @returns
  */
-const listMonthlyDaysUntil = (dayOfMonth: number, endDate: Date): Date[] => {
+const listMonthlyDaysUntil = (dayOfMonth: number, end_date: Date): Date[] => {
     // 現在の日付が指定された日より後の場合、最初の日付を次の月に設定
     let startMonth = today.getMonth();
     if (today.getDate() > dayOfMonth) {
@@ -122,7 +122,7 @@ const listMonthlyDaysUntil = (dayOfMonth: number, endDate: Date): Date[] => {
     let currentDate = new Date(today.getFullYear(), startMonth, dayOfMonth);
 
     const dates = [];
-    while (currentDate <= endDate) {
+    while (currentDate <= end_date) {
         dates.push(currentDate);
         currentDate = addMonths(currentDate, 1);
     }
@@ -132,17 +132,17 @@ const listMonthlyDaysUntil = (dayOfMonth: number, endDate: Date): Date[] => {
 /**
  * 指定曜日まで毎週の予定日を取得する
  * @param weekDayName
- * @param endDate
+ * @param end_date
  * @returns
  */
-const listWeeklyDaysUntil = (weekDayName: WeekDay, endDate: Date): Date[] => {
+const listWeeklyDaysUntil = (weekDayName: WeekDay, end_date: Date): Date[] => {
     // 今日の日付から次の指定曜日を求める
     const dayOfWeek = weekDays[weekDayName];
     let currentDate = nextDay(today, dayOfWeek);
     const dates = [];
 
     // 指定された終了日まで繰り返し
-    while (currentDate <= endDate) {
+    while (currentDate <= end_date) {
         dates.push(currentDate);
         currentDate = addDays(currentDate, 7);
     }
@@ -178,19 +178,19 @@ export const sortObjectsByParameter = (
 };
 
 /**
- * assetIdが同じ支払いのうち、dateが指定された日付より前の最後の支払いの残高を取得する
- * @param assetId
+ * asset_idが同じ支払いのうち、dateが指定された日付より前の最後の支払いの残高を取得する
+ * @param asset_id
  * @param date
  * @param updatePurchases
  * @returns
  */
 export const getLastBalance = (
-    assetId: string,
+    asset_id: string,
     date: Date,
     updatePurchases: PurchaseDataType[]
 ): number => {
     const lastPurchase = updatePurchases
-        .filter((p) => p.asset_id === assetId)
+        .filter((p) => p.asset_id === asset_id)
         .sort((a, b) => b.pay_date.getTime() - a.pay_date.getTime())
         .find((purchase) => purchase.pay_date <= date);
     // NaNに対応するために??ではなく三項演算子を使う
@@ -207,20 +207,20 @@ export const addScheduledPurchase = async (
     purchaseSchedule: InputPurchaseScheduleType,
 ):Promise<PurchaseDataType[] | undefined> => {
     const { methodList } = useMethod();
-    const { price, income, method, cycle, date, endDate, day } = purchaseSchedule;
+    const { price, income, method, cycle, date, end_date, day } = purchaseSchedule;
     const currentMethod = methodList.find((m) => m.id === method);
     if (currentMethod === undefined) return;
     const difference = income ? price : -price;
     const purchaseBase = {
-        user_id: purchaseSchedule.userId,
+        user_id: purchaseSchedule.user_id,
         title: purchaseSchedule.title,
         method,
         category: purchaseSchedule.category,
         description: purchaseSchedule.description,
-        is_uncertain: purchaseSchedule.isUncertain,
-        tab_id: purchaseSchedule.tabId,
+        is_uncertain: purchaseSchedule.is_uncertain,
+        tab_id: purchaseSchedule.tab_id,
         parent_schedule_id: purchaseScheduleId,
-        asset_id: currentMethod.assetId,
+        asset_id: currentMethod.asset_id,
         balance: 0,
         difference,
         id: new Date().getTime().toString(),
@@ -228,8 +228,8 @@ export const addScheduledPurchase = async (
 
     const purchaseList: PurchaseDataType[] = [];
     const getDays = ():Date[] => {
-        if (cycle === '毎月' && date !== undefined) return listMonthlyDaysUntil(date, endDate);
-        if (cycle === '毎週' && day) return listWeeklyDaysUntil(day, endDate);
+        if (cycle === '毎月' && date !== undefined) return listMonthlyDaysUntil(date, end_date);
+        if (cycle === '毎週' && day) return listWeeklyDaysUntil(day, end_date);
         return [];
     };
     getDays().forEach((dateDay) => purchaseList.push({
@@ -237,7 +237,7 @@ export const addScheduledPurchase = async (
         date: dateDay,
         pay_date: currentMethod.timing === '即時' ? 
             dateDay : 
-            getPayLaterDate(dateDay, currentMethod.timingDate),
+            getPayLaterDate(dateDay, currentMethod.timing_date),
     }));
     for (const purchase of purchaseList) {
         await createPurchase(purchase);
@@ -247,6 +247,6 @@ export const addScheduledPurchase = async (
 };
 
 export const getPayDate = (method: MethodListType, date:Date): Date => {
-    const { timing, timingDate } = method;
-    return timing === '即時' ? date : getPayLaterDate(date, timingDate);
+    const { timing, timing_date } = method;
+    return timing === '即時' ? date : getPayLaterDate(date, timing_date);
 };

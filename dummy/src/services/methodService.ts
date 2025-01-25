@@ -3,17 +3,17 @@ import { Methods } from '../../../entity/entities/Methods';
 import { QueryFailedError } from 'typeorm';
 
 interface GetMethodsParams {
-    userId?: string;
+    user_id?: string;
     methodId?: string;
 }
 
-export const getMethodsService = async ({ userId, methodId }: GetMethodsParams) => {
+export const getMethodsService = async ({ user_id, methodId }: GetMethodsParams) => {
     try {
         const methodRepository = AppDataSource.getRepository(Methods);
         const queryBuilder = methodRepository.createQueryBuilder('method');
 
-        if (userId) {
-            queryBuilder.andWhere('user_id = :userId', { userId });
+        if (user_id) {
+            queryBuilder.andWhere('user_id = :user_id', { user_id });
         }
 
         if (methodId) {

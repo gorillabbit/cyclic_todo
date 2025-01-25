@@ -70,8 +70,8 @@ const PlainMethodRow = memo(
                 </Select>
                 {methodInput.timing === '翌月' && (
                     <TextField
-                        name="timingDate"
-                        value={methodInput.timingDate}
+                        name="timing_date"
+                        value={methodInput.timing_date}
                         InputProps={{
                             endAdornment: <InputAdornment position="start">日</InputAdornment>,
                         }}
@@ -79,8 +79,8 @@ const PlainMethodRow = memo(
                         sx={{ maxWidth: 70, marginLeft: 1 }}
                         onChange={handleMethodInput}
                         size="small"
-                        error={!!errors.timingDate}
-                        helperText={errors.timingDate}
+                        error={!!errors.timing_date}
+                        helperText={errors.timing_date}
                     />
                 )}
             </TableCellWrapper>
