@@ -12,12 +12,7 @@ import { AssetListType, MethodListType } from '../../../types';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { deleteDocAsset, deleteDocMethod, updateDocAsset } from '../../../firebase';
-import {
-    addPurchaseAndUpdateLater,
-    getLastBalance,
-    updateAndAddPurchases,
-} from '../../../utilities/purchaseUtilities';
+import { getLastBalance } from '../../../utilities/purchaseUtilities';
 import DeleteConfirmDialog from '../DeleteConfirmDialog';
 import { useIsSmall } from '../../../hooks/useWindowSize';
 import { useAccount, useMethod, usePurchase, useTab } from '../../../hooks/useData';
@@ -25,6 +20,12 @@ import TableCellWrapper from '../TableCellWrapper';
 import { getFutureMonthFirstDay } from '../../../utilities/dateUtilities';
 import MethodList from './MethodList';
 import { PurchaseDataType } from '../../../types/purchaseTypes';
+import {
+    createPurchase,
+    deleteAsset,
+    deleteMethod,
+    updateAsset,
+} from '../../../utilities/apiClient';
 
 const tableInputStyle: {
     sx: TextFieldProps['sx'];
@@ -178,7 +179,7 @@ const PlainAssetRow = memo(
 const AssetRow = memo(({ asset, isOpen }: { asset: AssetListType; isOpen: boolean }) => {
     const assetId = asset.id;
     const assetName = asset.name;
-    const { purchaseList, setPurchaseList } = usePurchase();
+    const { purchaseList } = usePurchase();
     const [updatePurchases, setUpdatePurchases] = useState<PurchaseDataType[]>([]);
 
     useEffect(() => {
@@ -223,27 +224,22 @@ const AssetRow = memo(({ asset, isOpen }: { asset: AssetListType; isOpen: boolea
     // 編集内容を保存する関数
     const saveChanges = useCallback(() => {
         if (isBalanceChanged && balanceInput && userId) {
-            const updatePurchase = addPurchaseAndUpdateLater(
-                {
-                    assetId,
-                    balance: balanceInput,
-                    date: new Date(),
-                    payDate: new Date(),
-                    difference: balanceInput - lastBalance,
-                    userId,
-                    tabId,
-                    title: `${asset.name}残高調整`,
-                    method: '',
-                    category: '',
-                    description: '',
-                    id: '',
-                },
-                updatePurchases
-            );
-            updateAndAddPurchases(updatePurchase.purchases);
-            setPurchaseList(updatePurchase.purchases);
+            createPurchase({
+                id: new Date().getTime().toString(),
+                assetId,
+                balance: balanceInput,
+                date: new Date(),
+                payDate: new Date(),
+                difference: balanceInput - lastBalance,
+                userId,
+                tabId,
+                title: `${asset.name}残高調整`,
+                method: '',
+                category: '',
+                description: '',
+            });
         }
-        updateDocAsset(assetId, { name: assetNameInput });
+        updateAsset(assetId, { name: assetNameInput });
     }, [
         asset.name,
         assetId,
@@ -251,9 +247,7 @@ const AssetRow = memo(({ asset, isOpen }: { asset: AssetListType; isOpen: boolea
         balanceInput,
         isBalanceChanged,
         lastBalance,
-        setPurchaseList,
         tabId,
-        updatePurchases,
         userId,
     ]);
 
@@ -268,9 +262,9 @@ const AssetRow = memo(({ asset, isOpen }: { asset: AssetListType; isOpen: boolea
     }, []);
 
     const deleteAction = useCallback(() => {
-        deleteDocAsset(assetId);
+        deleteAsset(assetId);
         if (filteredMethodList.length > 0) {
-            filteredMethodList.forEach((method) => deleteDocMethod(method.id));
+            filteredMethodList.forEach((method) => deleteMethod(method.id));
         }
     }, [assetId, filteredMethodList]);
 
