@@ -8,6 +8,7 @@ import { AssetService } from './services/assetService.js';
 import { LogService } from './services/logService.js';
 import { TabService } from './services/tabService.js';
 import { TaskService } from './services/taskService.js';
+import { PurchaseTemplateService } from './services/purchaseTemplateService.js';
 
 // 1) まずは Express アプリを作成
 const app = express();
@@ -95,6 +96,47 @@ const dbInitPromise: Promise<void> = (async (): Promise<void> => {
         try {
             const { id } = req.params;
             await purchaseService.delete(id);
+            res.status(204).send();
+        } catch (error) {
+            res.status(500).send({ error });
+        }
+    });
+
+    const purchaseTemplateService = new PurchaseTemplateService();
+    
+    app.get('/api/purchase-template', async (req, res) => {
+        try {
+            const result = await purchaseTemplateService.getAll(req.query);
+            res.status(200).send(result);
+        } catch (error) {
+            res.status(500).send({ error });
+        }
+    });
+
+    app.put('/api/purchase-template/:id', async (req, res) => {
+        try {
+            const { id } = req.params;
+            const updateData = req.body;
+            const result = await purchaseTemplateService.update(id, updateData);
+            res.status(200).send(result);
+        } catch (error) {
+            res.status(500).send({ error });
+        }
+    });
+
+    app.post('/api/purchase-template', async (req, res) => {
+        try {
+            const result = await purchaseTemplateService.create(req.body);
+            res.status(201).send(result);
+        } catch (error) {
+            res.status(500).send({ error });
+        }
+    });
+
+    app.delete('/api/purchase-template/:id', async (req, res) => {
+        try {
+            const { id } = req.params;
+            await purchaseTemplateService.delete(id);
             res.status(204).send();
         } catch (error) {
             res.status(500).send({ error });
