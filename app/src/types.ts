@@ -189,4 +189,6 @@ export interface TabType extends InputTabType {
     id: string;
 }
 
+export interface TabListType extends TabType {}
+
 export type ErrorType = Record<string, string | undefined>;
