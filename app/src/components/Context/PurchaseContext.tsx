@@ -35,9 +35,8 @@ export const PurchaseProvider = memo(({ children }: { children: ReactNode }) => 
     }, []);
 
     useEffect(() => {
-        getPurchases('', tabId).then((data) => {
+        getPurchases(tabId).then((data) => {
             const purchases = parseDateFieldsDeep(data, ['date', 'payDate', 'timestamp']);
-            console.log('data:', purchases);
             _setPurchaseList(purchases);
         });
     }, []);

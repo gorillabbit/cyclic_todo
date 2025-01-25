@@ -205,6 +205,7 @@ export const getLastBalance = (
 ): number => {
     const lastPurchase = updatePurchases
         .filter((p) => p.assetId === assetId)
+        .filter((p) => Boolean(p.payDate))
         .sort((a, b) => b.payDate.getTime() - a.payDate.getTime())
         .find((purchase) => purchase.payDate <= date);
     // NaNに対応するために??ではなく三項演算子を使う

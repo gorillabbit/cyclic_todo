@@ -171,6 +171,7 @@ const Purchases = memo(() => {
             purchaseList.filter(
                 (p) =>
                     isLaterPayment(methodList.find((method) => method.id === p.method)) &&
+                    p.payDate &&
                     p.payDate.getMonth() === month.getMonth() &&
                     p.payDate.getFullYear() === month.getFullYear()
             ),

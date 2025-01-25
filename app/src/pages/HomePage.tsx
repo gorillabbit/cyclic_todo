@@ -6,9 +6,8 @@ import PurchasePage from './PurchasePage';
 import TaskPage from './TaskPage';
 import { useCookies } from 'react-cookie';
 import { AccountType, TabType } from '../types';
-import { getDoc, doc } from 'firebase/firestore';
-import { db } from '../firebase';
 import { useAccount } from '../hooks/useData';
+import { getTabs } from '../utilities/apiClient';
 
 type PlainHomePageProps = {
     tabValue: number;
@@ -62,16 +61,7 @@ const HomePage = memo(() => {
 
     useEffect(() => {
         if (!Account) return;
-        const getTabsByAccount = async (account: AccountType) => {
-            const dataPromises = account.useTabIds.map(async (id) => {
-                const docSnap = await getDoc(doc(db, 'Tabs', id));
-                return docSnap.exists() ? { id: docSnap.id, ...docSnap.data() } : null;
-            });
-            const data = await Promise.all(dataPromises);
-            return data.filter((tab) => tab !== null) as TabType[];
-        };
-
-        getTabsByAccount(Account).then((result) => setTabs(result));
+        getTabs([{ field: 'id', value: Account.useTabIds }]).then((result) => setTabs(result));
     }, [Account]);
 
     const plainProps = {
