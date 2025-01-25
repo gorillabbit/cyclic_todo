@@ -4,19 +4,15 @@ import { DatePicker } from '@mui/x-date-pickers';
 import { memo, useCallback, useMemo, useState } from 'react';
 import { addDocPurchaseTemplate } from '../../../firebase';
 import { ErrorType, MethodListType } from '../../../types';
-import {
-    addPurchaseAndUpdateLater,
-    getPayDate,
-    numericProps,
-    updateAndAddPurchases,
-} from '../../../utilities/purchaseUtilities';
+import { getPayDate, numericProps } from '../../../utilities/purchaseUtilities';
 import TemplateButtons from './TemplateButtonsContainer';
-import { useTab, usePurchase, useAccount, useMethod } from '../../../hooks/useData';
+import { useTab, useAccount, useMethod } from '../../../hooks/useData';
 import { defaultInputFieldPurchase, InputFieldPurchaseType } from '../../../types/purchaseTypes';
 import { set } from 'date-fns';
 import { getHasError, validatePurchase } from '../KakeiboSchemas';
 import MethodSelector from '../ScreenParts/MethodSelector';
 import CategorySelector from '../ScreenParts/CategorySelector';
+import { createPurchase } from '../../../utilities/apiClient';
 
 type PlainPurchaseInputProps = {
     handleNewPurchaseInput: (
@@ -114,6 +110,7 @@ const PlainPurchaseInput = memo(
 const PurchaseInput = () => {
     const [newPurchase, setNewPurchase] =
         useState<InputFieldPurchaseType>(defaultInputFieldPurchase);
+    const { methodList } = useMethod();
 
     const [errors, setErrors] = useState<ErrorType>({});
 
@@ -164,14 +161,12 @@ const PurchaseInput = () => {
 
     // useTabを関数内で呼び出すと、Invalid hook call. Hooks can only be called inside of the body of a function component.というエラーが出る。
     const { tabId } = useTab();
-    const { methodList } = useMethod();
-    const { purchaseList, setPurchaseList } = usePurchase();
     const addPurchase = useCallback(async () => {
         if (isError()) {
             return;
         }
 
-        const { income, price, ...newPurchaseData } = newPurchase;
+        const { income, price } = newPurchase;
         const difference = income ? Number(price) : -Number(price);
         const method = methodList.find((m) => m.id === newPurchase.method);
         if (!method) {
@@ -180,19 +175,20 @@ const PurchaseInput = () => {
         }
 
         const purchaseData = {
-            ...newPurchaseData,
             tabId,
             userId: Account?.id || '',
-            payDate: getPayDate(newPurchase),
+            payDate: getPayDate(method, newPurchase.date),
             difference,
             assetId: method.assetId,
             balance: 0,
             id: '',
+            date: newPurchase.date,
+            category: newPurchase.category,
+            description: newPurchase.description,
+            title: newPurchase.title,
+            method: newPurchase.method,
         };
-        const addedPurchaseAndId = addPurchaseAndUpdateLater(purchaseData, purchaseList);
-        const { purchases: addedPurchases } = addedPurchaseAndId;
-        updateAndAddPurchases(addedPurchases);
-        setPurchaseList(addedPurchases);
+        createPurchase(purchaseData);
         setNewPurchase(defaultInputFieldPurchase);
     }, [Account, defaultInputFieldPurchase, newPurchase]);
 

@@ -28,7 +28,6 @@ const purchaseSchema = z.object({
     title,
     price,
     date,
-    method,
 });
 
 const editMethod = z.object({
@@ -72,7 +71,9 @@ const transferSchema = z
         }
     });
 
-const validateField = <T, F extends ZodObject<any> | ZodEffects<any>>(schema: F, input: T) => {
+const validateField = <T, F extends ZodObject<any> | ZodEffects<any>>(
+    schema: F, input: T
+):ErrorType => {
     try {
         schema.parse(input);
         return {};
@@ -87,26 +88,26 @@ const validateField = <T, F extends ZodObject<any> | ZodEffects<any>>(schema: F,
     }
 };
 
-export const validatePurchase = (input: InputFieldPurchaseType) => {
+export const validatePurchase = (input: InputFieldPurchaseType): ErrorType => {
     return validateField<typeof input, typeof purchaseSchema>(purchaseSchema, input);
 };
 
-export const validateEditPurchase = (input: PurchaseDataType) => {
+export const validateEditPurchase = (input: PurchaseDataType): ErrorType => {
     return validateField<typeof input, typeof editPurchaseSchema>(editPurchaseSchema, input);
 };
 
-export const validatePurchaseSchedule = (input: InputPurchaseScheduleType) => {
+export const validatePurchaseSchedule = (input: InputPurchaseScheduleType): ErrorType => {
     return validateField<InputPurchaseScheduleType, typeof purchaseScheduleSchema>(
         purchaseScheduleSchema,
         input
     );
 };
 
-export const validateTransfer = (input: InputTransferType) => {
+export const validateTransfer = (input: InputTransferType): ErrorType => {
     return validateField<typeof input, typeof transferSchema>(transferSchema, input);
 };
 
-export const validateMethod = (input: MethodType) => {
+export const validateMethod = (input: MethodType): ErrorType => {
     return validateField<typeof input, typeof method>(method, input);
 };
 
@@ -115,6 +116,6 @@ export const validateMethod = (input: MethodType) => {
  * @param errors
  * @returns
  */
-export const getHasError = (errors: ErrorType) => {
-    return Object.values(errors).some((v) => v);
+export const getHasError = (errors: ErrorType): boolean => {
+    return Object.values(errors).some((v): boolean => Boolean(v));
 };

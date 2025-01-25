@@ -3,9 +3,9 @@ import { onRequest } from 'firebase-functions/v2/https';
 import { initializeDatabase } from './db.js';
 import { Accounts } from '../../entity/entities/Accounts.js';
 import { BaseService } from './services/serviceUtils.js';
-import { Purchases } from '../../entity/entities/Purchases.js';
 import { Methods } from '../../entity/entities/Methods.js';
 import { Assets } from '../../entity/entities/Assets.js';
+import { PurchaseService } from './services/purchaseService.js';
 
 // 1) まずは Express アプリを作成
 const app = express();
@@ -63,11 +63,6 @@ const dbInitPromise: Promise<void> = (async (): Promise<void> => {
         }
     });
 
-    class PurchaseService extends BaseService<Purchases> {
-        constructor() {
-            super(Purchases, 'purchases');
-        }
-    }
     const purchaseService = new PurchaseService();
 
     app.get('/api/purchase', async (req, res) => {

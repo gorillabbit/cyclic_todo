@@ -7,7 +7,6 @@ import {
     deleteDoc,
     doc,
     updateDoc,
-    writeBatch,
 } from 'firebase/firestore';
 import { getPerformance } from 'firebase/performance';
 import {
@@ -28,9 +27,7 @@ import {
     InputTabType,
 } from './types';
 import {
-    defaultPurchaseData,
     InputFieldPurchaseType,
-    PurchaseDataType,
 } from './types/purchaseTypes';
 
 // Firebase configuration
@@ -116,44 +113,6 @@ export const updateDocAccount = (id: string, updates: Partial<AccountType>) =>
     updateDocOperation(dbNames.account, id, updates);
 export const deleteDocAccount = (id: string) => deleteDocOperation(dbNames.account, id);
 
-/**
- *
- * @param v InputPurchaseTypeの一部。ない部分はdefaultPurchaseInputで補完される
- * @returns
- */
-export const addDocPurchase = (v: PurchaseDataType) =>
-    addDocOperation(dbNames.purchase, {
-        ...defaultPurchaseData,
-        ...v,
-    });
-export const updateDocPurchase = (id: string, updates: Partial<PurchaseDataType>) =>
-    updateDocOperation(dbNames.purchase, id, updates);
-export const batchAddDocPurchase = (purchaseList: (PurchaseDataType & { id?: string })[]) => {
-    const batch = writeBatch(db);
-    purchaseList.forEach((obj) => {
-        if (obj.id) {
-            const docRef = doc(collection(db, dbNames.purchase), obj.id);
-            batch.set(docRef, obj);
-        } else {
-            const docRef = doc(collection(db, dbNames.purchase));
-            batch.set(docRef, obj);
-        }
-    });
-    batch.commit().catch((error) => console.error('バッチ書き込み失敗:', error));
-};
-export const bulkUpdateDocPurchase = async (purchaseList: PurchaseDataType[]) => {
-    const batch = writeBatch(db);
-    purchaseList.forEach((obj: PurchaseDataType) => {
-        const { id, ...updateFields } = obj; // id を取り除いて残りのフィールドを取得
-        const docRef = doc(collection(db, dbNames.purchase), id);
-        batch.update(docRef, updateFields);
-    });
-    try {
-        return await batch.commit();
-    } catch (error) {
-        return console.error('バッチ書き込み失敗:', error);
-    }
-};
 
 export const deleteDocPurchase = (id: string) => deleteDocOperation(dbNames.purchase, id);
 

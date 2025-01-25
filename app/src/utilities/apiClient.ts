@@ -22,11 +22,32 @@ export const getPurchases = async (
     }
 };
 
-// PUT関数
+// POST関数
 export const createPurchase = async (data: PurchaseDataType): Promise<void> => {
     try {
         const response = await fetch(`${baseUrl}/purchase`, {
             method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+    } catch (error) {
+        console.error('Error updating purchase:', error);
+        throw error;
+    }
+};
+
+// PUT関数
+export const updatePurchase = async (id:string,data: Partial<PurchaseDataType>): Promise<void> => {
+    try {
+        console.log('updatePurchase', id, data, `${baseUrl}/purchase/${id}`);
+        const response = await fetch(`${baseUrl}/purchase/${id}`, {
+            method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
             },

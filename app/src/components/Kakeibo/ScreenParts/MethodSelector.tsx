@@ -18,13 +18,12 @@ const MethodSelector = ({
 }: MethodSelectorProps) => {
     const { methodList } = useMethod();
     const currentMethod = methodList.find((m) => m.id === newMethod);
-    console.log('methodList:', methodList);
     return (
         <Autocomplete
             value={currentMethod ?? null}
             sx={{ minWidth: 150 }}
             options={methodList}
-            onChange={(_e, v) => handleInput(inputName ?? 'method', v)}
+            onChange={(_e, v) => handleInput(inputName ?? 'method', v?.id)}
             isOptionEqualToValue={(option, value) => option.label === value?.label}
             renderInput={(params) => (
                 <TextField

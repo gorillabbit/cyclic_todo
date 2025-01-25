@@ -23,7 +23,7 @@ import { useMethod } from '../hooks/useData';
  * @param purchasesList
  * @returns
  */
-export const sumSpentAndIncome = (purchasesList: PurchaseDataType[]) =>
+export const sumSpentAndIncome = (purchasesList: PurchaseDataType[]):number =>
     purchasesList.reduce((acc, purchase) => acc + Number(purchase.difference), 0);
 
 export const numericProps: InputBaseComponentProps = {
@@ -409,11 +409,7 @@ export const updateDocuments = async ():Promise<void> => {
     console.log('データを更新しました');
 };
 
-export const getPayDate = (purchase: { method: string; date: Date }): Date => {
-    const { method, date } = purchase;
-    const { methodList } = useMethod();
-    const methodData = methodList.find((m) => m.id === method);
-    if (!methodData) return date;
-    const { timing, timingDate } = methodData;
+export const getPayDate = (method: MethodListType, date:Date): Date => {
+    const { timing, timingDate } = method;
     return timing === '即時' ? date : getPayLaterDate(date, timingDate);
 };
