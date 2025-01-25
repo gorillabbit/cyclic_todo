@@ -173,7 +173,7 @@ const dbInitPromise: Promise<void> = (async (): Promise<void> => {
 
     // Log endpoints
     const logService = new LogService();
-    app.get('/api/logs', async (req, res) => {
+    app.get('/api/log', async (req, res) => {
         try {
             const result = await logService.getAll(req.query);
             res.status(200).send(result);
@@ -181,7 +181,7 @@ const dbInitPromise: Promise<void> = (async (): Promise<void> => {
             res.status(500).send({ error });
         }
     });
-    app.post('/api/logs', async (req, res) => {
+    app.post('/api/log', async (req, res) => {
         try {
             const result = await logService.create(req.body);
             res.status(201).send(result);
@@ -189,7 +189,7 @@ const dbInitPromise: Promise<void> = (async (): Promise<void> => {
             res.status(500).send({ error });
         }
     });
-    app.put('/api/logs/:id', async (req, res) => {
+    app.put('/api/log/:id', async (req, res) => {
         try {
             const { id } = req.params;
             const result = await logService.update(id, req.body);
@@ -198,7 +198,7 @@ const dbInitPromise: Promise<void> = (async (): Promise<void> => {
             res.status(500).send({ error });
         }
     });
-    app.delete('/api/logs/:id', async (req, res) => {
+    app.delete('/api/log/:id', async (req, res) => {
         try {
             const { id } = req.params;
             await logService.delete(id);
@@ -210,7 +210,7 @@ const dbInitPromise: Promise<void> = (async (): Promise<void> => {
 
     // Tab endpoints
     const tabService = new TabService();
-    app.get('/api/tabs', async (req, res) => {
+    app.get('/api/tab', async (req, res) => {
         try {
             const result = await tabService.getAll(req.query);
             res.status(200).send(result);
@@ -218,7 +218,7 @@ const dbInitPromise: Promise<void> = (async (): Promise<void> => {
             res.status(500).send({ error });
         }
     });
-    app.post('/api/tabs', async (req, res) => {
+    app.post('/api/tab', async (req, res) => {
         try {
             const result = await tabService.create(req.body);
             res.status(201).send(result);
@@ -226,7 +226,7 @@ const dbInitPromise: Promise<void> = (async (): Promise<void> => {
             res.status(500).send({ error });
         }
     });
-    app.put('/api/tabs/:id', async (req, res) => {
+    app.put('/api/tab/:id', async (req, res) => {
         try {
             const { id } = req.params;
             const result = await tabService.update(id, req.body);
@@ -235,7 +235,7 @@ const dbInitPromise: Promise<void> = (async (): Promise<void> => {
             res.status(500).send({ error });
         }
     });
-    app.delete('/api/tabs/:id', async (req, res) => {
+    app.delete('/api/tab/:id', async (req, res) => {
         try {
             const { id } = req.params;
             await tabService.delete(id);
@@ -247,7 +247,7 @@ const dbInitPromise: Promise<void> = (async (): Promise<void> => {
 
     // Task endpoints
     const taskService = new TaskService();
-    app.get('/api/tasks', async (req, res) => {
+    app.get('/api/task', async (req, res) => {
         try {
             const result = await taskService.getAll(req.query);
             res.status(200).send(result);
@@ -255,7 +255,7 @@ const dbInitPromise: Promise<void> = (async (): Promise<void> => {
             res.status(500).send({ error });
         }
     });
-    app.post('/api/tasks', async (req, res) => {
+    app.post('/api/task', async (req, res) => {
         try {
             const result = await taskService.create(req.body);
             res.status(201).send(result);
@@ -263,7 +263,7 @@ const dbInitPromise: Promise<void> = (async (): Promise<void> => {
             res.status(500).send({ error });
         }
     });
-    app.put('/api/tasks/:id', async (req, res) => {
+    app.put('/api/task/:id', async (req, res) => {
         try {
             const { id } = req.params;
             const result = await taskService.update(id, req.body);
@@ -272,7 +272,7 @@ const dbInitPromise: Promise<void> = (async (): Promise<void> => {
             res.status(500).send({ error });
         }
     });
-    app.delete('/api/tasks/:id', async (req, res) => {
+    app.delete('/api/task/:id', async (req, res) => {
         try {
             const { id } = req.params;
             await taskService.delete(id);
