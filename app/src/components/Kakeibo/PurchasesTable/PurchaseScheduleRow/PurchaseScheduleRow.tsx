@@ -1,12 +1,16 @@
 import { memo, useCallback, useState } from 'react';
-import { InputPurchaseScheduleRowType, PurchaseScheduleListType } from '../../../../types';
+import {
+    InputPurchaseScheduleRowType,
+    MethodListType,
+    PurchaseScheduleListType,
+} from '../../../../types';
 import DeleteConfirmDialog from '../../DeleteConfirmDialog';
 import { deleteDocPurchaseSchedule } from '../../../../firebase';
 import EditPurchaseScheduleRow from './EditPurchaseScheduleRow';
 import { useIsSmall } from '../../../../hooks/useWindowSize';
 import NormalPurchaseScheduleRow from './NormalPurchaseScheduleRow';
 import { deleteScheduledPurchases } from '../../../../utilities/purchaseUtilities';
-import { usePurchase } from '../../../../hooks/useData';
+import { useMethod, usePurchase } from '../../../../hooks/useData';
 
 type PlainPurchaseScheduleRowProps = {
     purchaseSchedule: PurchaseScheduleListType;
@@ -18,6 +22,7 @@ type PlainPurchaseScheduleRowProps = {
     setEditFormData: React.Dispatch<React.SetStateAction<InputPurchaseScheduleRowType>>;
     deleteAction: () => void;
     isSmall: boolean;
+    method: MethodListType;
 };
 
 const PlainPurchaseScheduleRow = memo(
@@ -31,15 +36,23 @@ const PlainPurchaseScheduleRow = memo(
         setEditFormData,
         deleteAction,
         isSmall,
+        method,
     }: PlainPurchaseScheduleRowProps) => (
         <>
             {isEdit ? (
                 <EditPurchaseScheduleRow
-                    {...{ setIsEdit, editFormData, setEditFormData, isSmall }}
+                    setIsEdit={setIsEdit}
+                    editFormData={editFormData}
+                    setEditFormData={setEditFormData}
+                    isSmall={isSmall}
+                    method={method}
                 />
             ) : (
                 <NormalPurchaseScheduleRow
-                    {...{ editFormData, setIsEdit, setOpenDialog, isSmall }}
+                    editFormData={editFormData}
+                    setIsEdit={setIsEdit}
+                    setOpenDialog={setOpenDialog}
+                    isSmall={isSmall}
                 />
             )}
             <DeleteConfirmDialog
@@ -63,7 +76,11 @@ const PurchaseScheduleRow = ({
         endDate: purchaseSchedule.endDate.toDate(),
     });
     const { purchaseList } = usePurchase();
-
+    const { methodList } = useMethod();
+    const method = methodList.find((method) => method.id === purchaseSchedule.method);
+    if (!method) {
+        return <></>;
+    }
     const deleteAction = useCallback(() => {
         deleteScheduledPurchases(purchaseList, purchaseSchedule.id);
         deleteDocPurchaseSchedule(purchaseSchedule.id);
@@ -79,6 +96,7 @@ const PurchaseScheduleRow = ({
         setEditFormData,
         deleteAction,
         isSmall,
+        method,
     };
     return <PlainPurchaseScheduleRow {...plainProps} />;
 };

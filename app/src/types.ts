@@ -138,7 +138,7 @@ export interface InputPurchaseScheduleType {
     date?: number;
     day?: WeekDay;
     cycle: string;
-    method: MethodListType;
+    method: string;
     category: string;
     income: boolean;
     description: string;
@@ -160,8 +160,8 @@ export interface InputTransferType {
     userId: string;
     price: number;
     date: Date;
-    from: MethodListType;
-    to: MethodListType;
+    from: string;
+    to: string;
     description: string;
     tabId: string;
 }
@@ -169,8 +169,8 @@ export const defaultTransferInput: InputTransferType = {
     userId: '',
     price: 0,
     date: new Date(),
-    from: defaultMethodList,
-    to: defaultMethodList,
+    from: '',
+    to: '',
     description: '',
     tabId: '',
 };

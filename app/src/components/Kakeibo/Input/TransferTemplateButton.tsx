@@ -3,6 +3,7 @@ import { memo, useCallback, useState } from 'react';
 import { TransferType } from '../../../types';
 import { deleteDocTransferTemplate } from '../../../firebase';
 import DeleteConfirmDialog from '../DeleteConfirmDialog';
+import { useMethod } from '../../../hooks/useData';
 
 type PlainTransferTemplateButtonProps = {
     onClickTransferTemplateButton: () => void;
@@ -60,7 +61,11 @@ const TransferTemplateButton = ({
         deleteDocTransferTemplate(transfer.id);
     }, [transfer.id]);
 
-    const chipTitle = `${transfer.from.label}→${transfer.to.label}：${transfer.price}円`;
+    const { methodList } = useMethod();
+    const fromMethod = methodList.find((m) => m.id === transfer.from);
+    const toMethod = methodList.find((m) => m.id === transfer.to);
+
+    const chipTitle = `${fromMethod?.label}→${toMethod?.label}：${transfer.price}円`;
 
     const plainProps = {
         onClickTransferTemplateButton,

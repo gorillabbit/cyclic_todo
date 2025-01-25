@@ -19,7 +19,6 @@ import { addDocTab, app, db, updateDocAccount } from '../firebase';
 import { collection, doc, getDoc, setDoc } from 'firebase/firestore';
 import { Link, useNavigate } from 'react-router-dom';
 import { AccountType, defaultAccountInput } from '../types';
-import { AccountToLink } from '../utilities/tabUtilities';
 
 type PlainLoginPageProps = {
     Fields: {
@@ -165,7 +164,7 @@ const LoginPage = () => {
             createUserUid: account.id,
             name: 'タスク/ログ',
             type: 'task',
-            sharedAccounts: [AccountToLink(account)],
+            sharedAccounts: [account],
         });
         tabIds.push(taskTabDoc.id);
 
@@ -173,7 +172,7 @@ const LoginPage = () => {
             createUserUid: account.id,
             name: '家計簿',
             type: 'purchase',
-            sharedAccounts: [AccountToLink(account)],
+            sharedAccounts: [account],
         });
         tabIds.push(purchaseTabDoc.id);
 

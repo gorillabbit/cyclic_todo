@@ -15,7 +15,6 @@ import PushPinOutlinedIcon from '@mui/icons-material/PushPinOutlined';
 import AddIcon from '@mui/icons-material/Add';
 import { addDocTab, updateDocAccount } from '../firebase';
 import { TabType } from '../types';
-import { AccountToLink } from '../utilities/tabUtilities';
 import { useAccount } from '../hooks/useData';
 
 type HeaderTabsProps = {
@@ -133,7 +132,7 @@ const HeaderTabs = ({
             name: addTabName,
             type: addTabType,
             createUserUid: Account.id,
-            sharedAccounts: [AccountToLink(Account)],
+            sharedAccounts: [Account],
         }).then((result) => {
             updateDocAccount(Account.id, {
                 useTabIds: [...Account.useTabIds, result.id],

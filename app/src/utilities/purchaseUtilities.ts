@@ -1,5 +1,5 @@
 import { InputBaseComponentProps } from '@mui/material';
-import { InputPurchaseScheduleType, MethodType, WeekDay } from '../types';
+import { InputPurchaseScheduleType, MethodListType, WeekDay } from '../types';
 import { db, dbNames, deleteDocPurchase } from '../firebase';
 import { addMonths, nextDay, addDays } from 'date-fns';
 import {
@@ -16,6 +16,7 @@ import {
 } from 'firebase/firestore';
 import { getPayLaterDate } from './dateUtilities';
 import { PurchaseDataType, PurchaseRawDataType } from '../types/purchaseTypes';
+import { useMethod } from '../hooks/useData';
 
 /**
  * 収支を合計する(収入は+、支出は-で表現されるので支出の合計は-になる)
@@ -35,8 +36,8 @@ export const numericProps: InputBaseComponentProps = {
  * @param purchase
  * @returns boolean
  */
-export const isLaterPayment = (purchase: PurchaseDataType): boolean =>
-    purchase.method.timing === '翌月';
+export const isLaterPayment = (purchase: PurchaseDataType, methodList:MethodListType[]): boolean =>
+    methodList.find((m) => m.id === purchase.method)?.timing !== '即時';
 
 export const is今月の支払いwithout後払いの支払い = (
     purchase: PurchaseDataType,
@@ -176,8 +177,8 @@ export const sortObjectsByParameter = (
 ): PurchaseDataType[] => {
     return objects.sort((a, b) => {
         if (parameter === 'method') {
-            if (a.method.label < b.method.label) return ascending ? -1 : 1;
-            if (a.method.label > b.method.label) return ascending ? 1 : -1;
+            if (a.method < b.method) return ascending ? -1 : 1;
+            if (a.method > b.method) return ascending ? 1 : -1;
             return 0;
         }
         const aVal = a[parameter]; // このように代入しないと、型のチェックは行われない。Typescriptの型は変数に対して行われる式に対しては行われない
@@ -299,7 +300,10 @@ export const addScheduledPurchase = (
     purchaseSchedule: InputPurchaseScheduleType,
     updatePurchases: PurchaseDataType[]
 ) => {
+    const { methodList } = useMethod();
     const { price, income, method, cycle, date, endDate, day } = purchaseSchedule;
+    const currentMethod = methodList.find((m) => m.id === method);
+    if (!currentMethod) return;
     const difference = income ? price : -price;
     const purchaseBase = {
         userId: purchaseSchedule.userId,
@@ -310,7 +314,7 @@ export const addScheduledPurchase = (
         isUncertain: purchaseSchedule.isUncertain,
         tabId: purchaseSchedule.tabId,
         parentScheduleId: purchaseScheduleId,
-        assetId: method.assetId,
+        assetId: currentMethod.assetId,
         balance: 0,
         difference,
         id: '',
@@ -322,14 +326,13 @@ export const addScheduledPurchase = (
         if (cycle === '毎週' && day) return listWeeklyDaysUntil(day, endDate);
         return [];
     };
-    getDays().forEach((dateDay) => {
-        purchaseList.push({
-            ...purchaseBase,
-            date: dateDay,
-            payDate:
-                method.timing === '即時' ? dateDay : getPayLaterDate(dateDay, method.timingDate),
-        });
-    });
+    getDays().forEach((dateDay) => purchaseList.push({
+        ...purchaseBase,
+        date: dateDay,
+        payDate: currentMethod.timing === '即時' ? 
+            dateDay : 
+            getPayLaterDate(dateDay, currentMethod.timingDate),
+    }));
     let newUpdatePurchases = updatePurchases;
     for (const purchase of purchaseList) {
         newUpdatePurchases = addPurchaseAndUpdateLater(purchase, newUpdatePurchases).purchases;
@@ -371,11 +374,13 @@ export const updateDocuments = async () => {
             return { ...({ id: doc.id, ...doc.data() } as oldPurchases), doc };
         })
     );
+    const { methodList } = useMethod();
 
     purchases.forEach((data) => {
         console.log(data);
         if (!data.tabId) return;
-        const assetId = String(data.method.assetId);
+        const assetId = methodList.find((m) => m.id === data.method)?.assetId;
+        if (!assetId) return;
         const lastBalances = lastPurchases[assetId];
         if (!lastBalances) lastPurchases[assetId] = 0;
         const difference = data.difference ?? (data.income ? data.price : -(data.price ?? 0));
@@ -385,7 +390,7 @@ export const updateDocuments = async () => {
         batch.update(docRef, {
             difference,
             balance,
-            assetId: data.method.assetId,
+            assetId: assetId,
             timestamp: new Date(),
         });
 
@@ -396,8 +401,11 @@ export const updateDocuments = async () => {
     console.log('データを更新しました');
 };
 
-export const getPayDate = (purchase: { method: MethodType; date: Date }) => {
+export const getPayDate = (purchase: { method: string; date: Date }) => {
     const { method, date } = purchase;
-    const { timing, timingDate } = method;
+    const { methodList } = useMethod();
+    const methodData = methodList.find((m) => m.id === method);
+    if (!methodData) return date;
+    const { timing, timingDate } = methodData;
     return timing === '即時' ? date : getPayLaterDate(date, timingDate);
 };

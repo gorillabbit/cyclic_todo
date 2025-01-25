@@ -1,9 +1,7 @@
-import { ReactNode, createContext, memo, useMemo } from 'react';
-import { orderBy, where } from 'firebase/firestore';
+import { ReactNode, createContext, memo, useEffect, useMemo, useState } from 'react';
 import { AssetListType } from '../../types.js';
-import { useFirestoreQuery } from '../../utilities/firebaseUtilities';
 import { useTab } from '../../hooks/useData.js';
-import { dbNames } from '../../firebase.js';
+import { getAssets } from '../../utilities/apiClient.js';
 
 type AssetContextType = {
     assetList: AssetListType[];
@@ -16,15 +14,14 @@ export const AssetContext = createContext<AssetContextType>({
 
 export const AssetProvider = memo(({ children }: { children: ReactNode }) => {
     const { tabId } = useTab();
-    const assetQueryConstraints = useMemo(
-        () => [orderBy('timestamp'), where('tabId', '==', tabId)],
-        [tabId]
-    );
-    const { documents: assetList } = useFirestoreQuery<AssetListType>(
-        dbNames.asset,
-        assetQueryConstraints,
-        true
-    );
+    const [assetList, setAssetList] = useState<AssetListType[]>([]);
+
+    useEffect(() => {
+        getAssets(tabId).then((assets) => {
+            setAssetList(assets);
+            console.log('assets:', assets);
+        });
+    }, []);
 
     const context = useMemo(() => {
         return { assetList };

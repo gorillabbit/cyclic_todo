@@ -153,7 +153,7 @@ const MethodRow = ({ method }: { method: MethodListType }) => {
     );
 
     const { purchaseList } = usePurchase();
-    const methodPurchase = purchaseList.filter((p) => p.method.id === method.id);
+    const methodPurchase = purchaseList.filter((p) => p.method === method.id);
     const thisMonthPurchase = methodPurchase.filter(
         (p) => getFutureMonthFirstDay() > p.date && p.date >= getThisMonthFirstDay()
     );

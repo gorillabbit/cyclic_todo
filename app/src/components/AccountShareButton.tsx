@@ -14,7 +14,6 @@ import { collection, doc, getDoc, getDocs, query, where } from 'firebase/firesto
 import { AccountLinkType, AccountType } from '../types';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import CancelIcon from '@mui/icons-material/Cancel';
-import { AccountToLink } from '../utilities/tabUtilities';
 import { useAccount } from '../hooks/useData';
 import { getAccounts } from '../utilities/apiClient';
 
@@ -99,7 +98,7 @@ const AccountShareButton = () => {
         });
         const targetDoc = targetAccountDoc.docs[0];
         updateDocAccount(targetDoc.id, {
-            receiveRequest: [...targetDoc.data().receiveRequest, AccountToLink(Account)],
+            receiveRequest: [...targetDoc.data().receiveRequest, Account],
         });
         setEmail('');
     };

@@ -22,13 +22,14 @@ import {
     updateDocuments,
 } from '../../../utilities/purchaseUtilities';
 import TableHeadCell from './TableHeadCell';
-import { usePurchase } from '../../../hooks/useData';
+import { useMethod, usePurchase } from '../../../hooks/useData';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { PurchaseDataType } from '../../../types/purchaseTypes';
 import TableCellWrapper from '../TableCellWrapper';
 import DoughnutContainer from './Charts/ChartContainer';
 import NarrowDownDialog from './NarrowDownDialog';
+import { defaultMethodList } from '../../../types';
 
 type PlainPurchaseProps = {
     monthlyPurchasesAddedPayLaterPurchase: PurchaseDataType[];
@@ -144,6 +145,7 @@ const PlainPurchases = memo(
 
 const Purchases = memo(() => {
     const { purchaseList } = usePurchase();
+    const { methodList } = useMethod();
     const isSmall = useIsSmall();
 
     // 月の切り替え
@@ -169,7 +171,9 @@ const Purchases = memo(() => {
         () =>
             purchaseList.filter(
                 (p) =>
-                    isLaterPayment(p) &&
+                    isLaterPayment(p, [
+                        methodList.find((method) => method.id === p.method) ?? defaultMethodList,
+                    ]) &&
                     p.payDate.getMonth() === month.getMonth() &&
                     p.payDate.getFullYear() === month.getFullYear()
             ),
@@ -180,7 +184,9 @@ const Purchases = memo(() => {
         // 後払いを合計する(収入に後払いはないので考慮しない)
         const 後払い毎の合計 = {} as { [key: string]: PurchaseDataType };
         後払いでその月に払うもの.forEach((p) => {
-            const keyString = p.method.label + p.payDate.getMonth() + '/' + p.payDate.getDate(); // 支払日が同じ日のものを合計する
+            const method = methodList.find((m) => m.id === p.method);
+            if (!method) return;
+            const keyString = method.label + p.payDate.getMonth() + '/' + p.payDate.getDate(); // 支払日が同じ日のものを合計する
             const target = 後払い毎の合計[keyString];
             if (!target) {
                 // 後払いの合計を合計としてふさわしい形に変換
@@ -189,7 +195,7 @@ const Purchases = memo(() => {
                     parentScheduleId: '',
                     id: keyString,
                     date: p.payDate,
-                    title: p.method.label + '引き落し',
+                    title: method.label + '引き落し',
                     category: '後支払い',
                     isUncertain: false,
                     description: '',
@@ -211,9 +217,7 @@ const Purchases = memo(() => {
     const getGroupPurchases = useCallback(
         (groupedPurchase: PurchaseDataType) => {
             if (!groupedPurchase.isGroup) return [];
-            return 後払いでその月に払うもの.filter(
-                (p) => p.method.id === groupedPurchase.method.id
-            );
+            return 後払いでその月に払うもの.filter((p) => p.method === groupedPurchase.method);
         },
         [後払いでその月に払うもの]
     );

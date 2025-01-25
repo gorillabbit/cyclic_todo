@@ -11,7 +11,7 @@ import {
     updateAndAddPurchases,
 } from '../../../utilities/purchaseUtilities';
 import TemplateButtons from './TemplateButtonsContainer';
-import { useTab, usePurchase, useAccount } from '../../../hooks/useData';
+import { useTab, usePurchase, useAccount, useMethod } from '../../../hooks/useData';
 import { defaultInputFieldPurchase, InputFieldPurchaseType } from '../../../types/purchaseTypes';
 import { set } from 'date-fns';
 import { getHasError, validatePurchase } from '../KakeiboSchemas';
@@ -164,6 +164,7 @@ const PurchaseInput = () => {
 
     // useTabを関数内で呼び出すと、Invalid hook call. Hooks can only be called inside of the body of a function component.というエラーが出る。
     const { tabId } = useTab();
+    const { methodList } = useMethod();
     const { purchaseList, setPurchaseList } = usePurchase();
     const addPurchase = useCallback(async () => {
         if (isError()) {
@@ -172,6 +173,11 @@ const PurchaseInput = () => {
 
         const { income, price, ...newPurchaseData } = newPurchase;
         const difference = income ? Number(price) : -Number(price);
+        const method = methodList.find((m) => m.id === newPurchase.method);
+        if (!method) {
+            console.error('支払い方法が見つかりません');
+            return;
+        }
 
         const purchaseData = {
             ...newPurchaseData,
@@ -179,7 +185,7 @@ const PurchaseInput = () => {
             userId: Account?.id || '',
             payDate: getPayDate(newPurchase),
             difference,
-            assetId: newPurchase.method.assetId,
+            assetId: method.assetId,
             balance: 0,
             id: '',
         };

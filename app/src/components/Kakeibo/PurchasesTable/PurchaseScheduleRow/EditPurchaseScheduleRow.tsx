@@ -209,19 +209,19 @@ const EditPurchaseScheduleRow = ({
     editFormData,
     setEditFormData,
     isSmall,
+    method,
 }: {
     setIsEdit: React.Dispatch<React.SetStateAction<boolean>>;
     editFormData: InputPurchaseScheduleRowType;
     setEditFormData: React.Dispatch<React.SetStateAction<InputPurchaseScheduleRowType>>;
     isSmall: boolean;
+    method: MethodListType;
 }) => {
     const { purchaseList, setPurchaseList } = usePurchase();
 
     // 編集内容を保存する関数
     const handleSaveClick = useCallback(async () => {
-        const update = purchaseList.filter(
-            (purchase) => purchase.assetId === editFormData.method.assetId
-        );
+        const update = purchaseList.filter((purchase) => purchase.assetId === method.assetId);
         const { id, ...editFormDataWithoutId } = editFormData;
         // アップデートし、編集を閉じる
         const updateCurrentPurchaseSchedule = (feature: Partial<InputPurchaseScheduleRowType>) => {
@@ -237,6 +237,9 @@ const EditPurchaseScheduleRow = ({
         // idが含まれると、子タスクのidがそれになってしまう
 
         const update3 = addScheduledPurchase(id, editFormDataWithoutId, update2);
+        if (!update3) {
+            return console.error('予定タスクの追加に失敗しました');
+        }
         updateAndAddPurchases(update3);
         setPurchaseList(update3);
     }, [editFormData, purchaseList, setIsEdit, setPurchaseList]);

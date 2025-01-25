@@ -8,6 +8,7 @@ import {
 import BalanceChart from './BalanceChart';
 import MonthlyStackedBarChart from './MonthlyBarChats';
 import StackedBarChart from './StackedBarChart';
+import { useMethod } from '../../../../hooks/useData';
 
 type PlainDoughnutContainerProps = {
     currentMonthNetSpentList: PurchaseDataType[];
@@ -79,10 +80,12 @@ const DoughnutContainer = ({
     );
     const currentMonthPayment = sumSpentAndIncome(currentMonthPaymentList);
 
+    const { methodList } = useMethod();
+
     // 今月の支払金額(支払い方法ごと)
     const currentMonthPaymentCategoryList = currentMonthPaymentList.map((p) => ({
         ...p,
-        category: p.method.label,
+        category: methodList.find((m) => m.id === p.method)?.label || '不明',
     }));
 
     const currentMonthIncomeList = PurchasesWithoutTransfer.filter((p) => p.difference > 0);

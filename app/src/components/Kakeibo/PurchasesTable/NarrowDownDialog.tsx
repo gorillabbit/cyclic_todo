@@ -12,7 +12,6 @@ import { PurchaseDataType } from '../../../types/purchaseTypes';
 import { DatePicker } from '@mui/x-date-pickers';
 import CategorySelector from '../ScreenParts/CategorySelector';
 import MethodSelector from '../ScreenParts/MethodSelector';
-import { defaultMethodList } from '../../../types';
 import { useAsset } from '../../../hooks/useData';
 import { Timestamp } from 'firebase/firestore';
 
@@ -73,7 +72,7 @@ const NarrowDownDialog = ({
                         handleInput={handleFilterApply}
                     />
                     <MethodSelector
-                        newMethod={filterObject.method ?? defaultMethodList}
+                        newMethod={filterObject.method ?? ''}
                         handleInput={handleFilterApply}
                         errors={undefined}
                     />

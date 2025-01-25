@@ -4,6 +4,8 @@ import { initializeDatabase } from './db.js';
 import { Accounts } from '../../entity/entities/Accounts.js';
 import { BaseService } from './services/serviceUtils.js';
 import { Purchases } from '../../entity/entities/Purchases.js';
+import { Methods } from '../../entity/entities/Methods.js';
+import { Assets } from '../../entity/entities/Assets.js';
 
 // 1) まずは Express アプリを作成
 const app = express();
@@ -92,6 +94,96 @@ const dbInitPromise: Promise<void> = (async (): Promise<void> => {
         try {
             const result = await purchaseService.create(req.body);
             res.status(201).send(result);
+        } catch (error) {
+            res.status(500).send({ error });
+        }
+    });
+
+    class MethodService extends BaseService<Methods> {
+        constructor() {
+            super(Methods, 'methods');
+        }
+    }
+    const methodService = new MethodService();
+
+    app.get('/api/method', async (req, res) => {
+        try {
+            const result = await methodService.getAll(req.query);
+            res.status(200).send(result);
+        } catch (error) {
+            res.status(500).send({ error });
+        }
+    });
+
+    app.post('/api/method', async (req, res) => {
+        try {
+            const result = await methodService.create(req.body);
+            res.status(201).send(result);
+        } catch (error) {
+            res.status(500).send({ error });
+        }
+    });
+
+    app.put('/api/method/:id', async (req, res) => {
+        try {
+            const { id } = req.params;
+            const result = await methodService.update(id, req.body);
+            res.status(200).send(result);
+        } catch (error) {
+            res.status(500).send({ error });
+        }
+    });
+
+    app.delete('/api/method/:id', async (req, res) => {
+        try {
+            const { id } = req.params;
+            await methodService.delete(id);
+            res.status(204).send();
+        } catch (error) {
+            res.status(500).send({ error });
+        }
+    });
+
+    class AssetService extends BaseService<Assets> {
+        constructor() {
+            super(Assets, 'assets');
+        }
+    }
+    const assetService = new AssetService();
+
+    app.get('/api/asset', async (req, res) => {
+        try {
+            const result = await assetService.getAll(req.query);
+            res.status(200).send(result);
+        } catch (error) {
+            res.status(500).send({ error });
+        }
+    });
+
+    app.post('/api/asset', async (req, res) => {
+        try {
+            const result = await assetService.create(req.body);
+            res.status(201).send(result);
+        } catch (error) {
+            res.status(500).send({ error });
+        }
+    });
+
+    app.put('/api/asset/:id', async (req, res) => {
+        try {
+            const { id } = req.params;
+            const result = await assetService.update(id, req.body);
+            res.status(200).send(result);
+        } catch (error) {
+            res.status(500).send({ error });
+        }
+    });
+
+    app.delete('/api/asset/:id', async (req, res) => {
+        try {
+            const { id } = req.params;
+            await assetService.delete(id);
+            res.status(204).send();
         } catch (error) {
             res.status(500).send({ error });
         }

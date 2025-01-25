@@ -2,12 +2,7 @@ import { Box, Button, FormGroup, InputAdornment, MenuItem, Select, TextField } f
 import StyledCheckbox from '../../StyledCheckbox';
 import { useState, useCallback, useMemo } from 'react';
 import { addDocPurchaseSchedule } from '../../../firebase';
-import {
-    ErrorType,
-    InputPurchaseScheduleType,
-    MethodListType,
-    defaultMethodList,
-} from '../../../types';
+import { ErrorType, InputPurchaseScheduleType, MethodListType } from '../../../types';
 import { addYears } from 'date-fns';
 import { DatePicker } from '@mui/x-date-pickers';
 import {
@@ -27,7 +22,7 @@ const defaultNewPurchase: InputPurchaseScheduleType = {
     date: 1,
     day: '月曜日',
     category: '',
-    method: defaultMethodList,
+    method: '',
     price: 0,
     income: false,
     description: '',
@@ -81,6 +76,9 @@ const PurchaseScheduleInput = () => {
             userId: Account.id,
         });
         const result = addScheduledPurchase(addedSchedule.id, newPurchaseSchedule, purchaseList);
+        if (!result) {
+            return console.error('エラーが発生しました');
+        }
         updateAndAddPurchases(result);
         setPurchaseList(result);
         setNewPurchaseSchedule(defaultNewPurchase);

@@ -1,4 +1,4 @@
-import { AccountType } from '../types';
+import { AccountType, AssetListType, MethodListType } from '../types';
 import { PurchaseDataType } from '../types/purchaseTypes';
 
 const baseUrl = import.meta.env.VITE_FIREBASE_FUNCTIONS_URL;
@@ -41,6 +41,41 @@ export const createPurchase = async (data: PurchaseDataType): Promise<void> => {
         throw error;
     }
 };
+
+export const getMethods = async (
+    tabId?: string): Promise<MethodListType[]> => {
+    try {
+        const params = new URLSearchParams();
+        if (tabId != null && tabId !== '') params.append('tab_id', tabId);
+
+        const response = await fetch(`${baseUrl}/method?${params.toString()}`);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Error fetching purchases:', error);
+        throw error;
+    }
+};
+
+export const getAssets = async (
+    tabId?: string): Promise<AssetListType[]> => {
+    try {
+        const params = new URLSearchParams();
+        if (tabId != null && tabId !== '') params.append('tab_id', tabId);
+
+        const response = await fetch(`${baseUrl}/asset?${params.toString()}`);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Error fetching purchases:', error);
+        throw error;
+    }
+};
+
 
 // 既存のアカウント取得関数
 type FilterParam = {

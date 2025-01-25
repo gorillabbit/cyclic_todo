@@ -1,9 +1,8 @@
 import { Autocomplete, TextField } from '@mui/material';
 import { useMethod } from '../../../hooks/useData';
-import { MethodListType } from '../../../types';
 
 type MethodSelectorProps = {
-    newMethod: MethodListType;
+    newMethod: string;
     handleInput: (name: string, value: any) => void;
     errors: string | undefined;
     inputName?: string;
@@ -18,9 +17,11 @@ const MethodSelector = ({
     isSmall,
 }: MethodSelectorProps) => {
     const { methodList } = useMethod();
+    const currentMethod = methodList.find((m) => m.id === newMethod);
+    console.log('methodList:', methodList);
     return (
         <Autocomplete
-            value={newMethod?.label ? newMethod : null}
+            value={currentMethod ?? null}
             sx={{ minWidth: 150 }}
             options={methodList}
             onChange={(_e, v) => handleInput(inputName ?? 'method', v)}

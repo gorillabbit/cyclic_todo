@@ -75,7 +75,7 @@ const PlainEditPricePurchaseRow = memo(
                 <TableCellWrapper label={editFormData.title} />
 
                 <TableCellWrapper label={editFormData.category} />
-                <TableCellWrapper label={editFormData.method.label} />
+                <TableCellWrapper label={editFormData.method} />
                 {!isSmall && (
                     <UnderHalfRow
                         editFormData={editFormData}

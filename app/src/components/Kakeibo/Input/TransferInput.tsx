@@ -17,7 +17,7 @@ import {
     updateAndAddPurchases,
 } from '../../../utilities/purchaseUtilities';
 import TransferTemplateButtonsContainer from './TransferTemplateButtonContainer';
-import { usePurchase, useTab } from '../../../hooks/useData';
+import { useMethod, usePurchase, useTab } from '../../../hooks/useData';
 import { getHasError, validateTransfer } from '../KakeiboSchemas';
 import MethodSelector from '../ScreenParts/MethodSelector';
 
@@ -103,6 +103,7 @@ const PlainTransferInput = memo(
 const TransferInput = () => {
     const { currentUser } = getAuth();
     const { tabId } = useTab();
+    const { methodList } = useMethod();
     const [newTransfer, setNewTransfer] = useState<InputTransferType>({
         ...defaultTransferInput,
         tabId,
@@ -137,6 +138,11 @@ const TransferInput = () => {
         if (!currentUser) {
             return console.error('ログインしていません');
         }
+        const fromMethod = methodList.find((m) => m.id === newTransfer.from);
+        const toMethod = methodList.find((m) => m.id === newTransfer.to);
+        if (!fromMethod || !toMethod) {
+            return console.error('支払い方法が見つかりません');
+        }
         const { price, date, description, from, to } = newTransfer;
         const basePurchase = {
             userId: currentUser.uid,
@@ -147,13 +153,13 @@ const TransferInput = () => {
             id: '',
             balance: 0,
         };
-        const purchaseTitle = `${from.label}→${to.label}`;
+        const purchaseTitle = `${fromMethod.label}→${toMethod.label}`;
         const fromPurchase = {
             ...basePurchase,
             title: `【送】${purchaseTitle}`,
             method: from,
             payDate: getPayDate({ date, method: from }),
-            assetId: from.assetId,
+            assetId: fromMethod.assetId,
             difference: -price,
         };
         const addedFromPurchase = addPurchaseAndUpdateLater(fromPurchase, purchaseList).purchases;
@@ -163,7 +169,7 @@ const TransferInput = () => {
             title: `【受】${purchaseTitle}`,
             method: to,
             payDate: getPayDate({ date, method: to }),
-            assetId: to.assetId,
+            assetId: toMethod.assetId,
             difference: price,
         };
         const addedFromAndToPurchase = addPurchaseAndUpdateLater(

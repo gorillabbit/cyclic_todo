@@ -1,12 +1,11 @@
 import { Timestamp } from 'firebase/firestore';
-import { defaultMethodList, MethodListType } from '../types';
 
 interface PurchaseBaseType {
     userId: string;
     title: string;
     date: Date; // 商品を買った日
     payDate: Date; // お金を支払った日
-    method: MethodListType;
+    method: string;
     category: string;
     description: string;
     isUncertain?: boolean;
@@ -17,7 +16,7 @@ const defaultPurchaseBase: PurchaseBaseType = {
     title: '',
     date: new Date(),
     payDate: new Date(),
-    method: defaultMethodList,
+    method: '',
     category: '',
     description: '',
     isUncertain: false,

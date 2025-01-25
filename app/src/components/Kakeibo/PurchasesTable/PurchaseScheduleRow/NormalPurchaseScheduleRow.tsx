@@ -35,7 +35,7 @@ const PlainNormalPurchaseScheduleRow = memo(
             <TableCellWrapper label={editFormData.title} />
             <TableCellWrapper label={editFormData.price} />
             <TableCellWrapper label={editFormData.category} />
-            <TableCellWrapper label={editFormData.method.label} />
+            <TableCellWrapper label={editFormData.method} />
             <TableCellWrapper>{editFormData.isUncertain && <Chip label="未確" />}</TableCellWrapper>
             <TableCellWrapper label={editFormData.description} />
             <TableCellWrapper>
