@@ -106,24 +106,11 @@ export const updateData = async <T extends CreateDataType>(
     return sendData(`${endpoint}/${id}`, 'PUT', data);
 };
 
-// データ削除共通関数
-export const deleteData = async (
-    endpoint: string,
-    id: string
-): Promise<void> => {
-    return sendData(`${endpoint}/${id}`, 'DELETE', {});
-};
-
 // 購入データ更新（既存コードとの互換性のため保持）
 export const updatePurchase = async (
     id: string, data: Partial<PurchaseDataType>
 ): Promise<void> => {
     return updateData('/purchase', id, data);
-};
-
-// 購入データ削除
-export const deletePurchase = async (id: string): Promise<void> => {
-    return deleteData('/purchase', id);
 };
 
 // メソッド更新
@@ -139,6 +126,27 @@ export const updateAsset = async (id: string, data: Partial<AssetListType>): Pro
 // タブ更新
 export const updateTab = async (id: string, data: Partial<TabListType>): Promise<void> => {
     return updateData('/tab', id, data);
+};
+
+// データ削除共通関数
+export const deleteData = async (
+    endpoint: string,
+    id: string
+): Promise<void> => {
+    return sendData(`${endpoint}/${id}`, 'DELETE', {});
+};
+
+// 購入データ削除
+export const deletePurchase = async (id: string): Promise<void> => {
+    return deleteData('/purchase', id);
+};
+
+export const deleteAsset = async (id: string): Promise<void> => {
+    return deleteData('/asset', id);
+};
+
+export const deleteMethod = async (id: string): Promise<void> => {
+    return deleteData('/method', id);
 };
 
 export const getPurchases = async (
