@@ -19,7 +19,6 @@ export const AssetProvider = memo(({ children }: { children: ReactNode }) => {
     useEffect(() => {
         getAssets(tabId).then((assets) => {
             setAssetList(assets);
-            console.log('assets:', assets);
         });
     }, []);
 
