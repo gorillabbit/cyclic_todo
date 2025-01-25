@@ -3,9 +3,25 @@ import {
     Repository,
     DeepPartial,
     ObjectLiteral,
-    EntityTarget
+    EntityTarget,
+    EntityManager
 } from 'typeorm';
 import AppDataSource from '../db.js';
+
+// カスタムエラークラスを追加
+class DatabaseError extends Error {
+    constructor(message: string, options?: ErrorOptions) {
+        super(message, options);
+        this.name = 'DatabaseError';
+    }
+}
+
+class AppError extends Error {
+    constructor(message: string, options?: ErrorOptions) {
+        super(message, options);
+        this.name = 'AppError';
+    }
+}
 
 export abstract class BaseService<T extends ObjectLiteral> {
     protected repository: Repository<T>;
@@ -18,10 +34,15 @@ export abstract class BaseService<T extends ObjectLiteral> {
 
     protected async handleError(methodName: string, err: unknown): Promise<never> {
         if (err instanceof QueryFailedError) {
-            console.error(`${methodName} でDB操作に失敗しました:`, err.message);
-            throw new Error(err.message);
+            const errorMessage = `Database error in ${methodName}: ${err.message}`;
+            console.error(errorMessage);
+            throw new DatabaseError(errorMessage, { cause: err });
         }
-        throw err;
+        
+        const errorMessage = `Unexpected error in ${methodName}: ${err instanceof Error 
+            ? err.message : 'Unknown error'}`;
+        console.error(errorMessage);
+        throw new AppError(errorMessage, { cause: err });
     }
 
     async getAll(
@@ -34,7 +55,15 @@ export abstract class BaseService<T extends ObjectLiteral> {
             // 同じキーで複数値がある場合はOR条件で処理
             for (const [key, value] of Object.entries(filters)) {
                 if (Array.isArray(value)) {
-                    queryBuilder.andWhere(`${key} IN (:...${key})`, { [key]: value });
+                    const columnName = key;
+                    const paramName = `:...${key}`;
+                    const condition = `${columnName} IN (${paramName})`;
+                    const parameters = { [key]: value };
+                    
+                    queryBuilder.andWhere(
+                        condition,
+                        parameters
+                    );
                 } else if (typeof value === 'string' && value.includes(',')) {
                     const values = value.split(',').map(v => v.trim());
                     queryBuilder.andWhere(`${key} IN (:...${key})`, { [key]: values });
@@ -54,24 +83,30 @@ export abstract class BaseService<T extends ObjectLiteral> {
     }
 
     async create(entityData: DeepPartial<T>): Promise<T> {
-        try {
-            const newEntity = this.repository.create(entityData as DeepPartial<T>);
-            return await this.repository.save(newEntity);
-        } catch (err) {
-            return this.handleError('create', err);
-        }
+        return AppDataSource.manager.transaction(async (manager: EntityManager) => {
+            try {
+                const repo = manager.getRepository<T>(this.repository.target);
+                const newEntity = repo.create(entityData);
+                return await repo.save(newEntity);
+            } catch (err) {
+                return this.handleError('create', err);
+            }
+        });
     }
 
     async update(id: string, updateData: DeepPartial<T>): Promise<T> {
-        try {
-            const existing = await this.repository.findOneBy({ id } as object);
-            if (!existing) throw new Error('Entity not found');
-      
-            const merged = this.repository.merge(existing, updateData);
-            return await this.repository.save(merged);
-        } catch (err) {
-            return this.handleError('update', err);
-        }
+        return AppDataSource.manager.transaction(async (manager: EntityManager) => {
+            try {
+                const repo = manager.getRepository<T>(this.repository.target);
+                const existing = await repo.findOne({ where: { id } } as unknown as T);
+                if (!existing) throw new Error('Entity not found');
+                
+                const merged = repo.merge(existing, updateData);
+                return await repo.save(merged);
+            } catch (err) {
+                return this.handleError('update', err);
+            }
+        });
     }
 
     async delete(id: string): Promise<void> {
