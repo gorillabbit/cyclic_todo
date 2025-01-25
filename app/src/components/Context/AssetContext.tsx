@@ -3,7 +3,7 @@ import { AssetListType } from '../../types.js';
 import { useTab } from '../../hooks/useData.js';
 import { getAssets } from '../../utilities/apiClient.js';
 
-type AssetContextType = {
+export type AssetContextType = {
     assetList: AssetListType[];
 };
 

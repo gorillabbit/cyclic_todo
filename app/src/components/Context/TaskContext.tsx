@@ -5,7 +5,7 @@ import { useFirestoreQuery } from '../../utilities/firebaseUtilities';
 import { useTab } from '../../hooks/useData.js';
 import { dbNames } from '../../firebase.js';
 
-type TaskContextType = {
+export type TaskContextType = {
     taskList: TaskType[];
 };
 

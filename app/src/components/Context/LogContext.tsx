@@ -5,7 +5,7 @@ import { useFirestoreQuery } from '../../utilities/firebaseUtilities';
 import { useAccount, useTab } from '../../hooks/useData.js';
 import { dbNames } from '../../firebase.js';
 
-type LogContextType = {
+export type LogContextType = {
     logList: LogType[];
     logsCompleteLogsList: LogsCompleteLogsType[];
     sharedLogList: LogType[];

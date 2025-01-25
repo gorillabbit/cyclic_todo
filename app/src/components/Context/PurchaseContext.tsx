@@ -4,7 +4,7 @@ import { PurchaseDataType } from '../../types/purchaseTypes';
 import { getPurchases } from '../../utilities/apiClient';
 import { parseDateFieldsDeep } from '../../utilities/parseJsonUtils.js';
 
-type PurchaseContextType = {
+export type PurchaseContextType = {
     purchaseList: PurchaseDataType[];
     categorySet: string[];
     setPurchaseList: (purchaseList: PurchaseDataType[]) => void;

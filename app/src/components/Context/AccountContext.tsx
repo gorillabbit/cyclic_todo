@@ -6,7 +6,7 @@ interface AccountContextProp {
     children: React.ReactNode;
 }
 
-type AccountContextType = {
+export type AccountContextType = {
     Account: AccountType | undefined;
 };
 

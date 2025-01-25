@@ -3,7 +3,7 @@ import { MethodListType } from '../../types.js';
 import { useTab } from '../../hooks/useData.js';
 import { getMethods } from '../../utilities/apiClient.js';
 
-type MethodContextType = {
+export type MethodContextType = {
     methodList: MethodListType[];
 };
 
