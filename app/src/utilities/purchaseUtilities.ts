@@ -36,8 +36,8 @@ export const numericProps: InputBaseComponentProps = {
  * @param purchase
  * @returns boolean
  */
-export const isLaterPayment = (purchase: PurchaseDataType, methodList:MethodListType[]): boolean =>
-    methodList.find((m) => m.id === purchase.method)?.timing !== '即時';
+export const isLaterPayment = (method:MethodListType | undefined): boolean =>
+    method?.timing !== '即時';
 
 export const is今月の支払いwithout後払いの支払い = (
     purchase: PurchaseDataType,
@@ -72,7 +72,7 @@ export const validatedNum = (value: string): string => {
 export const filterPurchasesByIncomeType = (
     purchasesList: PurchaseDataType[],
     income: 'income' | 'spent'
-) => {
+): PurchaseDataType[] => {
     if (income === 'income') {
         return purchasesList.filter((purchases) => purchases.difference < 0);
     } else {
@@ -88,7 +88,7 @@ export const filterPurchasesByIncomeType = (
 export const deleteScheduledPurchases = async (
     purchaseList: PurchaseDataType[],
     purchaseScheduleId: string
-) => {
+):Promise<PurchaseDataType[]> => {
     let update = purchaseList;
     for (const purchase of update) {
         if (purchase.parentScheduleId === purchaseScheduleId) {
@@ -125,7 +125,7 @@ const today = new Date();
  * @param endDate
  * @returns
  */
-const listMonthlyDaysUntil = (dayOfMonth: number, endDate: Date) => {
+const listMonthlyDaysUntil = (dayOfMonth: number, endDate: Date): Date[] => {
     // 現在の日付が指定された日より後の場合、最初の日付を次の月に設定
     let startMonth = today.getMonth();
     if (today.getDate() > dayOfMonth) {
@@ -183,7 +183,7 @@ export const sortObjectsByParameter = (
         }
         const aVal = a[parameter]; // このように代入しないと、型のチェックは行われない。Typescriptの型は変数に対して行われる式に対しては行われない
         const bVal = b[parameter];
-        if (aVal && bVal) {
+        if (aVal !== undefined && aVal !== null && bVal !== undefined && bVal !== null) {
             if (aVal < bVal) return ascending ? -1 : 1;
             if (aVal > bVal) return ascending ? 1 : -1;
         }
@@ -217,7 +217,7 @@ export const updateAllLaterPurchases = (
     payDate: Date,
     difference: number,
     updatePurchases: PurchaseDataType[]
-) => {
+):PurchaseDataType[] => {
     if (difference === 0) return updatePurchases;
     const filteredPurchases = updatePurchases.filter((p) => p.assetId === assetId);
     const restPurchases = updatePurchases.filter((p) => p.assetId !== assetId);
@@ -234,7 +234,7 @@ export const updateAllLaterPurchases = (
 export const deletePurchaseAndUpdateLater = async (
     purchaseId: string,
     updatePurchases: PurchaseDataType[]
-) => {
+):Promise<PurchaseDataType[]> => {
     const docSnap = await getDoc(doc(db, dbNames.purchase, purchaseId));
     const purchase = docSnap.data() as PurchaseRawDataType;
     deleteDocPurchase(purchaseId);
@@ -250,7 +250,10 @@ export const deletePurchaseAndUpdateLater = async (
 export const addPurchaseAndUpdateLater = (
     purchase: PurchaseDataType,
     updatePurchases: PurchaseDataType[]
-) => {
+):{
+    purchases: PurchaseDataType[];
+    id: string;
+} => {
     const difference = Number(purchase.difference);
     const purchases = updateAllLaterPurchases(
         purchase.assetId,
@@ -276,7 +279,12 @@ export const addPurchaseAndUpdateLater = (
 export const updatePurchaseAndUpdateLater = async (
     purchase: PurchaseDataType,
     updatePurchases: PurchaseDataType[]
-) => {
+):Promise<{
+    purchases: PurchaseDataType[];
+    id: string;
+} | {
+    purchases: PurchaseDataType[];
+}> => {
     // purchaseIdで指定した支払いを取得して、その支払いの差額を計算して、引く
     // その後のcurrentPurchase以外の支払いを更新する
     const currentPurchases = updatePurchases.find((p) => p.id === purchase.id);
@@ -299,7 +307,7 @@ export const addScheduledPurchase = (
     purchaseScheduleId: string,
     purchaseSchedule: InputPurchaseScheduleType,
     updatePurchases: PurchaseDataType[]
-) => {
+):PurchaseDataType[] | undefined => {
     const { methodList } = useMethod();
     const { price, income, method, cycle, date, endDate, day } = purchaseSchedule;
     const currentMethod = methodList.find((m) => m.id === method);
@@ -321,7 +329,7 @@ export const addScheduledPurchase = (
     };
 
     const purchaseList: PurchaseDataType[] = [];
-    const getDays = () => {
+    const getDays = ():Date[] => {
         if (cycle === '毎月' && date) return listMonthlyDaysUntil(date, endDate);
         if (cycle === '毎週' && day) return listWeeklyDaysUntil(day, endDate);
         return [];
@@ -341,7 +349,7 @@ export const addScheduledPurchase = (
     return newUpdatePurchases;
 };
 
-export const updateAndAddPurchases = (updatePurchases: PurchaseDataType[]) => {
+export const updateAndAddPurchases = (updatePurchases: PurchaseDataType[]):void => {
     updatePurchases.forEach(async (purchase) => {
         if (purchase.id) {
             const docRef = doc(db, dbNames.purchase, purchase.id);
@@ -361,7 +369,7 @@ interface oldPurchases extends PurchaseRawDataType {
     price?: number;
     income?: boolean;
 }
-export const updateDocuments = async () => {
+export const updateDocuments = async ():Promise<void> => {
     const q = query(collection(db, dbNames.purchase), orderBy('payDate', 'asc'));
     const data = await getDocs(q);
 
@@ -401,7 +409,7 @@ export const updateDocuments = async () => {
     console.log('データを更新しました');
 };
 
-export const getPayDate = (purchase: { method: string; date: Date }) => {
+export const getPayDate = (purchase: { method: string; date: Date }): Date => {
     const { method, date } = purchase;
     const { methodList } = useMethod();
     const methodData = methodList.find((m) => m.id === method);

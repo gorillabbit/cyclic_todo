@@ -29,7 +29,6 @@ import { PurchaseDataType } from '../../../types/purchaseTypes';
 import TableCellWrapper from '../TableCellWrapper';
 import DoughnutContainer from './Charts/ChartContainer';
 import NarrowDownDialog from './NarrowDownDialog';
-import { defaultMethodList } from '../../../types';
 
 type PlainPurchaseProps = {
     monthlyPurchasesAddedPayLaterPurchase: PurchaseDataType[];
@@ -171,9 +170,7 @@ const Purchases = memo(() => {
         () =>
             purchaseList.filter(
                 (p) =>
-                    isLaterPayment(p, [
-                        methodList.find((method) => method.id === p.method) ?? defaultMethodList,
-                    ]) &&
+                    isLaterPayment(methodList.find((method) => method.id === p.method)) &&
                     p.payDate.getMonth() === month.getMonth() &&
                     p.payDate.getFullYear() === month.getFullYear()
             ),
