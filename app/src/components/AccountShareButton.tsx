@@ -142,7 +142,7 @@ const AccountShareButton = () => {
             updateDocAccount(targetDoc.id, {
                 receiveRequest: targetDoc
                     .data()
-                    .receiveRequest.filter((r: AccountLinkType) => r.email !== Account.email),
+                    .receiveRequest.filter((r: AccountLinkType) => r.id !== Account.id),
             });
         });
     };
@@ -204,9 +204,9 @@ const AccountShareButton = () => {
                     {linkedAccounts.map((linkedAccount) => (
                         <ChipWrapper
                             key={linkedAccount.id}
-                            tooltipTitle={linkedAccount.email}
-                            label={linkedAccount.name}
-                            avatar={<Avatar src={linkedAccount.icon} />}
+                            tooltipTitle={linkedAccount.id}
+                            label={linkedAccount.id}
+                            avatar={<Avatar src={linkedAccount.id} />}
                             cancelTooltipTitle="解除"
                             deleteAction={() => unlinkAccount(linkedAccount)}
                         />
@@ -215,8 +215,8 @@ const AccountShareButton = () => {
                     {receiveRequests.map((receiveRequest) => (
                         <ChipWrapper
                             key={receiveRequest.id}
-                            tooltipTitle={receiveRequest.email}
-                            label={receiveRequest.name}
+                            tooltipTitle={receiveRequest.id}
+                            label={receiveRequest.id}
                             icon={
                                 <Tooltip title="承認する">
                                     <Box

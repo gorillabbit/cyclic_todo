@@ -10,15 +10,14 @@ import {
     FormControlLabel,
 } from '@mui/material';
 import { memo, useCallback, useState } from 'react';
-import { AccountLinkType } from '../types';
-import { db, updateDocAccount, updateDocTab } from '../firebase';
+import { db, updateDocAccount } from '../firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import { useAccount, useTab } from '../hooks/useData';
 
 type PlainShareTabDialogProps = {
     open: boolean;
     setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-    linkedAccounts: AccountLinkType[];
+    linkedAccounts: string[];
     checked: number[];
     handleCheckbox: (e: React.ChangeEvent<HTMLInputElement>) => void;
     handleShareButton: () => void;
@@ -51,13 +50,13 @@ const PlainShareTabDialog = memo(
                                         onChange={handleCheckbox}
                                         value={index}
                                         checked={
-                                            tabSharedAccounts.includes(account.id) ||
+                                            tabSharedAccounts.includes(account) ||
                                             checked.includes(index)
                                         }
-                                        disabled={tabSharedAccounts.includes(account.id)}
+                                        disabled={tabSharedAccounts.includes(account)}
                                     />
                                 }
-                                label={account.name}
+                                label={account}
                                 key={index}
                             />
                         ))}
@@ -93,15 +92,15 @@ const ShareTabDialog = () => {
     const handleShareButton = useCallback(() => {
         if (!Account) return;
         checked.forEach((index) => {
-            getDoc(doc(db, 'Accounts', Account.linkedAccounts[index].id)).then((docSnap) => {
+            getDoc(doc(db, 'Accounts', Account.linkedAccounts[index])).then((docSnap) => {
                 if (!docSnap.exists()) return;
                 updateDocAccount(docSnap.id, {
                     useTabIds: [...docSnap.data().useTabIds, tab.id],
                 });
             });
-            updateDocTab(tab.id, {
-                sharedAccounts: [...tab.sharedAccounts, Account.linkedAccounts[index]],
-            });
+            // updateDocTab(tab.id, {
+            //     sharedAccounts: [...tab.sharedAccounts, Account.linkedAccounts[index]],
+            // });
         });
         setOpen(false);
     }, [Account, checked, tab]);

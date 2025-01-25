@@ -112,10 +112,10 @@ const Log: React.FC<LogProps> = ({ log, logsCompleteLogs, openDialog }) => {
                         <Box>
                             <AvatarGroup>
                                 {log.accessibleAccounts?.map((account) => (
-                                    <Tooltip key={account.name} title={account.name}>
+                                    <Tooltip key={account} title={account}>
                                         <Avatar
-                                            src={account.icon}
-                                            alt={account.name}
+                                            src={account}
+                                            alt={account}
                                             sx={{ width: 24, height: 24 }}
                                         />
                                     </Tooltip>
