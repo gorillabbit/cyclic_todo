@@ -29,6 +29,7 @@ def get_database_connection(env: str) -> pymysql.connections.Connection:
         password=password or "",
         database=database,
         autocommit=False,
+        charset="utf8mb4",
     )
     return conn
 
@@ -74,24 +75,41 @@ def import_data(collection_name: str, connection: pymysql.connections.Connection
     if not file_path.exists():
         print(f"File not found: {file_path}")
         return
-
     with open(file_path, "r", encoding="utf-8") as file:
         data = json.load(file)
 
     with connection.cursor() as cursor:
         for item in data:
+            # カラム名リスト
             try:
-                columns = ", ".join(item.keys())
-                values = [process_json_value(v) for v in item.values()]
+                columns_list = list(item.keys())
+                columns_str = ", ".join(columns_list)
+                # すべて %s プレースホルダに
+                placeholders_str = ", ".join(["%s"] * len(columns_list))
 
-                placeholders = ", ".join(values)
-                sql = (
-                    f"INSERT INTO {collection_name} ({columns}) VALUES ({placeholders})"
-                )
+                sql = f"INSERT INTO {collection_name} ({columns_str}) VALUES ({placeholders_str})"
                 print(f"# sql: {sql}")
-                cursor.execute(sql)
+
+                # 値を tuple 化
+                values_tuple = []
+                for col_name in columns_list:
+                    val = item[col_name]
+                    # 配列なら JSON 文字列化 or そのまま LIST としてBLOB化など(要検討)
+                    if isinstance(val, list):
+                        # JSON型に入れたいなら -> json.dumps(val)
+                        # TEXTに入れたいなら -> str(val)
+                        # など用途に合わせる
+                        values_tuple.append(json.dumps(val))
+                    else:
+                        # 特別な変換がなければそのまま
+                        values_tuple.append(val)
+                print(f"# 値: {values_tuple}")
+                # cursor.execute に (SQL, パラメータタプル) を渡す
+                cursor.execute(sql, tuple(values_tuple))
             except Exception as e:
-                print(f"Failed to import {collection_name}: {e}")
+                print(f"エラー: {e}")
+                connection.rollback()
+                pass
 
         connection.commit()
         print(f"Imported {collection_name} to Aurora.")

@@ -62,7 +62,7 @@ def get_firestore_client(env: str):
         cred_path = "service_account_test.json"
         print("[DEBUG] Using TEST environment.")
     else:
-        cred_path = "service_account_prd.json"
+        cred_path = "service_account_prod.json"
         print("[DEBUG] Using PRODUCTION environment.")
 
     print(f"[DEBUG] Loading credentials from {cred_path}")

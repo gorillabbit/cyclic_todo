@@ -39,6 +39,7 @@ def get_connection(env: str):
         password=password,
         database="mysql",  # 便宜上「mysql」DBに接続
         autocommit=False,
+        charset="utf8mb4",
     )
 
     return conn, db_name

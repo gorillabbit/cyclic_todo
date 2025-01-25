@@ -13,7 +13,10 @@ CREATE TABLE accounts (
     send_request JSON NULL,
     email VARCHAR(255) NOT NULL,
     use_tab_ids JSON NULL
-);
+)
+DEFAULT CHARSET=utf8mb4
+COLLATE=utf8mb4_unicode_ci;
+
 
 DROP TABLE IF EXISTS tabs;
 CREATE TABLE tabs (
@@ -23,10 +26,10 @@ CREATE TABLE tabs (
     shared_accounts JSON NOT NULL,
     type VARCHAR(50) NOT NULL,
     timestamp DATETIME NOT NULL,
-    user_id CHAR(28) NOT NULL,
-    CONSTRAINT fk_tabs_user FOREIGN KEY (user_id) REFERENCES accounts(id),
-    CONSTRAINT fk_tabs_create_user FOREIGN KEY (create_user_uid) REFERENCES accounts(id)
-);
+    user_id CHAR(28) NOT NULL
+)
+DEFAULT CHARSET=utf8mb4
+COLLATE=utf8mb4_unicode_ci;
 
 DROP TABLE IF EXISTS tasks;
 CREATE TABLE tasks (
@@ -45,10 +48,10 @@ CREATE TABLE tasks (
     timestamp DATETIME NULL,                      
     toggle_completion_timestamp DATETIME NULL,    
     completed BOOLEAN NULL,                       
-    tab_id CHAR(20) NOT NULL,
-    CONSTRAINT fk_tasks_user FOREIGN KEY (user_id) REFERENCES accounts(id),
-    CONSTRAINT fk_tasks_tab FOREIGN KEY (tab_id) REFERENCES tabs(id)
-);
+    tab_id CHAR(20) NOT NULL
+)
+DEFAULT CHARSET=utf8mb4
+COLLATE=utf8mb4_unicode_ci;
 
 DROP TABLE IF EXISTS logs;
 CREATE TABLE logs (
@@ -70,10 +73,10 @@ CREATE TABLE logs (
     display_feature JSON NULL,               
     is_interval BOOLEAN NULL DEFAULT FALSE,                   
     task_text VARCHAR(255) NULL,                  
-    timestamp DATETIME NOT NULL,
-    CONSTRAINT fk_logs_user FOREIGN KEY (user_id) REFERENCES accounts(id),
-    CONSTRAINT fk_logs_tab FOREIGN KEY (tab_id) REFERENCES tabs(id)
-);
+    timestamp DATETIME NOT NULL
+)
+DEFAULT CHARSET=utf8mb4
+COLLATE=utf8mb4_unicode_ci;
 
 DROP TABLE IF EXISTS logs_complete_logs;
 CREATE TABLE logs_complete_logs (
@@ -84,11 +87,10 @@ CREATE TABLE logs_complete_logs (
     type VARCHAR(50) NOT NULL,             
     timestamp DATETIME NOT NULL,           
     user_id CHAR(28) NOT NULL,             
-    tab_id CHAR(20) NOT NULL,
-    CONSTRAINT fk_logsCompleteLogs_user FOREIGN KEY (user_id) REFERENCES accounts(id),
-    CONSTRAINT fk_logsCompleteLogs_log FOREIGN KEY (log_id) REFERENCES logs(id),
-    CONSTRAINT fk_logsCompleteLogs_tab FOREIGN KEY (tab_id) REFERENCES tabs(id)
-);
+    tab_id CHAR(20) NOT NULL
+)
+DEFAULT CHARSET=utf8mb4
+COLLATE=utf8mb4_unicode_ci;
 
 DROP TABLE IF EXISTS assets;
 CREATE TABLE assets (
@@ -96,10 +98,10 @@ CREATE TABLE assets (
     tab_id CHAR(20) NOT NULL,
     name VARCHAR(255),
     user_id CHAR(28) NOT NULL,
-    timestamp DATETIME,
-    CONSTRAINT fk_assets_user FOREIGN KEY (user_id) REFERENCES accounts(id),
-    CONSTRAINT fk_assets_tab FOREIGN KEY (tab_id) REFERENCES tabs(id)
-);
+    timestamp DATETIME
+)
+DEFAULT CHARSET=utf8mb4
+COLLATE=utf8mb4_unicode_ci;
 
 DROP TABLE IF EXISTS methods;
 CREATE TABLE methods (
@@ -110,11 +112,10 @@ CREATE TABLE methods (
     timing VARCHAR(50) NOT NULL,
     user_id CHAR(28) NOT NULL,
     timestamp DATETIME NULL,
-    label VARCHAR(100) NOT NULL,
-    CONSTRAINT fk_methods_user FOREIGN KEY (user_id) REFERENCES accounts(id),
-    CONSTRAINT fk_methods_tab FOREIGN KEY (tab_id) REFERENCES tabs(id),
-    CONSTRAINT fk_methods_asset FOREIGN KEY (asset_id) REFERENCES assets(id)
-);
+    label VARCHAR(100) NOT NULL
+)
+DEFAULT CHARSET=utf8mb4
+COLLATE=utf8mb4_unicode_ci;
 
 
 DROP TABLE IF EXISTS purchases;
@@ -134,12 +135,10 @@ CREATE TABLE purchases (
     asset_id CHAR(20) NOT NULL,
     pay_date DATETIME NULL,
     balance INT NULL,
-    timestamp DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_purchases_user FOREIGN KEY (user_id) REFERENCES accounts(id),
-    CONSTRAINT fk_purchases_tab FOREIGN KEY (tab_id) REFERENCES tabs(id),
-    CONSTRAINT fk_purchases_asset FOREIGN KEY (asset_id) REFERENCES assets(id),
-    CONSTRAINT fk_purchases_method FOREIGN KEY (method) REFERENCES methods(id)
-);
+    timestamp DATETIME NULL DEFAULT CURRENT_TIMESTAMP
+)
+DEFAULT CHARSET=utf8mb4
+COLLATE=utf8mb4_unicode_ci;
 
 DROP TABLE IF EXISTS purchase_schedules;
 CREATE TABLE purchase_schedules (
@@ -157,11 +156,10 @@ CREATE TABLE purchase_schedules (
     is_uncertain BOOLEAN NULL,
     category VARCHAR(100) NOT NULL,
     day VARCHAR(50) NOT NULL,
-    timestamp DATETIME NOT NULL,
-    CONSTRAINT fk_purchase_schedules_user FOREIGN KEY (user_id) REFERENCES accounts(id),
-    CONSTRAINT fk_purchase_schedules_tab FOREIGN KEY (tab_id) REFERENCES tabs(id),
-    CONSTRAINT fk_purchase_schedules_method FOREIGN KEY (method) REFERENCES methods(id)
-);
+    timestamp DATETIME NOT NULL
+)
+DEFAULT CHARSET=utf8mb4
+COLLATE=utf8mb4_unicode_ci;
 
 
 DROP TABLE IF EXISTS purchase_templates;
@@ -178,11 +176,10 @@ CREATE TABLE purchase_templates (
     is_uncertain BOOLEAN NULL DEFAULT FALSE,
     is_group BOOLEAN NULL DEFAULT FALSE,
     category VARCHAR(100) NOT NULL,
-    timestamp DATETIME NOT NULL,
-    CONSTRAINT fk_purchase_templates_user FOREIGN KEY (user_id) REFERENCES accounts(id),
-    CONSTRAINT fk_purchase_templates_tab FOREIGN KEY (tab_id) REFERENCES tabs(id),
-    CONSTRAINT fk_purchase_templates_method FOREIGN KEY (method) REFERENCES methods(id)
-);
+    timestamp DATETIME NOT NULL
+)
+DEFAULT CHARSET=utf8mb4
+COLLATE=utf8mb4_unicode_ci;
 
 DROP TABLE IF EXISTS transfer_templates;
 CREATE TABLE transfer_templates (
@@ -194,9 +191,7 @@ CREATE TABLE transfer_templates (
     from_method CHAR(20) NULL,
     to_method CHAR(20) NULL,
     user_id CHAR(28) NOT NULL,
-    timestamp DATETIME NOT NULL,
-    CONSTRAINT fk_transfer_templates_user FOREIGN KEY (user_id) REFERENCES accounts(id),
-    CONSTRAINT fk_transfer_templates_tab FOREIGN KEY (tab_id) REFERENCES tabs(id),
-    CONSTRAINT fk_transfer_templates_from FOREIGN KEY (from_method) REFERENCES methods(id),
-    CONSTRAINT fk_transfer_templates_to FOREIGN KEY (to_method) REFERENCES methods(id)
-);
+    timestamp DATETIME NOT NULL
+)
+DEFAULT CHARSET=utf8mb4
+COLLATE=utf8mb4_unicode_ci;
