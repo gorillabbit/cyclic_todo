@@ -111,6 +111,9 @@ class Purchases(BaseModel):
     asset_id: str
     pay_date: Optional[datetime.datetime] = None
     balance: Optional[int] = None
+    is_uncertain: Optional[bool] = None
+    is_group: Optional[bool] = None
+    parent_purchase_id: Optional[str] = None
     timestamp: Optional[datetime.datetime] = None
 
 

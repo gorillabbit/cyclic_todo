@@ -135,6 +135,9 @@ CREATE TABLE purchases (
     asset_id CHAR(20) NOT NULL,
     pay_date DATETIME NULL,
     balance INT NULL,
+    is_uncertain BOOLEAN NULL,
+    is_group BOOLEAN NULL,
+    parent_purchase_id CHAR(20) NULL,
     timestamp DATETIME NULL DEFAULT CURRENT_TIMESTAMP
 )
 DEFAULT CHARSET=utf8mb4
