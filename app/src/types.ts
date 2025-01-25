@@ -54,7 +54,7 @@ export interface InputLogType {
     displayFeature: string[];
     description: string;
     archived: boolean;
-    accessibleAccounts: AccountLinkType[];
+    accessibleAccounts: string[];
     tabId: string;
 }
 
@@ -76,7 +76,7 @@ export interface AccountType extends AccountInputType {
     id: string;
 }
 
-export interface AccountLinkType extends Pick<AccountType, 'id' | 'email' | 'name' | 'icon'> {}
+export interface AccountLinkType extends Pick<AccountType, 'id'> {}
 
 export const defaultAccountInput: AccountInputType = {
     email: '',

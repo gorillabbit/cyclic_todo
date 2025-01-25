@@ -42,19 +42,12 @@ const LogInputForm: React.FC<LogInputFormProp> = ({ propLog, openDialog, setIsOp
         description: '',
         archived: false,
         tabId,
-        accessibleAccounts: [
-            {
-                id: '',
-                name: '',
-                email: '',
-                icon: '',
-            },
-        ],
+        accessibleAccounts: [],
     };
 
     const [newLog, setNewLog] = useState<InputLogType | LogType>(propLog ?? defaultNewLog);
     const [newAccessibleAccountIds, setNewAccessibleAccountIds] = useState<string[]>(
-        propLog?.accessibleAccounts?.map((account) => account.id) ?? []
+        propLog?.accessibleAccounts?.map((account) => account) ?? []
     );
 
     const handleNewLogInput = (name: string, value: unknown) => {
@@ -72,7 +65,7 @@ const LogInputForm: React.FC<LogInputFormProp> = ({ propLog, openDialog, setIsOp
     };
 
     const newAccessibleAccounts = Account?.linkedAccounts.filter((account) =>
-        newAccessibleAccountIds.includes(account.id)
+        newAccessibleAccountIds.includes(account)
     );
 
     const addLog = () => {
@@ -220,8 +213,8 @@ const LogInputForm: React.FC<LogInputFormProp> = ({ propLog, openDialog, setIsOp
                                         onChange={(e) => handleMultipleSelect(e.target.value)}
                                     >
                                         {Account.linkedAccounts.map((account) => (
-                                            <MenuItem key={account.id} value={account.id}>
-                                                {account.name}
+                                            <MenuItem key={account} value={account}>
+                                                {account}
                                             </MenuItem>
                                         ))}
                                     </Select>
