@@ -1,6 +1,6 @@
 import datetime
 from pydantic import BaseModel
-from typing import Optional, Union
+from typing import Optional, Any, Union
 
 
 class Accounts(BaseModel):
@@ -13,7 +13,6 @@ class Accounts(BaseModel):
     email: str
     use_tab_ids: Optional[Union[list[str], str]] = None
 
-
 class Tabs(BaseModel):
     id: str
     name: str
@@ -21,8 +20,7 @@ class Tabs(BaseModel):
     shared_accounts: Union[list[str], str]
     type: str
     timestamp: datetime.datetime
-    user_id: str
-
+    user_id: Optional[str] = None
 
 class Tasks(BaseModel):
     id: str
@@ -41,7 +39,6 @@ class Tasks(BaseModel):
     toggle_completion_timestamp: Optional[datetime.datetime] = None
     completed: Optional[bool] = None
     tab_id: str
-
 
 class Logs(BaseModel):
     id: str
@@ -64,7 +61,6 @@ class Logs(BaseModel):
     task_text: Optional[str] = None
     timestamp: datetime.datetime
 
-
 class LogsCompleteLogs(BaseModel):
     id: str
     processed: Optional[bool] = None
@@ -75,14 +71,12 @@ class LogsCompleteLogs(BaseModel):
     user_id: str
     tab_id: str
 
-
 class Assets(BaseModel):
     id: str
     tab_id: str
     name: Optional[str] = None
     user_id: str
     timestamp: Optional[datetime.datetime] = None
-
 
 class Methods(BaseModel):
     id: str
@@ -93,7 +87,6 @@ class Methods(BaseModel):
     user_id: str
     timestamp: Optional[datetime.datetime] = None
     label: str
-
 
 class Purchases(BaseModel):
     id: str
@@ -116,7 +109,6 @@ class Purchases(BaseModel):
     parent_purchase_id: Optional[str] = None
     timestamp: Optional[datetime.datetime] = None
 
-
 class PurchaseSchedules(BaseModel):
     id: str
     date: int
@@ -134,12 +126,11 @@ class PurchaseSchedules(BaseModel):
     day: str
     timestamp: datetime.datetime
 
-
 class PurchaseTemplates(BaseModel):
     id: str
     date: datetime.datetime
     income: bool
-    tab_id: str
+    tab_id: Optional[str] = None
     method: str
     description: str
     title: str
@@ -149,7 +140,6 @@ class PurchaseTemplates(BaseModel):
     is_group: Optional[bool] = None
     category: str
     timestamp: datetime.datetime
-
 
 class TransferTemplates(BaseModel):
     id: str

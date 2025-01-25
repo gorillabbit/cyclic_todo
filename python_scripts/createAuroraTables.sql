@@ -26,7 +26,7 @@ CREATE TABLE tabs (
     shared_accounts JSON NOT NULL,
     type VARCHAR(50) NOT NULL,
     timestamp DATETIME NOT NULL,
-    user_id CHAR(28) NOT NULL
+    user_id CHAR(28) NULL
 )
 DEFAULT CHARSET=utf8mb4
 COLLATE=utf8mb4_unicode_ci;
@@ -170,7 +170,7 @@ CREATE TABLE purchase_templates (
     id CHAR(20) NOT NULL PRIMARY KEY,
     date DATETIME NOT NULL,
     income BOOLEAN NOT NULL,
-    tab_id CHAR(20) NOT NULL,
+    tab_id CHAR(20) NULL,
     method CHAR(20) NOT NULL,
     description TEXT NOT NULL,
     title VARCHAR(255) NOT NULL,
