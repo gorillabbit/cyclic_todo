@@ -141,11 +141,11 @@ const TransferInput = () => {
         }
         const { price, date, description, from, to } = newTransfer;
         const basePurchase = {
-            userId: currentUser.uid,
+            user_id: currentUser.uid,
             category: '送受金',
             date,
             description,
-            tabId,
+            tab_id: tabId,
             id: '',
             balance: 0,
         };
@@ -154,8 +154,8 @@ const TransferInput = () => {
             ...basePurchase,
             title: `【送】${purchaseTitle}`,
             method: from,
-            payDate: getPayDate(fromMethod, date),
-            assetId: fromMethod.assetId,
+            pay_date: getPayDate(fromMethod, date),
+            asset_id: fromMethod.assetId,
             difference: -price,
         };
 
@@ -163,8 +163,8 @@ const TransferInput = () => {
             ...basePurchase,
             title: `【受】${purchaseTitle}`,
             method: to,
-            payDate: getPayDate(toMethod, date),
-            assetId: toMethod.assetId,
+            pay_date: getPayDate(toMethod, date),
+            asset_id: toMethod.assetId,
             difference: price,
         };
 

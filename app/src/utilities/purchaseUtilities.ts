@@ -77,7 +77,7 @@ export const deleteScheduledPurchases = async (
     purchaseScheduleId: string
 ):Promise<void> => {
     const targetPurchases =await getPurchases(
-        [{ field: 'parentScheduleId', value: purchaseScheduleId }]
+        [{ field: 'parent_schedule_id', value: purchaseScheduleId }]
     );
     for (const purchase of targetPurchases) {
         await deletePurchase(purchase.id);
@@ -190,10 +190,9 @@ export const getLastBalance = (
     updatePurchases: PurchaseDataType[]
 ): number => {
     const lastPurchase = updatePurchases
-        .filter((p) => p.assetId === assetId)
-        .filter((p) => Boolean(p.payDate))
-        .sort((a, b) => b.payDate.getTime() - a.payDate.getTime())
-        .find((purchase) => purchase.payDate <= date);
+        .filter((p) => p.asset_id === assetId)
+        .sort((a, b) => b.pay_date.getTime() - a.pay_date.getTime())
+        .find((purchase) => purchase.pay_date <= date);
     // NaNに対応するために??ではなく三項演算子を使う
     return Number(lastPurchase?.balance) ? Number(lastPurchase?.balance) : 0;
 };
@@ -213,15 +212,15 @@ export const addScheduledPurchase = async (
     if (currentMethod === undefined) return;
     const difference = income ? price : -price;
     const purchaseBase = {
-        userId: purchaseSchedule.userId,
+        user_id: purchaseSchedule.userId,
         title: purchaseSchedule.title,
         method,
         category: purchaseSchedule.category,
         description: purchaseSchedule.description,
-        isUncertain: purchaseSchedule.isUncertain,
-        tabId: purchaseSchedule.tabId,
-        parentScheduleId: purchaseScheduleId,
-        assetId: currentMethod.assetId,
+        is_uncertain: purchaseSchedule.isUncertain,
+        tab_id: purchaseSchedule.tabId,
+        parent_schedule_id: purchaseScheduleId,
+        asset_id: currentMethod.assetId,
         balance: 0,
         difference,
         id: new Date().getTime().toString(),
@@ -236,7 +235,7 @@ export const addScheduledPurchase = async (
     getDays().forEach((dateDay) => purchaseList.push({
         ...purchaseBase,
         date: dateDay,
-        payDate: currentMethod.timing === '即時' ? 
+        pay_date: currentMethod.timing === '即時' ? 
             dateDay : 
             getPayLaterDate(dateDay, currentMethod.timingDate),
     }));

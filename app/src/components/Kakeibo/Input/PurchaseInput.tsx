@@ -176,11 +176,11 @@ const PurchaseInput = () => {
         }
 
         const purchaseData = {
-            tabId,
-            userId: Account?.id || '',
-            payDate: getPayDate(method, newPurchase.date),
+            tab_id: tabId,
+            user_id: Account?.id || '',
+            pay_date: getPayDate(method, newPurchase.date),
             difference,
-            assetId: method.assetId,
+            asset_id: method.assetId,
             balance: 0,
             id: new Date().getTime().toString(),
             date: newPurchase.date,
@@ -200,7 +200,7 @@ const PurchaseInput = () => {
         }
         addDocPurchaseTemplate({
             ...newPurchase,
-            userId: Account?.id || '',
+            user_id: Account?.id || '',
             tabId,
         });
     }, [Account, newPurchase]);

@@ -30,7 +30,7 @@ export const PurchaseProvider = memo(({ children }: { children: ReactNode }) => 
     categorySet.push('');
 
     const fetchPurchases = async () => {
-        const data = await getPurchases([{ field: 'tabId', value: tabId }]);
+        const data = await getPurchases([{ field: 'tab_id', value: tabId }]);
         const purchases = parseDateFieldsDeep(data, ['date', 'payDate', 'timestamp']);
         const orderedPurchaseList = purchases.sort((a, b) => b.date.getTime() - a.date.getTime());
         setPurchaseList(orderedPurchaseList);

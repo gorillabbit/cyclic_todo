@@ -29,7 +29,7 @@ const UnderHalfRow = memo(
             <TableCellWrapper>
                 {editFormData.difference}
                 {method?.timing === '翌月' && !isGroup && <Chip label="翌月" />}
-                {editFormData.isUncertain && <Chip label="未確" />}
+                {editFormData.is_uncertain && <Chip label="未確" />}
             </TableCellWrapper>
             <TableCellWrapper
                 label={
@@ -45,7 +45,7 @@ const UnderHalfRow = memo(
                         purchase={editFormData}
                         setIsEdit={setIsEdit}
                         setIsEditPrice={setIsEditPrice}
-                        isUncertain={editFormData.isUncertain}
+                        isUncertain={editFormData.is_uncertain}
                     />
                 )}
             </TableCellWrapper>
@@ -138,7 +138,7 @@ const NormalPurchaseRow = (props: {
     const rowColor = useMemo(() => (props.index % 2 === 0 ? '#f0f0f0' : 'white'), [props.index]);
     const { assetList } = useAsset();
     const { methodList } = useMethod();
-    const assetName = assetList.find((asset) => asset.id === props.editFormData.assetId)?.name;
+    const assetName = assetList.find((asset) => asset.id === props.editFormData.asset_id)?.name;
     const method = methodList.find((m) => m.id === props.editFormData.method);
     const plainProps = { ...props, rowColor, assetName, method };
     // TODO 残高が他の残高と区別できるようにする

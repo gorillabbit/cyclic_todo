@@ -76,7 +76,7 @@ const DoughnutContainer = ({
 
     // 今月の支払金額(カテゴリーごと)(カード払いをまとめる)
     const currentMonthPaymentList = currentMonthSpentList.filter(
-        (spent) => spent.payDate && spent.payDate.getMonth() === currentMonth.getMonth()
+        (spent) => spent.pay_date.getMonth() === currentMonth.getMonth()
     );
     const currentMonthPayment = sumSpentAndIncome(currentMonthPaymentList);
 

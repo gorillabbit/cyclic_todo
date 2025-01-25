@@ -183,7 +183,7 @@ const AssetRow = memo(({ asset, isOpen }: { asset: AssetListType; isOpen: boolea
     const [updatePurchases, setUpdatePurchases] = useState<PurchaseDataType[]>([]);
 
     useEffect(() => {
-        setUpdatePurchases(purchaseList.filter((p) => p.assetId === assetId));
+        setUpdatePurchases(purchaseList.filter((p) => p.asset_id === assetId));
     }, [purchaseList, assetId]);
 
     const [balanceInput, setBalanceInput] = useState<number | undefined>(undefined);
@@ -226,13 +226,13 @@ const AssetRow = memo(({ asset, isOpen }: { asset: AssetListType; isOpen: boolea
         if (isBalanceChanged && balanceInput && userId) {
             createPurchase({
                 id: new Date().getTime().toString(),
-                assetId,
+                asset_id: assetId,
                 balance: balanceInput,
                 date: new Date(),
-                payDate: new Date(),
+                pay_date: new Date(),
                 difference: balanceInput - lastBalance,
-                userId,
-                tabId,
+                user_id: userId,
+                tab_id: tabId,
                 title: `${asset.name}残高調整`,
                 method: '',
                 category: '',

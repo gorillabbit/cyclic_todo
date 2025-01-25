@@ -100,7 +100,7 @@ const NarrowDownDialog = ({
                     />
                     <Autocomplete
                         value={
-                            assetLabelList.find((a) => a.id === filterObject.assetId) ??
+                            assetLabelList.find((a) => a.id === filterObject.asset_id) ??
                             defaultAsset
                         }
                         sx={{ minWidth: 150 }}

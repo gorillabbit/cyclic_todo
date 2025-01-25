@@ -19,23 +19,23 @@ const BalanceChart = () => {
     const lastPurchase = purchaseList.filter(
         (p) =>
             // とりあえず2ヶ月先までのデータを表示 TODO: 条件は変更できるように
-            p.payDate < getFutureMonthFirstDay(2) &&
+            p.pay_date < getFutureMonthFirstDay(2) &&
             // 2024年4月以降のデータを表示 TODO: 条件は変更できるように
-            p.payDate >= new Date('2024-04-01')
+            p.pay_date >= new Date('2024-04-01')
     );
     const { assetList } = useAsset();
 
     // データセットを作成
     const datasets = lastPurchase
         // 支払いの日付でソート
-        .sort((a, b) => a.payDate.getTime() - b.payDate.getTime())
+        .sort((a, b) => a.pay_date.getTime() - b.pay_date.getTime())
         .map((p, index) => {
-            const asset = assetList.find((asset) => asset.id === p.assetId);
+            const asset = assetList.find((asset) => asset.id === p.asset_id);
             if (!asset) {
                 return;
             }
             return {
-                time: set(p.payDate, {
+                time: set(p.pay_date, {
                     // データが更新されるとき、同じ時刻のデータが大量に作成される問題があるので暫定的解決策　TODO: 修正
                     milliseconds: index,
                 }).getTime(),

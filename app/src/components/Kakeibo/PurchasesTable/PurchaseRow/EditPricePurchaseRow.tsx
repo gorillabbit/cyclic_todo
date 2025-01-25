@@ -116,7 +116,7 @@ const EditPricePurchaseRow = ({
         await updatePurchase(editFormData.id, {
             ...editFormData,
             difference: Number(editFormData.difference),
-            isUncertain: false,
+            is_uncertain: false,
         });
 
         setEditFormData((prev) => ({ ...prev, isUncertain: false }));

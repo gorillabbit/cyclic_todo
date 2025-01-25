@@ -167,9 +167,8 @@ const Purchases = memo(() => {
             purchaseList.filter(
                 (p) =>
                     isLaterPayment(methodList.find((method) => method.id === p.method)) &&
-                    p.payDate &&
-                    p.payDate.getMonth() === month.getMonth() &&
-                    p.payDate.getFullYear() === month.getFullYear()
+                    p.pay_date.getMonth() === month.getMonth() &&
+                    p.pay_date.getFullYear() === month.getFullYear()
             ),
         [その月に発生した支払い, month]
     );
@@ -180,20 +179,20 @@ const Purchases = memo(() => {
         後払いでその月に払うもの.forEach((p) => {
             const method = methodList.find((m) => m.id === p.method);
             if (!method) return;
-            const keyString = method.label + p.payDate.getMonth() + '/' + p.payDate.getDate(); // 支払日が同じ日のものを合計する
+            const keyString = method.label + p.pay_date.getMonth() + '/' + p.pay_date.getDate(); // 支払日が同じ日のものを合計する
             const target = 後払い毎の合計[keyString];
             if (!target) {
                 // 後払いの合計を合計としてふさわしい形に変換
                 後払い毎の合計[keyString] = {
                     ...p,
-                    parentScheduleId: '',
+                    parent_schedule_id: '',
                     id: keyString,
-                    date: p.payDate,
+                    date: p.pay_date,
                     title: method.label + '引き落し',
                     category: '後支払い',
-                    isUncertain: false,
+                    is_uncertain: false,
                     description: '',
-                    isGroup: true,
+                    is_group: true,
                     difference: Number(p.difference),
                 };
             } else {
@@ -210,7 +209,7 @@ const Purchases = memo(() => {
     // 発生した後払いは含めない
     const getGroupPurchases = useCallback(
         (groupedPurchase: PurchaseDataType) => {
-            if (!groupedPurchase.isGroup) return [];
+            if (!groupedPurchase.is_group) return [];
             return 後払いでその月に払うもの.filter((p) => p.method === groupedPurchase.method);
         },
         [後払いでその月に払うもの]
