@@ -181,7 +181,7 @@ const PurchaseInput = () => {
             difference,
             assetId: method.assetId,
             balance: 0,
-            id: '',
+            id: new Date().getTime().toString(),
             date: newPurchase.date,
             category: newPurchase.category,
             description: newPurchase.description,
