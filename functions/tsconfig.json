@@ -14,13 +14,13 @@
         "baseUrl": ".",
         "paths": {
             "@entity/*": [
-                "../entity/entities/*"
+                "src/entities/*"
             ]
         }
     },
     "compileOnSave": true,
     "include": [
         "src",
-        "../entity/entities"
+        "src/entities"
     ]
 }

@@ -1,4 +1,4 @@
-import { Assets } from '../../../entity/entities/Assets.js';
+import { Assets } from '../entities/Assets.js';
 import { BaseService } from './serviceUtils.js';
 
 

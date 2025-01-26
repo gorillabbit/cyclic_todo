@@ -1,7 +1,7 @@
 import { DeepPartial, EntityManager } from 'typeorm';
 import AppDataSource from '../db.js';
 import { BaseService } from './serviceUtils.js';
-import { PurchaseSchedules } from '../../../entity/entities/PurchaseSchedules.js';
+import { PurchaseSchedules } from '../entities/PurchaseSchedules.js';
 
 export class PurchaseScheduleService extends BaseService<PurchaseSchedules> {
     constructor() {

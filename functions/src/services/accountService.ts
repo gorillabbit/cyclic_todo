@@ -1,5 +1,5 @@
 import { BaseService } from './serviceUtils.js';
-import { Accounts } from '../../../entity/entities/Accounts.js';
+import { Accounts } from '../entities/Accounts.js';
 
 export class AccountService extends BaseService<Accounts> {
     constructor() {

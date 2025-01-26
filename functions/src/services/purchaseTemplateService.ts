@@ -1,7 +1,7 @@
 import { DeepPartial, EntityManager } from 'typeorm';
 import AppDataSource from '../db.js';
 import { BaseService } from './serviceUtils.js';
-import { PurchaseTemplates } from '../../../entity/entities/PurchaseTemplates.js';
+import { PurchaseTemplates } from '../entities/PurchaseTemplates.js';
 
 export class PurchaseTemplateService extends BaseService<PurchaseTemplates> {
     constructor() {
