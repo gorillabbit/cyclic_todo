@@ -74,9 +74,10 @@ const dbInitPromise: Promise<void> = (async (): Promise<void> => {
     });
 
     // :id のやつよりあとにあると re_calc_all が id として扱われてしまうので注意
-    app.put('/api/purchase/re_calc_all', async (_req, res) => {
+    app.put('/api/purchase/re_calc_all/:tabId', async (req, res) => {
         try {
-            const result = await purchaseService.reCalcAllBalances();
+            const { tabId } = req.params;
+            const result = await purchaseService.reCalcAllBalances(tabId);
             res.status(200).send(result);
         } catch (error) {
             res.status(500).send({ error });

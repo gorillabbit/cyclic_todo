@@ -18,7 +18,7 @@ import { addMonths } from 'date-fns';
 import { useIsSmall } from '../../../hooks/useWindowSize';
 import { isLaterPayment, sortObjectsByParameter } from '../../../utilities/purchaseUtilities';
 import TableHeadCell from './TableHeadCell';
-import { useMethod, usePurchase } from '../../../hooks/useData';
+import { useMethod, usePurchase, useTab } from '../../../hooks/useData';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { PurchaseDataType } from '../../../types/purchaseTypes';
@@ -30,6 +30,7 @@ import { reCalcAllBalance } from '../../../api/updateApi';
 const Purchases = memo(() => {
     const { purchaseList } = usePurchase();
     const { methodList } = useMethod();
+    const { tab } = useTab();
     const isSmall = useIsSmall();
 
     // 月の切り替え
@@ -165,7 +166,7 @@ const Purchases = memo(() => {
                     <IconButton onClick={handleNextMonthButton}>
                         <ArrowForwardIosIcon />
                     </IconButton>
-                    <Button onClick={() => reCalcAllBalance()}>再計算</Button>
+                    <Button onClick={() => reCalcAllBalance(tab.id)}>再計算</Button>
                     <Button onClick={() => setOpenNarrowDown(true)}>絞り込み</Button>
                 </Box>
                 <Table size="small">

@@ -56,6 +56,6 @@ export const callApi = async <T>(
 };
 
 // 購入データ残高全更新
-export const reCalcAllBalance = async ():Promise<Partial<PurchaseDataType>> => {
-    return callApi('/purchase/re_calc_all');
+export const reCalcAllBalance = async (tabId:string):Promise<Partial<PurchaseDataType>> => {
+    return callApi(`/purchase/re_calc_all/?tabId=${tabId}`);
 };

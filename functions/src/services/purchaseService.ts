@@ -213,7 +213,7 @@ export class PurchaseService extends BaseService<Purchases> {
    * すべての Purchases の残高を再計算（必要に応じて実行）
    * ＝ テーブル全件を対象とするが、assetId が同じなら続けて積み上げ。
    */
-    async reCalcAllBalances(): Promise<void> {
+    async reCalcAllBalances(tabId:string): Promise<void> {
         return AppDataSource.manager.transaction(async (manager: EntityManager) => {
             const repo = manager.getRepository(Purchases);
 
@@ -222,6 +222,7 @@ export class PurchaseService extends BaseService<Purchases> {
 
             // 全件を assetId, payDate, id の順でソート
             const all = await repo.find({
+                where: { tabId },
                 order: { assetId: 'ASC', payDate: 'ASC', id: 'ASC' },
             });
 
