@@ -126,8 +126,6 @@ export const getTab = async (
         }
     });
 
-    console.log(params);
-
     return fetchData<TabListType[]>('/tab', params);
 };
 
@@ -143,8 +141,6 @@ export const getPurchase = async (
             params[field] = value;
         }
     });
-
-    console.log(params);
-
+    
     return fetchData<PurchaseDataType[]>('/purchase', params);
 };
