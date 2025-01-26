@@ -35,9 +35,6 @@ jobs:
 
               run: npm run build --prefix app
 
-            - name: エンティティの依存関係をインストール
-              run: npm ci --prefix entity
-
             - name: 関数の依存関係をインストール
               run: npm ci --prefix functions
 
