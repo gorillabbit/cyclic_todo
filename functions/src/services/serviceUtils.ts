@@ -55,9 +55,7 @@ export abstract class BaseService<T extends ObjectLiteral> {
             // 同じキーで複数値がある場合はOR条件で処理
             for (const [key, value] of Object.entries(filters)) {
                 if (Array.isArray(value)) {
-                    const columnName = key;
-                    const paramName = `:...${key}`;
-                    const condition = `${columnName} IN (${paramName})`;
+                    const condition = `${this.entityName}.${key} IN (:...${key})`;
                     const parameters = { [key]: value };
                     
                     queryBuilder.andWhere(
@@ -66,9 +64,10 @@ export abstract class BaseService<T extends ObjectLiteral> {
                     );
                 } else if (typeof value === 'string' && value.includes(',')) {
                     const values = value.split(',').map(v => v.trim());
-                    queryBuilder.andWhere(`${key} IN (:...${key})`, { [key]: values });
+                    queryBuilder.andWhere(
+                        `${this.entityName}.${key} IN (:...${key})`, { [key]: values });
                 } else {
-                    queryBuilder.andWhere(`${key} = :${key}`, { [key]: value });
+                    queryBuilder.andWhere(`${this.entityName}.${key} = :${key}`, { [key]: value });
                 }
             }
 
