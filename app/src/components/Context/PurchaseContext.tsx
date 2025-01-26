@@ -40,8 +40,8 @@ export const PurchaseProvider = memo(({ children }: { children: ReactNode }) => 
     for (const purchase of purchaseList) {
         console.log(
             purchase.title,
-            purchase.date.toDateString(),
-            purchase.payDate.toDateString(),
+            purchase.date.toLocaleDateString(),
+            purchase.payDate.toLocaleDateString(),
             purchase.difference
         );
     }
