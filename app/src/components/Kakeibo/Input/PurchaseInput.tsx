@@ -12,7 +12,7 @@ import { set } from 'date-fns';
 import { getHasError, validatePurchase } from '../KakeiboSchemas';
 import MethodSelector from '../ScreenParts/MethodSelector';
 import CategorySelector from '../ScreenParts/CategorySelector';
-import { createPurchase } from '../../../utilities/apiClient';
+import { createPurchase } from '../../../api/createApi';
 
 type PlainPurchaseInputProps = {
     handleNewPurchaseInput: (

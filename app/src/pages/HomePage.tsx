@@ -7,7 +7,7 @@ import TaskPage from './TaskPage';
 import { useCookies } from 'react-cookie';
 import { AccountType, TabType } from '../types';
 import { useAccount } from '../hooks/useData';
-import { getTab } from '../utilities/apiClient';
+import { getTab } from '../api/getApi';
 
 type PlainHomePageProps = {
     tabValue: number;

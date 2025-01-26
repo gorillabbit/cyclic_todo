@@ -1,8 +1,8 @@
 import { memo, ReactNode, useMemo, useState, useEffect, createContext } from 'react';
 import { useTab } from '../../hooks/useData';
 import { PurchaseDataType } from '../../types/purchaseTypes';
-import { getPurchase } from '../../utilities/apiClient';
 import { parseDateFieldsDeep } from '../../utilities/parseJsonUtils.js';
+import { getPurchase } from '../../api/getApi.js';
 
 export type PurchaseContextType = {
     purchaseList: PurchaseDataType[];

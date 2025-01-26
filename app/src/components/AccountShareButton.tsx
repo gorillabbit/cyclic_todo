@@ -15,7 +15,7 @@ import { AccountLinkType, AccountType } from '../types';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import CancelIcon from '@mui/icons-material/Cancel';
 import { useAccount } from '../hooks/useData';
-import { getAccount } from '../utilities/apiClient';
+import { getAccount } from '../api/getApi';
 
 // TODO: メアドがlinkedAccountsなどになくなったので機能していない
 const validateEmail = (email: string, account: AccountType): string => {

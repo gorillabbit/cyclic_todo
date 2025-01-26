@@ -21,7 +21,7 @@ import { usePurchase } from '../../../../hooks/useData';
 import TableCellWrapper from '../../TableCellWrapper';
 import MethodSelector from '../../ScreenParts/MethodSelector';
 import CategorySelector from '../../ScreenParts/CategorySelector';
-import { updatePurchaseSchedule } from '../../../../utilities/apiClient';
+import { updatePurchaseSchedule } from '../../../../api/updateApi';
 
 const EditPurchaseScheduleRow = ({
     setIsEdit,

@@ -12,7 +12,7 @@ import LoginPage from './pages/LoginPage';
 import HomePage from './pages/HomePage';
 import KiyakuPage from './pages/KiyakuPage';
 import ja from 'date-fns/locale/ja';
-import { getAccount } from './utilities/apiClient';
+import { getAccount } from './api/getApi';
 
 const App = memo(() => {
     const theme = createTheme({

@@ -20,12 +20,9 @@ import TableCellWrapper from '../TableCellWrapper';
 import { getFutureMonthFirstDay } from '../../../utilities/dateUtilities';
 import MethodList from './MethodList';
 import { PurchaseDataType } from '../../../types/purchaseTypes';
-import {
-    createPurchase,
-    deleteAsset,
-    deleteMethod,
-    updateAsset,
-} from '../../../utilities/apiClient';
+import { updateAsset } from '../../../api/updateApi';
+import { createPurchase } from '../../../api/createApi';
+import { deleteAsset, deleteMethod } from '../../../api/deleteApi';
 
 const tableInputStyle: {
     sx: TextFieldProps['sx'];

@@ -1,7 +1,7 @@
 import { ReactNode, createContext, memo, useEffect, useMemo, useState } from 'react';
 import { MethodListType } from '../../types.js';
 import { useTab } from '../../hooks/useData.js';
-import { getMethod } from '../../utilities/apiClient.js';
+import { getMethod } from '../../api/getApi.js';
 
 export type MethodContextType = {
     methodList: MethodListType[];

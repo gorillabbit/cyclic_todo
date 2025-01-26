@@ -15,7 +15,7 @@ import TransferTemplateButtonsContainer from './TransferTemplateButtonContainer'
 import { useMethod, usePurchase, useTab } from '../../../hooks/useData';
 import { getHasError, validateTransfer } from '../KakeiboSchemas';
 import MethodSelector from '../ScreenParts/MethodSelector';
-import { createPurchase } from '../../../utilities/apiClient';
+import { createPurchase } from '../../../api/createApi';
 
 type PlainTransferInputProps = {
     handleNewTransferInput: (name: string, value: string | Date | MethodListType | null) => void;

@@ -9,7 +9,7 @@ import { useAccount, usePurchase, useTab } from '../../../hooks/useData';
 import { getHasError, validatePurchaseSchedule } from '../KakeiboSchemas';
 import MethodSelector from '../ScreenParts/MethodSelector';
 import CategorySelector from '../ScreenParts/CategorySelector';
-import { createPurchaseSchedule } from '../../../utilities/apiClient';
+import { createPurchaseSchedule } from '../../../api/createApi';
 
 const defaultNewPurchase: InputPurchaseScheduleType = {
     userId: '',

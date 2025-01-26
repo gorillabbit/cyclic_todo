@@ -6,8 +6,8 @@ import TableCellWrapper from '../../TableCellWrapper';
 import { PurchaseDataType } from '../../../../types/purchaseTypes';
 import { ErrorType } from '../../../../types';
 import { getHasError, validateEditPurchase } from '../../KakeiboSchemas';
-import { updatePurchase } from '../../../../utilities/apiClient';
 import { usePurchase } from '../../../../hooks/useData';
+import { updatePurchase } from '../../../../api/updateApi';
 
 type UnderHalfRowProps = {
     handleEditFormChange: (name: string, value: string | number) => void;

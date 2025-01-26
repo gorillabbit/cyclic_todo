@@ -1,7 +1,7 @@
 import { ReactNode, createContext, memo, useEffect, useMemo, useState } from 'react';
 import { AssetListType } from '../../types.js';
 import { useTab } from '../../hooks/useData.js';
-import { getAsset } from '../../utilities/apiClient.js';
+import { getAsset } from '../../api/getApi.js';
 
 export type AssetContextType = {
     assetList: AssetListType[];
