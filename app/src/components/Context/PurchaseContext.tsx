@@ -36,6 +36,8 @@ export const PurchaseProvider = memo(({ children }: { children: ReactNode }) => 
         setPurchaseList(orderedPurchaseList);
     };
 
+    console.log('purchaseList', purchaseList);
+
     useEffect(() => {
         fetchPurchases();
     }, [tabId]);
