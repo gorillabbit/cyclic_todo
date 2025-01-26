@@ -70,6 +70,7 @@ const PurchaseScheduleInput = () => {
         const addedSchedule = await createPurchaseSchedule({
             ...newPurchaseSchedule,
             userId: Account.id,
+            id: new Date().getTime().toString(),
         });
         await addScheduledPurchase(addedSchedule.id, newPurchaseSchedule);
         setNewPurchaseSchedule(defaultNewPurchase);

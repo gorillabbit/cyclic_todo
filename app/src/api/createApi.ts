@@ -1,14 +1,14 @@
 import { 
-    InputPurchaseScheduleType, PurchaseScheduleType, MethodListType, AssetListType, TabListType, 
+    PurchaseScheduleType, MethodListType, AssetListType, TabListType, 
 } from '../types';
-import { PurchaseDataType } from '../types/purchaseTypes';
-import { sendData, WithId } from './apiClient';
+import { InputFieldPurchaseType, PurchaseDataType } from '../types/purchaseTypes';
+import { sendData } from './apiClient';
 
 // データ作成共通関数
 export const createData = async <T>(
     endpoint: string,
     data: T
-): Promise<WithId<T>> => {
+): Promise<T> => {
     return sendData(endpoint, 'POST', data);
 };
 
@@ -18,9 +18,15 @@ export const createPurchase = async (data: PurchaseDataType): Promise<PurchaseDa
 };
 
 export const createPurchaseSchedule = async (
-    data: InputPurchaseScheduleType
+    data: PurchaseScheduleType
 ): Promise<PurchaseScheduleType> => {
     return createData('/purchase-schedule', data);
+};
+
+export const createPurchaseTemplate = async (
+    data: InputFieldPurchaseType
+): Promise<InputFieldPurchaseType> => {
+    return createData('/purchase-template', data);
 };
 
 // メソッド作成
