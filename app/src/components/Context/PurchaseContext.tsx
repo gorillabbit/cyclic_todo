@@ -37,6 +37,9 @@ export const PurchaseProvider = memo(({ children }: { children: ReactNode }) => 
     };
 
     console.log('purchaseList', purchaseList);
+    for (const purchase of purchaseList) {
+        console.log('purchase', purchase.title, purchase.date, purchase.difference);
+    }
 
     useEffect(() => {
         fetchPurchases();
