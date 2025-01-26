@@ -239,6 +239,9 @@ export class PurchaseService extends BaseService<Purchases> {
 
                 runningBalance += purchase.difference ?? 0;
                 purchase.balance = runningBalance;
+                console.log(
+                    purchase.title, 
+                    purchase.payDate, purchase.assetId, purchase.difference, runningBalance); 
             }
 
             await repo.save(all);
