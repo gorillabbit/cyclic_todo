@@ -10,6 +10,8 @@ interface PurchaseBaseType {
     description: string;
     isUncertain?: boolean;
     isGroup?: boolean;
+    tabId: string;
+    assetId: string;
 }
 const defaultPurchaseBase: PurchaseBaseType = {
     userId: '',
@@ -21,24 +23,26 @@ const defaultPurchaseBase: PurchaseBaseType = {
     description: '',
     isUncertain: false,
     isGroup: false,
+    tabId: '',
+    assetId: '',
 };
 
 export interface InputFieldPurchaseType extends PurchaseBaseType {
     price: number;
     income: boolean;
+    id: string;
 }
 export const defaultInputFieldPurchase: InputFieldPurchaseType = {
     ...defaultPurchaseBase,
     price: 0,
     income: false,
+    id: '',
 };
 export interface PurchaseDataType extends PurchaseBaseType {
-    id: string;
-    tabId: string;
-    assetId: string;
     difference: number;
     balance: number;
     parentScheduleId?: string;
+    id: string;
 }
 
 export const defaultPurchaseData: PurchaseDataType = {
@@ -46,9 +50,7 @@ export const defaultPurchaseData: PurchaseDataType = {
     difference: 0,
     balance: 0,
     parentScheduleId: '',
-    assetId: '',
     id: '',
-    tabId: '',
 };
 export interface PurchaseRawDataType extends Omit<PurchaseDataType, 'date' | 'payDate'> {
     id: string;

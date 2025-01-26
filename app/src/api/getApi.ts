@@ -8,8 +8,8 @@ import {
     TransferType, 
     TabListType 
 } from '../types';
-import { PurchaseDataType } from '../types/purchaseTypes';
-import { fetchData } from './apiClient';
+import { InputFieldPurchaseType, PurchaseDataType } from '../types/purchaseTypes';
+import { fetchData, WithId } from './apiClient';
 
 export const getMethod = async (
     tabId?: string
@@ -72,8 +72,8 @@ export const getPurchaseSchedule = async (
 export const getPurchaseTemplate = async (
     userId?: string,
     tabId?: string
-): Promise<PurchaseScheduleType[]> => {
-    return fetchData<PurchaseScheduleType[]>('/purchase-template', {
+): Promise<WithId<InputFieldPurchaseType>[]> => {
+    return fetchData<WithId<InputFieldPurchaseType>[]>('/purchase-template', {
         user_id: userId,
         tab_id: tabId
     });

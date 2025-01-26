@@ -1,43 +1,8 @@
 import { Chip } from '@mui/material';
-import { memo, useCallback, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { deleteDocPurchaseTemplate } from '../../../firebase';
 import DeleteConfirmDialog from '../DeleteConfirmDialog';
 import { InputFieldPurchaseType, TemplateButtonType } from '../../../types/purchaseTypes';
-
-type PlainTemplateButtonProps = {
-    template: InputFieldPurchaseType;
-    onClickTemplateButton: () => void;
-    handleDeleteButtonClick: () => void;
-    openDialog: boolean;
-    setOpenDialog: React.Dispatch<React.SetStateAction<boolean>>;
-    deleteAction: () => void;
-};
-
-const PlainTemplateButton = memo(
-    ({
-        template,
-        onClickTemplateButton,
-        handleDeleteButtonClick,
-        openDialog,
-        setOpenDialog,
-        deleteAction,
-    }: PlainTemplateButtonProps) => (
-        <>
-            <Chip
-                sx={{ m: 0.5 }}
-                onClick={onClickTemplateButton}
-                onDelete={handleDeleteButtonClick}
-                label={template.title}
-            />
-            <DeleteConfirmDialog
-                target={<Chip sx={{ m: 0.5 }} label={template.title} />}
-                openDialog={openDialog}
-                setOpenDialog={setOpenDialog}
-                deleteAction={deleteAction}
-            />
-        </>
-    )
-);
 
 const TemplateButton = ({
     setNewPurchase,
@@ -54,6 +19,7 @@ const TemplateButton = ({
         setNewPurchase({
             ...templatePurchaseWithoutId,
             date: new Date(),
+            id: new Date().getTime().toString(),
         });
     }, [setNewPurchase, template]);
 
@@ -65,15 +31,22 @@ const TemplateButton = ({
         deleteDocPurchaseTemplate(template.id);
     }, [template.id]);
 
-    const plainProps = {
-        template,
-        onClickTemplateButton,
-        handleDeleteButtonClick,
-        openDialog,
-        setOpenDialog,
-        deleteAction,
-    };
-    return <PlainTemplateButton {...plainProps} />;
+    return (
+        <>
+            <Chip
+                sx={{ m: 0.5 }}
+                onClick={onClickTemplateButton}
+                onDelete={handleDeleteButtonClick}
+                label={template.title}
+            />
+            <DeleteConfirmDialog
+                target={<Chip sx={{ m: 0.5 }} label={template.title} />}
+                openDialog={openDialog}
+                setOpenDialog={setOpenDialog}
+                deleteAction={deleteAction}
+            />
+        </>
+    );
 };
 
 export default TemplateButton;
