@@ -29,7 +29,7 @@ const UnderHalfRow = memo(
             <TableCellWrapper>
                 {editFormData.difference}
                 {method?.timing === '翌月' && !isGroup && <Chip label="翌月" />}
-                {editFormData.isUncertain && <Chip label="未確" />}
+                {Boolean(editFormData.isUncertain) && <Chip label="未確" />}
             </TableCellWrapper>
             <TableCellWrapper
                 label={

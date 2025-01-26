@@ -59,7 +59,7 @@ const PurchaseRowButtons = ({
             >
                 <DeleteIcon />
             </IconButton>
-            {isUncertain && (
+            {Boolean(isUncertain) && (
                 <Button sx={{ p: 0.5 }} onClick={handleEditPriceButtonClick}>
                     金額確定
                 </Button>
