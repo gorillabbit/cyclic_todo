@@ -37,6 +37,9 @@ def transform_object(obj: dict) -> dict:
             and "id" in value
         ):
             return value["id"]
+        if key == "income":
+            return bool(value)
+
         if isinstance(value, dict) and "_seconds" in value and "_nanoseconds" in value:
             return convert_seconds_to_datetime(value["_seconds"], value["_nanoseconds"])
         if isinstance(value, dict):
@@ -74,7 +77,7 @@ def filter_and_validate_data(data, model):
 def process_file(file_name, input_folder, output_folder, model):
     """Process a single JSON file: transform, validate, and save."""
     input_file = os.path.join(input_folder, file_name)
-    output_file = os.path.join(output_folder, file_name)
+    output_file = os.path.join(output_folder, camel_to_snake(file_name))
 
     with open(input_file, "r", encoding="utf-8") as in_file:
         data = json.load(in_file)

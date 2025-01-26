@@ -70,7 +70,8 @@ def import_data(collection_name: str, connection: pymysql.connections.Connection
     """Import JSON data into the specified MySQL table."""
     # scripts/output/ から {collection_name}.json を読み込む想定
     file_path = (
-        Path(__file__).resolve().parents[1] / f"scripts/output/{collection_name}.json"
+        Path(__file__).resolve().parents[1]
+        / f"python_scripts/output/{collection_name}.json"
     )
     if not file_path.exists():
         print(f"File not found: {file_path}")
