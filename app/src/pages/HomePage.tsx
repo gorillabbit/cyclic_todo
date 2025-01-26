@@ -7,7 +7,7 @@ import TaskPage from './TaskPage';
 import { useCookies } from 'react-cookie';
 import { AccountType, TabType } from '../types';
 import { useAccount } from '../hooks/useData';
-import { getTabs } from '../utilities/apiClient';
+import { getTab } from '../utilities/apiClient';
 
 type PlainHomePageProps = {
     tabValue: number;
@@ -61,7 +61,7 @@ const HomePage = memo(() => {
 
     useEffect(() => {
         if (!Account) return;
-        getTabs([{ field: 'id', value: Account.useTabIds }]).then((result) => setTabs(result));
+        getTab([{ field: 'id', value: Account.useTabIds }]).then((result) => setTabs(result));
     }, [Account]);
 
     const plainProps = {

@@ -1,7 +1,7 @@
 import { memo, ReactNode, useMemo, useState, useEffect, createContext } from 'react';
 import { useTab } from '../../hooks/useData';
 import { PurchaseDataType } from '../../types/purchaseTypes';
-import { getPurchases } from '../../utilities/apiClient';
+import { getPurchase } from '../../utilities/apiClient';
 import { parseDateFieldsDeep } from '../../utilities/parseJsonUtils.js';
 
 export type PurchaseContextType = {
@@ -30,7 +30,7 @@ export const PurchaseProvider = memo(({ children }: { children: ReactNode }) => 
     categorySet.push('');
 
     const fetchPurchases = async () => {
-        const data = await getPurchases([{ field: 'tabId', value: tabId }]);
+        const data = await getPurchase([{ field: 'tabId', value: tabId }]);
         const purchases = parseDateFieldsDeep(data, ['date', 'payDate', 'timestamp']);
         const orderedPurchaseList = purchases.sort((a, b) => b.date.getTime() - a.date.getTime());
         setPurchaseList(orderedPurchaseList);

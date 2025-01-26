@@ -12,7 +12,7 @@ import LoginPage from './pages/LoginPage';
 import HomePage from './pages/HomePage';
 import KiyakuPage from './pages/KiyakuPage';
 import ja from 'date-fns/locale/ja';
-import { getAccounts } from './utilities/apiClient';
+import { getAccount } from './utilities/apiClient';
 
 const App = memo(() => {
     const theme = createTheme({
@@ -31,7 +31,7 @@ const App = memo(() => {
                 setAccount(undefined);
                 return;
             }
-            getAccounts([{ field: 'id', value: user.uid }]).then((data) => {
+            getAccount([{ field: 'id', value: user.uid }]).then((data) => {
                 setAccount(data[0] as AccountType);
             });
         });

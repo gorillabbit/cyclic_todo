@@ -15,7 +15,7 @@ import { AccountLinkType, AccountType } from '../types';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import CancelIcon from '@mui/icons-material/Cancel';
 import { useAccount } from '../hooks/useData';
-import { getAccounts } from '../utilities/apiClient';
+import { getAccount } from '../utilities/apiClient';
 
 // TODO: メアドがlinkedAccountsなどになくなったので機能していない
 const validateEmail = (email: string, account: AccountType): string => {
@@ -41,7 +41,7 @@ const AccountShareButton = () => {
         if (!Account) return;
         const fetchAccounts = async () => {
             try {
-                const data = await getAccounts([{ field: 'id', value: Account.linkedAccounts }]);
+                const data = await getAccount([{ field: 'id', value: Account.linkedAccounts }]);
                 setLinkedAccounts(
                     data.map((account) => ({
                         id: account.id,
@@ -50,7 +50,7 @@ const AccountShareButton = () => {
                         icon: account.icon,
                     }))
                 );
-                const receiveRequests = await getAccounts([
+                const receiveRequests = await getAccount([
                     { field: 'id', value: Account.receiveRequest },
                 ]);
                 setReceiveRequests(

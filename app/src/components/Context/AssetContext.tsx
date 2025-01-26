@@ -1,7 +1,7 @@
 import { ReactNode, createContext, memo, useEffect, useMemo, useState } from 'react';
 import { AssetListType } from '../../types.js';
 import { useTab } from '../../hooks/useData.js';
-import { getAssets } from '../../utilities/apiClient.js';
+import { getAsset } from '../../utilities/apiClient.js';
 
 export type AssetContextType = {
     assetList: AssetListType[];
@@ -17,7 +17,7 @@ export const AssetProvider = memo(({ children }: { children: ReactNode }) => {
     const [assetList, setAssetList] = useState<AssetListType[]>([]);
 
     useEffect(() => {
-        getAssets(tabId).then((assets) => {
+        getAsset(tabId).then((assets) => {
             setAssetList(assets);
         });
     }, []);

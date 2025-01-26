@@ -4,7 +4,7 @@ import { addMonths, nextDay, addDays } from 'date-fns';
 import { getPayLaterDate } from './dateUtilities';
 import { PurchaseDataType } from '../types/purchaseTypes';
 import { useMethod } from '../hooks/useData';
-import { createPurchase, deletePurchase, getPurchases } from './apiClient';
+import { createPurchase, deletePurchase, getPurchase } from './apiClient';
 
 /**
  * 収支を合計する(収入は+、支出は-で表現されるので支出の合計は-になる)
@@ -76,10 +76,10 @@ export const filterPurchasesByIncomeType = (
 export const deleteScheduledPurchases = async (
     purchaseScheduleId: string
 ):Promise<void> => {
-    const targetPurchases =await getPurchases(
+    const targetPurchase =await getPurchase(
         [{ field: 'parentScheduleId', value: purchaseScheduleId }]
     );
-    for (const purchase of targetPurchases) {
+    for (const purchase of targetPurchase) {
         await deletePurchase(purchase.id);
     }
 };

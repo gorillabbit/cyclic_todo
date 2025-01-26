@@ -171,7 +171,7 @@ const fetchData = async <T>(
     }
 };
 
-export const getMethods = async (
+export const getMethod = async (
     tabId?: string
 ): Promise<MethodListType[]> => {
     return fetchData<MethodListType[]>('/method', {
@@ -179,7 +179,7 @@ export const getMethods = async (
     });
 };
 
-export const getAssets = async (
+export const getAsset = async (
     tabId?: string
 ): Promise<AssetListType[]> => {
     return fetchData<AssetListType[]>('/asset', {
@@ -196,7 +196,7 @@ export const getAccountDetails = async (
 
 
 // タスク取得関数
-export const getTasks = async (
+export const getTask = async (
     userId?: string,
     tabId?: string
 ): Promise<TaskType[]> => {
@@ -207,7 +207,7 @@ export const getTasks = async (
 };
 
 // ログ取得関数
-export const getLogs = async (
+export const getLog = async (
     userId?: string,
     tabId?: string
 ): Promise<LogType[]> => {
@@ -218,7 +218,7 @@ export const getLogs = async (
 };
 
 // 購入スケジュール取得関数
-export const getPurchaseSchedules = async (
+export const getPurchaseSchedule = async (
     userId?: string,
     tabId?: string
 ): Promise<PurchaseScheduleType[]> => {
@@ -228,12 +228,24 @@ export const getPurchaseSchedules = async (
     });
 };
 
+// 購入スケジュール取得関数
+export const getPurchaseTemplate = async (
+    userId?: string,
+    tabId?: string
+): Promise<PurchaseScheduleType[]> => {
+    return fetchData<PurchaseScheduleType[]>('/purchase-template', {
+        user_id: userId,
+        tab_id: tabId
+    });
+};
+
+
 // 振替テンプレート取得関数
-export const getTransferTemplates = async (
+export const getTransferTemplate = async (
     userId?: string,
     tabId?: string
 ): Promise<TransferType[]> => {
-    return fetchData<TransferType[]>('/transfer-templates', {
+    return fetchData<TransferType[]>('/transfer-template', {
         user_id: userId,
         tab_id: tabId
     });
@@ -245,7 +257,7 @@ type FilterParam<T extends object> = {
     value: string | string[];
   };
 
-export const getAccounts = async (
+export const getAccount = async (
     filters: FilterParam<AccountType>[]
 ): Promise<AccountType[]> => {
     const params: Record<string, string> = {};
@@ -261,7 +273,7 @@ export const getAccounts = async (
     return fetchData<AccountType[]>('/account', params);
 };
 
-export const getTabs = async (
+export const getTab = async (
     filters: FilterParam<TabListType>[]
 ): Promise<TabListType[]> => {
     const params: Record<string, string | string[]> = {};
@@ -279,7 +291,7 @@ export const getTabs = async (
     return fetchData<TabListType[]>('/tab', params);
 };
 
-export const getPurchases = async (
+export const getPurchase = async (
     filters: FilterParam<PurchaseDataType>[]
 ): Promise<PurchaseDataType[]> => {
     const params: Record<string, string | string[]> = {};

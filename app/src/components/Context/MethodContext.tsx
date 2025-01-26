@@ -1,7 +1,7 @@
 import { ReactNode, createContext, memo, useEffect, useMemo, useState } from 'react';
 import { MethodListType } from '../../types.js';
 import { useTab } from '../../hooks/useData.js';
-import { getMethods } from '../../utilities/apiClient.js';
+import { getMethod } from '../../utilities/apiClient.js';
 
 export type MethodContextType = {
     methodList: MethodListType[];
@@ -17,7 +17,7 @@ export const MethodProvider = memo(({ children }: { children: ReactNode }) => {
     const [methodList, setMethodList] = useState<MethodListType[]>([]);
 
     useEffect(() => {
-        getMethods(tabId).then((methods) => {
+        getMethod(tabId).then((methods) => {
             setMethodList(methods);
             console.log('methods:', methods);
         });
