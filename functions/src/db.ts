@@ -51,6 +51,7 @@ export const initializeDatabase = async (): Promise<void> => {
     console.log(process.env.DB_PASSWORD);
     console.log(process.env.DB_HOST);
     console.log(process.env.DB_PORT);
+    console.log(process.env.DB_NAME);
 
     try {
         await AppDataSource.initialize();
