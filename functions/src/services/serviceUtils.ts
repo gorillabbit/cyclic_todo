@@ -75,9 +75,6 @@ export abstract class BaseService<T extends ObjectLiteral> {
                 queryBuilder.addOrderBy(`${field}`, direction);
             }
 
-            console.log(queryBuilder.getQueryAndParameters());
-            console.log(queryBuilder.getSql());
-
             return await queryBuilder.getMany();
         } catch (err) {
             return this.handleError('getAll', err);
