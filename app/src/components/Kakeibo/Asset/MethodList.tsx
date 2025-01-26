@@ -10,45 +10,11 @@ import {
 import { memo, useCallback } from 'react';
 import TableCellWrapper from '../TableCellWrapper';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import { defaultMethod, MethodListType, MethodType } from '../../../types';
+import { defaultMethod, MethodListType } from '../../../types';
 import { getAuth } from 'firebase/auth';
-import { addDocMethod } from '../../../firebase';
-import { useTab } from '../../../hooks/useData';
+import { useMethod, useTab } from '../../../hooks/useData';
 import MethodRow from './MethodRow';
-
-type PlainMethodListProps = {
-    open: boolean;
-    filteredMethodList: MethodListType[];
-    addMethod: () => void;
-};
-
-const PlainMethodList = memo(({ open, filteredMethodList, addMethod }: PlainMethodListProps) => (
-    <TableRow>
-        <TableCell sx={{ paddingY: 0 }} colSpan={6}>
-            <Collapse in={open} timeout="auto" unmountOnExit>
-                <Table size="small" aria-label="purchases">
-                    <TableHead>
-                        <TableRow>
-                            <TableCellWrapper label="名前" />
-                            <TableCellWrapper label="今月の収入" />
-                            <TableCellWrapper label="今月の支出" />
-                            <TableCellWrapper label="決済タイミング" />
-                            <TableCellWrapper colSpan={2} />
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {filteredMethodList.map((method) => (
-                            <MethodRow method={method} key={method.id} />
-                        ))}
-                    </TableBody>
-                </Table>
-                <IconButton onClick={addMethod} color="primary">
-                    <AddCircleOutlineIcon />
-                </IconButton>
-            </Collapse>
-        </TableCell>
-    </TableRow>
-));
+import { createMethod } from '../../../api/createApi';
 
 const MethodList = memo(
     ({
@@ -62,24 +28,49 @@ const MethodList = memo(
     }) => {
         const auth = getAuth();
         const { tabId } = useTab();
-        const addMethod = useCallback(() => {
+        const { fetchMethod } = useMethod();
+        const addMethod = useCallback(async () => {
             if (auth.currentUser) {
                 const userId = auth.currentUser.uid;
-                const newMethod: MethodType = {
+                const newMethod = {
                     ...defaultMethod,
                     userId,
                     tabId,
                     assetId,
+                    id: new Date().getTime().toString(),
                 };
-                addDocMethod(newMethod);
+                await createMethod(newMethod);
+                fetchMethod();
             }
         }, [assetId, auth.currentUser, tabId]);
-        const plainProps = {
-            open,
-            filteredMethodList,
-            addMethod,
-        };
-        return <PlainMethodList {...plainProps} />;
+
+        return (
+            <TableRow>
+                <TableCell sx={{ paddingY: 0 }} colSpan={6}>
+                    <Collapse in={open} timeout="auto" unmountOnExit>
+                        <Table size="small" aria-label="purchases">
+                            <TableHead>
+                                <TableRow>
+                                    <TableCellWrapper label="名前" />
+                                    <TableCellWrapper label="今月の収入" />
+                                    <TableCellWrapper label="今月の支出" />
+                                    <TableCellWrapper label="決済タイミング" />
+                                    <TableCellWrapper colSpan={2} />
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {filteredMethodList.map((method) => (
+                                    <MethodRow method={method} key={method.id} />
+                                ))}
+                            </TableBody>
+                        </Table>
+                        <IconButton onClick={addMethod} color="primary">
+                            <AddCircleOutlineIcon />
+                        </IconButton>
+                    </Collapse>
+                </TableCell>
+            </TableRow>
+        );
     }
 );
 export default MethodList;

@@ -8,42 +8,77 @@ import {
     SelectChangeEvent,
     InputAdornment,
 } from '@mui/material';
-import { memo, useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { ErrorType, MethodListType } from '../../../types';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { deleteDocMethod, updateDocMethod } from '../../../firebase';
 import { numericProps, sumSpentAndIncome } from '../../../utilities/purchaseUtilities';
 import { useMethod, usePurchase } from '../../../hooks/useData';
 import TableCellWrapper from '../TableCellWrapper';
 import { getFutureMonthFirstDay, getThisMonthFirstDay } from '../../../utilities/dateUtilities';
 import { getHasError, validateMethod } from '../KakeiboSchemas';
+import { updateMethod } from '../../../api/updateApi';
+import { deleteMethod } from '../../../api/deleteApi';
 
-type PlainMethodRowProps = {
-    methodInput: MethodListType;
-    handleMethodInput: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-    handleSelectInput: (e: SelectChangeEvent<string>) => void;
-    isChanged: boolean;
-    removeMethod: () => void;
-    saveChanges: () => void;
-    thisMonthSpent: number;
-    thisMonthIncome: number;
-    errors: ErrorType;
-    hasError: boolean;
-};
+const MethodRow = ({ method }: { method: MethodListType }) => {
+    const { methodList, fetchMethod } = useMethod();
+    const [methodInput, setMethodInput] = useState<MethodListType>(method);
 
-const PlainMethodRow = memo(
-    ({
-        methodInput,
-        handleMethodInput,
-        handleSelectInput,
-        isChanged,
-        removeMethod,
-        saveChanges,
-        thisMonthSpent,
-        thisMonthIncome,
-        errors,
-        hasError,
-    }: PlainMethodRowProps) => (
+    const [errors, setErrors] = useState<ErrorType>({});
+
+    const hasError = getHasError(errors);
+
+    const validate = useCallback((input: MethodListType) => {
+        const newErrors = validateMethod(input);
+        const duplicatedMethod =
+            methodList.filter((m) => m.label === input.label && m.id !== input.id).length > 0;
+        if (duplicatedMethod) {
+            newErrors.label = '他の支払い方法と同じ名前は禁止です';
+        }
+        setErrors(newErrors);
+        return getHasError(newErrors);
+    }, []);
+
+    const handleMethodInput = useCallback(
+        (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+            const { name, value } = e.target;
+            setMethodInput((prev) => {
+                const newMethod = { ...prev, [name]: value };
+                validate(newMethod);
+                return newMethod;
+            });
+        },
+        []
+    );
+
+    const handleSelectInput = useCallback((e: SelectChangeEvent<string>) => {
+        const { name, value } = e.target;
+        setMethodInput((prev) => ({ ...prev, [name]: value }));
+    }, []);
+
+    const saveChanges = useCallback(async () => {
+        await updateMethod(method.id, methodInput);
+        fetchMethod();
+    }, [method, methodInput]);
+
+    const removeMethod = useCallback(async () => {
+        await deleteMethod(method.id);
+        fetchMethod();
+    }, [method.id]);
+
+    const isChanged = useMemo(
+        () => method.label !== methodInput.label || method.timing !== methodInput.timing,
+        [method, methodInput]
+    );
+
+    const { purchaseList } = usePurchase();
+    const methodPurchase = purchaseList.filter((p) => p.method === method.id);
+    const thisMonthPurchase = methodPurchase.filter(
+        (p) => getFutureMonthFirstDay() > p.date && p.date >= getThisMonthFirstDay()
+    );
+    const thisMonthSpent = sumSpentAndIncome(thisMonthPurchase.filter((p) => p.difference < 0));
+    const thisMonthIncome = sumSpentAndIncome(thisMonthPurchase.filter((p) => p.difference > 0));
+
+    return (
         <TableRow>
             <TableCellWrapper>
                 <TextField
@@ -100,80 +135,7 @@ const PlainMethodRow = memo(
                 </IconButton>
             </TableCellWrapper>
         </TableRow>
-    )
-);
-
-const MethodRow = ({ method }: { method: MethodListType }) => {
-    const { methodList } = useMethod();
-    const [methodInput, setMethodInput] = useState<MethodListType>(method);
-
-    const [errors, setErrors] = useState<ErrorType>({});
-
-    const hasError = getHasError(errors);
-
-    const validate = useCallback((input: MethodListType) => {
-        const newErrors = validateMethod(input);
-        const duplicatedMethod =
-            methodList.filter((m) => m.label === input.label && m.id !== input.id).length > 0;
-        if (duplicatedMethod) {
-            newErrors.label = '他の支払い方法と同じ名前は禁止です';
-        }
-        setErrors(newErrors);
-        return getHasError(newErrors);
-    }, []);
-
-    const handleMethodInput = useCallback(
-        (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-            const { name, value } = e.target;
-            setMethodInput((prev) => {
-                const newMethod = { ...prev, [name]: value };
-                validate(newMethod);
-                return newMethod;
-            });
-        },
-        []
     );
-
-    const handleSelectInput = useCallback((e: SelectChangeEvent<string>) => {
-        const { name, value } = e.target;
-        setMethodInput((prev) => ({ ...prev, [name]: value }));
-    }, []);
-
-    const saveChanges = useCallback(() => {
-        updateDocMethod(method.id, methodInput);
-    }, [method, methodInput]);
-
-    const removeMethod = useCallback(() => {
-        deleteDocMethod(method.id);
-    }, [method.id]);
-
-    const isChanged = useMemo(
-        () => method.label !== methodInput.label || method.timing !== methodInput.timing,
-        [method, methodInput]
-    );
-
-    const { purchaseList } = usePurchase();
-    const methodPurchase = purchaseList.filter((p) => p.method === method.id);
-    const thisMonthPurchase = methodPurchase.filter(
-        (p) => getFutureMonthFirstDay() > p.date && p.date >= getThisMonthFirstDay()
-    );
-    const thisMonthSpent = sumSpentAndIncome(thisMonthPurchase.filter((p) => p.difference < 0));
-    const thisMonthIncome = sumSpentAndIncome(thisMonthPurchase.filter((p) => p.difference > 0));
-
-    const plainProps = {
-        methodInput,
-        handleMethodInput,
-        handleSelectInput,
-        isChanged,
-        saveChanges,
-        removeMethod,
-        thisMonthSpent,
-        thisMonthIncome,
-        errors,
-        hasError,
-    };
-
-    return <PlainMethodRow {...plainProps} />;
 };
 
 export default MethodRow;

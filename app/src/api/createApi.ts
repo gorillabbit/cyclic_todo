@@ -1,6 +1,5 @@
 import { 
     InputPurchaseScheduleType, PurchaseScheduleType, MethodListType, AssetListType, TabListType, 
-    InputAssetType
 } from '../types';
 import { PurchaseDataType } from '../types/purchaseTypes';
 import { sendData, WithId } from './apiClient';
@@ -25,12 +24,12 @@ export const createPurchaseSchedule = async (
 };
 
 // メソッド作成
-export const createMethod = async (data: MethodListType): Promise<MethodListType> => {
+export const createMethod = async (data:MethodListType ): Promise<MethodListType> => {
     return createData('/method', data);
 };
 
 // 資産作成
-export const createAsset = async (data: InputAssetType): Promise<AssetListType> => {
+export const createAsset = async (data: AssetListType): Promise<AssetListType> => {
     return createData('/asset', data);
 };
 
