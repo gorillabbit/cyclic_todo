@@ -59,19 +59,51 @@ const UnderHalfRow = memo(
     )
 );
 
-type PlainEditPurchaseRowProps = UnderHalfRowProps & {
+const EditPurchaseRow = ({
+    setIsEdit,
+    editFormData,
+    setEditFormData,
+    isSmall,
+}: {
+    setIsEdit: React.Dispatch<React.SetStateAction<boolean>>;
+    editFormData: PurchaseDataType;
+    setEditFormData: React.Dispatch<React.SetStateAction<PurchaseDataType>>;
     isSmall: boolean;
-};
+}) => {
+    const { methodList } = useMethod();
+    const { fetchPurchases } = usePurchase();
 
-const PlainEditPurchaseRow = memo(
-    ({
-        editFormData,
-        handleEditFormChange,
-        isSmall,
-        handleSaveClick,
-        errors,
-        hasError,
-    }: PlainEditPurchaseRowProps) => (
+    // 編集内容を保存する関数
+    const handleSaveClick = useCallback(async () => {
+        const method = methodList.find((m) => m.id === editFormData.method);
+        if (!method) {
+            return console.error('支払い方法が見つかりません');
+        }
+        await updatePurchase(editFormData.id, {
+            ...editFormData,
+            assetId: method.assetId,
+            payDate: getPayDate(method, editFormData.date),
+        });
+        setIsEdit(false);
+        fetchPurchases();
+    }, [editFormData, setIsEdit]);
+
+    const [errors, setErrors] = useState<ErrorType>({});
+    const hasError = getHasError(errors);
+
+    const handleEditFormChange = useCallback(
+        (name: string, value: string | Date | boolean | MethodListType | null) => {
+            setEditFormData((prev) => {
+                const nextPurchase = { ...prev, [name]: value };
+                const errors = validateEditPurchase(nextPurchase);
+                setErrors(errors);
+                return nextPurchase;
+            });
+        },
+        []
+    );
+
+    return (
         <>
             <TableRow
                 sx={{
@@ -135,62 +167,7 @@ const PlainEditPurchaseRow = memo(
                 </TableRow>
             )}
         </>
-    )
-);
-
-const EditPurchaseRow = ({
-    setIsEdit,
-    editFormData,
-    setEditFormData,
-    isSmall,
-}: {
-    setIsEdit: React.Dispatch<React.SetStateAction<boolean>>;
-    editFormData: PurchaseDataType;
-    setEditFormData: React.Dispatch<React.SetStateAction<PurchaseDataType>>;
-    isSmall: boolean;
-}) => {
-    const { methodList } = useMethod();
-    const { fetchPurchases } = usePurchase();
-
-    // 編集内容を保存する関数
-    const handleSaveClick = useCallback(async () => {
-        const method = methodList.find((m) => m.id === editFormData.method);
-        if (!method) {
-            return console.error('支払い方法が見つかりません');
-        }
-        await updatePurchase(editFormData.id, {
-            ...editFormData,
-            assetId: method.assetId,
-            payDate: getPayDate(method, editFormData.date),
-        });
-        setIsEdit(false);
-        fetchPurchases();
-    }, [editFormData, setIsEdit]);
-
-    const [errors, setErrors] = useState<ErrorType>({});
-    const hasError = getHasError(errors);
-
-    const handleEditFormChange = useCallback(
-        (name: string, value: string | Date | boolean | MethodListType | null) => {
-            setEditFormData((prev) => {
-                const nextPurchase = { ...prev, [name]: value };
-                const errors = validateEditPurchase(nextPurchase);
-                setErrors(errors);
-                return nextPurchase;
-            });
-        },
-        []
     );
-
-    const plainProps = {
-        editFormData,
-        handleEditFormChange,
-        handleSaveClick,
-        isSmall,
-        errors,
-        hasError,
-    };
-    return <PlainEditPurchaseRow {...plainProps} />;
 };
 
 export default EditPurchaseRow;

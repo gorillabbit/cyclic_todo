@@ -53,26 +53,25 @@ const UnderHalfRow = memo(
     )
 );
 
-type PlainNormalPurchaseRowProps = UnderHalfRowProps & {
+const NormalPurchaseRow = (props: {
+    isGroup: boolean;
+    editFormData: PurchaseDataType;
+    setIsEdit: (value: React.SetStateAction<boolean>) => void;
+    setIsEditPrice: React.Dispatch<React.SetStateAction<boolean>>;
     setOpen: React.Dispatch<React.SetStateAction<boolean>>;
     open: boolean;
     isSmall: boolean;
-    rowColor: string;
-};
-
-const PlainNormalPurchaseRow = memo(
-    ({
-        isGroup,
-        setOpen,
-        open,
-        editFormData,
-        isSmall,
-        setIsEdit,
-        setIsEditPrice,
-        rowColor,
-        assetName,
-        method,
-    }: PlainNormalPurchaseRowProps) => (
+    index: number;
+}) => {
+    const rowColor = useMemo(() => (props.index % 2 === 0 ? '#f0f0f0' : 'white'), [props.index]);
+    const { assetList } = useAsset();
+    const { methodList } = useMethod();
+    const assetName = assetList.find((asset) => asset.id === props.editFormData.assetId)?.name;
+    const method = methodList.find((m) => m.id === props.editFormData.method);
+    const { isGroup, editFormData, setIsEdit, setIsEditPrice, isSmall, setOpen, open } = props;
+    // TODO 残高が他の残高と区別できるようにする
+    // TODO 残高の推移グラフを描く
+    return (
         <>
             <TableRow
                 sx={{
@@ -122,28 +121,7 @@ const PlainNormalPurchaseRow = memo(
                 </TableRow>
             )}
         </>
-    )
-);
-
-const NormalPurchaseRow = (props: {
-    isGroup: boolean;
-    editFormData: PurchaseDataType;
-    setIsEdit: (value: React.SetStateAction<boolean>) => void;
-    setIsEditPrice: React.Dispatch<React.SetStateAction<boolean>>;
-    setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-    open: boolean;
-    isSmall: boolean;
-    index: number;
-}) => {
-    const rowColor = useMemo(() => (props.index % 2 === 0 ? '#f0f0f0' : 'white'), [props.index]);
-    const { assetList } = useAsset();
-    const { methodList } = useMethod();
-    const assetName = assetList.find((asset) => asset.id === props.editFormData.assetId)?.name;
-    const method = methodList.find((m) => m.id === props.editFormData.method);
-    const plainProps = { ...props, rowColor, assetName, method };
-    // TODO 残高が他の残高と区別できるようにする
-    // TODO 残高の推移グラフを描く
-    return <PlainNormalPurchaseRow {...plainProps} />;
+    );
 };
 
 export default NormalPurchaseRow;

@@ -1,5 +1,5 @@
 import { IconButton, Button, Box } from '@mui/material';
-import { memo, useCallback, useState } from 'react';
+import { useCallback, useState } from 'react';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import DeleteConfirmDialog from '../../DeleteConfirmDialog';
@@ -7,28 +7,35 @@ import { PurchaseDataType } from '../../../../types/purchaseTypes';
 import { deletePurchase } from '../../../../utilities/apiClient';
 import { usePurchase } from '../../../../hooks/useData';
 
-type PlainPurchaseRowButtonsProps = {
+const PurchaseRowButtons = ({
+    purchase,
+    setIsEdit,
+    setIsEditPrice,
+    isUncertain,
+}: {
     purchase: PurchaseDataType;
-    handleEditClick: () => void;
-    handleDeleteButton: () => void;
-    handleEditPriceButtonClick: () => void;
+    setIsEdit: (value: React.SetStateAction<boolean>) => void;
+    setIsEditPrice: React.Dispatch<React.SetStateAction<boolean>>;
     isUncertain: boolean | undefined;
-    openDialog: boolean;
-    setOpenDialog: React.Dispatch<React.SetStateAction<boolean>>;
-    deleteAction: () => void;
-};
+}) => {
+    const [openDialog, setOpenDialog] = useState<boolean>(false);
+    const { fetchPurchases } = usePurchase();
+    const handleEditClick = useCallback(() => {
+        setIsEdit(true);
+    }, [setIsEdit]);
 
-const PlainPurchaseRowButtons = memo(
-    ({
-        purchase,
-        handleEditClick,
-        handleDeleteButton,
-        handleEditPriceButtonClick,
-        isUncertain,
-        openDialog,
-        setOpenDialog,
-        deleteAction,
-    }: PlainPurchaseRowButtonsProps) => (
+    const handleDeleteButton = useCallback(() => {
+        setOpenDialog(true);
+    }, [setOpenDialog]);
+
+    const handleEditPriceButtonClick = useCallback(() => setIsEditPrice(true), [setIsEditPrice]);
+
+    const deleteAction = useCallback(async () => {
+        await deletePurchase(purchase.id);
+        fetchPurchases();
+    }, [purchase.id]);
+
+    return (
         <Box display="flex">
             <IconButton
                 onClick={handleEditClick}
@@ -64,48 +71,7 @@ const PlainPurchaseRowButtons = memo(
                 deleteAction={deleteAction}
             />
         </Box>
-    )
-);
-
-const PurchaseRowButtons = ({
-    purchase,
-    setIsEdit,
-    setIsEditPrice,
-    isUncertain,
-}: {
-    purchase: PurchaseDataType;
-    setIsEdit: (value: React.SetStateAction<boolean>) => void;
-    setIsEditPrice: React.Dispatch<React.SetStateAction<boolean>>;
-    isUncertain: boolean | undefined;
-}) => {
-    const [openDialog, setOpenDialog] = useState<boolean>(false);
-    const { fetchPurchases } = usePurchase();
-    const handleEditClick = useCallback(() => {
-        setIsEdit(true);
-    }, [setIsEdit]);
-
-    const handleDeleteButton = useCallback(() => {
-        setOpenDialog(true);
-    }, [setOpenDialog]);
-
-    const handleEditPriceButtonClick = useCallback(() => setIsEditPrice(true), [setIsEditPrice]);
-
-    const deleteAction = useCallback(async () => {
-        await deletePurchase(purchase.id);
-        fetchPurchases();
-    }, [purchase.id]);
-
-    const plainProps = {
-        purchase,
-        handleEditClick,
-        handleDeleteButton,
-        isUncertain,
-        handleEditPriceButtonClick,
-        openDialog,
-        setOpenDialog,
-        deleteAction,
-    };
-    return <PlainPurchaseRowButtons {...plainProps} />;
+    );
 };
 
 export default PurchaseRowButtons;

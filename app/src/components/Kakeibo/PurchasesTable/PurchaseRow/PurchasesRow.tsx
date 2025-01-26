@@ -1,40 +1,28 @@
 import { TableRow, TableCell, Collapse, Table, TableBody, TableHead } from '@mui/material';
-import { memo, useState } from 'react';
+import { useState } from 'react';
 import EditPurchaseRow from './EditPurchaseRow';
 import NormalPurchaseRow from './NormalPurchaseRow';
 import EditPricePurchaseRow from './EditPricePurchaseRow';
 import { PurchaseDataType } from '../../../../types/purchaseTypes';
 
-type PlainPurchasesRowProps = {
-    setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-    open: boolean;
+const PurchasesRow = ({
+    purchase,
+    groupPurchases,
+    isSmall,
+    index,
+}: {
+    purchase: PurchaseDataType;
     groupPurchases: PurchaseDataType[];
-    isGroup: boolean;
-    isEdit: boolean;
-    setIsEdit: React.Dispatch<React.SetStateAction<boolean>>;
-    editFormData: PurchaseDataType;
-    setEditFormData: React.Dispatch<React.SetStateAction<PurchaseDataType>>;
     isSmall: boolean;
-    isEditPrice: boolean;
-    setIsEditPrice: React.Dispatch<React.SetStateAction<boolean>>;
     index: number;
-};
+}) => {
+    const [isEdit, setIsEdit] = useState<boolean>(false);
+    const [isEditPrice, setIsEditPrice] = useState<boolean>(false);
+    const [open, setOpen] = useState(false);
+    const isGroup = groupPurchases.length > 0;
+    const [editFormData, setEditFormData] = useState<PurchaseDataType>(purchase);
 
-const PlainPurchasesRow = memo(
-    ({
-        setOpen,
-        open,
-        groupPurchases,
-        isGroup,
-        isEdit,
-        setIsEdit,
-        editFormData,
-        setEditFormData,
-        isSmall,
-        isEditPrice,
-        setIsEditPrice,
-        index,
-    }: PlainPurchasesRowProps) => (
+    return (
         <>
             {isEdit ? (
                 <EditPurchaseRow
@@ -115,41 +103,7 @@ const PlainPurchasesRow = memo(
                 </TableRow>
             )}
         </>
-    )
-);
-
-const PurchasesRow = ({
-    purchase,
-    groupPurchases,
-    isSmall,
-    index,
-}: {
-    purchase: PurchaseDataType;
-    groupPurchases: PurchaseDataType[];
-    isSmall: boolean;
-    index: number;
-}) => {
-    const [isEdit, setIsEdit] = useState<boolean>(false);
-    const [isEditPrice, setIsEditPrice] = useState<boolean>(false);
-    const [open, setOpen] = useState(false);
-    const isGroup = groupPurchases.length > 0;
-    const [editFormData, setEditFormData] = useState<PurchaseDataType>(purchase);
-
-    const plainProps = {
-        groupPurchases,
-        isGroup,
-        isEdit,
-        setIsEdit,
-        editFormData,
-        setEditFormData,
-        open,
-        setOpen,
-        isSmall,
-        isEditPrice,
-        setIsEditPrice,
-        index,
-    };
-    return <PlainPurchasesRow {...plainProps} />;
+    );
 };
 
 export default PurchasesRow;

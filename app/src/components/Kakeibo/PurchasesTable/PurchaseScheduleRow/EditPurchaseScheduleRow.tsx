@@ -8,7 +8,7 @@ import {
     Select,
 } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers';
-import { memo, useCallback } from 'react';
+import { useCallback } from 'react';
 import DoneIcon from '@mui/icons-material/Done';
 import { InputPurchaseScheduleRowType, MethodListType } from '../../../../types';
 import {
@@ -23,31 +23,70 @@ import MethodSelector from '../../ScreenParts/MethodSelector';
 import CategorySelector from '../../ScreenParts/CategorySelector';
 import { updatePurchaseSchedule } from '../../../../utilities/apiClient';
 
-type PlainEditPurchaseScheduleRowProps = {
+const EditPurchaseScheduleRow = ({
+    setIsEdit,
+    editFormData,
+    setEditFormData,
+    isSmall,
+}: {
+    setIsEdit: React.Dispatch<React.SetStateAction<boolean>>;
     editFormData: InputPurchaseScheduleRowType;
-    handleDateFormChange: (value: Date | null | undefined) => void;
-    handleEditFormChange: (event: {
-        target: {
-            name: string;
-            value: unknown;
-        };
-    }) => void;
-    handleAutocompleteChange: (name: string, value: unknown) => void;
-    handleMethodChange: (name: string, value: string | MethodListType | null) => void;
+    setEditFormData: React.Dispatch<React.SetStateAction<InputPurchaseScheduleRowType>>;
     isSmall: boolean;
-    handleSaveClick: () => void;
-};
+}) => {
+    const { purchaseList, setPurchaseList, fetchPurchases } = usePurchase();
 
-const PlainEditPurchaseScheduleRow = memo(
-    ({
-        editFormData,
-        handleDateFormChange,
-        handleEditFormChange,
-        handleAutocompleteChange,
-        handleMethodChange,
-        isSmall,
-        handleSaveClick,
-    }: PlainEditPurchaseScheduleRowProps) => (
+    // 編集内容を保存する関数
+    const handleSaveClick = useCallback(async () => {
+        const { id, ...editFormDataWithoutId } = editFormData;
+        // アップデートし、編集を閉じる
+        updatePurchaseSchedule(id, editFormData);
+        // まず子タスクをすべて削除し、その後で新たな予定タスクを追加する
+        await deleteScheduledPurchases(editFormData.id);
+        // idが含まれると、子タスクのidがそれになってしまう
+
+        addScheduledPurchase(id, editFormDataWithoutId);
+        fetchPurchases();
+    }, [editFormData, purchaseList, setIsEdit, setPurchaseList]);
+
+    const handleEditFormChange = useCallback(
+        (event: { target: { name: string; value: unknown } }) => {
+            const { name, value } = event.target;
+            setEditFormData((prev) => ({ ...prev, [name]: value }));
+        },
+        [setEditFormData]
+    );
+
+    const handleDateFormChange = useCallback(
+        (value: Date | null | undefined) => {
+            setEditFormData((prev) => ({
+                ...prev,
+                endDate: value ?? new Date(),
+            }));
+        },
+        [setEditFormData]
+    );
+
+    const handleMethodChange = useCallback(
+        (name: string, value: string | MethodListType | null) => {
+            if (value && typeof value !== 'string') {
+                setEditFormData((prev) => ({
+                    ...prev,
+                    [name]: value,
+                }));
+            }
+        },
+        [setEditFormData]
+    );
+
+    const handleAutocompleteChange = useCallback(
+        (name: string, value: unknown) => {
+            setEditFormData((prev) => ({ ...prev, [name]: value }));
+        },
+        [setEditFormData]
+    );
+
+    return (
         <>
             <TableRow>
                 <TableCell sx={{ px: 0.5, display: 'flex', gap: 1 }}>
@@ -200,82 +239,7 @@ const PlainEditPurchaseScheduleRow = memo(
                 </>
             )}
         </>
-    )
-);
-
-const EditPurchaseScheduleRow = ({
-    setIsEdit,
-    editFormData,
-    setEditFormData,
-    isSmall,
-}: {
-    setIsEdit: React.Dispatch<React.SetStateAction<boolean>>;
-    editFormData: InputPurchaseScheduleRowType;
-    setEditFormData: React.Dispatch<React.SetStateAction<InputPurchaseScheduleRowType>>;
-    isSmall: boolean;
-}) => {
-    const { purchaseList, setPurchaseList, fetchPurchases } = usePurchase();
-
-    // 編集内容を保存する関数
-    const handleSaveClick = useCallback(async () => {
-        const { id, ...editFormDataWithoutId } = editFormData;
-        // アップデートし、編集を閉じる
-        updatePurchaseSchedule(id, editFormData);
-        // まず子タスクをすべて削除し、その後で新たな予定タスクを追加する
-        await deleteScheduledPurchases(editFormData.id);
-        // idが含まれると、子タスクのidがそれになってしまう
-
-        addScheduledPurchase(id, editFormDataWithoutId);
-        fetchPurchases();
-    }, [editFormData, purchaseList, setIsEdit, setPurchaseList]);
-
-    const handleEditFormChange = useCallback(
-        (event: { target: { name: string; value: unknown } }) => {
-            const { name, value } = event.target;
-            setEditFormData((prev) => ({ ...prev, [name]: value }));
-        },
-        [setEditFormData]
     );
-
-    const handleDateFormChange = useCallback(
-        (value: Date | null | undefined) => {
-            setEditFormData((prev) => ({
-                ...prev,
-                endDate: value ?? new Date(),
-            }));
-        },
-        [setEditFormData]
-    );
-
-    const handleMethodChange = useCallback(
-        (name: string, value: string | MethodListType | null) => {
-            if (value && typeof value !== 'string') {
-                setEditFormData((prev) => ({
-                    ...prev,
-                    [name]: value,
-                }));
-            }
-        },
-        [setEditFormData]
-    );
-
-    const handleAutocompleteChange = useCallback(
-        (name: string, value: unknown) => {
-            setEditFormData((prev) => ({ ...prev, [name]: value }));
-        },
-        [setEditFormData]
-    );
-
-    const plainProps = {
-        editFormData,
-        handleEditFormChange,
-        handleDateFormChange,
-        handleMethodChange,
-        handleSaveClick,
-        handleAutocompleteChange,
-        isSmall,
-    };
-    return <PlainEditPurchaseScheduleRow {...plainProps} />;
 };
 
 export default EditPurchaseScheduleRow;

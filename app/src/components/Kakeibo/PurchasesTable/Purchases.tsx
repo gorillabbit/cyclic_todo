@@ -10,7 +10,7 @@ import {
     TableHead,
     TableRow,
 } from '@mui/material';
-import { JSX, memo, useCallback, useMemo, useState } from 'react';
+import { memo, useCallback, useMemo, useState } from 'react';
 import PurchaseSchedules from './PurchaseSchedules';
 import PurchasesRow from './PurchaseRow/PurchasesRow';
 import AssetsList from '../Asset/AssetsList';
@@ -25,118 +25,6 @@ import { PurchaseDataType } from '../../../types/purchaseTypes';
 import TableCellWrapper from '../TableCellWrapper';
 import DoughnutContainer from './Charts/ChartContainer';
 import NarrowDownDialog from './NarrowDownDialog';
-
-type PlainPurchaseProps = {
-    monthlyPurchasesAddedPayLaterPurchase: PurchaseDataType[];
-    getGroupPurchases: (groupedPurchase: PurchaseDataType) => PurchaseDataType[];
-    month: Date;
-    handleNextMonthButton: () => void;
-    handlePastMonthButton: () => void;
-    isSmall: boolean;
-    HeaderCellWrapper: ({
-        label,
-        value,
-    }: {
-        label: string;
-        value: keyof PurchaseDataType;
-    }) => JSX.Element;
-    filteredPurchases: PurchaseDataType[];
-    setFilterObject: React.Dispatch<React.SetStateAction<Partial<PurchaseDataType>>>;
-    openNarrowDown: boolean;
-    setOpenNarrowDown: React.Dispatch<React.SetStateAction<boolean>>;
-    filterObject: Partial<PurchaseDataType>;
-};
-
-const PlainPurchases = memo(
-    ({
-        monthlyPurchasesAddedPayLaterPurchase,
-        getGroupPurchases,
-        month,
-        handleNextMonthButton,
-        handlePastMonthButton,
-        isSmall,
-        HeaderCellWrapper,
-        filteredPurchases,
-        setFilterObject,
-        openNarrowDown,
-        setOpenNarrowDown,
-        filterObject,
-    }: PlainPurchaseProps) => (
-        <>
-            <AssetsList />
-            <DoughnutContainer
-                monthlyPurchases={monthlyPurchasesAddedPayLaterPurchase}
-                currentMonth={month}
-            />
-            <PurchaseSchedules />
-            <TableContainer component={Paper}>
-                <Box display="flex" justifyContent="center">
-                    <IconButton onClick={handlePastMonthButton}>
-                        <ArrowBackIosNewIcon />
-                    </IconButton>
-                    <Box fontSize={20}>
-                        {month.getFullYear() +
-                            '年' +
-                            //getMonthは1月=0
-                            (month.getMonth() + 1) +
-                            '月'}
-                    </Box>
-                    <IconButton onClick={handleNextMonthButton}>
-                        <ArrowForwardIosIcon />
-                    </IconButton>
-                    <Button onClick={() => console.log('未実装')}>再計算</Button>
-                    <Button onClick={() => setOpenNarrowDown(true)}>絞り込み</Button>
-                </Box>
-                <Table size="small">
-                    <TableHead>
-                        <TableRow>
-                            <TableCell padding="none" />
-                            <HeaderCellWrapper label="日付" value="date" />
-                            <HeaderCellWrapper label="品目" value="title" />
-                            <HeaderCellWrapper label="分類" value="category" />
-                            <HeaderCellWrapper label="支払い" value="method" />
-
-                            {!isSmall && (
-                                <>
-                                    <HeaderCellWrapper label="金額" value="difference" />
-                                    <HeaderCellWrapper label="残高" value="balance" />
-                                    <HeaderCellWrapper label="備考" value="description" />
-                                    <TableCell padding="none" />
-                                </>
-                            )}
-                        </TableRow>
-                        {isSmall && (
-                            <TableRow>
-                                <TableCell padding="none" />
-                                <HeaderCellWrapper label="金額" value="difference" />
-                                <HeaderCellWrapper label="残高" value="balance" />
-                                <HeaderCellWrapper label="備考" value="description" />
-                                <TableCellWrapper label="収入" />
-                            </TableRow>
-                        )}
-                    </TableHead>
-                    <TableBody>
-                        {filteredPurchases.map((purchase, index) => (
-                            <PurchasesRow
-                                key={purchase.id}
-                                groupPurchases={getGroupPurchases(purchase)}
-                                index={index}
-                                purchase={purchase}
-                                isSmall={isSmall}
-                            />
-                        ))}
-                    </TableBody>
-                </Table>
-            </TableContainer>
-            <NarrowDownDialog
-                setFilterObject={setFilterObject}
-                openNarrowDown={openNarrowDown}
-                setOpenNarrowDown={setOpenNarrowDown}
-                filterObject={filterObject}
-            />
-        </>
-    )
-);
 
 const Purchases = memo(() => {
     const { purchaseList } = usePurchase();
@@ -239,13 +127,6 @@ const Purchases = memo(() => {
         [filterObject, orderedPurchase]
     );
 
-    const filterProps = {
-        openNarrowDown,
-        setOpenNarrowDown,
-        filterObject,
-        setFilterObject,
-    };
-
     const HeaderCellWrapper = ({
         label,
         value,
@@ -263,23 +144,78 @@ const Purchases = memo(() => {
         />
     );
 
-    const plainProps = {
-        monthlyPurchasesAddedPayLaterPurchase: purchasesWithoutGroupFlag,
-        orderedPurchase,
-        getGroupPurchases,
-        month,
-        handleNextMonthButton,
-        handlePastMonthButton,
-        isSmall,
-        orderBy,
-        setOrderBy,
-        isAsc,
-        setIsAsc,
-        HeaderCellWrapper,
-        filteredPurchases,
-        ...filterProps,
-    };
-    return <PlainPurchases {...plainProps} />;
+    return (
+        <>
+            <AssetsList />
+            <DoughnutContainer monthlyPurchases={purchasesWithoutGroupFlag} currentMonth={month} />
+            <PurchaseSchedules />
+            <TableContainer component={Paper}>
+                <Box display="flex" justifyContent="center">
+                    <IconButton onClick={handlePastMonthButton}>
+                        <ArrowBackIosNewIcon />
+                    </IconButton>
+                    <Box fontSize={20}>
+                        {month.getFullYear() +
+                            '年' +
+                            //getMonthは1月=0
+                            (month.getMonth() + 1) +
+                            '月'}
+                    </Box>
+                    <IconButton onClick={handleNextMonthButton}>
+                        <ArrowForwardIosIcon />
+                    </IconButton>
+                    <Button onClick={() => console.log('未実装')}>再計算</Button>
+                    <Button onClick={() => setOpenNarrowDown(true)}>絞り込み</Button>
+                </Box>
+                <Table size="small">
+                    <TableHead>
+                        <TableRow>
+                            <TableCell padding="none" />
+                            <HeaderCellWrapper label="日付" value="date" />
+                            <HeaderCellWrapper label="品目" value="title" />
+                            <HeaderCellWrapper label="分類" value="category" />
+                            <HeaderCellWrapper label="支払い" value="method" />
+
+                            {!isSmall && (
+                                <>
+                                    <HeaderCellWrapper label="金額" value="difference" />
+                                    <HeaderCellWrapper label="残高" value="balance" />
+                                    <HeaderCellWrapper label="備考" value="description" />
+                                    <TableCell padding="none" />
+                                </>
+                            )}
+                        </TableRow>
+                        {isSmall && (
+                            <TableRow>
+                                <TableCell padding="none" />
+                                <HeaderCellWrapper label="金額" value="difference" />
+                                <HeaderCellWrapper label="残高" value="balance" />
+                                <HeaderCellWrapper label="備考" value="description" />
+                                <TableCellWrapper label="収入" />
+                            </TableRow>
+                        )}
+                    </TableHead>
+                    <TableBody>
+                        {filteredPurchases.map((purchase, index) => (
+                            <PurchasesRow
+                                key={purchase.id}
+                                groupPurchases={getGroupPurchases(purchase)}
+                                index={index}
+                                purchase={purchase}
+                                isSmall={isSmall}
+                            />
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+            <NarrowDownDialog
+                setFilterObject={setFilterObject}
+                openNarrowDown={openNarrowDown}
+                setOpenNarrowDown={setOpenNarrowDown}
+                filterObject={filterObject}
+            />
+        </>
+    );
 });
 
 export default Purchases;

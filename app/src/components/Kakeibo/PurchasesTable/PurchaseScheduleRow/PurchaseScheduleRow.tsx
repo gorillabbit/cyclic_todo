@@ -1,4 +1,4 @@
-import { memo, useCallback, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { InputPurchaseScheduleRowType, PurchaseScheduleListType } from '../../../../types';
 import DeleteConfirmDialog from '../../DeleteConfirmDialog';
 import { deleteDocPurchaseSchedule } from '../../../../firebase';
@@ -6,55 +6,7 @@ import EditPurchaseScheduleRow from './EditPurchaseScheduleRow';
 import { useIsSmall } from '../../../../hooks/useWindowSize';
 import NormalPurchaseScheduleRow from './NormalPurchaseScheduleRow';
 import { deleteScheduledPurchases } from '../../../../utilities/purchaseUtilities';
-import { usePurchase } from '../../../../hooks/useData';
-
-type PlainPurchaseScheduleRowProps = {
-    purchaseSchedule: PurchaseScheduleListType;
-    isEdit: boolean;
-    setIsEdit: React.Dispatch<React.SetStateAction<boolean>>;
-    openDialog: boolean;
-    setOpenDialog: React.Dispatch<React.SetStateAction<boolean>>;
-    editFormData: InputPurchaseScheduleRowType;
-    setEditFormData: React.Dispatch<React.SetStateAction<InputPurchaseScheduleRowType>>;
-    deleteAction: () => void;
-    isSmall: boolean;
-};
-
-const PlainPurchaseScheduleRow = memo(
-    ({
-        purchaseSchedule,
-        isEdit,
-        setIsEdit,
-        openDialog,
-        setOpenDialog,
-        editFormData,
-        setEditFormData,
-        deleteAction,
-        isSmall,
-    }: PlainPurchaseScheduleRowProps) => (
-        <>
-            {isEdit ? (
-                <EditPurchaseScheduleRow
-                    setIsEdit={setIsEdit}
-                    editFormData={editFormData}
-                    setEditFormData={setEditFormData}
-                    isSmall={isSmall}
-                />
-            ) : (
-                <NormalPurchaseScheduleRow
-                    editFormData={editFormData}
-                    setIsEdit={setIsEdit}
-                    setOpenDialog={setOpenDialog}
-                    isSmall={isSmall}
-                />
-            )}
-            <DeleteConfirmDialog
-                target={purchaseSchedule.title}
-                {...{ openDialog, setOpenDialog, deleteAction }}
-            />
-        </>
-    )
-);
+import { useMethod, usePurchase } from '../../../../hooks/useData';
 
 const PurchaseScheduleRow = ({
     purchaseSchedule,
@@ -72,18 +24,32 @@ const PurchaseScheduleRow = ({
         deleteDocPurchaseSchedule(purchaseSchedule.id);
     }, [purchaseList, purchaseSchedule]);
 
-    const plainProps = {
-        purchaseSchedule,
-        isEdit,
-        setIsEdit,
-        openDialog,
-        setOpenDialog,
-        editFormData,
-        setEditFormData,
-        deleteAction,
-        isSmall,
-    };
-    return <PlainPurchaseScheduleRow {...plainProps} />;
+    const { methodList } = useMethod();
+    const method = methodList.find((method) => method.id === purchaseSchedule.method);
+
+    return (
+        <>
+            {isEdit ? (
+                <EditPurchaseScheduleRow
+                    setIsEdit={setIsEdit}
+                    editFormData={editFormData}
+                    setEditFormData={setEditFormData}
+                    isSmall={isSmall}
+                />
+            ) : (
+                <NormalPurchaseScheduleRow
+                    editFormData={editFormData}
+                    setIsEdit={setIsEdit}
+                    setOpenDialog={setOpenDialog}
+                    method={method}
+                />
+            )}
+            <DeleteConfirmDialog
+                target={purchaseSchedule.title}
+                {...{ openDialog, setOpenDialog, deleteAction }}
+            />
+        </>
+    );
 };
 
 export default PurchaseScheduleRow;

@@ -8,7 +8,7 @@ import {
     TableBody,
     IconButton,
 } from '@mui/material';
-import { memo, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { PurchaseScheduleListType } from '../../../types';
 import { useFirestoreQuery } from '../../../utilities/firebaseUtilities';
 import PurchaseScheduleRow from './PurchaseScheduleRow/PurchaseScheduleRow';
@@ -19,14 +19,17 @@ import { useTab } from '../../../hooks/useData';
 import TableCellWrapper from '../TableCellWrapper';
 import { dbNames } from '../../../firebase';
 
-type PlainPurchaseSchedulesProps = {
-    purchaseScheduleList: PurchaseScheduleListType[];
-    isOpen: boolean;
-    setIsOpen: (isOpen: boolean) => void;
-};
+const PurchaseSchedules = () => {
+    const { tabId } = useTab();
+    const [isOpen, setIsOpen] = useState(false);
+    const purchaseScheduleQueryConstraints = useMemo(() => [where('tabId', '==', tabId)], [tabId]);
+    const { documents: purchaseScheduleList } = useFirestoreQuery<PurchaseScheduleListType>(
+        dbNames.purchaseSchedule,
+        purchaseScheduleQueryConstraints,
+        true
+    );
 
-const PlainPurchaseSchedules = memo(
-    ({ purchaseScheduleList, isOpen, setIsOpen }: PlainPurchaseSchedulesProps) => (
+    return (
         <Paper sx={{ marginY: 2 }}>
             <Box fontSize={20}>
                 予定収支
@@ -59,25 +62,7 @@ const PlainPurchaseSchedules = memo(
                 </TableContainer>
             )}
         </Paper>
-    )
-);
-
-const PurchaseSchedules = () => {
-    const { tabId } = useTab();
-    const [isOpen, setIsOpen] = useState(false);
-    const purchaseScheduleQueryConstraints = useMemo(() => [where('tabId', '==', tabId)], [tabId]);
-    const { documents: purchaseScheduleList } = useFirestoreQuery<PurchaseScheduleListType>(
-        dbNames.purchaseSchedule,
-        purchaseScheduleQueryConstraints,
-        true
     );
-
-    const plainProps = {
-        purchaseScheduleList,
-        isOpen,
-        setIsOpen,
-    };
-    return <PlainPurchaseSchedules {...plainProps} />;
 };
 
 export default PurchaseSchedules;

@@ -1,22 +1,30 @@
 import { IconButton, TableRow, Chip } from '@mui/material';
-import { memo, useCallback } from 'react';
+import { useCallback } from 'react';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { InputPurchaseScheduleRowType } from '../../../../types';
+import { InputPurchaseScheduleRowType, MethodListType } from '../../../../types';
 import TableCellWrapper from '../../TableCellWrapper';
 
-type PlainNormalPurchaseScheduleRowProps = {
+const NormalPurchaseScheduleRow = ({
+    editFormData,
+    setIsEdit,
+    setOpenDialog,
+    method,
+}: {
     editFormData: InputPurchaseScheduleRowType;
-    handleEditClick: () => void;
-    handleDeleteButton: () => void;
-};
+    setIsEdit: (value: React.SetStateAction<boolean>) => void;
+    setOpenDialog: React.Dispatch<React.SetStateAction<boolean>>;
+    method: MethodListType | undefined;
+}) => {
+    const handleEditClick = useCallback(() => {
+        setIsEdit(true);
+    }, [setIsEdit]);
 
-const PlainNormalPurchaseScheduleRow = memo(
-    ({
-        editFormData,
-        handleEditClick,
-        handleDeleteButton,
-    }: PlainNormalPurchaseScheduleRowProps) => (
+    const handleDeleteButton = useCallback(() => {
+        setOpenDialog(true);
+    }, [setOpenDialog]);
+
+    return (
         <TableRow
             key={editFormData.id}
             sx={{
@@ -35,7 +43,7 @@ const PlainNormalPurchaseScheduleRow = memo(
             <TableCellWrapper label={editFormData.title} />
             <TableCellWrapper label={editFormData.price} />
             <TableCellWrapper label={editFormData.category} />
-            <TableCellWrapper label={editFormData.method} />
+            <TableCellWrapper label={method?.label} />
             <TableCellWrapper>{editFormData.isUncertain && <Chip label="未確" />}</TableCellWrapper>
             <TableCellWrapper label={editFormData.description} />
             <TableCellWrapper>
@@ -63,35 +71,7 @@ const PlainNormalPurchaseScheduleRow = memo(
                 </>
             </TableCellWrapper>
         </TableRow>
-    )
-);
-
-const NormalPurchaseScheduleRow = ({
-    editFormData,
-    isSmall,
-    setIsEdit,
-    setOpenDialog,
-}: {
-    editFormData: InputPurchaseScheduleRowType;
-    isSmall: boolean;
-    setIsEdit: (value: React.SetStateAction<boolean>) => void;
-    setOpenDialog: React.Dispatch<React.SetStateAction<boolean>>;
-}) => {
-    const handleEditClick = useCallback(() => {
-        setIsEdit(true);
-    }, [setIsEdit]);
-
-    const handleDeleteButton = useCallback(() => {
-        setOpenDialog(true);
-    }, [setOpenDialog]);
-
-    const plainProps = {
-        editFormData,
-        isSmall,
-        handleEditClick,
-        handleDeleteButton,
-    };
-    return <PlainNormalPurchaseScheduleRow {...plainProps} />;
+    );
 };
 
 export default NormalPurchaseScheduleRow;

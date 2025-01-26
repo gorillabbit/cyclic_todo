@@ -1,5 +1,4 @@
 import { TableCell, TableSortLabel } from '@mui/material';
-import { memo } from 'react';
 import { PurchaseDataType } from '../../../types/purchaseTypes';
 
 type TableHeadCellProps = {
@@ -11,10 +10,9 @@ type TableHeadCellProps = {
     setIsAsc: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-type PlainTableHeadCellProps = TableHeadCellProps;
-
-const PlainTableHeadCell = memo(
-    ({ label, value, orderBy, setOrderBy, isAsc, setIsAsc }: PlainTableHeadCellProps) => (
+const TableHeadCell = (props: TableHeadCellProps) => {
+    const { label, value, orderBy, setOrderBy, isAsc, setIsAsc } = props;
+    return (
         <TableCell
             sortDirection={orderBy === value ? (isAsc ? 'asc' : 'desc') : false}
             sx={{ p: 0 }}
@@ -30,11 +28,7 @@ const PlainTableHeadCell = memo(
                 {label}
             </TableSortLabel>
         </TableCell>
-    )
-);
-
-const TableHeadCell = (props: TableHeadCellProps) => {
-    return <PlainTableHeadCell {...props} />;
+    );
 };
 
 export default TableHeadCell;

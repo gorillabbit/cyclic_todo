@@ -47,58 +47,6 @@ const UnderHalfRow = memo(
     )
 );
 
-type PlainEditPricePurchaseRowProps = UnderHalfRowProps & {
-    isSmall: boolean;
-};
-
-const PlainEditPricePurchaseRow = memo(
-    ({
-        editFormData,
-        handleEditFormChange,
-        isSmall,
-        handleSaveClick,
-        errors,
-        hasError,
-    }: PlainEditPricePurchaseRowProps) => (
-        <>
-            <TableRow
-                sx={{
-                    borderColor: editFormData.difference > 0 ? '#c5fcdc' : '#fcc9c5',
-                    borderRightWidth: 10,
-                }}
-            >
-                <TableCellWrapper />
-                <TableCellWrapper label={editFormData.date.toLocaleString().split(' ')[0]} />
-                <TableCellWrapper label={editFormData.title} />
-
-                <TableCellWrapper label={editFormData.category} />
-                <TableCellWrapper label={editFormData.method} />
-                {!isSmall && (
-                    <UnderHalfRow
-                        editFormData={editFormData}
-                        handleSaveClick={handleSaveClick}
-                        handleEditFormChange={handleEditFormChange}
-                        errors={errors}
-                        hasError={hasError}
-                    />
-                )}
-            </TableRow>
-            {isSmall && (
-                <TableRow>
-                    <TableCellWrapper />
-                    <UnderHalfRow
-                        editFormData={editFormData}
-                        handleSaveClick={handleSaveClick}
-                        handleEditFormChange={handleEditFormChange}
-                        errors={errors}
-                        hasError={hasError}
-                    />
-                </TableRow>
-            )}
-        </>
-    )
-);
-
 const EditPricePurchaseRow = ({
     setIsEditPrice,
     editFormData,
@@ -141,15 +89,44 @@ const EditPricePurchaseRow = ({
         });
     };
 
-    const plainProps = {
-        editFormData,
-        handleEditFormChange,
-        handleSaveClick,
-        isSmall,
-        errors,
-        hasError,
-    };
-    return <PlainEditPricePurchaseRow {...plainProps} />;
+    return (
+        <>
+            <TableRow
+                sx={{
+                    borderColor: editFormData.difference > 0 ? '#c5fcdc' : '#fcc9c5',
+                    borderRightWidth: 10,
+                }}
+            >
+                <TableCellWrapper />
+                <TableCellWrapper label={editFormData.date.toLocaleString().split(' ')[0]} />
+                <TableCellWrapper label={editFormData.title} />
+
+                <TableCellWrapper label={editFormData.category} />
+                <TableCellWrapper label={editFormData.method} />
+                {!isSmall && (
+                    <UnderHalfRow
+                        editFormData={editFormData}
+                        handleSaveClick={handleSaveClick}
+                        handleEditFormChange={handleEditFormChange}
+                        errors={errors}
+                        hasError={hasError}
+                    />
+                )}
+            </TableRow>
+            {isSmall && (
+                <TableRow>
+                    <TableCellWrapper />
+                    <UnderHalfRow
+                        editFormData={editFormData}
+                        handleSaveClick={handleSaveClick}
+                        handleEditFormChange={handleEditFormChange}
+                        errors={errors}
+                        hasError={hasError}
+                    />
+                </TableRow>
+            )}
+        </>
+    );
 };
 
 export default EditPricePurchaseRow;
