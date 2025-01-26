@@ -4,7 +4,7 @@
     "automerge": true,
     "packageRules": [
         {
-            "matchPackageNames": ["date-fns", "nodejs"],
+            "matchPackageNames": ["date-fns", "node"],
             "enabled": false
         }
     ]
