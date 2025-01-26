@@ -127,6 +127,8 @@ const Purchases = memo(() => {
         [filterObject, orderedPurchase]
     );
 
+    console.log('filteredPurchases', filteredPurchases);
+
     const HeaderCellWrapper = ({
         label,
         value,
