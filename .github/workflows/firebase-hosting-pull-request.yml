@@ -26,8 +26,6 @@ jobs:
                   VITE_GOOGLE_CALENDER_discoveryDocs: ${{ secrets.VITE_GOOGLE_CALENDER_discoveryDocs }}
                   VITE_FIREBASE_FUNCTIONS_URL: ${{ secrets.VITE_FIREBASE_FUNCTIONS_URL }}
               run: npm run build --prefix app
-            - name: ci entity
-              run: npm ci --prefix entity
             - name: ci function
               run: npm ci --prefix functions
             - name: build functions
