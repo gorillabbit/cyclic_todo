@@ -47,6 +47,11 @@ let isInitialized = false;
 export const initializeDatabase = async (): Promise<void> => {
     if (isInitialized) return;
 
+    console.log(process.env.DB_USER);
+    console.log(process.env.DB_PASSWORD);
+    console.log(process.env.DB_HOST);
+    console.log(process.env.DB_PORT);
+
     try {
         await AppDataSource.initialize();
         isInitialized = true;
