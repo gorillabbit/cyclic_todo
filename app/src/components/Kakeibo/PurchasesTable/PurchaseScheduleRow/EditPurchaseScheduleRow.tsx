@@ -17,7 +17,7 @@ import {
     numericProps,
     weekDaysString,
 } from '../../../../utilities/purchaseUtilities';
-import { usePurchase } from '../../../../hooks/useData';
+import { useMethod, usePurchase } from '../../../../hooks/useData';
 import TableCellWrapper from '../../TableCellWrapper';
 import MethodSelector from '../../ScreenParts/MethodSelector';
 import CategorySelector from '../../ScreenParts/CategorySelector';
@@ -35,6 +35,7 @@ const EditPurchaseScheduleRow = ({
     isSmall: boolean;
 }) => {
     const { purchaseList, setPurchaseList, fetchPurchases } = usePurchase();
+    const { methodList } = useMethod();
 
     // 編集内容を保存する関数
     const handleSaveClick = useCallback(async () => {
@@ -45,7 +46,7 @@ const EditPurchaseScheduleRow = ({
         await deleteScheduledPurchases(editFormData.id);
         // idが含まれると、子タスクのidがそれになってしまう
 
-        addScheduledPurchase(id, editFormDataWithoutId);
+        addScheduledPurchase(id, editFormDataWithoutId, methodList);
         fetchPurchases();
     }, [editFormData, purchaseList, setIsEdit, setPurchaseList]);
 
