@@ -1,8 +1,9 @@
 import { z, ZodEffects, ZodError, ZodObject } from 'zod';
-import { ErrorType, InputPurchaseScheduleType, InputTransferType, MethodType } from '../../types';
+import { ErrorType, InputPurchaseScheduleType, InputTransferType } from '../../types';
 import { InputFieldPurchaseType, PurchaseDataType } from '../../types/purchaseTypes';
 
 const title = z.string().min(1, { message: '品目名を入力してください' });
+const method = z.string().min(1, { message: '支払い方法を入力してください' });
 const price = z
     .union([z.string(), z.number()])
     .refine((val) => Number(val) >= 0, { message: '金額は正の数である必要があります' });
@@ -14,12 +15,6 @@ const dateNumber = z
     .refine((val) => Number(val) > 0 && 32 > Number(val), {
         message: '1~31の数である必要があります',
     });
-const method = z.object({
-    label: z.string().min(1, { message: '支払い方法を選択してください' }),
-    assetId: z.string(),
-    timing: z.enum(['即時', '翌月']),
-    timingDate: dateNumber,
-});
 const difference = z
     .union([z.string(), z.number()])
     .refine((val) => Number(val), { message: '金額は数である必要があります' });
@@ -28,25 +23,22 @@ const purchaseSchema = z.object({
     title,
     price,
     date,
-});
-
-const editMethod = z.object({
-    label: z.string().min(1, { message: '支払い方法を選択してください' }),
+    method
 });
 
 const editPurchaseSchema = z.object({
     title,
     difference,
     date,
-    method: editMethod,
+    method
 });
 
 const purchaseScheduleSchema = z.object({
     title,
     price,
     date: dateNumber,
-    method,
     endDate: date,
+    method
 });
 
 const transferSchema = z
@@ -54,10 +46,10 @@ const transferSchema = z
         price,
         date,
         from: method,
-        to: method.refine((data) => data.timing === '即時', { message: '後払いは選択できません' }),
+        to: method,
     })
     .superRefine((data, ctx) => {
-        if (data.from.label === data.to.label) {
+        if (data.from === data.to) {
             ctx.addIssue({
                 path: ['to'],
                 code: 'invalid_date',
@@ -105,10 +97,6 @@ export const validatePurchaseSchedule = (input: InputPurchaseScheduleType): Erro
 
 export const validateTransfer = (input: InputTransferType): ErrorType => {
     return validateField<typeof input, typeof transferSchema>(transferSchema, input);
-};
-
-export const validateMethod = (input: MethodType): ErrorType => {
-    return validateField<typeof input, typeof method>(method, input);
 };
 
 /**

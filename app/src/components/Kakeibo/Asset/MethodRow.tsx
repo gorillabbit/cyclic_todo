@@ -9,41 +9,24 @@ import {
     InputAdornment,
 } from '@mui/material';
 import { useCallback, useMemo, useState } from 'react';
-import { ErrorType, MethodListType } from '../../../types';
+import { MethodListType } from '../../../types';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { numericProps, sumSpentAndIncome } from '../../../utilities/purchaseUtilities';
 import { useMethod, usePurchase } from '../../../hooks/useData';
 import TableCellWrapper from '../TableCellWrapper';
 import { getFutureMonthFirstDay, getThisMonthFirstDay } from '../../../utilities/dateUtilities';
-import { getHasError, validateMethod } from '../KakeiboSchemas';
 import { updateMethod } from '../../../api/updateApi';
 import { deleteMethod } from '../../../api/deleteApi';
 
 const MethodRow = ({ method }: { method: MethodListType }) => {
-    const { methodList, fetchMethod } = useMethod();
+    const { fetchMethod } = useMethod();
     const [methodInput, setMethodInput] = useState<MethodListType>(method);
-
-    const [errors, setErrors] = useState<ErrorType>({});
-
-    const hasError = getHasError(errors);
-
-    const validate = useCallback((input: MethodListType) => {
-        const newErrors = validateMethod(input);
-        const duplicatedMethod =
-            methodList.filter((m) => m.label === input.label && m.id !== input.id).length > 0;
-        if (duplicatedMethod) {
-            newErrors.label = '他の支払い方法と同じ名前は禁止です';
-        }
-        setErrors(newErrors);
-        return getHasError(newErrors);
-    }, []);
 
     const handleMethodInput = useCallback(
         (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
             const { name, value } = e.target;
             setMethodInput((prev) => {
                 const newMethod = { ...prev, [name]: value };
-                validate(newMethod);
                 return newMethod;
             });
         },
@@ -87,8 +70,6 @@ const MethodRow = ({ method }: { method: MethodListType }) => {
                     name="label"
                     onChange={handleMethodInput}
                     size="small"
-                    error={!!errors.label}
-                    helperText={errors.label}
                 />
             </TableCellWrapper>
             <TableCellWrapper label={thisMonthIncome} />
@@ -114,8 +95,6 @@ const MethodRow = ({ method }: { method: MethodListType }) => {
                         sx={{ maxWidth: 70, marginLeft: 1 }}
                         onChange={handleMethodInput}
                         size="small"
-                        error={!!errors.timingDate}
-                        helperText={errors.timingDate}
                     />
                 )}
             </TableCellWrapper>
@@ -123,7 +102,7 @@ const MethodRow = ({ method }: { method: MethodListType }) => {
                 <Button
                     variant="contained"
                     color="primary"
-                    disabled={!isChanged || !!hasError}
+                    disabled={!isChanged}
                     onClick={saveChanges}
                 >
                     変更
