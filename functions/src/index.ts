@@ -9,6 +9,7 @@ import { LogService } from './services/logService.js';
 import { TabService } from './services/tabService.js';
 import { TaskService } from './services/taskService.js';
 import { PurchaseTemplateService } from './services/purchaseTemplateService.js';
+import { PurchaseScheduleService } from './services/purchaseScheduleService.js';
 
 // 1) まずは Express アプリを作成
 const app = express();
@@ -143,6 +144,47 @@ const dbInitPromise: Promise<void> = (async (): Promise<void> => {
         }
     });
 
+
+    const purchaseScheduleService = new PurchaseScheduleService();
+    
+    app.get('/api/purchase-schedule', async (req, res) => {
+        try {
+            const result = await purchaseScheduleService.getAll(req.query);
+            res.status(200).send(result);
+        } catch (error) {
+            res.status(500).send({ error });
+        }
+    });
+
+    app.put('/api/purchase-schedule/:id', async (req, res) => {
+        try {
+            const { id } = req.params;
+            const updateData = req.body;
+            const result = await purchaseScheduleService.update(id, updateData);
+            res.status(200).send(result);
+        } catch (error) {
+            res.status(500).send({ error });
+        }
+    });
+
+    app.post('/api/purchase-schedule', async (req, res) => {
+        try {
+            const result = await purchaseScheduleService.create(req.body);
+            res.status(201).send(result);
+        } catch (error) {
+            res.status(500).send({ error });
+        }
+    });
+
+    app.delete('/api/purchase-schedule/:id', async (req, res) => {
+        try {
+            const { id } = req.params;
+            await purchaseScheduleService.delete(id);
+            res.status(204).send();
+        } catch (error) {
+            res.status(500).send({ error });
+        }
+    });
 
     const methodService = new MethodService();
 

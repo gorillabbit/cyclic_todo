@@ -5,7 +5,7 @@ import { ErrorType, InputPurchaseScheduleType, MethodListType } from '../../../t
 import { addYears } from 'date-fns';
 import { DatePicker } from '@mui/x-date-pickers';
 import { addScheduledPurchase, weekDaysString } from '../../../utilities/purchaseUtilities';
-import { useAccount, usePurchase, useTab } from '../../../hooks/useData';
+import { useAccount, useMethod, usePurchase, useTab } from '../../../hooks/useData';
 import { getHasError, validatePurchaseSchedule } from '../KakeiboSchemas';
 import MethodSelector from '../ScreenParts/MethodSelector';
 import CategorySelector from '../ScreenParts/CategorySelector';
@@ -58,6 +58,7 @@ const PurchaseScheduleInput = () => {
 
     const { Account } = useAccount();
     const { fetchPurchases } = usePurchase();
+    const { methodList } = useMethod();
     const addPurchaseSchedule = useCallback(async () => {
         const isError = validateAndSetErrors(newPurchaseSchedule);
         if (isError) {
@@ -72,7 +73,7 @@ const PurchaseScheduleInput = () => {
             userId: Account.id,
             id: new Date().getTime().toString(),
         });
-        await addScheduledPurchase(addedSchedule.id, newPurchaseSchedule);
+        await addScheduledPurchase(addedSchedule.id, newPurchaseSchedule, methodList);
         setNewPurchaseSchedule(defaultNewPurchase);
         fetchPurchases();
     }, [newPurchaseSchedule]);

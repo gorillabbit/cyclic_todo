@@ -3,7 +3,6 @@ import { InputPurchaseScheduleType, MethodListType, WeekDay } from '../types';
 import { addMonths, nextDay, addDays } from 'date-fns';
 import { getPayLaterDate } from './dateUtilities';
 import { PurchaseDataType } from '../types/purchaseTypes';
-import { useMethod } from '../hooks/useData';
 import { getPurchase } from '../api/getApi';
 import { createPurchase } from '../api/createApi';
 import { deletePurchase } from '../api/deleteApi';
@@ -208,8 +207,8 @@ export const getLastBalance = (
 export const addScheduledPurchase = async (
     purchaseScheduleId: string,
     purchaseSchedule: InputPurchaseScheduleType,
+    methodList: MethodListType[]
 ):Promise<PurchaseDataType[] | undefined> => {
-    const { methodList } = useMethod();
     const { price, income, method, cycle, date, endDate, day } = purchaseSchedule;
     const currentMethod = methodList.find((m) => m.id === method);
     if (currentMethod === undefined) return;
