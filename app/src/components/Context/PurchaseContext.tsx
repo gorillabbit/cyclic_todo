@@ -36,16 +36,6 @@ export const PurchaseProvider = memo(({ children }: { children: ReactNode }) => 
         setPurchaseList(orderedPurchaseList);
     };
 
-    console.log('purchaseList', purchaseList);
-    for (const purchase of purchaseList) {
-        console.log(
-            purchase.title,
-            purchase.date.toLocaleDateString(),
-            purchase.payDate.toLocaleDateString(),
-            purchase.difference
-        );
-    }
-
     useEffect(() => {
         fetchPurchases();
     }, [tabId]);

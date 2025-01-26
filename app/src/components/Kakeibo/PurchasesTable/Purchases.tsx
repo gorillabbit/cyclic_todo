@@ -25,6 +25,7 @@ import { PurchaseDataType } from '../../../types/purchaseTypes';
 import TableCellWrapper from '../TableCellWrapper';
 import DoughnutContainer from './Charts/ChartContainer';
 import NarrowDownDialog from './NarrowDownDialog';
+import { reCalcAllBalance } from '../../../api/updateApi';
 
 const Purchases = memo(() => {
     const { purchaseList } = usePurchase();
@@ -164,7 +165,7 @@ const Purchases = memo(() => {
                     <IconButton onClick={handleNextMonthButton}>
                         <ArrowForwardIosIcon />
                     </IconButton>
-                    <Button onClick={() => console.log('未実装')}>再計算</Button>
+                    <Button onClick={() => reCalcAllBalance()}>再計算</Button>
                     <Button onClick={() => setOpenNarrowDown(true)}>絞り込み</Button>
                 </Box>
                 <Table size="small">

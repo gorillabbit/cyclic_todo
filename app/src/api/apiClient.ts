@@ -1,4 +1,4 @@
-const baseUrl = import.meta.env.VITE_FIREBASE_FUNCTIONS_URL;
+export const baseUrl = import.meta.env.VITE_FIREBASE_FUNCTIONS_URL;
 
 export type WithId<T> = T & {
     id: string;
