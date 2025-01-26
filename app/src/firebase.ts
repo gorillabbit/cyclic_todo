@@ -17,11 +17,9 @@ import {
     InputLogType,
     LogType,
     InputPurchaseScheduleType,
-    AssetType,
     TaskInputType,
     AccountInputType,
     LogsCompleteLogsInputType,
-    InputAssetType,
     InputTransferType,
     InputPurchaseScheduleRowType,
     InputTabType,
@@ -120,11 +118,6 @@ export const addDocPurchaseTemplate = (v: InputFieldPurchaseType & { tabId: stri
     addDocOperation(dbNames.purchaseTemplate, v);
 export const deleteDocPurchaseTemplate = (id: string) =>
     deleteDocOperation(dbNames.purchaseTemplate, id);
-
-export const addDocAsset = (asset: InputAssetType) => addDocOperation(dbNames.asset, asset);
-export const updateDocAsset = (id: string, updates: Partial<AssetType>) =>
-    updateDocOperation(dbNames.asset, id, updates);
-export const deleteDocAsset = (id: string) => deleteDocOperation(dbNames.asset, id);
 
 export const addDocPurchaseSchedule = (v: InputPurchaseScheduleType) =>
     addDocOperation(dbNames.purchaseSchedule, v);

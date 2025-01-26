@@ -124,10 +124,7 @@ export interface InputAssetType {
     name: string;
     tabId: string;
 }
-export interface AssetType extends InputAssetType {
-    timestamp: Timestamp;
-}
-export interface AssetListType extends AssetType {
+export interface AssetListType extends InputAssetType {
     id: string;
 }
 

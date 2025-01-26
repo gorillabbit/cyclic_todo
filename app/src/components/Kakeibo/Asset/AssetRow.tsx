@@ -8,14 +8,14 @@ import {
     TextFieldProps,
 } from '@mui/material';
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
-import { AssetListType, MethodListType } from '../../../types';
+import { AssetListType } from '../../../types';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { getLastBalance } from '../../../utilities/purchaseUtilities';
 import DeleteConfirmDialog from '../DeleteConfirmDialog';
 import { useIsSmall } from '../../../hooks/useWindowSize';
-import { useAccount, useMethod, usePurchase, useTab } from '../../../hooks/useData';
+import { useAccount, useAsset, useMethod, usePurchase, useTab } from '../../../hooks/useData';
 import TableCellWrapper from '../TableCellWrapper';
 import { getFutureMonthFirstDay } from '../../../utilities/dateUtilities';
 import MethodList from './MethodList';
@@ -59,46 +59,102 @@ const UnderHalfRow = memo(
     )
 );
 
-type PlainAssetRowProps = UnderHalfRowProps & {
-    assetNameInput: string;
-    assetId: string;
-    handleAssetInput: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-    open: boolean;
-    setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-    filteredMethodList: MethodListType[];
-    handleBalanceInput: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-    balanceInput: number | undefined;
-    openDialog: boolean;
-    setOpenDialog: React.Dispatch<React.SetStateAction<boolean>>;
-    deleteAction: () => void;
-    isSmall: boolean;
-    lastBalance: number;
-    monthEndBalance: number;
-    isOpen: boolean;
-};
+const AssetRow = memo(({ asset, isOpen }: { asset: AssetListType; isOpen: boolean }) => {
+    const assetId = asset.id;
+    const assetName = asset.name;
+    const { purchaseList } = usePurchase();
+    const { fetchAsset } = useAsset();
+    const [updatePurchases, setUpdatePurchases] = useState<PurchaseDataType[]>([]);
 
-const PlainAssetRow = memo(
-    ({
-        open,
-        setOpen,
-        assetNameInput,
-        handleAssetInput,
-        isNameChanged,
-        isBalanceChanged,
-        saveChanges,
-        removeAsset,
-        filteredMethodList,
-        handleBalanceInput,
-        balanceInput,
-        openDialog,
-        setOpenDialog,
-        deleteAction,
-        isSmall,
+    useEffect(() => {
+        setUpdatePurchases(purchaseList.filter((p) => p.assetId === assetId));
+    }, [purchaseList, assetId]);
+
+    const [balanceInput, setBalanceInput] = useState<number | undefined>(undefined);
+    const [open, setOpen] = useState(false);
+    const [openDialog, setOpenDialog] = useState<boolean>(false);
+    const [assetNameInput, setAssetNameInput] = useState<string>(assetName);
+    const lastBalance = getLastBalance(assetId, new Date(), updatePurchases);
+    const monthEndBalance = getLastBalance(assetId, getFutureMonthFirstDay(), updatePurchases);
+    const isSmall = useIsSmall();
+
+    const handleAssetInput = useCallback(
+        (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+            setAssetNameInput(e.target.value);
+        },
+        []
+    );
+
+    const isNameChanged = assetName !== assetNameInput;
+
+    const handleBalanceInput = useCallback(
+        (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+            const numValue = Number(e.target.value);
+            Number.isNaN(numValue) ? alert('不適切な入力です') : setBalanceInput(numValue);
+        },
+        []
+    );
+
+    // TODO どういう時に「変更」が活性化するかきちんと考える
+    const isBalanceChanged = useMemo(
+        () => balanceInput !== undefined && lastBalance !== balanceInput,
+        [balanceInput, lastBalance]
+    );
+
+    const { Account } = useAccount();
+    const userId = Account?.id;
+    const { tabId } = useTab();
+
+    // 編集内容を保存する関数
+    const saveChanges = useCallback(async () => {
+        if (isBalanceChanged && balanceInput && userId) {
+            createPurchase({
+                id: new Date().getTime().toString(),
+                assetId,
+                balance: balanceInput,
+                date: new Date(),
+                payDate: new Date(),
+                difference: balanceInput - lastBalance,
+                userId,
+                tabId,
+                title: `${asset.name}残高調整`,
+                method: '',
+                category: '',
+                description: '',
+            });
+        }
+        await updateAsset(assetId, { name: assetNameInput });
+        fetchAsset();
+    }, [
+        asset.name,
         assetId,
+        assetNameInput,
+        balanceInput,
+        isBalanceChanged,
         lastBalance,
-        monthEndBalance,
-        isOpen,
-    }: PlainAssetRowProps) => (
+        tabId,
+        userId,
+    ]);
+
+    const { methodList } = useMethod();
+    const filteredMethodList = useMemo(
+        () => methodList.filter((method) => method.assetId === assetId),
+        [methodList, assetId]
+    );
+
+    const removeAsset = useCallback(() => {
+        setOpenDialog(true);
+    }, []);
+
+    const deleteAction = useCallback(async () => {
+        await deleteAsset(assetId);
+        if (filteredMethodList.length > 0) {
+            filteredMethodList.forEach((method) => deleteMethod(method.id));
+        }
+        fetchAsset();
+    }, [assetId, filteredMethodList]);
+
+    return (
         <>
             <TableRow>
                 <TableCell padding="none" sx={{ borderBottom: 0 }}>
@@ -170,124 +226,7 @@ const PlainAssetRow = memo(
                 deleteAction={deleteAction}
             />
         </>
-    )
-);
-
-const AssetRow = memo(({ asset, isOpen }: { asset: AssetListType; isOpen: boolean }) => {
-    const assetId = asset.id;
-    const assetName = asset.name;
-    const { purchaseList } = usePurchase();
-    const [updatePurchases, setUpdatePurchases] = useState<PurchaseDataType[]>([]);
-
-    useEffect(() => {
-        setUpdatePurchases(purchaseList.filter((p) => p.assetId === assetId));
-    }, [purchaseList, assetId]);
-
-    const [balanceInput, setBalanceInput] = useState<number | undefined>(undefined);
-    const [open, setOpen] = useState(false);
-    const [openDialog, setOpenDialog] = useState<boolean>(false);
-    const [assetNameInput, setAssetNameInput] = useState<string>(assetName);
-    const lastBalance = getLastBalance(assetId, new Date(), updatePurchases);
-    const monthEndBalance = getLastBalance(assetId, getFutureMonthFirstDay(), updatePurchases);
-    const isSmall = useIsSmall();
-
-    const handleAssetInput = useCallback(
-        (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-            setAssetNameInput(e.target.value);
-        },
-        []
     );
-
-    const isNameChanged = assetName !== assetNameInput;
-
-    const handleBalanceInput = useCallback(
-        (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-            const numValue = Number(e.target.value);
-            Number.isNaN(numValue) ? alert('不適切な入力です') : setBalanceInput(numValue);
-        },
-        []
-    );
-
-    // TODO どういう時に「変更」が活性化するかきちんと考える
-    const isBalanceChanged = useMemo(
-        () => balanceInput !== undefined && lastBalance !== balanceInput,
-        [balanceInput, lastBalance]
-    );
-
-    const { Account } = useAccount();
-    const userId = Account?.id;
-    const { tabId } = useTab();
-
-    // 編集内容を保存する関数
-    const saveChanges = useCallback(() => {
-        if (isBalanceChanged && balanceInput && userId) {
-            createPurchase({
-                id: new Date().getTime().toString(),
-                assetId,
-                balance: balanceInput,
-                date: new Date(),
-                payDate: new Date(),
-                difference: balanceInput - lastBalance,
-                userId,
-                tabId,
-                title: `${asset.name}残高調整`,
-                method: '',
-                category: '',
-                description: '',
-            });
-        }
-        updateAsset(assetId, { name: assetNameInput });
-    }, [
-        asset.name,
-        assetId,
-        assetNameInput,
-        balanceInput,
-        isBalanceChanged,
-        lastBalance,
-        tabId,
-        userId,
-    ]);
-
-    const { methodList } = useMethod();
-    const filteredMethodList = useMemo(
-        () => methodList.filter((method) => method.assetId === assetId),
-        [methodList, assetId]
-    );
-
-    const removeAsset = useCallback(() => {
-        setOpenDialog(true);
-    }, []);
-
-    const deleteAction = useCallback(() => {
-        deleteAsset(assetId);
-        if (filteredMethodList.length > 0) {
-            filteredMethodList.forEach((method) => deleteMethod(method.id));
-        }
-    }, [assetId, filteredMethodList]);
-
-    const plainProps = {
-        open,
-        setOpen,
-        assetNameInput,
-        handleAssetInput,
-        isNameChanged,
-        isBalanceChanged,
-        saveChanges,
-        removeAsset,
-        filteredMethodList,
-        handleBalanceInput,
-        balanceInput,
-        openDialog,
-        setOpenDialog,
-        deleteAction,
-        isSmall,
-        lastBalance,
-        monthEndBalance,
-        assetId,
-        isOpen,
-    };
-
-    return <PlainAssetRow {...plainProps} />;
 });
 
 export default AssetRow;
