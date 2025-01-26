@@ -1,19 +1,8 @@
-import { Column, Entity, OneToMany } from "typeorm";
-import { Assets } from "./Assets.js";
-import { Logs } from "./Logs.js";
-import { LogsCompleteLogs } from "./LogsCompleteLogs.js";
-import { Methods } from "./Methods.js";
-import { Purchases } from "./Purchases.js";
-import { PurchaseSchedules } from "./PurchaseSchedules.js";
-import { PurchaseTemplates } from "./PurchaseTemplates.js";
-import { Tabs } from "./Tabs.js";
-import { Tasks } from "./Tasks.js";
-import { TransferTemplates } from "./TransferTemplates.js";
-
+import { Column, Entity } from "typeorm";
 
 @Entity("accounts", { schema: "cyclictodo" })
 export class Accounts {
-  @Column("char", { primary: true, name: "id", length: 20 })
+  @Column("char", { primary: true, name: "id", length: 28 })
   id!: string;
 
   @Column("json", { name: "receive_request", nullable: true })
@@ -36,49 +25,4 @@ export class Accounts {
 
   @Column("json", { name: "use_tab_ids", nullable: true })
   useTabIds!: object | null;
-
-  @OneToMany(() => Assets, (assets) => assets.user)
-  assets!: Assets[];
-
-  @OneToMany(() => Logs, (logs) => logs.user)
-  logs!: Logs[];
-
-  @OneToMany(
-    () => LogsCompleteLogs,
-    (logsCompleteLogs) => logsCompleteLogs.user
-  )
-  logsCompleteLogs!: LogsCompleteLogs[];
-
-  @OneToMany(() => Methods, (methods) => methods.user)
-  methods!: Methods[];
-
-  @OneToMany(
-    () => PurchaseSchedules,
-    (purchaseSchedules) => purchaseSchedules.user
-  )
-  purchaseSchedules!: PurchaseSchedules[];
-
-  @OneToMany(
-    () => PurchaseTemplates,
-    (purchaseTemplates) => purchaseTemplates.user
-  )
-  purchaseTemplates!: PurchaseTemplates[];
-
-  @OneToMany(() => Purchases, (purchases) => purchases.user)
-  purchases!: Purchases[];
-
-  @OneToMany(() => Tabs, (tabs) => tabs.createUserU)
-  tabs!: Tabs[];
-
-  @OneToMany(() => Tabs, (tabs) => tabs.user)
-  tabs2!: Tabs[];
-
-  @OneToMany(() => Tasks, (tasks) => tasks.user)
-  tasks!: Tasks[];
-
-  @OneToMany(
-    () => TransferTemplates,
-    (transferTemplates) => transferTemplates.user
-  )
-  transferTemplates!: TransferTemplates[];
 }

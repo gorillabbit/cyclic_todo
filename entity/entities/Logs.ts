@@ -1,17 +1,5 @@
-import {
-  Column,
-  Entity,
-  Index,
-  JoinColumn,
-  ManyToOne,
-  OneToMany,
-} from "typeorm";
-import { Accounts } from "./Accounts.js";
-import { LogsCompleteLogs } from "./LogsCompleteLogs.js";
-import { Tabs } from "./Tabs.js";
+import { Column, Entity } from "typeorm";
 
-@Index("fk_logs_user", ["userId"], {})
-@Index("fk_logs_tab", ["tabId"], {})
 @Entity("logs", { schema: "cyclictodo" })
 export class Logs {
   @Column("char", { primary: true, name: "id", length: 20 })
@@ -41,7 +29,7 @@ export class Logs {
   @Column("varchar", { name: "description", nullable: true, length: 255 })
   description!: string | null;
 
-  @Column("char", { name: "user_id", length: 20 })
+  @Column("char", { name: "user_id", length: 28 })
   userId!: string;
 
   @Column("tinyint", { name: "duration", width: 1 })
@@ -85,21 +73,4 @@ export class Logs {
 
   @Column("datetime", { name: "timestamp" })
   timestamp!: Date;
-
-  @ManyToOne(() => Tabs, (tabs) => tabs.logs, {
-    onDelete: "NO ACTION",
-    onUpdate: "NO ACTION",
-  })
-  @JoinColumn([{ name: "tab_id", referencedColumnName: "id" }])
-  tab!: Tabs;
-
-  @ManyToOne(() => Accounts, (accounts) => accounts.logs, {
-    onDelete: "NO ACTION",
-    onUpdate: "NO ACTION",
-  })
-  @JoinColumn([{ name: "user_id", referencedColumnName: "id" }])
-  user!: Accounts;
-
-  @OneToMany(() => LogsCompleteLogs, (logsCompleteLogs) => logsCompleteLogs.log)
-  logsCompleteLogs!: LogsCompleteLogs[];
 }

@@ -1,10 +1,5 @@
-import { Column, Entity, Index, JoinColumn, ManyToOne } from "typeorm";
-import { Accounts } from "./Accounts.js";
-import { Methods } from "./Methods.js";
-import { Tabs } from "./Tabs.js";
-@Index("fk_purchase_templates_user", ["userId"], {})
-@Index("fk_purchase_templates_tab", ["tabId"], {})
-@Index("fk_purchase_templates_method", ["method"], {})
+import { Column, Entity } from "typeorm";
+
 @Entity("purchase_templates", { schema: "cyclictodo" })
 export class PurchaseTemplates {
   @Column("char", { primary: true, name: "id", length: 20 })
@@ -16,8 +11,8 @@ export class PurchaseTemplates {
   @Column("tinyint", { name: "income", width: 1 })
   income!: boolean;
 
-  @Column("char", { name: "tab_id", length: 20 })
-  tabId!: string;
+  @Column("char", { name: "tab_id", nullable: true, length: 20 })
+  tabId!: string | null;
 
   @Column("char", { name: "method", length: 20 })
   method!: string;
@@ -28,7 +23,7 @@ export class PurchaseTemplates {
   @Column("varchar", { name: "title", length: 255 })
   title!: string;
 
-  @Column("char", { name: "user_id", length: 20 })
+  @Column("char", { name: "user_id", length: 28 })
   userId!: string;
 
   @Column("int", { name: "price" })
@@ -55,25 +50,4 @@ export class PurchaseTemplates {
 
   @Column("datetime", { name: "timestamp" })
   timestamp!: Date;
-
-  @ManyToOne(() => Methods, (methods) => methods.purchaseTemplates, {
-    onDelete: "NO ACTION",
-    onUpdate: "NO ACTION",
-  })
-  @JoinColumn([{ name: "method", referencedColumnName: "id" }])
-  method2!: Methods;
-
-  @ManyToOne(() => Tabs, (tabs) => tabs.purchaseTemplates, {
-    onDelete: "NO ACTION",
-    onUpdate: "NO ACTION",
-  })
-  @JoinColumn([{ name: "tab_id", referencedColumnName: "id" }])
-  tab!: Tabs;
-
-  @ManyToOne(() => Accounts, (accounts) => accounts.purchaseTemplates, {
-    onDelete: "NO ACTION",
-    onUpdate: "NO ACTION",
-  })
-  @JoinColumn([{ name: "user_id", referencedColumnName: "id" }])
-  user!: Accounts;
 }

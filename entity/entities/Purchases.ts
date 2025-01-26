@@ -1,13 +1,5 @@
-import { Column, Entity, Index, JoinColumn, ManyToOne } from "typeorm";
-import { Accounts } from "./Accounts.js";
-import { Assets } from "./Assets.js";
-import { Methods } from "./Methods.js";
-import { Tabs } from "./Tabs.js";
+import { Column, Entity } from "typeorm";
 
-@Index("fk_purchases_user", ["userId"], {})
-@Index("fk_purchases_tab", ["tabId"], {})
-@Index("fk_purchases_asset", ["assetId"], {})
-@Index("fk_purchases_method", ["method"], {})
 @Entity("purchases", { schema: "cyclictodo" })
 export class Purchases {
   @Column("char", { primary: true, name: "id", length: 20 })
@@ -42,7 +34,7 @@ export class Purchases {
   @Column("varchar", { name: "category", nullable: true, length: 100 })
   category!: string | null;
 
-  @Column("char", { name: "user_id", length: 20 })
+  @Column("char", { name: "user_id", length: 28 })
   userId!: string;
 
   @Column("char", { name: "child_purchase_id", nullable: true, length: 20 })
@@ -60,38 +52,19 @@ export class Purchases {
   @Column("int", { name: "balance", nullable: true })
   balance!: number | null;
 
+  @Column("tinyint", { name: "is_uncertain", nullable: true, width: 1 })
+  isUncertain!: boolean | null;
+
+  @Column("tinyint", { name: "is_group", nullable: true, width: 1 })
+  isGroup!: boolean | null;
+
+  @Column("char", { name: "parent_purchase_id", nullable: true, length: 20 })
+  parentPurchaseId!: string | null;
+
   @Column("datetime", {
     name: "timestamp",
     nullable: true,
     default: () => "CURRENT_TIMESTAMP",
   })
   timestamp!: Date | null;
-
-  @ManyToOne(() => Assets, (assets) => assets.purchases, {
-    onDelete: "NO ACTION",
-    onUpdate: "NO ACTION",
-  })
-  @JoinColumn([{ name: "asset_id", referencedColumnName: "id" }])
-  asset!: Assets;
-
-  @ManyToOne(() => Methods, (methods) => methods.purchases, {
-    onDelete: "NO ACTION",
-    onUpdate: "NO ACTION",
-  })
-  @JoinColumn([{ name: "method", referencedColumnName: "id" }])
-  method2!: Methods;
-
-  @ManyToOne(() => Tabs, (tabs) => tabs.purchases, {
-    onDelete: "NO ACTION",
-    onUpdate: "NO ACTION",
-  })
-  @JoinColumn([{ name: "tab_id", referencedColumnName: "id" }])
-  tab!: Tabs;
-
-  @ManyToOne(() => Accounts, (accounts) => accounts.purchases, {
-    onDelete: "NO ACTION",
-    onUpdate: "NO ACTION",
-  })
-  @JoinColumn([{ name: "user_id", referencedColumnName: "id" }])
-  user!: Accounts;
 }
