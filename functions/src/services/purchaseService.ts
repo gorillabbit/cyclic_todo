@@ -99,7 +99,7 @@ export class PurchaseService extends BaseService<Purchases> {
         // "date" で昇順に並べ、同日に複数ある場合は "id" で昇順に
         const list = await repo.find({
             where: { userId, assetId },
-            order: { date: 'ASC', id: 'ASC' },
+            order: { payDate: 'ASC', id: 'ASC' },
         });
 
         let runningBalance = 0;
