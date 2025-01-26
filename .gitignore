@@ -62,3 +62,6 @@ typings/
 # Node.js dependency directory
 node_modules/
 *.local
+
+create_log.txt
+import_data_log.txt
