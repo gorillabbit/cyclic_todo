@@ -111,6 +111,9 @@ const Purchases = memo(() => {
         () => sortObjectsByParameter(purchasesWithoutGroupFlag, orderBy, isAsc),
         [isAsc, orderBy, purchasesWithoutGroupFlag]
     );
+    console.log('purchasesWithoutGroupFlag', purchasesWithoutGroupFlag);
+
+    console.log('orderedPurchase', orderedPurchase);
 
     // 絞り込み機能
     const [openNarrowDown, setOpenNarrowDown] = useState<boolean>(false);
