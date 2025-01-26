@@ -1,5 +1,5 @@
 import { Box } from '@mui/material';
-import { memo, useMemo } from 'react';
+import { useMemo } from 'react';
 import { PurchaseDataType } from '../../../../types/purchaseTypes';
 import {
     is今月の支払いwithout後払いの支払い,
@@ -10,49 +10,6 @@ import MonthlyStackedBarChart from './MonthlyBarChats';
 import StackedBarChart from './StackedBarChart';
 import { useMethod } from '../../../../hooks/useData';
 
-type PlainDoughnutContainerProps = {
-    currentMonthNetSpentList: PurchaseDataType[];
-    currentMonthNetSpent: number;
-    currentMonthPaymentList: PurchaseDataType[];
-    currentMonthPayment: number;
-    currentMonthPaymentCategoryList: PurchaseDataType[];
-    currentMonthIncomeList: PurchaseDataType[];
-    currentMonthIncome: number;
-};
-
-const PlainDoughnutContainer = memo(
-    ({
-        currentMonthNetSpentList,
-        currentMonthNetSpent,
-        currentMonthPaymentList,
-        currentMonthPayment,
-        currentMonthPaymentCategoryList,
-        currentMonthIncomeList,
-        currentMonthIncome,
-    }: PlainDoughnutContainerProps) => (
-        <Box display="flex" flexWrap="wrap" justifyContent="center">
-            <StackedBarChart
-                purchaseList={currentMonthNetSpentList}
-                title={`今月の使用金額 ${-currentMonthNetSpent}円`}
-            />
-            <StackedBarChart
-                purchaseList={currentMonthPaymentList}
-                title={`今月の支払い金額 ${-currentMonthPayment}円`}
-            />
-            <StackedBarChart
-                purchaseList={currentMonthPaymentCategoryList}
-                title={`今月の支払い金額(支払い方法ごと) ${-currentMonthPayment}円`}
-            />
-            <StackedBarChart
-                purchaseList={currentMonthIncomeList}
-                title={`今月の収入金額 ${currentMonthIncome}円`}
-            />
-
-            <BalanceChart />
-            <MonthlyStackedBarChart />
-        </Box>
-    )
-);
 // 全期間の推移グラフも表示する。
 const DoughnutContainer = ({
     monthlyPurchases,
@@ -91,17 +48,30 @@ const DoughnutContainer = ({
     const currentMonthIncomeList = PurchasesWithoutTransfer.filter((p) => p.difference > 0);
     const currentMonthIncome = sumSpentAndIncome(currentMonthIncomeList);
 
-    const plainProps = {
-        currentMonthNetSpentList,
-        currentMonthNetSpent,
-        currentMonthPaymentList,
-        currentMonthPayment,
-        currentMonthPaymentCategoryList,
-        currentMonthIncomeList,
-        currentMonthIncome,
-    };
     // TODO 円グラフじゃなくて棒グラフに変更する
-    return <PlainDoughnutContainer {...plainProps} />;
+    return (
+        <Box display="flex" flexWrap="wrap" justifyContent="center">
+            <StackedBarChart
+                purchaseList={currentMonthNetSpentList}
+                title={`今月の使用金額 ${-currentMonthNetSpent}円`}
+            />
+            <StackedBarChart
+                purchaseList={currentMonthPaymentList}
+                title={`今月の支払い金額 ${-currentMonthPayment}円`}
+            />
+            <StackedBarChart
+                purchaseList={currentMonthPaymentCategoryList}
+                title={`今月の支払い金額(支払い方法ごと) ${-currentMonthPayment}円`}
+            />
+            <StackedBarChart
+                purchaseList={currentMonthIncomeList}
+                title={`今月の収入金額 ${currentMonthIncome}円`}
+            />
+
+            <BalanceChart />
+            <MonthlyStackedBarChart />
+        </Box>
+    );
 };
 
 export default DoughnutContainer;
