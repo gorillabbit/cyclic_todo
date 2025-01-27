@@ -217,16 +217,11 @@ export class PurchaseService extends BaseService<Purchases> {
         return AppDataSource.manager.transaction(async (manager: EntityManager) => {
             const repo = manager.getRepository(Purchases);
 
-            console.log('Re-calculating all balances...');
-
-
             // 全件を assetId, payDate, id の順でソート
             const all = await repo.find({
                 where: { tabId },
                 order: { assetId: 'ASC', payDate: 'ASC', id: 'ASC' },
             });
-
-            console.log(`Total ${all.length} records found.`);
 
             let currentAsset = '';
             let runningBalance = 0;
@@ -240,9 +235,6 @@ export class PurchaseService extends BaseService<Purchases> {
 
                 runningBalance += purchase.difference ?? 0;
                 purchase.balance = runningBalance;
-                console.log(
-                    purchase.title, 
-                    purchase.payDate, purchase.assetId, purchase.difference, runningBalance); 
             }
 
             await repo.save(all);
