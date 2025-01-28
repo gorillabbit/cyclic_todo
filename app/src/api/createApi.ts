@@ -1,5 +1,6 @@
 import { 
-    PurchaseScheduleType, MethodListType, AssetListType, TabListType, 
+    PurchaseScheduleType, MethodListType, AssetListType, TabListType,
+    TransferType, 
 } from '../types';
 import { InputFieldPurchaseType, PurchaseDataType } from '../types/purchaseTypes';
 import { sendData } from './apiClient';
@@ -28,6 +29,13 @@ export const createPurchaseTemplate = async (
 ): Promise<InputFieldPurchaseType> => {
     return createData('/purchase-template', data);
 };
+
+export const createTransferTemplate = async (
+    data: TransferType
+): Promise<TransferType> => {
+    return createData('/transfer-template', data);
+};
+
 
 // メソッド作成
 export const createMethod = async (data:MethodListType ): Promise<MethodListType> => {

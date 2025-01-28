@@ -62,8 +62,8 @@ const TransferTemplateButton = ({
     }, [transfer.id]);
 
     const { methodList } = useMethod();
-    const fromMethod = methodList.find((m) => m.id === transfer.from);
-    const toMethod = methodList.find((m) => m.id === transfer.to);
+    const fromMethod = methodList.find((m) => m.id === transfer.fromMethod);
+    const toMethod = methodList.find((m) => m.id === transfer.toMethod);
 
     const chipTitle = `${fromMethod?.label}→${toMethod?.label}：${transfer.price}円`;
 

@@ -10,6 +10,7 @@ import { TabService } from './services/tabService.js';
 import { TaskService } from './services/taskService.js';
 import { PurchaseTemplateService } from './services/purchaseTemplateService.js';
 import { PurchaseScheduleService } from './services/purchaseScheduleService.js';
+import { TransferTemplateService } from './services/transferTemplate.js';
 
 // 1) まずは Express アプリを作成
 const app = express();
@@ -191,6 +192,47 @@ const dbInitPromise: Promise<void> = (async (): Promise<void> => {
         try {
             const { id } = req.params;
             await purchaseScheduleService.delete(id);
+            res.status(204).send();
+        } catch (error) {
+            res.status(500).send({ error });
+        }
+    });
+
+    const transferTemplateService = new TransferTemplateService();
+    
+    app.get('/api/transfer-template', async (req, res) => {
+        try {
+            const result = await transferTemplateService.getAll(req.query);
+            res.status(200).send(result);
+        } catch (error) {
+            res.status(500).send({ error });
+        }
+    });
+
+    app.put('/api/transfer-template/:id', async (req, res) => {
+        try {
+            const { id } = req.params;
+            const updateData = req.body;
+            const result = await transferTemplateService.update(id, updateData);
+            res.status(200).send(result);
+        } catch (error) {
+            res.status(500).send({ error });
+        }
+    });
+
+    app.post('/api/transfer-template', async (req, res) => {
+        try {
+            const result = await transferTemplateService.create(req.body);
+            res.status(201).send(result);
+        } catch (error) {
+            res.status(500).send({ error });
+        }
+    });
+
+    app.delete('/api/transfer_template/:id', async (req, res) => {
+        try {
+            const { id } = req.params;
+            await transferTemplateService.delete(id);
             res.status(204).send();
         } catch (error) {
             res.status(500).send({ error });

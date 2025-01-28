@@ -1,7 +1,7 @@
 import { Box, Button, FormGroup, TextField } from '@mui/material';
 import StyledCheckbox from '../../StyledCheckbox';
 import { DatePicker } from '@mui/x-date-pickers';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ErrorType, MethodListType } from '../../../types';
 import { getPayDate, numericProps } from '../../../utilities/purchaseUtilities';
 import TemplateButtons from './TemplateButtonsContainer';
@@ -33,6 +33,16 @@ const PurchaseInput = () => {
     }, []);
 
     const hasError = useMemo(() => getHasError(errors), [errors]);
+
+    const fetchTemplates = useCallback(async () => {
+        const data = await getPurchaseTemplate(Account?.id || '', tabId);
+        setTemplateList(data);
+    }, []);
+
+    useEffect(() => {
+        fetchTemplates();
+    }, []);
+
     const setNewPurchaseWithValidation = (
         name: string,
         value: string | Date | boolean | MethodListType | null
@@ -105,11 +115,6 @@ const PurchaseInput = () => {
         setNewPurchase(defaultInputFieldPurchase);
         fetchPurchases();
     }, [Account, defaultInputFieldPurchase, newPurchase]);
-
-    const fetchTemplates = useCallback(async () => {
-        const data = await getPurchaseTemplate(Account?.id || '', tabId);
-        setTemplateList(data);
-    }, []);
 
     const addTemplate = useCallback(async () => {
         if (isError()) {

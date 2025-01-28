@@ -62,7 +62,6 @@ const EditPricePurchaseRow = ({
     // 編集内容を保存する関数
     const handleSaveClick = useCallback(async () => {
         await updatePurchase(editFormData.id, {
-            ...editFormData,
             difference: Number(editFormData.difference),
             isUncertain: false,
         });

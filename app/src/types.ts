@@ -157,8 +157,8 @@ export interface InputTransferType {
     userId: string;
     price: number;
     date: Date;
-    from: string;
-    to: string;
+    fromMethod: string;
+    toMethod: string;
     description: string;
     tabId: string;
 }
@@ -166,14 +166,13 @@ export const defaultTransferInput: InputTransferType = {
     userId: '',
     price: 0,
     date: new Date(),
-    from: '',
-    to: '',
+    fromMethod: '',
+    toMethod: '',
     description: '',
     tabId: '',
 };
-export interface TransferType extends Omit<InputTransferType, 'date'> {
+export interface TransferType extends InputTransferType {
     id: string;
-    date: Timestamp;
 }
 
 export interface InputTabType {

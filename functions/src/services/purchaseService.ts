@@ -47,40 +47,46 @@ export class PurchaseService extends BaseService<Purchases> {
    */
     override async update(id: string, updateData: DeepPartial<Purchases>): Promise<Purchases> {
         return AppDataSource.manager.transaction(async (manager: EntityManager) => {
-            const repo = manager.getRepository(Purchases);
+            try {
+                const repo = manager.getRepository(Purchases);
 
-            const existing = await repo.findOne({ where: { id } });
-            if (!existing) throw new Error('Entity not found');
+                const existing = await repo.findOne({ where: { id } });
+                if (!existing) throw new Error('Entity not found');
 
-            // 1. 更新
-            const merged = repo.merge(existing, updateData);
-            const savedPurchase = await repo.save(merged);
+                // 1. 更新
+                const merged = repo.merge(existing, updateData);
+                const savedPurchase = await repo.save(merged);
 
-            // 2. payDate が変更されているかどうか
-            //    - DeepPartial で受けているため、型アサーションなど適宜必要
-            const isPayDateChanged =
+                // 2. payDate が変更されているかどうか
+                //    - DeepPartial で受けているため、型アサーションなど適宜必要
+                const isPayDateChanged =
         updateData.payDate != null && // null or undefined 以外
-        existing.payDate?.getTime() !== new Date(updateData.payDate as string | Date).getTime();
+        existing.payDate !== new Date(updateData.payDate as string | Date);
 
-            // 3. 再計算
-            if (!savedPurchase.assetId) {
-                return savedPurchase;
-            }
+                // 3. 再計算
+                if (!savedPurchase.assetId) {
+                    return savedPurchase;
+                }
 
-            if (isPayDateChanged) {
+                if (isPayDateChanged) {
                 // payDate が変わった場合は全件再計算（同じ assetId だけ全件）
-                await this.reCalcBalances(manager, savedPurchase.assetId);
-            } else {
+                    await this.reCalcBalances(manager, savedPurchase.assetId);
+                } else {
                 // payDate が変わっていない場合は部分再計算
-                await this.reCalcBalancesFrom(
-                    manager,
-                    savedPurchase.assetId,
-                    savedPurchase.id
-                );
-            }
+                    await this.reCalcBalancesFrom(
+                        manager,
+                        savedPurchase.assetId,
+                        savedPurchase.id
+                    );
+                }
 
-            // 4. 再計算後の状態を取り直して返す
-            return await repo.findOneOrFail({ where: { id: savedPurchase.id } });
+                // 4. 再計算後の状態を取り直して返す
+                return await repo.findOneOrFail({ where: { id: savedPurchase.id } });
+            } catch (error) {
+            // ここで詳細なエラーをログ出力する
+                console.error('Transaction Error:', error);
+                throw error; // ここで再スローしてトランザクションにロールバックを指示
+            }
         });
     }
 
