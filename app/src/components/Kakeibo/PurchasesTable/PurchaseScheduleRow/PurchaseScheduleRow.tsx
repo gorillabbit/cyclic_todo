@@ -1,17 +1,19 @@
 import { useCallback, useState } from 'react';
-import { InputPurchaseScheduleRowType, PurchaseScheduleListType } from '../../../../types';
+import { InputPurchaseScheduleRowType, PurchaseScheduleType } from '../../../../types';
 import DeleteConfirmDialog from '../../DeleteConfirmDialog';
-import { deleteDocPurchaseSchedule } from '../../../../firebase';
 import EditPurchaseScheduleRow from './EditPurchaseScheduleRow';
 import { useIsSmall } from '../../../../hooks/useWindowSize';
 import NormalPurchaseScheduleRow from './NormalPurchaseScheduleRow';
 import { deleteScheduledPurchases } from '../../../../utilities/purchaseUtilities';
 import { useMethod, usePurchase } from '../../../../hooks/useData';
+import { deletePurchaseSchedule } from '../../../../api/deleteApi';
 
 const PurchaseScheduleRow = ({
     purchaseSchedule,
+    fetchPurchaseSchedule,
 }: {
-    purchaseSchedule: PurchaseScheduleListType;
+    purchaseSchedule: PurchaseScheduleType;
+    fetchPurchaseSchedule: () => void;
 }) => {
     const isSmall = useIsSmall();
     const [isEdit, setIsEdit] = useState<boolean>(false);
@@ -21,7 +23,8 @@ const PurchaseScheduleRow = ({
     const { purchaseList } = usePurchase();
     const deleteAction = useCallback(() => {
         deleteScheduledPurchases(purchaseSchedule.id);
-        deleteDocPurchaseSchedule(purchaseSchedule.id);
+        deletePurchaseSchedule(purchaseSchedule.id);
+        fetchPurchaseSchedule();
     }, [purchaseList, purchaseSchedule]);
 
     const { methodList } = useMethod();
@@ -35,6 +38,7 @@ const PurchaseScheduleRow = ({
                     editFormData={editFormData}
                     setEditFormData={setEditFormData}
                     isSmall={isSmall}
+                    fetchPurchaseSchedule={fetchPurchaseSchedule}
                 />
             ) : (
                 <NormalPurchaseScheduleRow

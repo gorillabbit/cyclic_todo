@@ -28,11 +28,13 @@ const EditPurchaseScheduleRow = ({
     editFormData,
     setEditFormData,
     isSmall,
+    fetchPurchaseSchedule,
 }: {
     setIsEdit: React.Dispatch<React.SetStateAction<boolean>>;
     editFormData: InputPurchaseScheduleRowType;
     setEditFormData: React.Dispatch<React.SetStateAction<InputPurchaseScheduleRowType>>;
     isSmall: boolean;
+    fetchPurchaseSchedule: () => void;
 }) => {
     const { purchaseList, setPurchaseList, fetchPurchases } = usePurchase();
     const { methodList } = useMethod();
@@ -48,6 +50,7 @@ const EditPurchaseScheduleRow = ({
 
         addScheduledPurchase(id, editFormDataWithoutId, methodList);
         fetchPurchases();
+        fetchPurchaseSchedule();
     }, [editFormData, purchaseList, setIsEdit, setPurchaseList]);
 
     const handleEditFormChange = useCallback(

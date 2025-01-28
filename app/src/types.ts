@@ -149,9 +149,6 @@ export interface InputPurchaseScheduleRowType extends InputPurchaseScheduleType 
 export interface PurchaseScheduleType extends InputPurchaseScheduleType {
     id: string;
 }
-export interface PurchaseScheduleListType extends PurchaseScheduleType {
-    id: string;
-}
 
 export interface InputTransferType {
     userId: string;

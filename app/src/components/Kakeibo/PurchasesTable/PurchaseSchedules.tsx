@@ -8,26 +8,28 @@ import {
     TableBody,
     IconButton,
 } from '@mui/material';
-import { useMemo, useState } from 'react';
-import { PurchaseScheduleListType } from '../../../types';
-import { useFirestoreQuery } from '../../../utilities/firebaseUtilities';
+import { useEffect, useState } from 'react';
+import { PurchaseScheduleType } from '../../../types';
 import PurchaseScheduleRow from './PurchaseScheduleRow/PurchaseScheduleRow';
 import CloseFullscreenIcon from '@mui/icons-material/CloseFullscreen';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import { where } from 'firebase/firestore';
 import { useTab } from '../../../hooks/useData';
 import TableCellWrapper from '../TableCellWrapper';
-import { dbNames } from '../../../firebase';
+import { getPurchaseSchedule } from '../../../api/getApi';
 
 const PurchaseSchedules = () => {
     const { tabId } = useTab();
     const [isOpen, setIsOpen] = useState(false);
-    const purchaseScheduleQueryConstraints = useMemo(() => [where('tabId', '==', tabId)], [tabId]);
-    const { documents: purchaseScheduleList } = useFirestoreQuery<PurchaseScheduleListType>(
-        dbNames.purchaseSchedule,
-        purchaseScheduleQueryConstraints,
-        true
-    );
+    const [purchaseScheduleList, setPurchaseScheduleList] = useState<PurchaseScheduleType[]>([]);
+
+    const fetchPurchaseSchedule = async () => {
+        const data = await getPurchaseSchedule('', tabId);
+        setPurchaseScheduleList(data);
+    };
+
+    useEffect(() => {
+        fetchPurchaseSchedule();
+    }, [tabId]);
 
     return (
         <Paper sx={{ marginY: 2 }}>
@@ -55,7 +57,11 @@ const PurchaseSchedules = () => {
                         </TableHead>
                         <TableBody>
                             {purchaseScheduleList.map((ps) => (
-                                <PurchaseScheduleRow purchaseSchedule={ps} key={ps.id} />
+                                <PurchaseScheduleRow
+                                    purchaseSchedule={ps}
+                                    key={ps.id}
+                                    fetchPurchaseSchedule={fetchPurchaseSchedule}
+                                />
                             ))}
                         </TableBody>
                     </Table>

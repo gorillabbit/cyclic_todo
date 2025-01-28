@@ -14,11 +14,9 @@ import {
     TaskType,
     InputLogType,
     LogType,
-    InputPurchaseScheduleType,
     TaskInputType,
     AccountInputType,
     LogsCompleteLogsInputType,
-    InputPurchaseScheduleRowType,
     InputTabType,
 } from './types';
 
@@ -73,8 +71,6 @@ export const dbNames = {
     log: 'logs',
     logsCompleteLog: 'logsCompleteLogs',
     account: 'Accounts',
-    purchaseSchedule: 'PurchaseSchedules',
-    transferTemplate: 'TransferTemplates',
     tab: 'Tabs',
 };
 
@@ -100,15 +96,6 @@ export const addDocAccount = (account: AccountInputType) =>
 export const updateDocAccount = (id: string, updates: Partial<AccountType>) =>
     updateDocOperation(dbNames.account, id, updates);
 export const deleteDocAccount = (id: string) => deleteDocOperation(dbNames.account, id);
-
-export const addDocPurchaseSchedule = (v: InputPurchaseScheduleType) =>
-    addDocOperation(dbNames.purchaseSchedule, v);
-export const updateDocPurchaseSchedule = (
-    id: string,
-    updates: Partial<InputPurchaseScheduleRowType>
-) => updateDocOperation(dbNames.purchaseSchedule, id, updates);
-export const deleteDocPurchaseSchedule = (id: string) =>
-    deleteDocOperation(dbNames.purchaseSchedule, id);
 
 export const addDocTab = (tab: InputTabType) => addDocOperation(dbNames.tab, tab);
 export const updateDocTab = (id: string, updates: Partial<InputTabType>) =>
