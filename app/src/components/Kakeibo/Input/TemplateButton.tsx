@@ -1,15 +1,17 @@
 import { Chip } from '@mui/material';
 import { useCallback, useState } from 'react';
-import { deleteDocPurchaseTemplate } from '../../../firebase';
 import DeleteConfirmDialog from '../DeleteConfirmDialog';
 import { InputFieldPurchaseType, TemplateButtonType } from '../../../types/purchaseTypes';
+import { deletePurchaseTemplate } from '../../../api/deleteApi';
 
 const TemplateButton = ({
     setNewPurchase,
     template,
+    fetchTemplates,
 }: {
     setNewPurchase: (value: React.SetStateAction<InputFieldPurchaseType>) => void;
     template: TemplateButtonType;
+    fetchTemplates: () => Promise<void>;
 }) => {
     const [openDialog, setOpenDialog] = useState<boolean>(false);
 
@@ -27,8 +29,9 @@ const TemplateButton = ({
         setOpenDialog(true);
     }, []);
 
-    const deleteAction = useCallback(() => {
-        deleteDocPurchaseTemplate(template.id);
+    const deleteAction = useCallback(async () => {
+        await deletePurchaseTemplate(template.id);
+        fetchTemplates();
     }, [template.id]);
 
     return (

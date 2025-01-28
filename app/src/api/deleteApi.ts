@@ -16,3 +16,7 @@ export const deleteMethod = async (id: string): Promise<{}> => {
 export const deleteTransferTemplate = async (id: string): Promise<{}> => {
     return deleteData('/transfer-template', id);
 };
+
+export const deletePurchaseTemplate = async (id: string): Promise<{}> => {
+    return deleteData('/purchase-template', id);
+};

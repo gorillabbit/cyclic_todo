@@ -10,9 +10,7 @@ import {
 } from 'firebase/firestore';
 import { getPerformance } from 'firebase/performance';
 import {
-    MethodType,
     AccountType,
-    MethodListType,
     TaskType,
     InputLogType,
     LogType,
@@ -20,13 +18,9 @@ import {
     TaskInputType,
     AccountInputType,
     LogsCompleteLogsInputType,
-    InputTransferType,
     InputPurchaseScheduleRowType,
     InputTabType,
 } from './types';
-import {
-    InputFieldPurchaseType,
-} from './types/purchaseTypes';
 
 // Firebase configuration
 const firebaseConfig = {
@@ -79,11 +73,7 @@ export const dbNames = {
     log: 'logs',
     logsCompleteLog: 'logsCompleteLogs',
     account: 'Accounts',
-    purchase: 'Purchases',
-    purchaseTemplate: 'PurchaseTemplates',
-    asset: 'Assets',
     purchaseSchedule: 'PurchaseSchedules',
-    method: 'Methods',
     transferTemplate: 'TransferTemplates',
     tab: 'Tabs',
 };
@@ -111,14 +101,6 @@ export const updateDocAccount = (id: string, updates: Partial<AccountType>) =>
     updateDocOperation(dbNames.account, id, updates);
 export const deleteDocAccount = (id: string) => deleteDocOperation(dbNames.account, id);
 
-
-export const deleteDocPurchase = (id: string) => deleteDocOperation(dbNames.purchase, id);
-
-export const addDocPurchaseTemplate = (v: InputFieldPurchaseType & { tabId: string }) =>
-    addDocOperation(dbNames.purchaseTemplate, v);
-export const deleteDocPurchaseTemplate = (id: string) =>
-    deleteDocOperation(dbNames.purchaseTemplate, id);
-
 export const addDocPurchaseSchedule = (v: InputPurchaseScheduleType) =>
     addDocOperation(dbNames.purchaseSchedule, v);
 export const updateDocPurchaseSchedule = (
@@ -127,16 +109,6 @@ export const updateDocPurchaseSchedule = (
 ) => updateDocOperation(dbNames.purchaseSchedule, id, updates);
 export const deleteDocPurchaseSchedule = (id: string) =>
     deleteDocOperation(dbNames.purchaseSchedule, id);
-
-export const addDocMethod = (v: MethodType) => addDocOperation(dbNames.method, v);
-export const updateDocMethod = (id: string, updates: MethodListType) =>
-    updateDocOperation(dbNames.method, id, updates);
-export const deleteDocMethod = (id: string) => deleteDocOperation(dbNames.method, id);
-
-export const addDocTransferTemplate = (v: InputTransferType & { tabId: string }) =>
-    addDocOperation(dbNames.transferTemplate, v);
-export const deleteDocTransferTemplate = (id: string) =>
-    deleteDocOperation(dbNames.transferTemplate, id);
 
 export const addDocTab = (tab: InputTabType) => addDocOperation(dbNames.tab, tab);
 export const updateDocTab = (id: string, updates: Partial<InputTabType>) =>
