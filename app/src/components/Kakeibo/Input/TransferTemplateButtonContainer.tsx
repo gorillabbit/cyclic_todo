@@ -5,9 +5,11 @@ import TransferTemplateButton from './TransferTemplateButton';
 const TransferTemplateButtonsContainer = ({
     useTemplate,
     transferList,
+    fetchTemplates,
 }: {
     useTemplate: (transfer: TransferType) => void;
     transferList: TransferType[];
+    fetchTemplates: () => void;
 }) => {
     return (
         <Box m={0.5}>
@@ -16,6 +18,7 @@ const TransferTemplateButtonsContainer = ({
                     transfer={transfer}
                     useTemplate={useTemplate}
                     key={transfer.id}
+                    fetchTemplates={fetchTemplates}
                 />
             ))}
         </Box>

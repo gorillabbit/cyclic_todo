@@ -229,7 +229,7 @@ const dbInitPromise: Promise<void> = (async (): Promise<void> => {
         }
     });
 
-    app.delete('/api/transfer_template/:id', async (req, res) => {
+    app.delete('/api/transfer-template/:id', async (req, res) => {
         try {
             const { id } = req.params;
             await transferTemplateService.delete(id);

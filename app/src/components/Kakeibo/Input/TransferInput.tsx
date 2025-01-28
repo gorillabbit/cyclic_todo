@@ -140,6 +140,7 @@ const TransferInput = () => {
             <TransferTemplateButtonsContainer
                 useTemplate={useTemplate}
                 transferList={templateList}
+                fetchTemplates={fetchTemplates}
             />
             <Box display="flex">
                 <FormGroup row sx={{ gap: 1, mr: 1, width: '100%' }}>
