@@ -1,14 +1,16 @@
 import { useState, useRef } from 'react';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { MethodListType } from '../../../types';
-import fs from 'fs';
 import { Button, Box } from '@mui/material';
+import { useMethod, usePurchase } from '../../../hooks/useData';
 
 interface ReceiptScannerProps {
     setNewPurchase: (name: string, value: string | Date | boolean | MethodListType | null) => void;
 }
 
 const ReceiptScanner = ({ setNewPurchase }: ReceiptScannerProps) => {
+    const { categorySet } = usePurchase();
+    const { methodList } = useMethod();
     const [image, setImage] = useState<string | null>(null);
     const inputRef = useRef<HTMLInputElement>(null);
 
@@ -28,10 +30,10 @@ const ReceiptScanner = ({ setNewPurchase }: ReceiptScannerProps) => {
     };
 
     // Converts local file information to base64
-    function fileToGenerativePart(path: string, mimeType: string) {
+    function fileToGenerativePart(image: string, mimeType: string) {
         return {
             inlineData: {
-                data: Buffer.from(fs.readFileSync(path)).toString('base64'),
+                data: image.split(',')[1],
                 mimeType,
             },
         };
@@ -53,13 +55,18 @@ const ReceiptScanner = ({ setNewPurchase }: ReceiptScannerProps) => {
             const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
             const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
-            const textPart = `Extract the purchase information from this receipt and return it as a JSON object with the following format:
+            const textPart = `Extract the purchase information from this receipt and return it as a single JSON object with the following format. Write all the detailed information in the "description" field.
+            一つのレシートで、一つのJSONオブジェクトを返してください。一つのレシートで複数の商品を買っている場合もリストの形にはしないで、priceは合計金額、categoryは一番多いカテゴリーを選んで、個別の商品はdescriptionに書いてください。
+            categorySet: ${JSON.stringify(categorySet)}
+            methodList: ${JSON.stringify(methodList)}
             {
-              "title": "品目",
-              "price": "金額",
-              "date": "日付",
-              "category": "カテゴリー",
-              "description": "備考"
+              "title": "品目",　# 「商品を買った商店名+商品名」　複数の商品がある場合は「商品を買った商店名+その商品群を総称した名称」にして type:string
+              "price": "金額", # type:number
+              "date": "日付", # type:date YYYY-MM-DD HH:MM:SS
+              "category": "カテゴリー", # type:string
+              "description": "備考", # type:string
+              "method": "支払い方法", # methodId type:string
+              "income": "収支" # type:boolean optional default:false
             }`;
             const imageParts = fileToGenerativePart(image, 'image/jpeg');
             const generatedContent = await model.generateContent([textPart, imageParts] as any);
@@ -74,7 +81,8 @@ const ReceiptScanner = ({ setNewPurchase }: ReceiptScannerProps) => {
         // TODO: Implement the logic to handle the response from Gemini.
         console.log('Gemini response:', text);
         try {
-            const response = JSON.parse(text);
+            const jsonString = text.replace(/```json\n|\n```/g, '');
+            const response = JSON.parse(jsonString);
             console.log('Parsed Gemini response:', response);
             parseGeminiResponse(response);
         } catch (error) {
@@ -87,9 +95,11 @@ const ReceiptScanner = ({ setNewPurchase }: ReceiptScannerProps) => {
         console.log('Parsing Gemini response:', response);
         setNewPurchase('title', response.title);
         setNewPurchase('price', response.price);
-        setNewPurchase('date', response.date);
+        setNewPurchase('date', new Date(response.date));
         setNewPurchase('category', response.category);
         setNewPurchase('description', response.description);
+        setNewPurchase('method', response.method);
+        setNewPurchase('income', response.income);
     };
 
     return (
