@@ -18,17 +18,6 @@ const ReceiptScanner = ({ setNewPurchase }: ReceiptScannerProps) => {
         inputRef.current?.click();
     };
 
-    const handleImageChange = (event: any) => {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setImage(reader.result as string);
-            };
-            reader.readAsDataURL(file);
-        }
-    };
-
     // Converts local file information to base64
     function fileToGenerativePart(image: string, mimeType: string) {
         return {
@@ -39,64 +28,70 @@ const ReceiptScanner = ({ setNewPurchase }: ReceiptScannerProps) => {
         };
     }
 
-    const handleSendToGemini = async () => {
-        if (!image) {
-            alert('Please capture an image first.');
-            return;
-        }
-        if (!import.meta.env.VITE_GEMINI_API_KEY) {
-            alert('Please set the GEMINI_API_KEY environment variable.');
-            return;
-        }
+    const handleImageChange = async (event: any) => {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = async () => {
+                const image = reader.result as string;
+                setImage(image);
 
-        try {
-            const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
-            const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+                if (!import.meta.env.VITE_GEMINI_API_KEY) {
+                    alert('Please set the GEMINI_API_KEY environment variable.');
+                    return;
+                }
 
-            console.log(
-                JSON.stringify(
-                    methodList.map((m) => ({
-                        id: m.id,
-                        label: m.label,
-                    }))
-                )
-            );
-            // TODO: 将来的に含めたい「商品がレシートに書いてない場合は、レシートの店舗の業態などから推測・検索して大雑把なカテゴリーでいいので商品を書いてください。」
-            const textPart = `Extract the purchase information from this receipt and return it as a single JSON object with the following format. Write all the detailed information in the "description" field.
-            一つのレシートで、一つのJSONオブジェクトを返してください。一つのレシートで複数の商品を買っている場合もリストの形にはしないで、priceは合計金額、categoryは一番多いカテゴリーを選んで、個別の商品はdescriptionに書いてください。
-            具体的な商品の情報がレシートにない場合は、description欄を空にしてください。伝票番号など不必要な情報は書かないでください
-            categorySet: ${JSON.stringify(categorySet)}
-            methodList: ${JSON.stringify(
-                methodList.map((m) => ({
-                    id: m.id,
-                    label: m.label,
-                }))
-            )}
-            {
-              "title": "品目",　# 「商品を買った商店名+商品名」を約10~20文字程度でできるだけ詳細に書いてください　商店名は、運営企業などではなく、レシートの頭のロゴなどに書いてある一般的な名称を書いて下さい。複数の商品がある場合は「商品を買った商店名+その商品群を総称した名称」にしてその際「購入品」「商品」など一般的すぎる言葉ではなく、「食料品と雑貨品」「入浴関連商品とラーメン」など、購入した商品のうち、大多数を占めるものをもっとも狭い範囲でまとめた言葉を使ってください type:string
-              "price": "金額", # type:number
-              "date": "日付", # type:date YYYY-MM-DD HH:MM:SS
-              "category": "カテゴリー", # type:string
-              "description": "備考", # type:string
-              "method": "支払い方法", # methodListのmethodのid type:string
-              "income": "収支" # type:boolean optional default:false
-            }`;
+                try {
+                    const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
+                    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
-            console.log('Sending text to Gemini:', textPart);
-            const imageParts = fileToGenerativePart(image, 'image/jpeg');
-            const generatedContent = await model.generateContent({
-                contents: [
+                    console.log(
+                        JSON.stringify(
+                            methodList.map((m) => ({
+                                id: m.id,
+                                label: m.label,
+                            }))
+                        )
+                    );
+                    // TODO: 将来的に含めたい「商品がレシートに書いてない場合は、レシートの店舗の業態などから推測・検索して大雑把なカテゴリーでいいので商品を書いてください。」
+                    const textPart = `Extract the purchase information from this receipt and return it as a single JSON object with the following format. Write all the detailed information in the "description" field.
+                    一つのレシートで、一つのJSONオブジェクトを返してください。一つのレシートで複数の商品を買っている場合もリストの形にはしないで、priceは合計金額、categoryは一番多いカテゴリーを選んで、個別の商品はdescriptionに書いてください。
+                    具体的な商品の情報がレシートにない場合は、description欄を空にしてください。伝票番号など不必要な情報は書かないでください
+                    categorySet: ${JSON.stringify(categorySet)}
+                    methodList: ${JSON.stringify(
+                        methodList.map((m) => ({
+                            id: m.id,
+                            label: m.label,
+                        }))
+                    )}
                     {
-                        role: 'user',
-                        parts: [imageParts, { text: textPart }],
-                    },
-                ],
-                // tools: [{ googleSearchRetrieval: {} }], 今は使えない。画像と検索は同時にできない
-            });
+                      "title": "品目",　# 「商品を買った商店名+商品名」を約10~20文字程度でできるだけ詳細に書いてください　商店名は、運営企業などではなく、レシートの頭のロゴなどに書いてある一般的な名称を書いて下さい。複数の商品がある場合は「商品を買った商店名+その商品群を総称した名称」にしてその際「購入品」「商品」など一般的すぎる言葉ではなく、「食料品と雑貨品」「入浴関連商品とラーメン」など、購入した商品のうち、大多数を占めるものをもっとも狭い範囲でまとめた言葉を使ってください type:string
+                      "price": "金額", # type:number
+                      "date": "日付", # type:date YYYY-MM-DD HH:MM:SS
+                      "category": "カテゴリー", # type:string
+                      "description": "備考", # type:string
+                      "method": "支払い方法", # methodListのmethodのid type:string
+                      "income": "収支" # type:boolean optional default:false
+                    }`;
 
-            handleGeminiResponse(generatedContent.response.text());
-        } catch (error) {
-            console.error('Error sending image to Gemini:', error);
+                    console.log('Sending text to Gemini:', textPart);
+                    const imageParts = fileToGenerativePart(image, 'image/jpeg');
+                    const generatedContent = await model.generateContent({
+                        contents: [
+                            {
+                                role: 'user',
+                                parts: [imageParts, { text: textPart }],
+                            },
+                        ],
+                        // tools: [{ googleSearchRetrieval: {} }], 今は使えない。画像と検索は同時にできない
+                    });
+
+                    handleGeminiResponse(generatedContent.response.text());
+                } catch (error) {
+                    console.error('Error sending image to Gemini:', error);
+                }
+            };
+            reader.readAsDataURL(file);
         }
     };
 
@@ -139,9 +134,6 @@ const ReceiptScanner = ({ setNewPurchase }: ReceiptScannerProps) => {
             <Box gap={1} display="flex">
                 <Button variant="contained" onClick={handleCapture}>
                     レシート撮影
-                </Button>
-                <Button variant="contained" onClick={handleSendToGemini} disabled={!image}>
-                    AI解析
                 </Button>
             </Box>
         </Box>
