@@ -32,6 +32,7 @@ jobs:
                   VITE_GOOGLE_CALENDER_scope: ${{ secrets.VITE_GOOGLE_CALENDER_scope }}
                   VITE_GOOGLE_CALENDER_discoveryDocs: ${{ secrets.VITE_GOOGLE_CALENDER_discoveryDocs }}
                   VITE_FIREBASE_FUNCTIONS_URL: ${{ secrets.VITE_FIREBASE_FUNCTIONS_URL }}
+                  VITE_GEMINI_API_KEY: ${{ secrets.VITE_GEMINI_API_KEY }}
 
               run: npm run build --prefix app
 
