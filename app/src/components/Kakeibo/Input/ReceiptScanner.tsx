@@ -63,9 +63,7 @@ const ReceiptScanner = ({ setNewPurchase }: ReceiptScannerProps) => {
                 )
             );
             // TODO: 将来的に含めたい「商品がレシートに書いてない場合は、レシートの店舗の業態などから推測・検索して大雑把なカテゴリーでいいので商品を書いてください。」
-            let textPart = geminiContext
-                ? geminiContext
-                : `Extract the purchase information from this receipt and return it as a JSON array with the following format. Write all the detailed information in the "description" field.
+            const defaultContext = `Extract the purchase information from this receipt and return it as a JSON array with the following format. Write all the detailed information in the "description" field.
             一つのレシートで、複数のJSONオブジェクトを返してください。
             具体的な商品の情報がレシートにない場合は、description欄を空にしてください。伝票番号など不必要な情報は書かないでください
             categorySet: ${JSON.stringify(categorySet)}
@@ -86,6 +84,9 @@ const ReceiptScanner = ({ setNewPurchase }: ReceiptScannerProps) => {
                 "income": "収支" # type:boolean optional default:false
               }
             ]`;
+            const textPart = geminiContext
+                ? `優先プロンプト：${geminiContext}\n次のプロンプトが優先プロンプトと矛盾する場合は優先プロンプトに従ってください\nプロンプト：${defaultContext}`
+                : defaultContext;
 
             console.log('Sending text to Gemini:', textPart);
             const imageParts = fileToGenerativePart(image, 'image/jpeg');
