@@ -117,7 +117,7 @@ const ReceiptScanner = ({ setNewPurchase }: ReceiptScannerProps) => {
     };
 
     return (
-        <Box gap={1} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <Box gap={1} sx={{ m: 2, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <input
                 type="file"
                 accept="image/*"
@@ -129,10 +129,10 @@ const ReceiptScanner = ({ setNewPurchase }: ReceiptScannerProps) => {
             {image && <img src={image} alt="Receipt" style={{ maxWidth: '300px' }} />}
             <Box gap={1} display="flex">
                 <Button variant="contained" onClick={handleCapture}>
-                    Capture Receipt
+                    レシート撮影
                 </Button>
                 <Button variant="contained" onClick={handleSendToGemini} disabled={!image}>
-                    Send to Gemini
+                    AI解析
                 </Button>
             </Box>
         </Box>

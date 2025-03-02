@@ -132,12 +132,12 @@ const PurchaseInput = () => {
 
     return (
         <>
-            <ReceiptScanner setNewPurchase={handleNewPurchaseInput} />
             <TemplateButtons
                 setNewPurchase={setNewPurchase}
                 templateList={templateList}
                 fetchTemplates={fetchTemplates}
             />
+            <ReceiptScanner setNewPurchase={handleNewPurchaseInput} />
             <Box display="flex">
                 <FormGroup row sx={{ gap: 1, mr: 1, width: '100%' }}>
                     <TextField
