@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { MethodListType } from '../../../types';
-import { Button, Box } from '@mui/material';
+import { Button, Box, CircularProgress } from '@mui/material';
 import { useMethod, usePurchase } from '../../../hooks/useData';
 
 interface ReceiptScannerProps {
@@ -12,6 +12,7 @@ const ReceiptScanner = ({ setNewPurchase }: ReceiptScannerProps) => {
     const { categorySet } = usePurchase();
     const { methodList } = useMethod();
     const [image, setImage] = useState<string | null>(null);
+    const [loading, setLoading] = useState<boolean>(false);
     const inputRef = useRef<HTMLInputElement>(null);
 
     const handleCapture = () => {
@@ -35,9 +36,11 @@ const ReceiptScanner = ({ setNewPurchase }: ReceiptScannerProps) => {
             reader.onloadend = async () => {
                 const image = reader.result as string;
                 setImage(image);
+                setLoading(true);
 
                 if (!import.meta.env.VITE_GEMINI_API_KEY) {
                     alert('Please set the GEMINI_API_KEY environment variable.');
+                    setLoading(false);
                     return;
                 }
 
@@ -89,6 +92,8 @@ const ReceiptScanner = ({ setNewPurchase }: ReceiptScannerProps) => {
                     handleGeminiResponse(generatedContent.response.text());
                 } catch (error) {
                     console.error('Error sending image to Gemini:', error);
+                } finally {
+                    setLoading(false);
                 }
             };
             reader.readAsDataURL(file);
@@ -131,10 +136,11 @@ const ReceiptScanner = ({ setNewPurchase }: ReceiptScannerProps) => {
                 ref={inputRef}
             />
             {image && <img src={image} alt="Receipt" style={{ maxWidth: '300px' }} />}
-            <Box gap={1} display="flex">
-                <Button variant="contained" onClick={handleCapture}>
+            <Box gap={1} display="flex" alignItems="center">
+                <Button variant="contained" onClick={handleCapture} disabled={loading}>
                     レシート撮影
                 </Button>
+                {loading && <CircularProgress size={24} />}
             </Box>
         </Box>
     );
