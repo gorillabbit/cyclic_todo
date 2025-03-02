@@ -185,7 +185,7 @@ const ReceiptScanner = ({ setNewPurchase }: ReceiptScannerProps) => {
             {image && <img src={image} alt="Receipt" style={{ maxWidth: '300px' }} />}
             <Box gap={1} display="flex" alignItems="center">
                 <Button variant="contained" onClick={handleCapture} disabled={loading}>
-                    レシート撮影
+                    レシート
                 </Button>
                 <Button variant="contained" onClick={handleResend} disabled={loading || !image}>
                     再送信
@@ -199,7 +199,7 @@ const ReceiptScanner = ({ setNewPurchase }: ReceiptScannerProps) => {
                         currentIndex >= receiptDataArray.length - 1
                     }
                 >
-                    次へ
+                    次へ ({currentIndex + 1} / {receiptDataArray.length})
                 </Button>
                 <Button variant="contained" onClick={handleContextOpen} disabled={loading}>
                     Context
