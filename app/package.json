@@ -17,6 +17,7 @@
         "@fullcalendar/interaction": "6.1.15",
         "@fullcalendar/react": "6.1.15",
         "@fullcalendar/timegrid": "6.1.15",
+        "@google/generative-ai": "0.22.0",
         "@mui/icons-material": "6.4.6",
         "@mui/lab": "5.0.0-alpha.175",
         "@mui/material": "6.4.6",

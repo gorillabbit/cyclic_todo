@@ -17,6 +17,7 @@ import MethodSelector from '../ScreenParts/MethodSelector';
 import CategorySelector from '../ScreenParts/CategorySelector';
 import { createPurchase, createPurchaseTemplate } from '../../../api/createApi';
 import { getPurchaseTemplate } from '../../../api/getApi';
+import ReceiptScanner from './ReceiptScanner';
 
 const PurchaseInput = () => {
     const [newPurchase, setNewPurchase] =
@@ -131,6 +132,7 @@ const PurchaseInput = () => {
 
     return (
         <>
+            <ReceiptScanner setNewPurchase={handleNewPurchaseInput} />
             <TemplateButtons
                 setNewPurchase={setNewPurchase}
                 templateList={templateList}
