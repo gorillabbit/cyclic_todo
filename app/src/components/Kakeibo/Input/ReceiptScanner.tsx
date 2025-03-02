@@ -49,25 +49,39 @@ const ReceiptScanner = ({ setNewPurchase }: ReceiptScannerProps) => {
             return;
         }
 
-        // TODO: Implement the logic to send the image to Gemini.
-        console.log('Sending image to Gemini:', image);
         try {
             const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
             const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
+            console.log(
+                JSON.stringify(
+                    methodList.map((m) => ({
+                        id: m.id,
+                        label: m.label,
+                    }))
+                )
+            );
+
             const textPart = `Extract the purchase information from this receipt and return it as a single JSON object with the following format. Write all the detailed information in the "description" field.
             一つのレシートで、一つのJSONオブジェクトを返してください。一つのレシートで複数の商品を買っている場合もリストの形にはしないで、priceは合計金額、categoryは一番多いカテゴリーを選んで、個別の商品はdescriptionに書いてください。
             categorySet: ${JSON.stringify(categorySet)}
-            methodList: ${JSON.stringify(methodList)}
+            methodList: ${JSON.stringify(
+                methodList.map((m) => ({
+                    id: m.id,
+                    label: m.label,
+                }))
+            )}
             {
-              "title": "品目",　# 「商品を買った商店名+商品名」　複数の商品がある場合は「商品を買った商店名+その商品群を総称した名称」にして type:string
+              "title": "品目",　# 「商品を買った商店名+商品名」を約10~20文字程度でできるだけ詳細に書いてください　商店名は、運営企業などではなく、レシートの頭のロゴなどに書いてある一般的な名称を書いて下さい。複数の商品がある場合は「商品を買った商店名+その商品群を総称した名称」にしてその際「購入品」「商品」など一般的すぎる言葉ではなく、「食料品と雑貨品」「入浴関連商品とラーメン」など、購入した商品のうち、大多数を占めるものをもっとも狭い範囲でまとめた言葉を使ってください type:string
               "price": "金額", # type:number
               "date": "日付", # type:date YYYY-MM-DD HH:MM:SS
               "category": "カテゴリー", # type:string
               "description": "備考", # type:string
-              "method": "支払い方法", # methodId type:string
+              "method": "支払い方法", # methodListのmethodのid type:string
               "income": "収支" # type:boolean optional default:false
             }`;
+
+            console.log('Sending text to Gemini:', textPart);
             const imageParts = fileToGenerativePart(image, 'image/jpeg');
             const generatedContent = await model.generateContent([textPart, imageParts] as any);
 
@@ -103,10 +117,7 @@ const ReceiptScanner = ({ setNewPurchase }: ReceiptScannerProps) => {
     };
 
     return (
-        <Box>
-            <Button variant="contained" onClick={handleCapture}>
-                Capture Receipt
-            </Button>
+        <Box gap={1} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <input
                 type="file"
                 accept="image/*"
@@ -116,9 +127,14 @@ const ReceiptScanner = ({ setNewPurchase }: ReceiptScannerProps) => {
                 ref={inputRef}
             />
             {image && <img src={image} alt="Receipt" style={{ maxWidth: '300px' }} />}
-            <Button variant="contained" onClick={handleSendToGemini} disabled={!image}>
-                Send to Gemini
-            </Button>
+            <Box gap={1} display="flex">
+                <Button variant="contained" onClick={handleCapture}>
+                    Capture Receipt
+                </Button>
+                <Button variant="contained" onClick={handleSendToGemini} disabled={!image}>
+                    Send to Gemini
+                </Button>
+            </Box>
         </Box>
     );
 };
