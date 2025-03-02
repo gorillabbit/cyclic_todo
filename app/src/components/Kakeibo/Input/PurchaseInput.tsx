@@ -185,6 +185,7 @@ const PurchaseInput = () => {
                     </StyledCheckbox>
                     <TextField
                         label="備考"
+                        sx={{ width: '100%' }}
                         multiline
                         value={newPurchase.description}
                         onChange={(e) => handleNewPurchaseInput('description', e.target.value)}
