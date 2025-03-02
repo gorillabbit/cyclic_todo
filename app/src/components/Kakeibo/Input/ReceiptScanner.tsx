@@ -1,13 +1,14 @@
-import React, { useState, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { MethodListType } from '../../../types';
 import fs from 'fs';
+import { Button, Box } from '@mui/material';
 
 interface ReceiptScannerProps {
     setNewPurchase: (name: string, value: string | Date | boolean | MethodListType | null) => void;
 }
 
-const ReceiptScanner: React.FC<ReceiptScannerProps> = ({ setNewPurchase }) => {
+const ReceiptScanner = ({ setNewPurchase }: ReceiptScannerProps) => {
     const [image, setImage] = useState<string | null>(null);
     const inputRef = useRef<HTMLInputElement>(null);
 
@@ -41,7 +42,7 @@ const ReceiptScanner: React.FC<ReceiptScannerProps> = ({ setNewPurchase }) => {
             alert('Please capture an image first.');
             return;
         }
-        if (!process.env.GEMINI_API_KEY) {
+        if (!import.meta.env.VITE_GEMINI_API_KEY) {
             alert('Please set the GEMINI_API_KEY environment variable.');
             return;
         }
@@ -49,7 +50,7 @@ const ReceiptScanner: React.FC<ReceiptScannerProps> = ({ setNewPurchase }) => {
         // TODO: Implement the logic to send the image to Gemini.
         console.log('Sending image to Gemini:', image);
         try {
-            const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+            const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
             const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
             const textPart = `Extract the purchase information from this receipt and return it as a JSON object with the following format:
@@ -92,8 +93,10 @@ const ReceiptScanner: React.FC<ReceiptScannerProps> = ({ setNewPurchase }) => {
     };
 
     return (
-        <div>
-            <button onClick={handleCapture}>Capture Receipt</button>
+        <Box>
+            <Button variant="contained" onClick={handleCapture}>
+                Capture Receipt
+            </Button>
             <input
                 type="file"
                 accept="image/*"
@@ -103,10 +106,10 @@ const ReceiptScanner: React.FC<ReceiptScannerProps> = ({ setNewPurchase }) => {
                 ref={inputRef}
             />
             {image && <img src={image} alt="Receipt" style={{ maxWidth: '300px' }} />}
-            <button onClick={handleSendToGemini} disabled={!image}>
+            <Button variant="contained" onClick={handleSendToGemini} disabled={!image}>
                 Send to Gemini
-            </button>
-        </div>
+            </Button>
+        </Box>
     );
 };
 
