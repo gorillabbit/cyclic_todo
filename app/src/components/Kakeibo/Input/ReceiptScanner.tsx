@@ -61,9 +61,10 @@ const ReceiptScanner = ({ setNewPurchase }: ReceiptScannerProps) => {
                     }))
                 )
             );
-
+            // TODO: 将来的に含めたい「商品がレシートに書いてない場合は、レシートの店舗の業態などから推測・検索して大雑把なカテゴリーでいいので商品を書いてください。」
             const textPart = `Extract the purchase information from this receipt and return it as a single JSON object with the following format. Write all the detailed information in the "description" field.
             一つのレシートで、一つのJSONオブジェクトを返してください。一つのレシートで複数の商品を買っている場合もリストの形にはしないで、priceは合計金額、categoryは一番多いカテゴリーを選んで、個別の商品はdescriptionに書いてください。
+            具体的な商品の情報がレシートにない場合は、description欄を空にしてください。伝票番号など不必要な情報は書かないでください
             categorySet: ${JSON.stringify(categorySet)}
             methodList: ${JSON.stringify(
                 methodList.map((m) => ({
@@ -83,7 +84,15 @@ const ReceiptScanner = ({ setNewPurchase }: ReceiptScannerProps) => {
 
             console.log('Sending text to Gemini:', textPart);
             const imageParts = fileToGenerativePart(image, 'image/jpeg');
-            const generatedContent = await model.generateContent([textPart, imageParts] as any);
+            const generatedContent = await model.generateContent({
+                contents: [
+                    {
+                        role: 'user',
+                        parts: [imageParts, { text: textPart }],
+                    },
+                ],
+                // tools: [{ googleSearchRetrieval: {} }], 今は使えない。画像と検索は同時にできない
+            });
 
             handleGeminiResponse(generatedContent.response.text());
         } catch (error) {
