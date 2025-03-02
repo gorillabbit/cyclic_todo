@@ -14,6 +14,8 @@ const ReceiptScanner = ({ setNewPurchase }: ReceiptScannerProps) => {
     const [image, setImage] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const inputRef = useRef<HTMLInputElement>(null);
+    const [receiptDataArray, setReceiptDataArray] = useState<any[]>([]);
+    const [currentIndex, setCurrentIndex] = useState<number>(0);
 
     const handleCapture = () => {
         inputRef.current?.click();
@@ -57,8 +59,8 @@ const ReceiptScanner = ({ setNewPurchase }: ReceiptScannerProps) => {
                         )
                     );
                     // TODO: 将来的に含めたい「商品がレシートに書いてない場合は、レシートの店舗の業態などから推測・検索して大雑把なカテゴリーでいいので商品を書いてください。」
-                    const textPart = `Extract the purchase information from this receipt and return it as a single JSON object with the following format. Write all the detailed information in the "description" field.
-                    一つのレシートで、一つのJSONオブジェクトを返してください。一つのレシートで複数の商品を買っている場合もリストの形にはしないで、priceは合計金額、categoryは一番多いカテゴリーを選んで、個別の商品はdescriptionに書いてください。
+                    const textPart = `Extract the purchase information from this receipt and return it as a JSON array with the following format. Write all the detailed information in the "description" field.
+                    一つのレシートで、複数のJSONオブジェクトを返してください。
                     具体的な商品の情報がレシートにない場合は、description欄を空にしてください。伝票番号など不必要な情報は書かないでください
                     categorySet: ${JSON.stringify(categorySet)}
                     methodList: ${JSON.stringify(
@@ -67,15 +69,17 @@ const ReceiptScanner = ({ setNewPurchase }: ReceiptScannerProps) => {
                             label: m.label,
                         }))
                     )}
-                    {
-                      "title": "品目",　# 「商品を買った商店名+商品名」を約10~20文字程度でできるだけ詳細に書いてください　商店名は、運営企業などではなく、レシートの頭のロゴなどに書いてある一般的な名称を書いて下さい。複数の商品がある場合は「商品を買った商店名+その商品群を総称した名称」にしてその際「購入品」「商品」など一般的すぎる言葉ではなく、「食料品と雑貨品」「入浴関連商品とラーメン」など、購入した商品のうち、大多数を占めるものをもっとも狭い範囲でまとめた言葉を使ってください type:string
-                      "price": "金額", # type:number
-                      "date": "日付", # type:date YYYY-MM-DD HH:MM:SS
-                      "category": "カテゴリー", # type:string
-                      "description": "備考", # type:string
-                      "method": "支払い方法", # methodListのmethodのid type:string
-                      "income": "収支" # type:boolean optional default:false
-                    }`;
+                    [
+                      {
+                        "title": "品目",　# 「商品を買った商店名+商品名」を約10~20文字程度でできるだけ詳細に書いてください　商店名は、運営企業などではなく、レシートの頭のロゴなどに書いてある一般的な名称を書いて下さい。複数の商品がある場合は「商品を買った商店名+その商品群を総称した名称」にしてその際「購入品」「商品」など一般的すぎる言葉ではなく、「食料品と雑貨品」「入浴関連商品とラーメン」など、購入した商品のうち、大多数を占めるものをもっとも狭い範囲でまとめた言葉を使ってください type:string
+                        "price": "金額", # type:number
+                        "date": "日付", # type:date YYYY-MM-DD HH:MM:SS
+                        "category": "カテゴリー", # type:string
+                        "description": "備考", # type:string
+                        "method": "支払い方法", # methodListのmethodのid type:string
+                        "income": "収支" # type:boolean optional default:false
+                      }
+                    ]`;
 
                     console.log('Sending text to Gemini:', textPart);
                     const imageParts = fileToGenerativePart(image, 'image/jpeg');
@@ -107,22 +111,35 @@ const ReceiptScanner = ({ setNewPurchase }: ReceiptScannerProps) => {
             const jsonString = text.replace(/```json\n|\n```/g, '');
             const response = JSON.parse(jsonString);
             console.log('Parsed Gemini response:', response);
-            parseGeminiResponse(response);
+            if (Array.isArray(response)) {
+                setReceiptDataArray(response);
+                setCurrentIndex(0);
+                parseGeminiResponse(response[0]);
+            } else {
+                console.error('Expected an array from Gemini, but received:', response);
+            }
         } catch (error) {
             console.error('Error parsing Gemini response:', error);
         }
     };
 
-    const parseGeminiResponse = (response: any) => {
+    const parseGeminiResponse = (item: any) => {
         // TODO: Implement the logic to parse the text and update the purchase input fields.
-        console.log('Parsing Gemini response:', response);
-        setNewPurchase('title', response.title);
-        setNewPurchase('price', response.price);
-        setNewPurchase('date', new Date(response.date));
-        setNewPurchase('category', response.category);
-        setNewPurchase('description', response.description);
-        setNewPurchase('method', response.method);
-        setNewPurchase('income', response.income);
+        console.log('Parsing Gemini response:', item);
+        setNewPurchase('title', item.title);
+        setNewPurchase('price', item.price);
+        setNewPurchase('date', new Date(item.date));
+        setNewPurchase('category', item.category);
+        setNewPurchase('description', item.description);
+        setNewPurchase('method', item.method);
+        setNewPurchase('income', item.income);
+    };
+
+    const handleNext = () => {
+        if (currentIndex < receiptDataArray.length - 1) {
+            setCurrentIndex(currentIndex + 1);
+            parseGeminiResponse(receiptDataArray[currentIndex + 1]);
+        }
     };
 
     return (
@@ -139,6 +156,17 @@ const ReceiptScanner = ({ setNewPurchase }: ReceiptScannerProps) => {
             <Box gap={1} display="flex" alignItems="center">
                 <Button variant="contained" onClick={handleCapture} disabled={loading}>
                     レシート撮影
+                </Button>
+                <Button
+                    variant="contained"
+                    onClick={handleNext}
+                    disabled={
+                        loading ||
+                        receiptDataArray.length === 0 ||
+                        currentIndex >= receiptDataArray.length - 1
+                    }
+                >
+                    次へ
                 </Button>
                 {loading && <CircularProgress size={24} />}
             </Box>
