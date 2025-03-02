@@ -1,8 +1,9 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { MethodListType } from '../../../types';
 import { Button, Box, CircularProgress } from '@mui/material';
 import { useMethod, usePurchase } from '../../../hooks/useData';
+import ContextInputDialog from './ContextInputDialog';
 
 interface ReceiptScannerProps {
     setNewPurchase: (name: string, value: string | Date | boolean | MethodListType | null) => void;
@@ -16,6 +17,15 @@ const ReceiptScanner = ({ setNewPurchase }: ReceiptScannerProps) => {
     const inputRef = useRef<HTMLInputElement>(null);
     const [receiptDataArray, setReceiptDataArray] = useState<any[]>([]);
     const [currentIndex, setCurrentIndex] = useState<number>(0);
+    const [contextDialogOpen, setContextDialogOpen] = useState<boolean>(false);
+    const [geminiContext, setGeminiContext] = useState<string>('');
+
+    useEffect(() => {
+        const storedContext = localStorage.getItem('geminiContext');
+        if (storedContext) {
+            setGeminiContext(storedContext);
+        }
+    }, []);
 
     const handleCapture = () => {
         inputRef.current?.click();
@@ -53,7 +63,9 @@ const ReceiptScanner = ({ setNewPurchase }: ReceiptScannerProps) => {
                 )
             );
             // TODO: 将来的に含めたい「商品がレシートに書いてない場合は、レシートの店舗の業態などから推測・検索して大雑把なカテゴリーでいいので商品を書いてください。」
-            const textPart = `Extract the purchase information from this receipt and return it as a JSON array with the following format. Write all the detailed information in the "description" field.
+            let textPart = geminiContext
+                ? geminiContext
+                : `Extract the purchase information from this receipt and return it as a JSON array with the following format. Write all the detailed information in the "description" field.
             一つのレシートで、複数のJSONオブジェクトを返してください。
             具体的な商品の情報がレシートにない場合は、description欄を空にしてください。伝票番号など不必要な情報は書かないでください
             categorySet: ${JSON.stringify(categorySet)}
@@ -146,6 +158,19 @@ const ReceiptScanner = ({ setNewPurchase }: ReceiptScannerProps) => {
         }
     };
 
+    const handleContextSave = (context: string) => {
+        setGeminiContext(context);
+        localStorage.setItem('geminiContext', context);
+    };
+
+    const handleContextClose = () => {
+        setContextDialogOpen(false);
+    };
+
+    const handleContextOpen = () => {
+        setContextDialogOpen(true);
+    };
+
     return (
         <Box gap={1} sx={{ m: 2, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <input
@@ -175,8 +200,17 @@ const ReceiptScanner = ({ setNewPurchase }: ReceiptScannerProps) => {
                 >
                     次へ
                 </Button>
+                <Button variant="contained" onClick={handleContextOpen} disabled={loading}>
+                    Context
+                </Button>
                 {loading && <CircularProgress size={24} />}
             </Box>
+            <ContextInputDialog
+                open={contextDialogOpen}
+                onClose={handleContextClose}
+                onSave={handleContextSave}
+                initialContext={geminiContext}
+            />
         </Box>
     );
 
