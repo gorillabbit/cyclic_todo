@@ -1,4 +1,4 @@
-import { Box, Button, FormGroup, TextField } from '@mui/material';
+import { Box, Button, FormGroup, TextField, CircularProgress } from '@mui/material';
 import StyledCheckbox from '../../StyledCheckbox';
 import { DatePicker } from '@mui/x-date-pickers';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -24,6 +24,7 @@ const PurchaseInput = () => {
         useState<InputFieldPurchaseType>(defaultInputFieldPurchase);
     const { methodList } = useMethod();
     const [templateList, setTemplateList] = useState<TemplateButtonType[]>([]);
+    const [loading, setLoading] = useState<boolean>(false);
 
     const [errors, setErrors] = useState<ErrorType>({});
 
@@ -89,32 +90,38 @@ const PurchaseInput = () => {
         if (isError()) {
             return;
         }
+        setLoading(true);
+        try {
+            const { income, price } = newPurchase;
+            const difference = income ? Number(price) : -Number(price);
+            const method = methodList.find((m) => m.id === newPurchase.method);
+            if (!method) {
+                console.error('支払い方法が見つかりません');
+                return;
+            }
 
-        const { income, price } = newPurchase;
-        const difference = income ? Number(price) : -Number(price);
-        const method = methodList.find((m) => m.id === newPurchase.method);
-        if (!method) {
-            console.error('支払い方法が見つかりません');
-            return;
+            const purchaseData = {
+                tabId,
+                userId: Account?.id || '',
+                payDate: getPayDate(method, newPurchase.date),
+                difference,
+                assetId: method.assetId,
+                balance: 0,
+                id: new Date().getTime().toString(),
+                date: newPurchase.date,
+                category: newPurchase.category,
+                description: newPurchase.description,
+                title: newPurchase.title,
+                method: newPurchase.method,
+            };
+            await createPurchase(purchaseData);
+            setNewPurchase(defaultInputFieldPurchase);
+            fetchPurchases();
+        } catch (error) {
+            console.error('Error adding purchase:', error);
+        } finally {
+            setLoading(false);
         }
-
-        const purchaseData = {
-            tabId,
-            userId: Account?.id || '',
-            payDate: getPayDate(method, newPurchase.date),
-            difference,
-            assetId: method.assetId,
-            balance: 0,
-            id: new Date().getTime().toString(),
-            date: newPurchase.date,
-            category: newPurchase.category,
-            description: newPurchase.description,
-            title: newPurchase.title,
-            method: newPurchase.method,
-        };
-        await createPurchase(purchaseData);
-        setNewPurchase(defaultInputFieldPurchase);
-        fetchPurchases();
     }, [Account, defaultInputFieldPurchase, newPurchase]);
 
     const addTemplate = useCallback(async () => {
@@ -189,9 +196,9 @@ const PurchaseInput = () => {
                     sx={{ width: '50%' }}
                     variant="contained"
                     onClick={addPurchase}
-                    disabled={hasError}
+                    disabled={hasError || loading}
                 >
-                    追加
+                    {loading ? <CircularProgress size={24} /> : '追加'}
                 </Button>
                 <Button
                     sx={{ width: '50%' }}
