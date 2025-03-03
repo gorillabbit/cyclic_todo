@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { MethodListType } from '../../../types';
-import { Button, Box, CircularProgress, FormControlLabel, Switch } from '@mui/material';
+import { Button, Box, CircularProgress, FormControlLabel, Switch, FormGroup } from '@mui/material';
 import { useMethod, usePurchase } from '../../../hooks/useData';
 import ContextInputDialog from './ContextInputDialog';
 import { getMonth, getYear } from 'date-fns';
@@ -224,42 +224,44 @@ ${sendExistingData ? `Existing purchase data: ${existingPurchasesString}` : ''}
             />
             {image && <img src={image} alt="Receipt" style={{ maxWidth: '300px' }} />}
             <Box gap={1} display="flex" alignItems="center">
-                <Button variant="contained" onClick={handleCapture} disabled={loading}>
-                    レシート
-                </Button>
-                <Button variant="contained" onClick={handleResend} disabled={loading || !image}>
-                    再送信
-                </Button>
-                <Button
-                    variant="contained"
-                    onClick={handleNext}
-                    disabled={
-                        loading ||
-                        receiptDataArray.length === 0 ||
-                        currentIndex >= receiptDataArray.length - 1
-                    }
-                >
-                    次へ ({currentIndex + 1} / {receiptDataArray.length})
-                </Button>
-                <FormControlLabel
-                    control={
-                        <Switch
-                            checked={sendExistingData}
-                            onChange={(e) => setSendExistingData(e.target.checked)}
-                        />
-                    }
-                    label="既存データ送信"
-                />
-                <DatePicker
-                    label="年月を選択"
-                    value={selectedDate}
-                    onChange={(newValue) => setSelectedDate(newValue)}
-                    views={['year', 'month']}
-                />
-                <Button variant="contained" onClick={handleContextOpen} disabled={loading}>
-                    Context
-                </Button>
-                {loading && <CircularProgress size={24} />}
+                <FormGroup row sx={{ gap: 1, mr: 1, width: '100%' }}>
+                    <Button variant="contained" onClick={handleCapture} disabled={loading}>
+                        レシート
+                    </Button>
+                    <Button variant="contained" onClick={handleResend} disabled={loading || !image}>
+                        再送信
+                    </Button>
+                    <Button
+                        variant="contained"
+                        onClick={handleNext}
+                        disabled={
+                            loading ||
+                            receiptDataArray.length === 0 ||
+                            currentIndex >= receiptDataArray.length - 1
+                        }
+                    >
+                        次へ ({currentIndex + 1} / {receiptDataArray.length})
+                    </Button>
+                    <FormControlLabel
+                        control={
+                            <Switch
+                                checked={sendExistingData}
+                                onChange={(e) => setSendExistingData(e.target.checked)}
+                            />
+                        }
+                        label="既存データ送信"
+                    />
+                    <DatePicker
+                        label="年月を選択"
+                        value={selectedDate}
+                        onChange={(newValue) => setSelectedDate(newValue)}
+                        views={['year', 'month']}
+                    />
+                    <Button variant="contained" onClick={handleContextOpen} disabled={loading}>
+                        Context
+                    </Button>
+                    {loading && <CircularProgress size={24} />}
+                </FormGroup>
             </Box>
             <ContextInputDialog
                 open={contextDialogOpen}
