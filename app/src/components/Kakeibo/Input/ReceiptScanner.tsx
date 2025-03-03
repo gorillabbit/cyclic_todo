@@ -1,16 +1,19 @@
 import { useState, useRef, useEffect } from 'react';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { MethodListType } from '../../../types';
-import { Button, Box, CircularProgress } from '@mui/material';
+import { Button, Box, CircularProgress, FormControlLabel, Switch } from '@mui/material';
 import { useMethod, usePurchase } from '../../../hooks/useData';
 import ContextInputDialog from './ContextInputDialog';
+import { PurchaseDataType } from '../../../types/purchaseTypes';
+import { getMonth, getYear } from 'date-fns';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
 interface ReceiptScannerProps {
     setNewPurchase: (name: string, value: string | Date | boolean | MethodListType | null) => void;
 }
 
 const ReceiptScanner = ({ setNewPurchase }: ReceiptScannerProps) => {
-    const { categorySet } = usePurchase();
+    const { categorySet, purchaseList } = usePurchase();
     const { methodList } = useMethod();
     const [image, setImage] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
@@ -19,6 +22,8 @@ const ReceiptScanner = ({ setNewPurchase }: ReceiptScannerProps) => {
     const [currentIndex, setCurrentIndex] = useState<number>(0);
     const [contextDialogOpen, setContextDialogOpen] = useState<boolean>(false);
     const [geminiContext, setGeminiContext] = useState<string>('');
+    const [sendExistingData, setSendExistingData] = useState<boolean>(false);
+    const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
 
     useEffect(() => {
         const storedContext = localStorage.getItem('geminiContext');
@@ -62,9 +67,34 @@ const ReceiptScanner = ({ setNewPurchase }: ReceiptScannerProps) => {
                     }))
                 )
             );
-            // TODO: 将来的に含めたい「商品がレシートに書いてない場合は、レシートの店舗の業態などから推測・検索して大雑把なカテゴリーでいいので商品を書いてください。」
-            const defaultContext = `Extract the purchase information from this receipt and return it as a JSON array with the following format. Write all the detailed information in the "description" field.
-            一つのレシートで、複数のJSONオブジェクトを返してください。
+
+            let existingPurchases:
+                | PurchaseDataType[]
+                | { date: Date; price: number; title: string; category: string }[] = [];
+            if (sendExistingData && selectedDate) {
+                const year = getYear(selectedDate);
+                const month = getMonth(selectedDate) + 1;
+
+                existingPurchases = purchaseList.filter((purchase) => {
+                    return getYear(purchase.date) === year && getMonth(purchase.date) + 1 === month;
+                });
+                existingPurchases = existingPurchases.map((purchase) => {
+                    return {
+                        date: purchase.date,
+                        price: Math.abs(purchase.difference),
+                        title: purchase.title,
+                        category: purchase.category,
+                    };
+                });
+            }
+
+            const existingPurchasesString = JSON.stringify(existingPurchases);
+
+            console.log('Existing purchases:', existingPurchasesString);
+
+            const defaultContext = `Extract the purchase information from this receipt and return it as a JSON array with the following format. 
+            ${sendExistingData ? 'If the existing purchase data is provided, only extract the purchases from the receipt that are NOT already in the existing purchase data, primarily by comparing the date and price.' : ''}
+            1枚のレシートで1つのJSONオブジェクトを返してください。複数の商品がある場合でも、1つのレシートで、1つのJSONオブジェクトを返してください。
             具体的な商品の情報がレシートにない場合は、description欄を空にしてください。伝票番号など不必要な情報は書かないでください
             categorySet: ${JSON.stringify(categorySet)}
             methodList: ${JSON.stringify(
@@ -73,6 +103,7 @@ const ReceiptScanner = ({ setNewPurchase }: ReceiptScannerProps) => {
                     label: m.label,
                 }))
             )}
+            ${sendExistingData ? `Existing purchase data: ${existingPurchasesString}` : ''}
             [
               {
                 "title": "品目",　# 「商品を買った商店名+商品名」を約10~20文字程度でできるだけ詳細に書いてください　商店名は、運営企業などではなく、レシートの頭のロゴなどに書いてある一般的な名称を書いて下さい。複数の商品がある場合は「商品を買った商店名+その商品群を総称した名称」にしてその際「購入品」「商品」など一般的すぎる言葉ではなく、「食料品と雑貨品」「入浴関連商品とラーメン」など、購入した商品のうち、大多数を占めるものをもっとも狭い範囲でまとめた言葉を使ってください type:string
@@ -201,6 +232,23 @@ const ReceiptScanner = ({ setNewPurchase }: ReceiptScannerProps) => {
                 >
                     次へ ({currentIndex + 1} / {receiptDataArray.length})
                 </Button>
+                <FormControlLabel
+                    control={
+                        <Switch
+                            checked={sendExistingData}
+                            onChange={(e) => setSendExistingData(e.target.checked)}
+                        />
+                    }
+                    label="既存データ送信"
+                />
+                <DatePicker
+                    label="年月を選択"
+                    value={selectedDate}
+                    onChange={(newValue) => {
+                        setSelectedDate(newValue);
+                    }}
+                    views={['year', 'month']}
+                />
                 <Button variant="contained" onClick={handleContextOpen} disabled={loading}>
                     Context
                 </Button>
