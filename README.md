@@ -1,30 +1,86 @@
-# React + TypeScript + Vite
+# Cyclic Todo
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## 説明
 
-Currently, two official plugins are available:
+Cyclic Todo は、タスク、 финансы、ログを管理するのに役立つモノレポアプリケーションです。フロントエンド（`app`ディレクトリ）、バックエンド（`functions`ディレクトリ）、およびデータ管理とデプロイメントのためのさまざまなスクリプトで構成されています。
 
--   [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
--   [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 特徴
 
-## Expanding the ESLint configuration
+### タスク管理
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+-   **タスク管理:** タスクの作成、管理、追跡を行います。
+-   **カレンダー連携:** Google カレンダーと連携して、タスクやイベントを表示および管理します。
 
--   Configure the top-level `parserOptions` property like this:
+### 家計簿
 
-```js
-export default {
-    // other rules...
-    parserOptions: {
-        ecmaVersion: 'latest',
-        sourceType: 'module',
-        project: ['./tsconfig.json', './tsconfig.node.json'],
-        tsconfigRootDir: __dirname,
-    },
-};
-```
+-   **財務追跡:** 収入と支出を追跡します。
+-   **レシートスキャン:** レシートをスキャンして、購入情報を自動的に入力します。
 
--   Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
--   Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
--   Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+### その他
+
+-   **ログ管理:** 毎日の活動を記録および管理します。
+-   **アカウント共有:** アカウントを他のユーザーと共有して、共同でタスクと財務を管理します。
+
+## プロジェクト構成
+
+-   `app/`: React と TypeScript で構築されたフロントエンドコードが含まれています。
+-   `functions/`: Firebase Cloud Functions として実装されたバックエンドコードが含まれています。
+-   `dummy/`: ダミーデータとテストユーティリティが含まれています。
+-   `python_scripts/`: データ処理とデータベース管理のための Python スクリプトが含まれています。
+-   `scripts/`: データ移行やデプロイメントなど、さまざまなタスクのための JavaScript スクリプトが含まれています。
+
+## 使用技術
+
+-   **フロントエンド:** React, TypeScript, Material UI
+-   **バックエンド:** Firebase Cloud Functions, Node.js
+-   **データベース:** Firebase Firestore
+-   **その他:** Python, JavaScript
+
+## セットアップ手順
+
+1.  **依存関係のインストール:**
+
+    ```bash
+    cd app
+    npm install
+    cd ../functions
+    npm install
+    ```
+
+2.  **Firebase の設定:**
+
+    -   [Firebase コンソール](https://console.firebase.google.com/)で Firebase プロジェクトを作成します。
+    -   Firestore と Cloud Functions を有効にします。
+    -   Firebase CLI を使用して Firebase クレデンシャルを設定します。
+
+        ```bash
+        firebase login
+        firebase use <your-project-id>
+        ```
+
+3.  **バックエンドのデプロイ:**
+
+    ```bash
+    cd functions
+    firebase deploy --only functions
+    ```
+
+4.  **フロントエンドの実行:**
+
+    ```bash
+    cd app
+    npm run dev
+    ```
+
+## 貢献
+
+貢献は大歓迎です！以下の手順に従ってください。
+
+1.  リポジトリをフォークします。
+2.  機能またはバグ修正のために新しいブランチを作成します。
+3.  変更を実装します。
+4.  プルリクエストを送信します。
+
+## ライセンス
+
+[MIT](LICENSE)
