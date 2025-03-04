@@ -25,7 +25,6 @@ Cyclic Todo は、タスク、ログ、家計簿を管理するのに役立つ�
 
 -   `app/`: React と TypeScript で構築されたフロントエンドコードが含まれています。
 -   `functions/`: Firebase Cloud Functions として実装されたバックエンドコードが含まれています。
--   `dummy/`: ダミーデータとテストユーティリティが含まれています。
 -   `python_scripts/`: データ処理とデータベース管理のための Python スクリプトが含まれています。
 -   `scripts/`: データ移行やデプロイメントなど、さまざまなタスクのための JavaScript スクリプトが含まれています。
 
