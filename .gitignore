@@ -64,3 +64,6 @@ node_modules/
 *.local
 
 */log/*.txt
+backup.sql
+backup_test.sql
+repomix-output.txt

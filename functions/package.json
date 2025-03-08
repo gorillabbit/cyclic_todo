@@ -24,7 +24,7 @@
         "express": "4.21.2",
         "firebase-admin": "13.2.0",
         "firebase-functions": "6.3.2",
-        "mysql": "2.18.1",
+        "mysql2": "3.13.0",
         "typeorm": "0.3.21",
         "uuid": "11.1.0"
     },
