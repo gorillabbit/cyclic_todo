@@ -9,7 +9,7 @@ import {
     ErrorType,
     TransferType,
 } from '../../../types';
-import { getPayDate, numericProps } from '../../../utilities/purchaseUtilities';
+import { getPayDate } from '../../../utilities/purchaseUtilities';
 import TransferTemplateButtonsContainer from './TransferTemplateButtonContainer';
 import { useMethod, usePurchase, useTab } from '../../../hooks/useData';
 import { getHasError, validateTransfer } from '../KakeiboSchemas';
@@ -150,7 +150,6 @@ const TransferInput = () => {
                     <TextField
                         label="金額"
                         value={newTransfer.price}
-                        inputProps={numericProps}
                         onChange={(e) => handleNewTransferInput('price', e.target.value)}
                         error={!!errors.price}
                         helperText={errors.price}

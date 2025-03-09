@@ -74,7 +74,6 @@ const LogInputForm: React.FC<LogInputFormProp> = ({ propLog, openDialog, setIsOp
     const addLog = async () => {
         if (newLog && auth.currentUser) {
             const userId = auth.currentUser.uid;
-            console.log(newLog);
             await createLog({
                 ...newLog,
                 userId,

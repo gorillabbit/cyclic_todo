@@ -118,10 +118,7 @@ ${sendExistingData ? `Existing purchase data: ${existingPurchasesString}` : ''}
             const existingPurchases = getExistingPurchases();
             const existingPurchasesString = JSON.stringify(existingPurchases);
 
-            console.log('Existing purchases:', existingPurchasesString);
-
             const promptText = buildGeminiPrompt(existingPurchasesString);
-            console.log('Sending text to Gemini:', promptText);
 
             const imagePart = fileToGenerativePart(image, 'image/jpeg');
             const generatedContent = await model.generateContent({
@@ -157,12 +154,10 @@ ${sendExistingData ? `Existing purchase data: ${existingPurchasesString}` : ''}
 
     // Parse Gemini's response and update state accordingly
     const handleGeminiResponse = (text: string) => {
-        console.log('Gemini response:', text);
         try {
             // Remove markdown formatting if present
             const jsonString = text.replace(/```json\n|\n```/g, '');
             const response = JSON.parse(jsonString);
-            console.log('Parsed Gemini response:', response);
             if (Array.isArray(response)) {
                 setReceiptDataArray(response);
                 setCurrentIndex(0);
@@ -177,7 +172,6 @@ ${sendExistingData ? `Existing purchase data: ${existingPurchasesString}` : ''}
 
     // Update purchase fields using the parsed Gemini response
     const parseGeminiResponse = (item: any) => {
-        console.log('Parsing Gemini response:', item);
         setNewPurchase('title', item.title);
         setNewPurchase('price', item.price);
         setNewPurchase('date', new Date(item.date));

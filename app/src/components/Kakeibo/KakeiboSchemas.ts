@@ -45,18 +45,18 @@ const transferSchema = z
     .object({
         price,
         date,
-        from: method,
-        to: method,
+        fromMethod: method,
+        toMethod: method,
     })
     .superRefine((data, ctx) => {
-        if (data.from === data.to) {
+        if (data.fromMethod === data.toMethod) {
             ctx.addIssue({
-                path: ['to'],
+                path: ['toMethod'],
                 code: 'invalid_date',
                 message: '同じ支払い方法を選択することはできません',
             });
             ctx.addIssue({
-                path: ['from'],
+                path: ['fromMethod'],
                 code: 'invalid_date',
                 message: '同じ支払い方法を選択することはできません',
             });
