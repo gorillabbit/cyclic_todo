@@ -6,7 +6,7 @@ import { useIsSmall } from '../../../../hooks/useWindowSize';
 import NormalPurchaseScheduleRow from './NormalPurchaseScheduleRow';
 import { deleteScheduledPurchases } from '../../../../utilities/purchaseUtilities';
 import { useMethod, usePurchase } from '../../../../hooks/useData';
-import { deletePurchaseSchedule } from '../../../../api/deleteApi';
+import { deletePurchaseSchedule } from '../../../../api/combinedApi';
 
 const PurchaseScheduleRow = ({
     purchaseSchedule,

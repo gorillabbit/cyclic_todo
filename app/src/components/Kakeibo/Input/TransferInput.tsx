@@ -14,8 +14,11 @@ import TransferTemplateButtonsContainer from './TransferTemplateButtonContainer'
 import { useMethod, usePurchase, useTab } from '../../../hooks/useData';
 import { getHasError, validateTransfer } from '../KakeiboSchemas';
 import MethodSelector from '../ScreenParts/MethodSelector';
-import { createPurchase, createTransferTemplate } from '../../../api/createApi';
-import { getTransferTemplate } from '../../../api/getApi';
+import {
+    createPurchase,
+    createTransferTemplate,
+    getTransferTemplate,
+} from '../../../api/combinedApi';
 
 const TransferInput = () => {
     const { currentUser } = getAuth();
@@ -51,7 +54,7 @@ const TransferInput = () => {
     );
 
     const fetchTemplates = useCallback(async () => {
-        const data = await getTransferTemplate('', tabId);
+        const data = await getTransferTemplate({ tabId });
         setTemplateList(data);
     }, []);
 

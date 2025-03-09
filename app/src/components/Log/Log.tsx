@@ -91,7 +91,7 @@ const Log: React.FC<LogProps> = ({ log, logsCompleteLogs, openDialog }) => {
                                     marginTop: '-0.25em',
                                 }}
                             >
-                                {log.text}
+                                {log.taskText}
                                 {!isSharedLog && (
                                     <EditIcon
                                         color="action"

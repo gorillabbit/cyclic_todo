@@ -1,12 +1,12 @@
 import { MenuItem, Select, TextField, FormGroup, Button, Box } from '@mui/material';
 import { DatePicker, TimePicker } from '@mui/x-date-pickers';
 import { useState } from 'react';
-import { addDocTask, updateDocTask } from '../../firebase';
 import { format, parse } from 'date-fns';
 import { TaskInputType, TaskType } from '../../types.js';
 import { getAuth } from 'firebase/auth';
 import StyledCheckbox from '../StyledCheckbox';
 import { useTab } from '../../hooks/useData.js';
+import { createTask, updateTask } from '../../api/combinedApi.js';
 
 interface TaskInputFormProp {
     date?: Date; // カレンダーからの日付指定
@@ -33,9 +33,9 @@ const TaskInputForm = ({
         dueDate: '',
         hasDueTime: date ? true : false,
         dueTime: '',
-        is周期的: '周期なし',
-        周期日数: '1',
-        周期単位: '日',
+        isCyclic: '周期なし',
+        cyclicCount: '1',
+        cyclicUnit: '日',
         completed: false,
         icon: '',
         description: '',
@@ -57,7 +57,7 @@ const TaskInputForm = ({
 
     const [newTask, setNewTask] = useState<TaskInputType>(defaultNewTask);
     const handleNewTaskInput = (name: string, value: string | boolean) => {
-        if (name === '周期日数' && typeof value === 'string' && parseInt(value, 10) <= 0) {
+        if (name === 'cyclicCount' && typeof value === 'string' && parseInt(value, 10) <= 0) {
             alert('0以下は入力できません。');
             return;
         }
@@ -83,7 +83,7 @@ const TaskInputForm = ({
         if (auth.currentUser) {
             const validatedTask = validateTask(newTask);
             const userId = auth.currentUser.uid;
-            addDocTask({ ...validatedTask, userId });
+            createTask({ ...validatedTask, userId, id: new Date().getTime().toString() });
             setNewTask(defaultNewTask);
         }
         buttonAction?.();
@@ -91,7 +91,7 @@ const TaskInputForm = ({
 
     const editTask = () => {
         const validatedTask = validateTask(newTask) as TaskType;
-        updateDocTask(validatedTask.id, validatedTask);
+        updateTask(validatedTask.id, validatedTask);
         setIsOpenEditDialog?.(false);
     };
 
@@ -153,26 +153,26 @@ const TaskInputForm = ({
 
                         <Select
                             label="周期"
-                            value={newTask.is周期的}
-                            onChange={(e) => handleNewTaskInput('is周期的', e.target.value)}
+                            value={newTask.isCyclic}
+                            onChange={(e) => handleNewTaskInput('isCyclic', e.target.value)}
                         >
                             <MenuItem value="周期なし">周期なし</MenuItem>
                             <MenuItem value="完了後に追加">完了後にタスクを追加</MenuItem>
                             <MenuItem value="必ず追加">必ず追加</MenuItem>
                         </Select>
-                        {newTask.is周期的 !== '周期なし' && (
+                        {newTask.isCyclic !== '周期なし' && (
                             <TextField
-                                label="周期日数"
+                                label="cyclicCount"
                                 type="number"
-                                value={newTask.周期日数}
-                                onChange={(e) => handleNewTaskInput('周期日数', e.target.value)}
+                                value={newTask.cyclicCount}
+                                onChange={(e) => handleNewTaskInput('cyclicCount', e.target.value)}
                                 sx={{ maxWidth: 100 }}
                             />
                         )}
-                        {newTask.is周期的 !== '周期なし' && (
+                        {newTask.isCyclic !== '周期なし' && (
                             <Select
-                                value={newTask.周期単位}
-                                onChange={(e) => handleNewTaskInput('周期単位', e.target.value)}
+                                value={newTask.cyclicUnit}
+                                onChange={(e) => handleNewTaskInput('cyclicUnit', e.target.value)}
                             >
                                 <MenuItem value="日">日</MenuItem>
                                 <MenuItem value="週">週</MenuItem>

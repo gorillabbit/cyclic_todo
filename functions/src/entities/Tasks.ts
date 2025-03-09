@@ -7,14 +7,14 @@ export  class Tasks {
 @Column('char',{ primary:true,name:'id',length:20 })
     id!: string;
 
-@Column('varchar',{ name:'is周期的',nullable:true,length:50 })
-    is周期的!: string | null;
+@Column('varchar',{ name:'is_cyclic',nullable:true,length:50 })
+    isCyclic!: string | null;
 
-@Column('varchar',{ name:'周期単位',nullable:true,length:50 })
-    周期単位!: string | null;
+@Column('varchar',{ name:'cyclic_unit',nullable:true,length:50 })
+    cyclicUnit!: string | null;
 
-@Column('int',{ name:'周期日数',nullable:true })
-    周期日数!: number | null;
+@Column('int',{ name:'cyclic_count',nullable:true })
+    cyclicCount!: number | null;
 
 @Column('varchar',{ name:'due_date',nullable:true,length:20 })
     dueDate!: string | null;

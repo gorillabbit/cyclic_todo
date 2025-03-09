@@ -17,9 +17,9 @@ export interface TaskInputType {
     hasDueTime: boolean; // タスクに時刻があるかどうか
     dueTime: string; // タスクの時刻 (形式: HH時mm分)
     completed: boolean; // タスクが完了したかどうか
-    is周期的: string; // タスクの定期的なスケジュール ('周期なし', '完了後に追加', '必ず追加')
-    周期日数: string; // 定期的なスケジュールの日数
-    周期単位: string; // 定期的なスケジュールの単位 ('日', '週', '月', '年')
+    isCyclic: string; // タスクの定期的なスケジュール ('周期なし', '完了後に追加', '必ず追加')
+    cyclicCount: string; // 定期的なスケジュールの日数
+    cyclicUnit: string; // 定期的なスケジュールの単位 ('日', '週', '月', '年')
     親taskId?: string; // 親タスクのID (タスクがサブタスクの場合)
     toggleCompletionTimestamp?: Timestamp; // タスクが完了としてマークされたときのタイムスタンプ
     icon: string;

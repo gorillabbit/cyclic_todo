@@ -1,17 +1,17 @@
 import { Button } from '@mui/material';
 import React from 'react';
-import { deleteDocLog, deleteDocLogsCompleteLog } from '../../firebase';
 import { LogType, LogsCompleteLogsType } from '../../types.js';
+import { deleteLog, deleteLogCompleteLog } from '../../api/combinedApi.js';
 
 interface LogDeleteButtonProps {
     log: LogType;
     completeLogs: LogsCompleteLogsType[];
 }
 
-const deleteLog = (log: LogType, completeLogs: LogsCompleteLogsType[]) => {
-    deleteDocLog(log.id);
+const deleteLogAndCompleteLogs = (log: LogType, completeLogs: LogsCompleteLogsType[]) => {
+    deleteLog(log.id);
     completeLogs.forEach((element) => {
-        deleteDocLogsCompleteLog(element.id);
+        deleteLogCompleteLog(element.id);
     });
 };
 
@@ -22,7 +22,7 @@ const LogDeleteButton: React.FC<LogDeleteButtonProps> = ({ log, completeLogs }) 
             variant="contained"
             color="error"
             sx={{ borderRadius: '0px' }}
-            onClick={() => deleteLog(log, completeLogs)}
+            onClick={() => deleteLogAndCompleteLogs(log, completeLogs)}
         >
             削除
         </Button>

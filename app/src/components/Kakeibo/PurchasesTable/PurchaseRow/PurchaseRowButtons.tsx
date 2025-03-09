@@ -5,7 +5,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import DeleteConfirmDialog from '../../DeleteConfirmDialog';
 import { PurchaseDataType } from '../../../../types/purchaseTypes';
 import { usePurchase } from '../../../../hooks/useData';
-import { deletePurchase } from '../../../../api/deleteApi';
+import { deletePurchase } from '../../../../api/combinedApi';
 
 const PurchaseRowButtons = ({
     purchase,

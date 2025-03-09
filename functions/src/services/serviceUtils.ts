@@ -23,6 +23,11 @@ class AppError extends Error {
     }
 }
 
+export interface GetAllParams {
+    filters: Record<string, unknown>;
+    order: Record<string, 'ASC' | 'DESC'>;
+}
+
 export abstract class BaseService<T extends ObjectLiteral> {
     protected repository: Repository<T>;
     protected entityName: string;

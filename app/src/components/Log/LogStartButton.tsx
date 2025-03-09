@@ -1,7 +1,7 @@
 import { Button } from '@mui/material';
-import { addDocLogsCompleteLog } from '../../firebase';
 import React from 'react';
 import { LogType } from '../../types.js';
+import { createLogCompleteLog } from '../../api/combinedApi.js';
 
 interface LogStartButtonProps {
     log: LogType;
@@ -10,12 +10,13 @@ interface LogStartButtonProps {
 const logStart = (log: LogType, event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     event.stopPropagation();
     const logsCompleteLogs = {
+        id: new Date().getTime().toString(),
         logId: log.id,
         type: 'start',
         memo: '',
         tabId: log.tabId,
     };
-    addDocLogsCompleteLog(logsCompleteLogs);
+    createLogCompleteLog(logsCompleteLogs);
 };
 
 const LogStartButton: React.FC<LogStartButtonProps> = ({ log }) => {

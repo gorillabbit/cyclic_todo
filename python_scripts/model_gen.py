@@ -67,7 +67,7 @@ def parse_sql_file(
         カラム名・型・NULL可否を抽出します。
         """
         logger.debug("カラム定義解析を開始します。対象: %s", column)
-        # 例: `is周期的 VARCHAR(50) NULL DEFAULT '...'`
+        # 例: `isCyclic VARCHAR(50) NULL DEFAULT '...'`
         #     `user_id CHAR(28) NOT NULL`
         #     backtickで囲まれていなくてもOKにするため、以下のように修正。
         #

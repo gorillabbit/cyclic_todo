@@ -1,9 +1,12 @@
-import { updateDocLog } from '../../firebase';
 import { LogType, LogsCompleteLogsType } from '../../types';
 import ChipWrapper from '../ChipWrapper';
 import { differenceInDays } from 'date-fns';
 import { useEffect, useState } from 'react';
 import { checkLastLogCompleted } from '../../utilities/dateUtilities';
+import { useLogStore } from '../../stores/logStore';
+import { useAccountStore } from '../../stores/accountStore';
+import { useTab } from '../../hooks/useData';
+import { updateLog } from '../../api/combinedApi';
 
 interface LogFeatureProp {
     log: LogType;
@@ -13,15 +16,22 @@ interface LogFeatureProp {
     isOpen: boolean;
 }
 
-const updateDisplayFeature = (log: LogType, feature: string) => {
+const updateDisplayFeature = async (
+    log: LogType,
+    feature: string,
+    tabId: string,
+    accountId: string
+) => {
+    const { fetchLogs } = useLogStore(); // useLogStore
     if (log.displayFeature.includes(feature)) {
         const newDisplayFeature = log.displayFeature.filter((item: string) => item !== feature);
-        updateDocLog(log.id, { displayFeature: [...newDisplayFeature] });
+        await updateLog(log.id, { displayFeature: [...newDisplayFeature] });
     } else {
-        updateDocLog(log.id, {
+        await updateLog(log.id, {
             displayFeature: [...log.displayFeature, feature],
         });
     }
+    fetchLogs(tabId, accountId);
 };
 
 const LogFeature: React.FC<LogFeatureProp> = ({
@@ -32,6 +42,9 @@ const LogFeature: React.FC<LogFeatureProp> = ({
     isOpen,
 }) => {
     const [intervalFromLastCompleted, setIntervalFromLastCompleted] = useState<string>('');
+
+    const { Account } = useAccountStore(); // useAccountStore
+    const { tabId } = useTab();
 
     useEffect(() => {
         if (isLastCompletedAvailable) {
@@ -55,6 +68,9 @@ const LogFeature: React.FC<LogFeatureProp> = ({
     );
     const displayFeature = log.displayFeature;
     if (!displayFeature) {
+        return <></>;
+    }
+    if (!Account) {
         return <></>;
     }
     const displayFeatureMap = [
@@ -94,7 +110,9 @@ const LogFeature: React.FC<LogFeatureProp> = ({
                             key={mapItem.label}
                             label={mapItem.label}
                             isSelected={displayFeature.includes(mapItem.title)}
-                            onClick={() => updateDisplayFeature(log, mapItem.title)}
+                            onClick={() =>
+                                updateDisplayFeature(log, mapItem.title, tabId, Account.id)
+                            }
                         />
                     )
             )}

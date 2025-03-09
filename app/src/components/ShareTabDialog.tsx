@@ -10,10 +10,9 @@ import {
     FormControlLabel,
 } from '@mui/material';
 import { useCallback, useState } from 'react';
-import { db, updateDocAccount } from '../firebase';
-import { doc, getDoc } from 'firebase/firestore';
 import { useTab } from '../hooks/useData';
 import { useAccountStore } from '../stores/accountStore';
+import { getAccount, updateAccount } from '../api/combinedApi';
 
 const ShareTabDialog = () => {
     const [open, setOpen] = useState(false);
@@ -29,16 +28,15 @@ const ShareTabDialog = () => {
         );
     }, []);
 
-    const handleShareButton = useCallback(() => {
+    const handleShareButton = useCallback(async () => {
         if (!Account) return;
-        checked.forEach((index) => {
-            getDoc(doc(db, 'Accounts', Account.linkedAccounts[index])).then((docSnap) => {
-                if (!docSnap.exists()) return;
-                updateDocAccount(docSnap.id, {
-                    useTabIds: [...docSnap.data().useTabIds, tab.id],
-                });
+        for (const index of checked) {
+            const targetAccount = (await getAccount({ id: Account.linkedAccounts[index] }))[0];
+            if (!targetAccount) return;
+            await updateAccount(targetAccount.id, {
+                useTabIds: [...targetAccount.useTabIds, tab.id],
             });
-        });
+        }
         setOpen(false);
     }, [Account, checked, tab]);
 

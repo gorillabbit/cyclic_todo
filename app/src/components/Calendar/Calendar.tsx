@@ -16,7 +16,8 @@ import TaskInputForm from '../InputForms/TaskInputForm';
 import Task from '../Task/Task';
 import Log from '../Log/Log';
 import { EventClickArg } from '@fullcalendar/core/index.js';
-import { useLog, useTask } from '../../hooks/useData';
+import { useTask } from '../../hooks/useData';
+import { useLogStore } from '../../stores/logStore';
 
 const Calendar = () => {
     const [isSignedIn, setIsSignedIn] = useState(false);
@@ -28,7 +29,7 @@ const Calendar = () => {
             extendedProps: { source: string };
         }[]
     >([]);
-    const { logList, logsCompleteLogsList } = useLog();
+    const { logList, logsCompleteLogsList } = useLogStore();
     const logEvents = logList.map((log) => {
         const completeLogs = logsCompleteLogsList.filter(
             (completeLog) => completeLog.logId === log.id

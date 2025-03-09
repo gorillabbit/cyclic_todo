@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { AssetListType } from '../types.js';
-import { getAsset } from '../api/getApi.js';
+import { getAsset } from '../api/combinedApi.js';
 
 type AssetState = {
     assetList: AssetListType[];
@@ -10,7 +10,7 @@ type AssetState = {
 export const useAssetStore = create<AssetState>((set) => ({
     assetList: [],
     fetchAsset: async (tabId: string): Promise<void> => {
-        const data = await getAsset(tabId);
+        const data = await getAsset({ tabId });
         set({ assetList: data });
     },
 }));

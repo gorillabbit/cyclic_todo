@@ -15,7 +15,7 @@ import CloseFullscreenIcon from '@mui/icons-material/CloseFullscreen';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { useTab } from '../../../hooks/useData';
 import TableCellWrapper from '../TableCellWrapper';
-import { getPurchaseSchedule } from '../../../api/getApi';
+import { getPurchaseSchedule } from '../../../api/combinedApi';
 
 const PurchaseSchedules = () => {
     const { tabId } = useTab();
@@ -23,7 +23,7 @@ const PurchaseSchedules = () => {
     const [purchaseScheduleList, setPurchaseScheduleList] = useState<PurchaseScheduleType[]>([]);
 
     const fetchPurchaseSchedule = async () => {
-        const data = await getPurchaseSchedule('', tabId);
+        const data = await getPurchaseSchedule({ tabId });
         setPurchaseScheduleList(data);
     };
 

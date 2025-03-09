@@ -13,9 +13,9 @@ import { useCallback, useState } from 'react';
 import PushPinRoundedIcon from '@mui/icons-material/PushPinRounded';
 import PushPinOutlinedIcon from '@mui/icons-material/PushPinOutlined';
 import AddIcon from '@mui/icons-material/Add';
-import { addDocTab, updateDocAccount } from '../firebase';
 import { TabType } from '../types';
 import { useAccountStore } from '../stores/accountStore';
+import { createTab, updateAccount } from '../api/combinedApi';
 
 type HeaderTabsProps = {
     tabValue: number;
@@ -46,13 +46,14 @@ const HeaderTabs = ({
     const [addTabName, setAddTabName] = useState('');
     const onSaveButtonClick = () => {
         if (!Account || !addTabName) return;
-        addDocTab({
+        createTab({
+            id: new Date().getTime().toString(),
             name: addTabName,
             type: addTabType,
             createUserUid: Account.id,
             sharedAccounts: [Account],
         }).then((result) => {
-            updateDocAccount(Account.id, {
+            updateAccount(Account.id, {
                 useTabIds: [...Account.useTabIds, result.id],
             });
         });

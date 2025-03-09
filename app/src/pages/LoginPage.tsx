@@ -15,10 +15,10 @@ import {
     signInWithPopup,
 } from 'firebase/auth';
 import { memo, useCallback, useState } from 'react';
-import { addDocTab, app, db, updateDocAccount } from '../firebase';
-import { collection, doc, getDoc, setDoc } from 'firebase/firestore';
 import { Link, useNavigate } from 'react-router-dom';
 import { AccountType, defaultAccountInput } from '../types';
+import { createAccount, createTab, getAccount, updateAccount } from '../api/combinedApi';
+import { app } from '../firebase';
 
 type PlainLoginPageProps = {
     Fields: {
@@ -112,7 +112,7 @@ const PlainLoginPage = memo(
     }
 );
 
-const LoginPage = () => {
+const LoginPage = async () => {
     const [toggleButton, setToggleButton] = useState<string>('login');
     const [Fields, setFields] = useState({
         email: '',
@@ -160,7 +160,8 @@ const LoginPage = () => {
     const createDefaultTabs = useCallback(async (account: AccountType) => {
         const tabIds: string[] = [];
 
-        const taskTabDoc = await addDocTab({
+        const taskTabDoc = await createTab({
+            id: new Date().getTime().toString(),
             createUserUid: account.id,
             name: 'タスク/ログ',
             type: 'task',
@@ -168,7 +169,8 @@ const LoginPage = () => {
         });
         tabIds.push(taskTabDoc.id);
 
-        const purchaseTabDoc = await addDocTab({
+        const purchaseTabDoc = await createTab({
+            id: new Date().getTime().toString() + '-purchase',
             createUserUid: account.id,
             name: '家計簿',
             type: 'purchase',
@@ -176,10 +178,10 @@ const LoginPage = () => {
         });
         tabIds.push(purchaseTabDoc.id);
 
-        await updateDocAccount(account.id, { useTabIds: tabIds });
+        await updateAccount(account.id, { useTabIds: tabIds });
     }, []);
 
-    const accountRef = collection(db, 'Accounts');
+    const accountRef = await getAccount();
     const handleSignIn = useCallback(() => {
         if (!Fields.email || !Fields.password) {
             return alert('メールアドレスとパスワードを入力してください');
@@ -190,15 +192,13 @@ const LoginPage = () => {
         createUserWithEmailAndPassword(auth, Fields.email, Fields.password)
             .then(async (userCredential) => {
                 const newAccount = {
+                    id: userCredential.user.uid,
                     ...defaultAccountInput,
                     email: Fields.email,
                     name: Fields.name,
                 };
-                await setDoc(doc(accountRef, userCredential.user.uid), newAccount);
-                createDefaultTabs({
-                    ...newAccount,
-                    id: userCredential.user.uid,
-                });
+                await createAccount(newAccount);
+                createDefaultTabs(newAccount);
                 successLogin();
             })
             .catch((error) => {
@@ -213,19 +213,17 @@ const LoginPage = () => {
         const provider = new GoogleAuthProvider();
         signInWithPopup(auth, provider)
             .then(async (result) => {
-                const accountDoc = await getDoc(doc(accountRef, result.user.uid));
-                if (!accountDoc.exists()) {
+                const accountDoc = await getAccount({ id: result.user.uid });
+                if (!accountDoc) {
                     const newAccount = {
                         ...defaultAccountInput,
+                        id: result.user.uid,
                         email: result.user.email ?? '',
                         name: result.user.displayName ?? '',
                         icon: result.user.photoURL ?? '',
                     };
-                    await setDoc(doc(accountRef, result.user.uid), newAccount);
-                    createDefaultTabs({
-                        id: result.user.uid,
-                        ...newAccount,
-                    });
+                    await createAccount(newAccount);
+                    createDefaultTabs(newAccount);
                 }
                 successLogin();
             })

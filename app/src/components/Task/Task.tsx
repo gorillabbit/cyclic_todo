@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { addDocTask, deleteDocTask, updateDocTask } from '../../firebase';
 import { calculateNext期日 } from '../../utilities/dateUtilities';
 import { getBackgroundColor } from '../../utilities/taskUtilities';
 
@@ -13,6 +12,7 @@ import { BodyTypography } from '../TypographyWrapper';
 import EditIcon from '@mui/icons-material/Edit';
 import TaskInputForm from '../InputForms/TaskInputForm';
 import { getUnixTime } from 'date-fns';
+import { createTask, deleteTask, updateTask } from '../../api/combinedApi';
 
 interface TaskProps {
     task: TaskType;
@@ -23,21 +23,22 @@ interface TaskProps {
 
 const auth = getAuth();
 
-const toggleCompletion = (task: TaskType) => {
-    updateDocTask(task.id, {
+const toggleCompletion = async (task: TaskType) => {
+    await updateTask(task.id, {
         completed: !task.completed,
         toggleCompletionTimestamp: new Timestamp(getUnixTime(new Date()), 0),
     });
 
-    if (task.completed === false && task.is周期的 === '完了後に追加' && auth.currentUser) {
+    if (task.completed === false && task.isCyclic === '完了後に追加' && auth.currentUser) {
         const newTask = {
+            id: new Date().getTime().toString(),
             userId: auth.currentUser.uid,
             text: task.text,
             dueDate: calculateNext期日(task, new Date()),
             dueTime: task.dueTime,
-            is周期的: '完了後に追加',
-            周期日数: task.周期日数,
-            周期単位: task.周期単位,
+            isCyclic: '完了後に追加',
+            cyclicCount: task.cyclicCount,
+            cyclicUnit: task.cyclicUnit,
             親taskId: task.親taskId ?? task.id,
             completed: false,
             hasDue: false,
@@ -46,7 +47,7 @@ const toggleCompletion = (task: TaskType) => {
             description: '',
             tabId: task.tabId,
         };
-        addDocTask(newTask);
+        createTask(newTask);
     }
 };
 
@@ -66,7 +67,7 @@ const Task = ({ task, setTaskList, tasklist }: TaskProps) => {
     const 子tasks = tasklist?.filter((listTask) => listTask.親taskId === task.id);
     const 親tasks = tasklist?.filter((listTask) => listTask.id === task.親taskId);
 
-    const is完了後追加 = task.is周期的 === '完了後に追加';
+    const is完了後追加 = task.isCyclic === '完了後に追加';
     const [open, setOpen] = useState(false);
     const [isOpenEditDialog, setIsOpenEditDialog] = useState<boolean>(false);
 
@@ -92,13 +93,13 @@ const Task = ({ task, setTaskList, tasklist }: TaskProps) => {
                         </Typography>
                     </Box>
                     {task.description && <BodyTypography text={task.description} />}
-                    {task.is周期的 !== '周期なし' && (
+                    {task.isCyclic !== '周期なし' && (
                         <BodyTypography
                             text={
                                 '周期' +
                                 (is完了後追加 && ' タスク完了後 ') +
-                                task.周期日数 +
-                                task.周期単位
+                                task.cyclicCount +
+                                task.cyclicUnit
                             }
                         />
                     )}
@@ -134,7 +135,7 @@ const Task = ({ task, setTaskList, tasklist }: TaskProps) => {
                         color="error"
                         variant="contained"
                         sx={{ borderRadius: '0px' }}
-                        onClick={() => deleteDocTask(task.id)}
+                        onClick={() => deleteTask(task.id)}
                     >
                         削除
                     </Button>

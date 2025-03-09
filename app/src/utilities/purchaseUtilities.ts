@@ -3,9 +3,7 @@ import { InputPurchaseScheduleType, MethodListType, WeekDay } from '../types';
 import { addMonths, nextDay, addDays } from 'date-fns';
 import { getPayLaterDate } from './dateUtilities';
 import { PurchaseDataType } from '../types/purchaseTypes';
-import { getPurchase } from '../api/getApi';
-import { createPurchase } from '../api/createApi';
-import { deletePurchase } from '../api/deleteApi';
+import { createPurchase, deletePurchase, getPurchase } from '../api/combinedApi';
 
 /**
  * 収支を合計する(収入は+、支出は-で表現されるので支出の合計は-になる)
@@ -77,8 +75,8 @@ export const filterPurchasesByIncomeType = (
 export const deleteScheduledPurchases = async (
     purchaseScheduleId: string
 ):Promise<void> => {
-    const targetPurchase =await getPurchase(
-        [{ field: 'parentScheduleId', value: purchaseScheduleId }]
+    const targetPurchase = await getPurchase(
+        { parentScheduleId: purchaseScheduleId }
     );
     for (const purchase of targetPurchase) {
         await deletePurchase(purchase.id);

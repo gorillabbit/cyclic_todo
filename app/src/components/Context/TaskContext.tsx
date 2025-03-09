@@ -1,9 +1,7 @@
-import { ReactNode, createContext, memo, useMemo } from 'react';
-import { orderBy, where } from 'firebase/firestore';
+import { ReactNode, createContext, memo, useEffect, useState } from 'react';
 import { TaskType } from '../../types.js';
-import { useFirestoreQuery } from '../../utilities/firebaseUtilities';
 import { useTab } from '../../hooks/useData.js';
-import { dbNames } from '../../firebase.js';
+import { getTask } from '../../api/combinedApi.js';
 
 export type TaskContextType = {
     taskList: TaskType[];
@@ -16,15 +14,15 @@ export const TaskContext = createContext<TaskContextType>({
 
 export const TaskProvider = memo(({ children }: { children: ReactNode }) => {
     const { tabId } = useTab();
-    const tasksQueryConstraints = useMemo(
-        () => [orderBy('dueDate'), orderBy('dueTime'), where('tabId', '==', tabId)],
-        [tabId]
-    );
+    const [taskList, setTaskList] = useState<TaskType[]>([]);
 
-    const { documents: taskList } = useFirestoreQuery<TaskType>(
-        dbNames.task,
-        tasksQueryConstraints
-    );
+    useEffect(() => {
+        const fetchTask = async () => {
+            const taskList = await getTask({ tabId });
+            setTaskList(taskList);
+        };
+        fetchTask();
+    }, [tabId]);
 
     return (
         <TaskContext.Provider

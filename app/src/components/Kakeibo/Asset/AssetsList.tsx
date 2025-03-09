@@ -16,7 +16,7 @@ import { memo, useCallback, useState } from 'react';
 import AssetRow from './AssetRow';
 import { useTab } from '../../../hooks/useData';
 import TableCellWrapper from '../TableCellWrapper';
-import { createAsset } from '../../../api/createApi';
+import { createAsset } from '../../../api/combinedApi';
 import { useAccountStore } from '../../../stores/accountStore';
 import { useAssetStore } from '../../../stores/assetStore';
 

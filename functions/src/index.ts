@@ -10,435 +10,176 @@ import { TabService } from './services/tabService.js';
 import { TaskService } from './services/taskService.js';
 import { PurchaseTemplateService } from './services/purchaseTemplateService.js';
 import { PurchaseScheduleService } from './services/purchaseScheduleService.js';
+import { Request, Response } from 'express';
+import { DeepPartial } from 'typeorm';
 import { TransferTemplateService } from './services/transferTemplate.js';
+import { LogsCompleteLogService } from './services/logCompleteLogService.js';
 
-// 1) まずは Express アプリを作成
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// 2) DB 初期化を走らせておいて、Promise を変数に入れておく
+const handleServiceError = (res: Response, error: Error): void => {
+    console.error('Service error:', error);
+    res.status(500).send({ error: error.message || 'Internal Server Error' });
+};
+
+// 汎用 GET リクエストハンドラ
+const handleGetRequest = async <T>(
+    req: Request,
+    res: Response,
+    serviceMethod: (filters?: Record<string, unknown>, order?: Record<string, 'ASC' | 'DESC'>) => Promise<T[]>
+): Promise<void> => {
+    try {
+        const result = await serviceMethod(req.query);
+        res.status(200).send(result);
+    } catch (error) {
+        handleServiceError(res, error as Error);
+    }
+};
+
+// 汎用 POST リクエストハンドラ
+const handlePostRequest = async <T>(
+    req: Request,
+    res: Response,
+    serviceMethod: (entityData: DeepPartial<T>) => Promise<T>
+): Promise<void> => {
+    try {
+        const result = await serviceMethod(req.body as DeepPartial<T>);
+        res.status(201).send(result);
+    } catch (error) {
+        handleServiceError(res, error as Error);
+    }
+};
+
+// 汎用 PUT リクエストハンドラ
+const handlePutRequest = async <T, U>(
+    req: Request,
+    res: Response,
+    serviceMethod: (id: string, updateData: DeepPartial<T>) => Promise<U>
+): Promise<void> => {
+    try {
+        const id = req.params.id;
+        const result = await serviceMethod(id, req.body as DeepPartial<T>);
+        res.status(200).send(result);
+    } catch (error) {
+        handleServiceError(res, error as Error);
+    }
+};
+
+// 汎用 DELETE リクエストハンドラ
+const handleDeleteRequest = async <T>(
+    req: Request,
+    res: Response,
+    serviceMethod: (id: string) => Promise<void>
+): Promise<void> => {
+    try {
+        const id = req.params.id;
+        await serviceMethod(id);
+        res.status(204).send();
+    } catch (error) {
+        handleServiceError(res, error as Error);
+    }
+};
+
+// サービスとエンドポイントを登録するための関数
+interface ServiceMethods<T, U> {
+    getAll: (filters?: Record<string, unknown>, order?: Record<string, 'ASC' | 'DESC'>) => Promise<T[]>;
+    create: (entityData: DeepPartial<T>) => Promise<T>;
+    update: (id: string, updateData: DeepPartial<T>) => Promise<U>;
+    delete: (id: string) => Promise<void>;
+    [key: string]: any; // Index signature
+}
+
+// Custom Endpointの型定義
+interface CustomEndpoint {
+    path: string;
+    method: 'get' | 'post' | 'put' | 'delete';
+    handler: (req: Request, res: Response) => Promise<void>;
+}
+
+const registerServiceEndpoints = <T, U>(
+    basePath: string,
+    service: ServiceMethods<T, U>,
+    customEndpoints: CustomEndpoint[] = [] // デフォルト引数を追加
+): void => {
+    // Custom Endpoints
+    for (const endpoint of customEndpoints) {
+        app[endpoint.method](`/api/${basePath}${endpoint.path}`, endpoint.handler);
+    }
+    // Standard CRUD Endpoints
+    app.get(`/api/${basePath}`, async (req, res) => {
+        handleGetRequest(req, res, service.getAll.bind(service));
+    });
+
+    app.post(`/api/${basePath}`, async (req, res) => {
+        handlePostRequest(req, res, service.create.bind(service));
+    });
+
+    app.put(`/api/${basePath}/:id`, async (req, res) => {
+        handlePutRequest(req, res, service.update.bind(service));
+    });
+
+    app.delete(`/api/${basePath}/:id`, async (req, res) => {
+        handleDeleteRequest(req, res, service.delete.bind(service));
+    });
+};
+
+
+// DB 初期化とサービス登録
 const dbInitPromise: Promise<void> = (async (): Promise<void> => {
-    // ここで DB の初期化
     await initializeDatabase();
 
-    // 初期化が完了したので、サービスやルーティングを設定する
-    const accountService = new AccountService();
+    // Custom Endpointsの定義
+    const purchaseCustomEndpoints: CustomEndpoint[] = [
+        {
+            path: '/re-calc-all/:tabId',
+            method: 'put',
+            handler: async (req: Request, res: Response): Promise<void> => {
+                try {
+                    const purchaseService = new PurchaseService();
+                    const result = await purchaseService.reCalcAllBalances(req.params.tabId);
+                    res.status(200).send(result);
+                } catch (error) {
+                    handleServiceError(res, error as Error);
+                }
+            },
+        },
+    ];
 
-    app.get('/api/account', async (req, res) => {
-        try {
-            const result = await accountService.getAll(req.query);
-            res.status(200).send(result);
-        } catch (error) {
-            res.status(500).send({ error });
-        }
-    });
+    const logCustomEndpoints: CustomEndpoint[] = [
+        {
+            path: '/get-shared-logs/:tabId',
+            method: 'get',
+            handler: async (req: Request, res: Response): Promise<void> => {
+                try {
+                    const logService = new LogService();
+                    const result = await logService.getSharedLogs(req.params.tabId, req.body.userId);
+                    res.status(200).send(result);
+                } catch (error) {
+                    handleServiceError(res, error as Error);
+                }
+            },
+        },
+    ];
 
-    app.post('/api/account', async (req, res) => {
-        try {
-            const result = await accountService.create(req.body);
-            res.status(201).send(result);
-        } catch (error) {
-            res.status(500).send({ error });
-        }
-    });
-
-    app.put('/api/account/:id', async (req, res) => {
-        try {
-            const { id } = req.params;
-            const result = await accountService.update(id, req.body);
-            res.status(200).send(result);
-        } catch (error) {
-            res.status(500).send({ error });
-        }
-    });
-
-    app.delete('/api/account/:id', async (req, res) => {
-        try {
-            const { id } = req.params;
-            await accountService.delete(id);
-            res.status(204).send();
-        } catch (error) {
-            res.status(500).send({ error });
-        }
-    });
-
-    const purchaseService = new PurchaseService();
-
-    app.get('/api/purchase', async (req, res) => {
-        try {
-            const result = await purchaseService.getAll(req.query);
-            res.status(200).send(result);
-        } catch (error) {
-            res.status(500).send({ error });
-        }
-    });
-
-    // :id のやつよりあとにあると re_calc_all が id として扱われてしまうので注意
-    app.put('/api/purchase/re_calc_all/:tabId', async (req, res) => {
-        try {
-            const { tabId } = req.params;
-            const result = await purchaseService.reCalcAllBalances(tabId);
-            res.status(200).send(result);
-        } catch (error) {
-            res.status(500).send({ error });
-        }
-    });
-
-    app.put('/api/purchase/:id', async (req, res) => {
-        try {
-            const { id } = req.params;
-            const updateData = req.body;
-            const result = await purchaseService.update(id, updateData);
-            res.status(200).send(result);
-        } catch (error) {
-            res.status(500).send({ error });
-        }
-    });
-
-    app.post('/api/purchase', async (req, res) => {
-        try {
-            const result = await purchaseService.create(req.body);
-            res.status(201).send(result);
-        } catch (error) {
-            res.status(500).send({ error });
-        }
-    });
-
-    app.delete('/api/purchase/:id', async (req, res) => {
-        try {
-            const { id } = req.params;
-            await purchaseService.delete(id);
-            res.status(204).send();
-        } catch (error) {
-            res.status(500).send({ error });
-        }
-    });
-
-    const purchaseTemplateService = new PurchaseTemplateService();
-    
-    app.get('/api/purchase-template', async (req, res) => {
-        try {
-            const result = await purchaseTemplateService.getAll(req.query);
-            res.status(200).send(result);
-        } catch (error) {
-            res.status(500).send({ error });
-        }
-    });
-
-    app.put('/api/purchase-template/:id', async (req, res) => {
-        try {
-            const { id } = req.params;
-            const updateData = req.body;
-            const result = await purchaseTemplateService.update(id, updateData);
-            res.status(200).send(result);
-        } catch (error) {
-            res.status(500).send({ error });
-        }
-    });
-
-    app.post('/api/purchase-template', async (req, res) => {
-        try {
-            const result = await purchaseTemplateService.create(req.body);
-            res.status(201).send(result);
-        } catch (error) {
-            res.status(500).send({ error });
-        }
-    });
-
-    app.delete('/api/purchase-template/:id', async (req, res) => {
-        try {
-            const { id } = req.params;
-            await purchaseTemplateService.delete(id);
-            res.status(204).send();
-        } catch (error) {
-            res.status(500).send({ error });
-        }
-    });
-
-
-    const purchaseScheduleService = new PurchaseScheduleService();
-    
-    app.get('/api/purchase-schedule', async (req, res) => {
-        try {
-            const result = await purchaseScheduleService.getAll(req.query);
-            res.status(200).send(result);
-        } catch (error) {
-            res.status(500).send({ error });
-        }
-    });
-
-    app.put('/api/purchase-schedule/:id', async (req, res) => {
-        try {
-            const { id } = req.params;
-            const updateData = req.body;
-            const result = await purchaseScheduleService.update(id, updateData);
-            res.status(200).send(result);
-        } catch (error) {
-            res.status(500).send({ error });
-        }
-    });
-
-    app.post('/api/purchase-schedule', async (req, res) => {
-        try {
-            const result = await purchaseScheduleService.create(req.body);
-            res.status(201).send(result);
-        } catch (error) {
-            res.status(500).send({ error });
-        }
-    });
-
-    app.delete('/api/purchase-schedule/:id', async (req, res) => {
-        try {
-            const { id } = req.params;
-            await purchaseScheduleService.delete(id);
-            res.status(204).send();
-        } catch (error) {
-            res.status(500).send({ error });
-        }
-    });
-
-    const transferTemplateService = new TransferTemplateService();
-    
-    app.get('/api/transfer-template', async (req, res) => {
-        try {
-            const result = await transferTemplateService.getAll(req.query);
-            res.status(200).send(result);
-        } catch (error) {
-            res.status(500).send({ error });
-        }
-    });
-
-    app.put('/api/transfer-template/:id', async (req, res) => {
-        try {
-            const { id } = req.params;
-            const updateData = req.body;
-            const result = await transferTemplateService.update(id, updateData);
-            res.status(200).send(result);
-        } catch (error) {
-            res.status(500).send({ error });
-        }
-    });
-
-    app.post('/api/transfer-template', async (req, res) => {
-        try {
-            const result = await transferTemplateService.create(req.body);
-            res.status(201).send(result);
-        } catch (error) {
-            res.status(500).send({ error });
-        }
-    });
-
-    app.delete('/api/transfer-template/:id', async (req, res) => {
-        try {
-            const { id } = req.params;
-            await transferTemplateService.delete(id);
-            res.status(204).send();
-        } catch (error) {
-            res.status(500).send({ error });
-        }
-    });
-
-    const methodService = new MethodService();
-
-    app.get('/api/method', async (req, res) => {
-        try {
-            const result = await methodService.getAll(req.query);
-            res.status(200).send(result);
-        } catch (error) {
-            res.status(500).send({ error });
-        }
-    });
-
-    app.post('/api/method', async (req, res) => {
-        try {
-            const result = await methodService.create(req.body);
-            res.status(201).send(result);
-        } catch (error) {
-            res.status(500).send({ error });
-        }
-    });
-
-    app.put('/api/method/:id', async (req, res) => {
-        try {
-            const { id } = req.params;
-            const result = await methodService.update(id, req.body);
-            res.status(200).send(result);
-        } catch (error) {
-            res.status(500).send({ error });
-        }
-    });
-
-    app.delete('/api/method/:id', async (req, res) => {
-        try {
-            const { id } = req.params;
-            await methodService.delete(id);
-            res.status(204).send();
-        } catch (error) {
-            res.status(500).send({ error });
-        }
-    });
-
-    const assetService = new AssetService();
-
-    app.get('/api/asset', async (req, res) => {
-        try {
-            const result = await assetService.getAll(req.query);
-            res.status(200).send(result);
-        } catch (error) {
-            res.status(500).send({ error });
-        }
-    });
-
-    app.post('/api/asset', async (req, res) => {
-        try {
-            const result = await assetService.create(req.body);
-            res.status(201).send(result);
-        } catch (error) {
-            res.status(500).send({ error });
-        }
-    });
-
-    app.put('/api/asset/:id', async (req, res) => {
-        try {
-            const { id } = req.params;
-            const result = await assetService.update(id, req.body);
-            res.status(200).send(result);
-        } catch (error) {
-            res.status(500).send({ error });
-        }
-    });
-
-    app.delete('/api/asset/:id', async (req, res) => {
-        try {
-            const { id } = req.params;
-            await assetService.delete(id);
-            res.status(204).send();
-        } catch (error) {
-            res.status(500).send({ error });
-        }
-    });
-
-    // Log endpoints
-    const logService = new LogService();
-    app.get('/api/log', async (req, res) => {
-        try {
-            const result = await logService.getAll(req.query);
-            res.status(200).send(result);
-        } catch (error) {
-            res.status(500).send({ error });
-        }
-    });
-    app.post('/api/log', async (req, res) => {
-        try {
-            const result = await logService.create(req.body);
-            res.status(201).send(result);
-        } catch (error) {
-            res.status(500).send({ error });
-        }
-    });
-    app.put('/api/log/:id', async (req, res) => {
-        try {
-            const { id } = req.params;
-            const result = await logService.update(id, req.body);
-            res.status(200).send(result);
-        } catch (error) {
-            res.status(500).send({ error });
-        }
-    });
-    app.delete('/api/log/:id', async (req, res) => {
-        try {
-            const { id } = req.params;
-            await logService.delete(id);
-            res.status(204).send();
-        } catch (error) {
-            res.status(500).send({ error });
-        }
-    });
-
-    // Tab endpoints
-    const tabService = new TabService();
-    app.get('/api/tab', async (req, res) => {
-        try {
-            const result = await tabService.getAll(req.query);
-            res.status(200).send(result);
-        } catch (error) {
-            res.status(500).send({ error });
-        }
-    });
-    app.post('/api/tab', async (req, res) => {
-        try {
-            const result = await tabService.create(req.body);
-            res.status(201).send(result);
-        } catch (error) {
-            res.status(500).send({ error });
-        }
-    });
-    app.put('/api/tab/:id', async (req, res) => {
-        try {
-            const { id } = req.params;
-            const result = await tabService.update(id, req.body);
-            res.status(200).send(result);
-        } catch (error) {
-            res.status(500).send({ error });
-        }
-    });
-    app.delete('/api/tab/:id', async (req, res) => {
-        try {
-            const { id } = req.params;
-            await tabService.delete(id);
-            res.status(204).send();
-        } catch (error) {
-            res.status(500).send({ error });
-        }
-    });
-
-    // Task endpoints
-    const taskService = new TaskService();
-    app.get('/api/task', async (req, res) => {
-        try {
-            const result = await taskService.getAll(req.query);
-            res.status(200).send(result);
-        } catch (error) {
-            res.status(500).send({ error });
-        }
-    });
-    app.post('/api/task', async (req, res) => {
-        try {
-            const result = await taskService.create(req.body);
-            res.status(201).send(result);
-        } catch (error) {
-            res.status(500).send({ error });
-        }
-    });
-    app.put('/api/task/:id', async (req, res) => {
-        try {
-            const { id } = req.params;
-            const result = await taskService.update(id, req.body);
-            res.status(200).send(result);
-        } catch (error) {
-            res.status(500).send({ error });
-        }
-    });
-    app.delete('/api/task/:id', async (req, res) => {
-        try {
-            const { id } = req.params;
-            await taskService.delete(id);
-            res.status(204).send();
-        } catch (error) {
-            res.status(500).send({ error });
-        }
-    });
+    registerServiceEndpoints('account', new AccountService());
+    registerServiceEndpoints('purchase', new PurchaseService(), purchaseCustomEndpoints); // Custom Endpointsを渡す
+    registerServiceEndpoints('purchase-template', new PurchaseTemplateService());
+    registerServiceEndpoints('purchase-schedule', new PurchaseScheduleService());
+    registerServiceEndpoints('transfer-template', new TransferTemplateService());
+    registerServiceEndpoints('method', new MethodService());
+    registerServiceEndpoints('asset', new AssetService());
+    registerServiceEndpoints('log', new LogService(), logCustomEndpoints); // Custom Endpointsを渡す
+    registerServiceEndpoints('log-complete-log', new LogsCompleteLogService());
+    registerServiceEndpoints('tab', new TabService());
+    registerServiceEndpoints('task', new TaskService());
 
 })().catch((error) => {
     console.error('Failed to initialize database:', error);
 });
 
-// 3) Firebase Functions のハンドラとしてエクスポート
 export const api = onRequest(async (req, res) => {
-    // リクエストが来た時点で、DB 初期化が終わっているかどうかチェックし、
-    // 終わっていなければ待つ。
     await dbInitPromise;
-    // DB 初期化完了後に、Express アプリの処理に委譲
     return app(req, res);
 });

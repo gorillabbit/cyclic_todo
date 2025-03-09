@@ -9,12 +9,13 @@ import {
     InputLabel,
 } from '@mui/material';
 import { useState } from 'react';
-import { addDocLog, updateDocLog } from '../../firebase';
 import { InputLogType, LogType } from '../../types.js';
 import StyledCheckbox from '../StyledCheckbox';
 import { getAuth } from 'firebase/auth';
 import { useTab } from '../../hooks/useData.js';
 import { useAccountStore } from '../../stores/accountStore.js';
+import { useLogStore } from '../../stores/logStore.js';
+import { createLog, updateLog } from '../../api/combinedApi.js';
 
 interface LogInputFormProp {
     propLog?: LogType;
@@ -29,7 +30,7 @@ const LogInputForm: React.FC<LogInputFormProp> = ({ propLog, openDialog, setIsOp
     const { tabId } = useTab();
     const defaultNewLog: InputLogType = {
         userId: '',
-        text: '',
+        taskText: '',
         duration: false,
         interval: false,
         intervalNum: 1,
@@ -47,6 +48,7 @@ const LogInputForm: React.FC<LogInputFormProp> = ({ propLog, openDialog, setIsOp
     };
 
     const [newLog, setNewLog] = useState<InputLogType | LogType>(propLog ?? defaultNewLog);
+    const { fetchLogs } = useLogStore();
     const [newAccessibleAccountIds, setNewAccessibleAccountIds] = useState<string[]>(
         propLog?.accessibleAccounts?.map((account) => account) ?? []
     );
@@ -69,24 +71,29 @@ const LogInputForm: React.FC<LogInputFormProp> = ({ propLog, openDialog, setIsOp
         newAccessibleAccountIds.includes(account)
     );
 
-    const addLog = () => {
+    const addLog = async () => {
         if (newLog && auth.currentUser) {
             const userId = auth.currentUser.uid;
-            addDocLog({
+            console.log(newLog);
+            await createLog({
                 ...newLog,
                 userId,
                 accessibleAccounts: newAccessibleAccounts ?? [],
+                id: new Date().getTime().toString(),
+                timestamp: new Date(),
             });
+            fetchLogs(tabId, userId);
             setNewLog(defaultNewLog);
         }
     };
 
-    const editLog = () => {
-        if (newLog) {
-            updateDocLog((newLog as LogType).id, {
+    const editLog = async () => {
+        if (newLog && auth.currentUser) {
+            await updateLog((newLog as LogType).id, {
                 ...newLog,
                 accessibleAccounts: newAccessibleAccounts ?? [],
             });
+            fetchLogs(tabId, auth.currentUser.uid);
         }
         setIsOpenEditDialog?.(false);
     };
@@ -99,11 +106,11 @@ const LogInputForm: React.FC<LogInputFormProp> = ({ propLog, openDialog, setIsOp
                     autoFocus
                     required
                     label="ログ"
-                    value={newLog.text}
-                    onChange={(e) => handleNewLogInput('text', e.target.value)}
+                    value={newLog.taskText}
+                    onChange={(e) => handleNewLogInput('taskText', e.target.value)}
                     placeholder="記録を入力"
                 />
-                {(newLog.text || openDialog) && (
+                {(newLog.taskText || openDialog) && (
                     <>
                         <TextField
                             fullWidth

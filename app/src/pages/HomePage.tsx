@@ -6,7 +6,7 @@ import PurchasePage from './PurchasePage';
 import TaskPage from './TaskPage';
 import { useCookies } from 'react-cookie';
 import { TabType } from '../types';
-import { getTab } from '../api/getApi';
+import { getTab } from '../api/combinedApi';
 import { useAccountStore } from '../stores/accountStore';
 
 const HomePage = memo(() => {
@@ -18,7 +18,7 @@ const HomePage = memo(() => {
 
     useEffect(() => {
         if (!Account) return;
-        getTab([{ field: 'id', value: Account.useTabIds }]).then((result) => setTabs(result));
+        getTab({ id: Account.useTabIds }).then((result) => setTabs(result));
     }, [Account]);
 
     return (

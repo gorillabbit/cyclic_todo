@@ -1,6 +1,6 @@
 import datetime
 from pydantic import BaseModel
-from typing import Optional, Any, Union
+from typing import Optional, Union
 
 
 class Accounts(BaseModel):
@@ -13,6 +13,7 @@ class Accounts(BaseModel):
     email: str
     use_tab_ids: Optional[Union[list[str], str]] = None
 
+
 class Tabs(BaseModel):
     id: str
     name: str
@@ -22,11 +23,12 @@ class Tabs(BaseModel):
     timestamp: datetime.datetime
     user_id: Optional[str] = None
 
+
 class Tasks(BaseModel):
     id: str
-    is周期的: Optional[str] = None
-    周期単位: Optional[str] = None
-    周期日数: Optional[int] = None
+    isCyclic: Optional[str] = None
+    cyclicUnit: Optional[str] = None
+    cyclicCount: Optional[int] = None
     due_date: Optional[str] = None
     has_due_time: Optional[bool] = None
     icon: Optional[str] = None
@@ -39,6 +41,7 @@ class Tasks(BaseModel):
     toggle_completion_timestamp: Optional[datetime.datetime] = None
     completed: Optional[bool] = None
     tab_id: str
+
 
 class Logs(BaseModel):
     id: str
@@ -61,6 +64,7 @@ class Logs(BaseModel):
     task_text: Optional[str] = None
     timestamp: datetime.datetime
 
+
 class LogsCompleteLogs(BaseModel):
     id: str
     processed: Optional[bool] = None
@@ -71,12 +75,14 @@ class LogsCompleteLogs(BaseModel):
     user_id: str
     tab_id: str
 
+
 class Assets(BaseModel):
     id: str
     tab_id: str
     name: Optional[str] = None
     user_id: str
     timestamp: Optional[datetime.datetime] = None
+
 
 class Methods(BaseModel):
     id: str
@@ -87,6 +93,7 @@ class Methods(BaseModel):
     user_id: str
     timestamp: Optional[datetime.datetime] = None
     label: str
+
 
 class Purchases(BaseModel):
     id: str
@@ -109,6 +116,7 @@ class Purchases(BaseModel):
     parent_purchase_id: Optional[str] = None
     timestamp: Optional[datetime.datetime] = None
 
+
 class PurchaseSchedules(BaseModel):
     id: str
     date: int
@@ -126,6 +134,7 @@ class PurchaseSchedules(BaseModel):
     day: str
     timestamp: datetime.datetime
 
+
 class PurchaseTemplates(BaseModel):
     id: str
     date: datetime.datetime
@@ -140,6 +149,7 @@ class PurchaseTemplates(BaseModel):
     is_group: Optional[bool] = None
     category: str
     timestamp: datetime.datetime
+
 
 class TransferTemplates(BaseModel):
     id: str

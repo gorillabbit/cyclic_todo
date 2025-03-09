@@ -1,7 +1,7 @@
 import { Button } from '@mui/material';
 import React from 'react';
-import { updateDocLog } from '../../firebase';
 import { LogType } from '../../types.js';
+import { updateLog } from '../../api/combinedApi.js';
 
 interface LogDeleteButtonProps {
     log: LogType;
@@ -9,7 +9,7 @@ interface LogDeleteButtonProps {
 
 const archiveLog = (log: LogType, event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     event.stopPropagation();
-    updateDocLog(log.id, { archived: !log.archived });
+    updateLog(log.id, { archived: !log.archived });
 };
 
 const LogArchiveButton: React.FC<LogDeleteButtonProps> = ({ log }) => {

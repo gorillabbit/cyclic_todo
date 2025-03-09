@@ -9,12 +9,10 @@ import {
     Tooltip,
 } from '@mui/material';
 import { ChangeEvent, JSX, memo, useState, useEffect } from 'react';
-import { updateDocAccount, db } from '../firebase';
-import { collection, doc, getDoc, getDocs, query, where } from 'firebase/firestore';
 import { AccountLinkType, AccountType } from '../types';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import CancelIcon from '@mui/icons-material/Cancel';
-import { getAccount } from '../api/getApi';
+import { getAccount, updateAccount } from '../api/combinedApi';
 import { useAccountStore } from '../stores/accountStore';
 
 // TODO: メアドがlinkedAccountsなどになくなったので機能していない
@@ -41,7 +39,7 @@ const AccountShareButton = () => {
         if (!Account) return;
         const fetchAccounts = async () => {
             try {
-                const data = await getAccount([{ field: 'id', value: Account.linkedAccounts }]);
+                const data = await getAccount({ id: Account.linkedAccounts });
                 setLinkedAccounts(
                     data.map((account) => ({
                         id: account.id,
@@ -50,9 +48,7 @@ const AccountShareButton = () => {
                         icon: account.icon,
                     }))
                 );
-                const receiveRequests = await getAccount([
-                    { field: 'id', value: Account.receiveRequest },
-                ]);
+                const receiveRequests = await getAccount({ id: Account.receiveRequest });
                 setReceiveRequests(
                     receiveRequests.map((account) => ({
                         id: account.id,
@@ -78,83 +74,71 @@ const AccountShareButton = () => {
         setError(validateEmail(value, Account));
     };
 
-    const AccountCollection = collection(db, 'Accounts');
-    const getAccountDoc = async (id: string) => {
-        const accountDoc = await getDoc(doc(AccountCollection, id));
-        if (!accountDoc.exists()) throw new Error('Document not found');
-        return { ...accountDoc.data(), id: accountDoc.id } as AccountType;
-    };
-
     const sendLinkRequests = async () => {
         if (!Account) return;
         if (!email) return setError('メールアドレスが入力されていません');
 
-        const q = query(AccountCollection, where('email', '==', email));
-        const targetAccountDoc = await getDocs(q);
-        if (targetAccountDoc.empty) return setError('入力対象はアカウントを持っていません');
+        const targetAccountDoc = await getAccount({ email });
+        if (!targetAccountDoc || targetAccountDoc.length === 0)
+            return setError('入力対象はアカウントを持っていません');
 
-        updateDocAccount(Account.id, {
+        await updateAccount(Account.id, {
             sendRequest: [...Account.sendRequest, email],
         });
-        const targetDoc = targetAccountDoc.docs[0];
-        updateDocAccount(targetDoc.id, {
-            receiveRequest: [...targetDoc.data().receiveRequest, Account],
+
+        const targetDoc = targetAccountDoc[0];
+        await updateAccount(targetDoc.id, {
+            receiveRequest: [...targetDoc.receiveRequest, Account.id],
         });
         setEmail('');
     };
 
-    const refuseRequest = (receivedRequest: AccountLinkType) => {
+    const refuseRequest = async (receivedRequest: AccountLinkType) => {
         if (!Account) return;
-        updateDocAccount(Account.id, {
+        updateAccount(Account.id, {
             receiveRequest: Account.receiveRequest.filter((r) => r !== receivedRequest.id),
         });
-        getAccountDoc(receivedRequest.id).then((doc) => {
-            updateDocAccount(doc.id, {
-                sendRequest: doc.sendRequest.filter((r) => r !== Account.email),
-            });
+        const receivedRequestAccount = (await getAccount({ id: receivedRequest.id }))[0];
+
+        await updateAccount(receivedRequestAccount.id, {
+            sendRequest: receivedRequestAccount.sendRequest.filter((r) => r !== Account.email),
         });
     };
 
     const acceptRequest = async (receiveRequest: AccountLinkType) => {
         if (!Account) return;
-        updateDocAccount(Account.id, {
+        updateAccount(Account.id, {
             linkedAccounts: [...Account.linkedAccounts, receiveRequest.id],
             receiveRequest: Account.receiveRequest.filter((r) => r !== receiveRequest.id),
         });
-        getAccountDoc(receiveRequest.id).then((doc) => {
-            updateDocAccount(doc.id, {
-                linkedAccounts: [...doc.linkedAccounts, Account.id],
-                sendRequest: doc.sendRequest.filter((r) => r !== Account.email),
-            });
+        const receivedRequestAccount = (await getAccount({ id: receiveRequest.id }))[0];
+        await updateAccount(receivedRequestAccount.id, {
+            linkedAccounts: [...receivedRequestAccount.linkedAccounts, Account.id],
+            sendRequest: receivedRequestAccount.sendRequest.filter((r) => r !== Account.email),
         });
     };
 
-    const cancelRequest = (request: string) => {
+    const cancelRequest = async (request: string) => {
         if (!Account) return;
-        updateDocAccount(Account.id, {
+        await updateAccount(Account.id, {
             sendRequest: Account.sendRequest.filter((r) => r !== request),
         });
-        const q = query(AccountCollection, where('email', '==', request));
-        getDocs(q).then((docs) => {
-            if (docs.empty) return;
-            const targetDoc = docs.docs[0];
-            updateDocAccount(targetDoc.id, {
-                receiveRequest: targetDoc
-                    .data()
-                    .receiveRequest.filter((r: AccountLinkType) => r.id !== Account.id),
-            });
+        const accounts = await getAccount({ email: request });
+        if (!accounts || accounts.length === 0) return;
+        const targetDoc = accounts[0];
+        await updateAccount(targetDoc.id, {
+            receiveRequest: targetDoc.receiveRequest.filter((r) => r !== Account.id),
         });
     };
 
-    const unlinkAccount = (linkedAccount: AccountLinkType) => {
+    const unlinkAccount = async (linkedAccount: AccountLinkType) => {
         if (!Account) return;
-        updateDocAccount(Account.id, {
+        await updateAccount(Account.id, {
             linkedAccounts: Account.linkedAccounts.filter((a) => a !== linkedAccount.id),
         });
-        getAccountDoc(linkedAccount.id).then((doc) => {
-            updateDocAccount(doc.id, {
-                linkedAccounts: doc.linkedAccounts.filter((a) => a !== Account.id),
-            });
+        const doc = (await getAccount({ id: linkedAccount.id }))[0];
+        await updateAccount(doc.id, {
+            linkedAccounts: doc.linkedAccounts.filter((a) => a !== Account.id),
         });
     };
 

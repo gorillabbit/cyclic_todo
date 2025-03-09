@@ -2,7 +2,7 @@ import { Chip } from '@mui/material';
 import { useCallback, useState } from 'react';
 import DeleteConfirmDialog from '../DeleteConfirmDialog';
 import { InputFieldPurchaseType, TemplateButtonType } from '../../../types/purchaseTypes';
-import { deletePurchaseTemplate } from '../../../api/deleteApi';
+import { deletePurchaseTemplate } from '../../../api/combinedApi';
 
 const TemplateButton = ({
     setNewPurchase,

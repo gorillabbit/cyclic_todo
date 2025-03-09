@@ -10,7 +10,7 @@ import { getPayDate } from '../../../../utilities/purchaseUtilities';
 import { getHasError, validateEditPurchase } from '../../KakeiboSchemas';
 import MethodSelector from '../../ScreenParts/MethodSelector';
 import CategorySelector from '../../ScreenParts/CategorySelector';
-import { updatePurchase } from '../../../../api/updateApi';
+import { updatePurchase } from '../../../../api/combinedApi';
 
 type UnderHalfRowProps = {
     editFormData: PurchaseDataType;

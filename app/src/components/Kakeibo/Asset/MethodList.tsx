@@ -14,7 +14,7 @@ import { defaultMethod, MethodListType } from '../../../types';
 import { getAuth } from 'firebase/auth';
 import { useMethod, useTab } from '../../../hooks/useData';
 import MethodRow from './MethodRow';
-import { createMethod } from '../../../api/createApi';
+import { createMethod } from '../../../api/combinedApi';
 
 const MethodList = memo(
     ({

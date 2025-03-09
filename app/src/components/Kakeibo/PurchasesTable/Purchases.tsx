@@ -25,7 +25,7 @@ import { PurchaseDataType } from '../../../types/purchaseTypes';
 import TableCellWrapper from '../TableCellWrapper';
 import DoughnutContainer from './Charts/ChartContainer';
 import NarrowDownDialog from './NarrowDownDialog';
-import { reCalcAllBalance } from '../../../api/updateApi';
+import { reCalcAllBalance } from '../../../api/combinedApi';
 
 const Purchases = memo(() => {
     const { purchaseList } = usePurchase();

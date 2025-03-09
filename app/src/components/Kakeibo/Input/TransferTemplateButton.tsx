@@ -3,7 +3,7 @@ import { useCallback, useState } from 'react';
 import { TransferType } from '../../../types';
 import DeleteConfirmDialog from '../DeleteConfirmDialog';
 import { useMethod } from '../../../hooks/useData';
-import { deleteTransferTemplate } from '../../../api/deleteApi';
+import { deleteTransferTemplate } from '../../../api/combinedApi';
 
 const TransferTemplateButton = ({
     transfer,

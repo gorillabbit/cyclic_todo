@@ -2,10 +2,10 @@ import { Masonry } from '@mui/lab';
 import { Button } from '@mui/material'; // MUIのButtonをインポート
 import Log from './Log';
 import { useState } from 'react';
-import { useLog } from '../../hooks/useData';
+import { useLogStore } from '../../stores/logStore';
 
 const LogList = () => {
-    const { logList, logsCompleteLogsList, sharedLogList } = useLog();
+    const { logList, logsCompleteLogsList, sharedLogList } = useLogStore();
     const mergerLogList = [...logList, ...sharedLogList];
     const [showArchived, setShowArchived] = useState(false); // archivedログの表示状態を管理
 

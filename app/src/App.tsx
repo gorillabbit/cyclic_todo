@@ -11,8 +11,8 @@ import LoginPage from './pages/LoginPage';
 import HomePage from './pages/HomePage';
 import KiyakuPage from './pages/KiyakuPage';
 import ja from 'date-fns/locale/ja';
-import { getAccount } from './api/getApi';
 import { useAccountStore } from './stores/accountStore';
+import { getAccount } from './api/combinedApi';
 
 const App = memo(() => {
     const theme = createTheme({
@@ -31,7 +31,7 @@ const App = memo(() => {
                 setAccount(undefined);
                 return;
             }
-            getAccount([{ field: 'id', value: user.uid }]).then((data) => {
+            getAccount({ id: user.uid }).then((data) => {
                 setAccount(data[0] as AccountType);
             });
         });

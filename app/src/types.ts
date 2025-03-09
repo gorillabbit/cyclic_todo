@@ -11,9 +11,9 @@ export interface TaskInputType {
     hasDueTime: boolean;
     dueTime: string;
     completed: boolean;
-    is周期的: string;
-    周期日数: string;
-    周期単位: string;
+    isCyclic: string;
+    cyclicCount: string;
+    cyclicUnit: string;
     親taskId?: string;
     toggleCompletionTimestamp?: Timestamp;
     icon: string;
@@ -38,9 +38,9 @@ export interface LogsCompleteLogsType extends LogsCompleteLogsInputType {
 
 export interface InputLogType {
     userId: string;
-    text: string;
+    taskText: string;
     親logId?: string;
-    timestamp?: Timestamp;
+    timestamp?: Date;
     completeLogs?: LogsCompleteLogsType[];
     duration: boolean;
     interval: boolean;

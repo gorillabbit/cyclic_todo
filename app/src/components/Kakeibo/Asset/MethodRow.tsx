@@ -15,8 +15,7 @@ import { numericProps, sumSpentAndIncome } from '../../../utilities/purchaseUtil
 import { useMethod, usePurchase } from '../../../hooks/useData';
 import TableCellWrapper from '../TableCellWrapper';
 import { getFutureMonthFirstDay, getThisMonthFirstDay } from '../../../utilities/dateUtilities';
-import { updateMethod } from '../../../api/updateApi';
-import { deleteMethod } from '../../../api/deleteApi';
+import { updateMethod, deleteMethod } from '../../../api/combinedApi';
 
 const MethodRow = ({ method }: { method: MethodListType }) => {
     const { fetchMethod } = useMethod();

@@ -34,9 +34,9 @@ COLLATE=utf8mb4_unicode_ci;
 DROP TABLE IF EXISTS tasks;
 CREATE TABLE tasks (
     id CHAR(20) NOT NULL PRIMARY KEY,                  
-    is周期的 VARCHAR(50) NULL,
-    周期単位 VARCHAR(50) NULL,
-    周期日数 INT NULL,
+    isCyclic VARCHAR(50) NULL,
+    cyclicUnit VARCHAR(50) NULL,
+    cyclicCount INT NULL,
     due_date VARCHAR(20) NULL,                           
     has_due_time BOOLEAN NULL,                    
     icon TEXT NULL,                               

@@ -15,10 +15,13 @@ import { set } from 'date-fns';
 import { getHasError, validatePurchase } from '../KakeiboSchemas';
 import MethodSelector from '../ScreenParts/MethodSelector';
 import CategorySelector from '../ScreenParts/CategorySelector';
-import { createPurchase, createPurchaseTemplate } from '../../../api/createApi';
-import { getPurchaseTemplate } from '../../../api/getApi';
 import ReceiptScanner from './ReceiptScanner';
 import { useAccountStore } from '../../../stores/accountStore';
+import {
+    getPurchaseTemplate,
+    createPurchase,
+    createPurchaseTemplate,
+} from '../../../api/combinedApi';
 
 const PurchaseInput = () => {
     const [newPurchase, setNewPurchase] =
@@ -38,7 +41,10 @@ const PurchaseInput = () => {
     const hasError = useMemo(() => getHasError(errors), [errors]);
 
     const fetchTemplates = useCallback(async () => {
-        const data = await getPurchaseTemplate(Account?.id || '', tabId);
+        const data = await getPurchaseTemplate({
+            userId: Account?.id || '',
+            tabId: tabId || '',
+        });
         setTemplateList(data);
     }, []);
 
