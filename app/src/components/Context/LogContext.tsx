@@ -2,8 +2,9 @@ import { ReactNode, createContext, memo, useMemo } from 'react';
 import { orderBy, where } from 'firebase/firestore';
 import { LogType, LogsCompleteLogsType } from '../../types.js';
 import { useFirestoreQuery } from '../../utilities/firebaseUtilities';
-import { useAccount, useTab } from '../../hooks/useData.js';
+import { useTab } from '../../hooks/useData.js';
 import { dbNames } from '../../firebase.js';
+import { useAccountStore } from '../../stores/accountStore.js';
 
 export type LogContextType = {
     logList: LogType[];
@@ -19,7 +20,7 @@ export const LogContext = createContext<LogContextType>({
 });
 
 export const LogProvider = memo(({ children }: { children: ReactNode }) => {
-    const { Account } = useAccount();
+    const { Account } = useAccountStore();
     const { tabId } = useTab();
 
     const logQueryConstraints = useMemo(() => [where('tabId', '==', tabId)], [tabId]);

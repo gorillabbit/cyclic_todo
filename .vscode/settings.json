@@ -4,6 +4,7 @@
   "python.analysis.autoImportCompletions": true,
   "cSpell.words": [
     "cyclictodo",
+    "Firestore",
     "Kakeibo",
     "kiyaku",
     "tinyint",

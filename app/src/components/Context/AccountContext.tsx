@@ -1,27 +1,17 @@
-import { createContext } from 'react';
-import { AccountType, defaultAccount } from '../../types';
+import { ReactNode } from 'react';
+import { AccountType } from '../../types';
+import { useAccountStore } from '../../stores/accountStore';
 
 interface AccountContextProp {
     Account: AccountType | undefined;
-    children: React.ReactNode;
+    children: ReactNode;
 }
 
-export type AccountContextType = {
-    Account: AccountType | undefined;
-};
-
-export const AccountContext = createContext<AccountContextType>({
-    Account: defaultAccount,
-});
-
 export const AccountProvider: React.FC<AccountContextProp> = ({ Account, children }) => {
-    return (
-        <AccountContext.Provider
-            value={{
-                Account: Account,
-            }}
-        >
-            {children}
-        </AccountContext.Provider>
-    );
+    const { setAccount } = useAccountStore();
+    // Accountがundefinedの場合のみ、setAccountを実行
+    if (Account) {
+        setAccount(Account);
+    }
+    return <>{children}</>;
 };

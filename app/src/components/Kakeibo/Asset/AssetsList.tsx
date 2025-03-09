@@ -14,14 +14,17 @@ import CloseFullscreenIcon from '@mui/icons-material/CloseFullscreen';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { memo, useCallback, useState } from 'react';
 import AssetRow from './AssetRow';
-import { useAccount, useAsset, useTab } from '../../../hooks/useData';
+import { useTab } from '../../../hooks/useData';
 import TableCellWrapper from '../TableCellWrapper';
 import { createAsset } from '../../../api/createApi';
+import { useAccountStore } from '../../../stores/accountStore';
+import { useAssetStore } from '../../../stores/assetStore';
 
 const AssetTable = memo(() => {
-    const { assetList, fetchAsset } = useAsset();
+    const assetStore = useAssetStore();
+    const { assetList, fetchAsset } = assetStore;
     const { tabId } = useTab();
-    const { Account } = useAccount();
+    const { Account } = useAccountStore();
     const [isOpen, setIsOpen] = useState(false);
 
     // TODO 追加時に「残高調整」というメソッドを自動でつくる
@@ -34,8 +37,8 @@ const AssetTable = memo(() => {
             id: new Date().getTime().toString(),
         };
         await createAsset(newAssetLog);
-        fetchAsset();
-    }, [Account, tabId]);
+        fetchAsset(tabId);
+    }, [tabId, fetchAsset, Account]);
 
     return (
         <TableContainer component={Paper} sx={{ marginY: 2 }}>

@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ErrorType, MethodListType } from '../../../types';
 import { getPayDate, numericProps } from '../../../utilities/purchaseUtilities';
 import TemplateButtons from './TemplateButtonsContainer';
-import { useTab, useAccount, useMethod, usePurchase } from '../../../hooks/useData';
+import { useTab, useMethod, usePurchase } from '../../../hooks/useData';
 import {
     defaultInputFieldPurchase,
     InputFieldPurchaseType,
@@ -18,6 +18,7 @@ import CategorySelector from '../ScreenParts/CategorySelector';
 import { createPurchase, createPurchaseTemplate } from '../../../api/createApi';
 import { getPurchaseTemplate } from '../../../api/getApi';
 import ReceiptScanner from './ReceiptScanner';
+import { useAccountStore } from '../../../stores/accountStore';
 
 const PurchaseInput = () => {
     const [newPurchase, setNewPurchase] =
@@ -72,7 +73,7 @@ const PurchaseInput = () => {
         []
     );
 
-    const { Account } = useAccount();
+    const { Account } = useAccountStore();
 
     // 第2因数にnewPurchaseを追加しないと、newPurchaseを更新しても関数が更新されず、初期値が使われてしまう。
     const isError = useCallback(() => {

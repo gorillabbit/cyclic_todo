@@ -15,7 +15,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { getLastBalance } from '../../../utilities/purchaseUtilities';
 import DeleteConfirmDialog from '../DeleteConfirmDialog';
 import { useIsSmall } from '../../../hooks/useWindowSize';
-import { useAccount, useAsset, useMethod, usePurchase, useTab } from '../../../hooks/useData';
+import { useMethod, usePurchase, useTab } from '../../../hooks/useData';
 import TableCellWrapper from '../TableCellWrapper';
 import { getFutureMonthFirstDay } from '../../../utilities/dateUtilities';
 import MethodList from './MethodList';
@@ -23,6 +23,8 @@ import { PurchaseDataType } from '../../../types/purchaseTypes';
 import { updateAsset } from '../../../api/updateApi';
 import { createPurchase } from '../../../api/createApi';
 import { deleteAsset, deleteMethod } from '../../../api/deleteApi';
+import { useAccountStore } from '../../../stores/accountStore';
+import { useAssetStore } from '../../../stores/assetStore';
 
 const tableInputStyle: {
     sx: TextFieldProps['sx'];
@@ -63,7 +65,7 @@ const AssetRow = memo(({ asset, isOpen }: { asset: AssetListType; isOpen: boolea
     const assetId = asset.id;
     const assetName = asset.name;
     const { purchaseList } = usePurchase();
-    const { fetchAsset } = useAsset();
+    const { fetchAsset } = useAssetStore();
     const [updatePurchases, setUpdatePurchases] = useState<PurchaseDataType[]>([]);
 
     useEffect(() => {
@@ -101,7 +103,7 @@ const AssetRow = memo(({ asset, isOpen }: { asset: AssetListType; isOpen: boolea
         [balanceInput, lastBalance]
     );
 
-    const { Account } = useAccount();
+    const Account = useAccountStore((state) => state.Account);
     const userId = Account?.id;
     const { tabId } = useTab();
 
@@ -124,7 +126,7 @@ const AssetRow = memo(({ asset, isOpen }: { asset: AssetListType; isOpen: boolea
             });
         }
         await updateAsset(assetId, { name: assetNameInput });
-        fetchAsset();
+        fetchAsset(tabId);
     }, [
         asset.name,
         assetId,
@@ -151,7 +153,7 @@ const AssetRow = memo(({ asset, isOpen }: { asset: AssetListType; isOpen: boolea
         if (filteredMethodList.length > 0) {
             filteredMethodList.forEach((method) => deleteMethod(method.id));
         }
-        fetchAsset();
+        fetchAsset(tabId);
     }, [assetId, filteredMethodList]);
 
     return (

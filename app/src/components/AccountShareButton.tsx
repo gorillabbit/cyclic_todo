@@ -14,8 +14,8 @@ import { collection, doc, getDoc, getDocs, query, where } from 'firebase/firesto
 import { AccountLinkType, AccountType } from '../types';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import CancelIcon from '@mui/icons-material/Cancel';
-import { useAccount } from '../hooks/useData';
 import { getAccount } from '../api/getApi';
+import { useAccountStore } from '../stores/accountStore';
 
 // TODO: メアドがlinkedAccountsなどになくなったので機能していない
 const validateEmail = (email: string, account: AccountType): string => {
@@ -35,7 +35,7 @@ const AccountShareButton = () => {
     const [linkedAccounts, setLinkedAccounts] = useState<AccountLinkType[]>([]);
     const [receiveRequests, setReceiveRequests] = useState<AccountLinkType[]>([]);
 
-    const { Account } = useAccount();
+    const { Account } = useAccountStore();
 
     useEffect(() => {
         if (!Account) return;

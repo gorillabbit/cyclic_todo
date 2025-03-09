@@ -9,13 +9,13 @@ import {
     Button,
     TextField,
 } from '@mui/material';
-import { memo, useCallback, useState } from 'react';
+import { useCallback, useState } from 'react';
 import PushPinRoundedIcon from '@mui/icons-material/PushPinRounded';
 import PushPinOutlinedIcon from '@mui/icons-material/PushPinOutlined';
 import AddIcon from '@mui/icons-material/Add';
 import { addDocTab, updateDocAccount } from '../firebase';
 import { TabType } from '../types';
-import { useAccount } from '../hooks/useData';
+import { useAccountStore } from '../stores/accountStore';
 
 type HeaderTabsProps = {
     tabValue: number;
@@ -25,34 +25,41 @@ type HeaderTabsProps = {
     tabs: TabType[];
 };
 
-type PlainHeaderTabsProps = Omit<HeaderTabsProps, 'setPinnedTab' | 'tabList' | 'tabValue'> & {
-    tabs: TabType[];
-    defaultTabValue: number;
-    handlePinClick: (tabNumber: number) => void;
-    openDialog: boolean;
-    setOpenDialog: React.Dispatch<React.SetStateAction<boolean>>;
-    addTabType: 'task' | 'purchase';
-    setAddTabType: React.Dispatch<React.SetStateAction<'task' | 'purchase'>>;
-    onSaveButtonClick: () => void;
-    addTabName: string;
-    setAddTabName: React.Dispatch<React.SetStateAction<string>>;
-};
+const HeaderTabs = ({
+    pinnedTabNum,
+    setPinnedTab,
+    tabValue,
+    setTabValue,
+    tabs,
+}: HeaderTabsProps) => {
+    const { Account } = useAccountStore();
+    const defaultTabValue = tabValue > tabs.length - 1 ? 0 : tabValue;
+    const handlePinClick = useCallback(
+        (tabNumber: number) => {
+            setPinnedTab('pinnedTab', tabNumber);
+        },
+        [setPinnedTab]
+    );
 
-const PlainHeaderTabs = memo(
-    ({
-        tabs,
-        defaultTabValue,
-        setTabValue,
-        handlePinClick,
-        pinnedTabNum,
-        openDialog,
-        setOpenDialog,
-        addTabType,
-        setAddTabType,
-        onSaveButtonClick,
-        addTabName,
-        setAddTabName,
-    }: PlainHeaderTabsProps) => (
+    const [openDialog, setOpenDialog] = useState(false);
+    const [addTabType, setAddTabType] = useState<'task' | 'purchase'>('task');
+    const [addTabName, setAddTabName] = useState('');
+    const onSaveButtonClick = () => {
+        if (!Account || !addTabName) return;
+        addDocTab({
+            name: addTabName,
+            type: addTabType,
+            createUserUid: Account.id,
+            sharedAccounts: [Account],
+        }).then((result) => {
+            updateDocAccount(Account.id, {
+                useTabIds: [...Account.useTabIds, result.id],
+            });
+        });
+        setOpenDialog(false);
+    };
+
+    return (
         <Box display="flex">
             <Tabs value={defaultTabValue} onChange={(_e, v) => setTabValue(v)}>
                 {tabs.map((tab, index) => (
@@ -104,58 +111,7 @@ const PlainHeaderTabs = memo(
                 </Box>
             </Dialog>
         </Box>
-    )
-);
-
-const HeaderTabs = ({
-    pinnedTabNum,
-    setPinnedTab,
-    tabValue,
-    setTabValue,
-    tabs,
-}: HeaderTabsProps) => {
-    const { Account } = useAccount();
-    const defaultTabValue = tabValue > tabs.length - 1 ? 0 : tabValue;
-    const handlePinClick = useCallback(
-        (tabNumber: number) => {
-            setPinnedTab('pinnedTab', tabNumber);
-        },
-        [setPinnedTab]
     );
-
-    const [openDialog, setOpenDialog] = useState(false);
-    const [addTabType, setAddTabType] = useState<'task' | 'purchase'>('task');
-    const [addTabName, setAddTabName] = useState('');
-    const onSaveButtonClick = () => {
-        if (!Account || !addTabName) return;
-        addDocTab({
-            name: addTabName,
-            type: addTabType,
-            createUserUid: Account.id,
-            sharedAccounts: [Account],
-        }).then((result) => {
-            updateDocAccount(Account.id, {
-                useTabIds: [...Account.useTabIds, result.id],
-            });
-        });
-        setOpenDialog(false);
-    };
-
-    const plainProps = {
-        tabs,
-        defaultTabValue,
-        setTabValue,
-        handlePinClick,
-        pinnedTabNum,
-        openDialog,
-        setOpenDialog,
-        addTabType,
-        setAddTabType,
-        onSaveButtonClick,
-        addTabName,
-        setAddTabName,
-    };
-    return <PlainHeaderTabs {...plainProps} />;
 };
 
 export default HeaderTabs;

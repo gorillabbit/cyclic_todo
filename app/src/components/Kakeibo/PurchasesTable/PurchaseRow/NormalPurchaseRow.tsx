@@ -5,7 +5,8 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import PurchaseRowButtons from './PurchaseRowButtons';
 import TableCellWrapper from '../../TableCellWrapper';
 import { PurchaseDataType } from '../../../../types/purchaseTypes';
-import { useAsset, useMethod } from '../../../../hooks/useData';
+import { useMethod } from '../../../../hooks/useData';
+import { useAssetStore } from '../../../../stores/assetStore';
 
 type UnderHalfRowProps = {
     isGroup: boolean;
@@ -64,7 +65,7 @@ const NormalPurchaseRow = (props: {
     index: number;
 }) => {
     const rowColor = useMemo(() => (props.index % 2 === 0 ? '#f0f0f0' : 'white'), [props.index]);
-    const { assetList } = useAsset();
+    const { assetList } = useAssetStore();
     const { methodList } = useMethod();
     const assetName = assetList.find((asset) => asset.id === props.editFormData.assetId)?.name;
     const method = methodList.find((m) => m.id === props.editFormData.method);

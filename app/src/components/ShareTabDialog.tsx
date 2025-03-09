@@ -9,31 +9,43 @@ import {
     FormGroup,
     FormControlLabel,
 } from '@mui/material';
-import { memo, useCallback, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { db, updateDocAccount } from '../firebase';
 import { doc, getDoc } from 'firebase/firestore';
-import { useAccount, useTab } from '../hooks/useData';
+import { useTab } from '../hooks/useData';
+import { useAccountStore } from '../stores/accountStore';
 
-type PlainShareTabDialogProps = {
-    open: boolean;
-    setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-    linkedAccounts: string[];
-    checked: number[];
-    handleCheckbox: (e: React.ChangeEvent<HTMLInputElement>) => void;
-    handleShareButton: () => void;
-    tabSharedAccounts: string[];
-};
+const ShareTabDialog = () => {
+    const [open, setOpen] = useState(false);
+    const { Account } = useAccountStore();
+    const { tab } = useTab();
+    const [checked, setChecked] = useState<number[]>([]);
 
-const PlainShareTabDialog = memo(
-    ({
-        open,
-        setOpen,
-        linkedAccounts,
-        checked,
-        handleCheckbox,
-        handleShareButton,
-        tabSharedAccounts,
-    }: PlainShareTabDialogProps) => (
+    const handleCheckbox = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+        setChecked((prev) =>
+            e.target.checked
+                ? [...prev, Number(e.target.value)]
+                : prev.filter((num) => num !== Number(e.target.value))
+        );
+    }, []);
+
+    const handleShareButton = useCallback(() => {
+        if (!Account) return;
+        checked.forEach((index) => {
+            getDoc(doc(db, 'Accounts', Account.linkedAccounts[index])).then((docSnap) => {
+                if (!docSnap.exists()) return;
+                updateDocAccount(docSnap.id, {
+                    useTabIds: [...docSnap.data().useTabIds, tab.id],
+                });
+            });
+        });
+        setOpen(false);
+    }, [Account, checked, tab]);
+
+    const tabSharedAccounts = tab.sharedAccounts.map((account) => account.id);
+
+    const linkedAccounts = Account?.linkedAccounts ?? [];
+    return (
         <>
             <Button onClick={() => setOpen(true)}>共有</Button>
             <Dialog sx={{ m: 2 }} open={open} onClose={() => setOpen(false)}>
@@ -72,54 +84,6 @@ const PlainShareTabDialog = memo(
                 </DialogActions>
             </Dialog>
         </>
-    )
-);
-
-const ShareTabDialog = () => {
-    const [open, setOpen] = useState(false);
-    const { Account } = useAccount();
-    const { tab } = useTab();
-    const [checked, setChecked] = useState<number[]>([]);
-
-    const handleCheckbox = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-        setChecked((prev) =>
-            e.target.checked
-                ? [...prev, Number(e.target.value)]
-                : prev.filter((num) => num !== Number(e.target.value))
-        );
-    }, []);
-
-    const handleShareButton = useCallback(() => {
-        if (!Account) return;
-        checked.forEach((index) => {
-            getDoc(doc(db, 'Accounts', Account.linkedAccounts[index])).then((docSnap) => {
-                if (!docSnap.exists()) return;
-                updateDocAccount(docSnap.id, {
-                    useTabIds: [...docSnap.data().useTabIds, tab.id],
-                });
-            });
-            // updateDocTab(tab.id, {
-            //     sharedAccounts: [...tab.sharedAccounts, Account.linkedAccounts[index]],
-            // });
-        });
-        setOpen(false);
-    }, [Account, checked, tab]);
-
-    const tabSharedAccounts = tab.sharedAccounts.map((account) => account.id);
-
-    const linkedAccounts = Account?.linkedAccounts ?? [];
-    return (
-        <PlainShareTabDialog
-            {...{
-                open,
-                setOpen,
-                linkedAccounts,
-                checked,
-                handleCheckbox,
-                handleShareButton,
-                tabSharedAccounts,
-            }}
-        />
     );
 };
 

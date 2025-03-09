@@ -2,11 +2,11 @@ import { getAuth, signOut } from 'firebase/auth';
 import { app } from '../firebase';
 import { Avatar, Chip } from '@mui/material';
 import { Link } from 'react-router-dom';
-import { useAccount } from '../hooks/useData';
+import { useAccountStore } from '../stores/accountStore';
 
 const AccountChip = () => {
     const auth = getAuth(app);
-    const { Account } = useAccount();
+    const { Account } = useAccountStore();
 
     return Account ? (
         <Chip avatar={<Avatar src={''} alt="アイコン" />} onDelete={() => signOut(auth)} />

@@ -12,8 +12,8 @@ import { PurchaseDataType } from '../../../types/purchaseTypes';
 import { DatePicker } from '@mui/x-date-pickers';
 import CategorySelector from '../ScreenParts/CategorySelector';
 import MethodSelector from '../ScreenParts/MethodSelector';
-import { useAsset } from '../../../hooks/useData';
 import { Timestamp } from 'firebase/firestore';
+import { useAssetStore } from '../../../stores/assetStore';
 
 type NarrowDownDialogProps = {
     setOpenNarrowDown: React.Dispatch<React.SetStateAction<boolean>>;
@@ -28,7 +28,7 @@ const NarrowDownDialog = ({
     setFilterObject,
     filterObject,
 }: NarrowDownDialogProps) => {
-    const { assetList } = useAsset();
+    const { assetList } = useAssetStore();
     const assetLabelList = assetList.map((a) => ({ ...a, label: a.name }));
     const defaultAsset = {
         id: '',

@@ -9,10 +9,11 @@ import {
     Brush,
 } from 'recharts';
 import { format, set } from 'date-fns';
-import { usePurchase, useAsset } from '../../../../hooks/useData';
+import { usePurchase } from '../../../../hooks/useData';
 import { getFutureMonthFirstDay } from '../../../../utilities/dateUtilities';
 import { fontSizeObj } from './DefaultConst';
 import { generateColor } from './ChartUtils';
+import { useAssetStore } from '../../../../stores/assetStore';
 
 const BalanceChart = () => {
     const { purchaseList } = usePurchase();
@@ -23,7 +24,7 @@ const BalanceChart = () => {
             // 2024年4月以降のデータを表示 TODO: 条件は変更できるように
             p.payDate >= new Date('2024-04-01')
     );
-    const { assetList } = useAsset();
+    const { assetList } = useAssetStore();
 
     // データセットを作成
     const datasets = lastPurchase

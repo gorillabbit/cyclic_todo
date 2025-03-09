@@ -13,7 +13,8 @@ import { addDocLog, updateDocLog } from '../../firebase';
 import { InputLogType, LogType } from '../../types.js';
 import StyledCheckbox from '../StyledCheckbox';
 import { getAuth } from 'firebase/auth';
-import { useAccount, useTab } from '../../hooks/useData.js';
+import { useTab } from '../../hooks/useData.js';
+import { useAccountStore } from '../../stores/accountStore.js';
 
 interface LogInputFormProp {
     propLog?: LogType;
@@ -24,7 +25,7 @@ interface LogInputFormProp {
 const auth = getAuth();
 
 const LogInputForm: React.FC<LogInputFormProp> = ({ propLog, openDialog, setIsOpenEditDialog }) => {
-    const { Account } = useAccount();
+    const { Account } = useAccountStore();
     const { tabId } = useTab();
     const defaultNewLog: InputLogType = {
         userId: '',

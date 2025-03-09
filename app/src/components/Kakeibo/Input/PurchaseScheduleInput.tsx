@@ -5,11 +5,12 @@ import { ErrorType, InputPurchaseScheduleType, MethodListType } from '../../../t
 import { addYears } from 'date-fns';
 import { DatePicker } from '@mui/x-date-pickers';
 import { addScheduledPurchase, weekDaysString } from '../../../utilities/purchaseUtilities';
-import { useAccount, useMethod, usePurchase, useTab } from '../../../hooks/useData';
+import { useMethod, usePurchase, useTab } from '../../../hooks/useData';
 import { getHasError, validatePurchaseSchedule } from '../KakeiboSchemas';
 import MethodSelector from '../ScreenParts/MethodSelector';
 import CategorySelector from '../ScreenParts/CategorySelector';
 import { createPurchaseSchedule } from '../../../api/createApi';
+import { useAccountStore } from '../../../stores/accountStore';
 
 const defaultNewPurchase: InputPurchaseScheduleType = {
     userId: '',
@@ -56,7 +57,7 @@ const PurchaseScheduleInput = () => {
         []
     );
 
-    const { Account } = useAccount();
+    const { Account } = useAccountStore();
     const { fetchPurchases } = usePurchase();
     const { methodList } = useMethod();
     const addPurchaseSchedule = useCallback(async () => {
