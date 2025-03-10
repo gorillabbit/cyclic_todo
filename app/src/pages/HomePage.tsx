@@ -18,7 +18,11 @@ const HomePage = memo(() => {
 
     useEffect(() => {
         if (!Account) return;
-        getTab({ id: Account.useTabIds }).then((result) => setTabs(result));
+        const fetchTabs = async () => {
+            const result = await getTab({ id: Account.useTabIds });
+            setTabs(result);
+        };
+        fetchTabs();
     }, [Account]);
 
     return (

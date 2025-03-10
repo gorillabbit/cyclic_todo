@@ -26,14 +26,13 @@ const App = memo(() => {
 
     const auth = getAuth();
     useEffect(() => {
-        const unsubscribeFromAuth = onAuthStateChanged(auth, (user) => {
+        const unsubscribeFromAuth = onAuthStateChanged(auth, async (user) => {
             if (!user) {
                 setAccount(undefined);
                 return;
             }
-            getAccount({ id: user.uid }).then((data) => {
-                setAccount(data[0] as AccountType);
-            });
+            const data = await getAccount({ id: user.uid });
+            setAccount(data[0] as AccountType);
         });
 
         // クリーンアップ: 認証状態のリスナーを解除
