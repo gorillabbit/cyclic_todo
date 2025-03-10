@@ -91,7 +91,6 @@ const LoginPage = () => {
     }, []);
 
     const handleSignIn = useCallback(() => {
-        // Changed: Corrected logic and async handling
         if (!Fields.email || !Fields.password) {
             alert('メールアドレスとパスワードを入力してください');
             return;
