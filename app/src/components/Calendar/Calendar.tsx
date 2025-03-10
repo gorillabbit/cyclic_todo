@@ -37,7 +37,7 @@ const Calendar = () => {
         const events = [];
         while (completeLogs.length > 0) {
             events.push({
-                title: log.text,
+                title: log.taskText,
                 start: completeLogs.pop()?.timestamp?.toDate() ?? '',
                 end: log.duration ? (completeLogs.pop()?.timestamp?.toDate() ?? '') : '',
                 display: 'list-item',
