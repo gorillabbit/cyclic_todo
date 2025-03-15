@@ -13,6 +13,7 @@ import KiyakuPage from './pages/KiyakuPage';
 import ja from 'date-fns/locale/ja';
 import { useAccountStore } from './stores/accountStore';
 import { getAccount } from './api/combinedApi';
+import { CookiesProvider } from 'react-cookie';
 
 const App = memo(() => {
     const theme = createTheme({
@@ -43,12 +44,14 @@ const App = memo(() => {
         <BrowserRouter>
             <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ja}>
                 <ThemeProvider theme={theme}>
-                    <Header />
-                    <Routes>
-                        <Route path="/Login" Component={LoginPage} />
-                        <Route path="/" Component={HomePage} />
-                        <Route path="/kiyaku" Component={KiyakuPage} />
-                    </Routes>
+                    <CookiesProvider>
+                        <Header />
+                        <Routes>
+                            <Route path="/Login" Component={LoginPage} />
+                            <Route path="/" Component={HomePage} />
+                            <Route path="/kiyaku" Component={KiyakuPage} />
+                        </Routes>
+                    </CookiesProvider>
                 </ThemeProvider>
             </LocalizationProvider>
         </BrowserRouter>
