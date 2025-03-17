@@ -63,8 +63,7 @@ export class Purchases {
 
   @Column('datetime', {
       name: 'timestamp',
-      nullable: true,
       default: () => 'CURRENT_TIMESTAMP',
   })
-      timestamp!: Date | null;
+      timestamp!: Date;
 }

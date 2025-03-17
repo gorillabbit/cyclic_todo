@@ -48,6 +48,6 @@ export class PurchaseTemplates {
   @Column('varchar', { name: 'category', length: 100 })
       category!: string;
 
-  @Column('datetime', { name: 'timestamp' })
+  @Column('datetime', { name: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
       timestamp!: Date;
 }

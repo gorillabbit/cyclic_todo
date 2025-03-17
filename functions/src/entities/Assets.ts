@@ -14,6 +14,6 @@ export class Assets {
   @Column('char', { name: 'user_id', length: 28 })
       userId!: string;
 
-  @Column('datetime', { name: 'timestamp', nullable: true })
-      timestamp!: Date | null;
+  @Column('datetime', { name: 'timestamp', default: () => 'CURRENT_TIMESTAMP'  })
+      timestamp!: Date;
 }

@@ -40,8 +40,8 @@ export  class Tasks {
 @Column('tinyint',{ name:'has_due',nullable:true,width:1 })
     hasDue!: boolean | null;
 
-@Column('datetime',{ name:'timestamp',nullable:true })
-    timestamp!: Date | null;
+@Column('datetime',{ name:'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+    timestamp!: Date;
 
 @Column('datetime',{ name:'toggle_completion_timestamp',nullable:true })
     toggleCompletionTimestamp!: Date | null;

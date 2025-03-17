@@ -26,6 +26,6 @@ export class TransferTemplates {
   @Column('char', { name: 'user_id', length: 28 })
       userId!: string;
 
-  @Column('datetime', { name: 'timestamp' })
+  @Column('datetime', { name: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
       timestamp!: Date;
 }

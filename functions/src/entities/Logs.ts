@@ -71,6 +71,6 @@ export class Logs {
   @Column('varchar', { name: 'task_text', nullable: true, length: 255 })
       taskText!: string | null;
 
-  @Column('datetime', { name: 'timestamp' })
+  @Column('datetime', { name: 'timestamp', default: () => 'CURRENT_TIMESTAMP'  })
       timestamp!: Date;
 }

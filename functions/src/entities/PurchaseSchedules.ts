@@ -44,6 +44,6 @@ export class PurchaseSchedules {
   @Column('varchar', { name: 'day', length: 50 })
       day!: string;
 
-  @Column('datetime', { name: 'timestamp' })
+  @Column('datetime', { name: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
       timestamp!: Date;
 }

@@ -17,7 +17,7 @@ export class LogsCompleteLogs {
   @Column('varchar', { name: 'type', length: 50 })
       type!: string;
 
-  @Column('datetime', { name: 'timestamp' })
+  @Column('datetime', { name: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
       timestamp!: Date;
 
   @Column('char', { name: 'user_id', length: 28 })

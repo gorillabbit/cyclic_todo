@@ -1,5 +1,6 @@
-import express from 'express';
-import { onRequest } from 'firebase-functions/v2/https';
+import express, { Request, Response } from 'express';
+import cors from 'cors';
+import { DeepPartial } from 'typeorm';
 import { initializeDatabase } from './db.js';
 import { PurchaseService } from './services/purchaseService.js';
 import { MethodService } from './services/methodService.js';
@@ -10,14 +11,17 @@ import { TabService } from './services/tabService.js';
 import { TaskService } from './services/taskService.js';
 import { PurchaseTemplateService } from './services/purchaseTemplateService.js';
 import { PurchaseScheduleService } from './services/purchaseScheduleService.js';
-import { Request, Response } from 'express';
-import { DeepPartial } from 'typeorm';
 import { TransferTemplateService } from './services/transferTemplate.js';
 import { LogsCompleteLogService } from './services/logCompleteLogService.js';
 
 const app = express();
+const port = process.env.PORT || 4000; // 環境変数PORTを使うか、デフォルトで3000番を使用
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// http://localhost:3000 からのアクセスを許可する場合
+app.use(cors({ origin: 'http://localhost:3000' }));
 
 const handleServiceError = (res: Response, error: Error): void => {
     console.error('Service error:', error);
@@ -127,59 +131,61 @@ const registerServiceEndpoints = <T, U>(
 
 
 // DB 初期化とサービス登録
-const dbInitPromise: Promise<void> = (async (): Promise<void> => {
-    await initializeDatabase();
+(async (): Promise<void> => {
+    try {
+        await initializeDatabase();
 
-    // Custom Endpointsの定義
-    const purchaseCustomEndpoints: CustomEndpoint[] = [
-        {
-            path: '/re-calc-all/:tabId',
-            method: 'put',
-            handler: async (req: Request, res: Response): Promise<void> => {
-                try {
-                    const purchaseService = new PurchaseService();
-                    const result = await purchaseService.reCalcAllBalances(req.params.tabId);
-                    res.status(200).send(result);
-                } catch (error) {
-                    handleServiceError(res, error as Error);
-                }
+        // Custom Endpointsの定義
+        const purchaseCustomEndpoints: CustomEndpoint[] = [
+            {
+                path: '/re-calc-all/:tabId',
+                method: 'put',
+                handler: async (req: Request, res: Response): Promise<void> => {
+                    try {
+                        const purchaseService = new PurchaseService();
+                        const result = await purchaseService.reCalcAllBalances(req.params.tabId);
+                        res.status(200).send(result);
+                    } catch (error) {
+                        handleServiceError(res, error as Error);
+                    }
+                },
             },
-        },
-    ];
+        ];
 
-    const logCustomEndpoints: CustomEndpoint[] = [
-        {
-            path: '/get-shared-logs/:tabId',
-            method: 'get',
-            handler: async (req: Request, res: Response): Promise<void> => {
-                try {
-                    const logService = new LogService();
-                    const result = await logService.getSharedLogs(req.params.tabId, req.body.userId);
-                    res.status(200).send(result);
-                } catch (error) {
-                    handleServiceError(res, error as Error);
-                }
+        const logCustomEndpoints: CustomEndpoint[] = [
+            {
+                path: '/get-shared-logs/:tabId',
+                method: 'get',
+                handler: async (req: Request, res: Response): Promise<void> => {
+                    try {
+                        const logService = new LogService();
+                        const result = await logService.getSharedLogs(req.params.tabId, req.body.userId);
+                        res.status(200).send(result);
+                    } catch (error) {
+                        handleServiceError(res, error as Error);
+                    }
+                },
             },
-        },
-    ];
+        ];
 
-    registerServiceEndpoints('account', new AccountService());
-    registerServiceEndpoints('purchase', new PurchaseService(), purchaseCustomEndpoints); // Custom Endpointsを渡す
-    registerServiceEndpoints('purchase-template', new PurchaseTemplateService());
-    registerServiceEndpoints('purchase-schedule', new PurchaseScheduleService());
-    registerServiceEndpoints('transfer-template', new TransferTemplateService());
-    registerServiceEndpoints('method', new MethodService());
-    registerServiceEndpoints('asset', new AssetService());
-    registerServiceEndpoints('log', new LogService(), logCustomEndpoints); // Custom Endpointsを渡す
-    registerServiceEndpoints('log-complete-log', new LogsCompleteLogService());
-    registerServiceEndpoints('tab', new TabService());
-    registerServiceEndpoints('task', new TaskService());
+        registerServiceEndpoints('account', new AccountService());
+        registerServiceEndpoints('purchase', new PurchaseService(), purchaseCustomEndpoints); // Custom Endpointsを渡す
+        registerServiceEndpoints('purchase-template', new PurchaseTemplateService());
+        registerServiceEndpoints('purchase-schedule', new PurchaseScheduleService());
+        registerServiceEndpoints('transfer-template', new TransferTemplateService());
+        registerServiceEndpoints('method', new MethodService());
+        registerServiceEndpoints('asset', new AssetService());
+        registerServiceEndpoints('log', new LogService(), logCustomEndpoints); // Custom Endpointsを渡す
+        registerServiceEndpoints('log-complete-log', new LogsCompleteLogService());
+        registerServiceEndpoints('tab', new TabService());
+        registerServiceEndpoints('task', new TaskService());
 
-})().catch((error) => {
-    console.error('Failed to initialize database:', error);
-});
+        // サーバーを起動
+        app.listen(port, () => {
+            console.log(`Server is running on port ${port}`);
+        });
 
-export const api = onRequest(async (req, res) => {
-    await dbInitPromise;
-    return app(req, res);
-});
+    } catch (error) {
+        console.error('Failed to initialize database or start server:', error);
+    }
+})();

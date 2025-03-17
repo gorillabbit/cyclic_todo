@@ -17,7 +17,7 @@ export class Tabs {
   @Column('varchar', { name: 'type', length: 50 })
       type!: string;
 
-  @Column('datetime', { name: 'timestamp' })
+  @Column('datetime', { name: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
       timestamp!: Date;
 
   @Column('char', { name: 'user_id', nullable: true, length: 28 })

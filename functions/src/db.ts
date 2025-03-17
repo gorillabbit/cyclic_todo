@@ -12,7 +12,11 @@ import { Tasks } from './entities/Tasks.js';
 import { TransferTemplates } from './entities/TransferTemplates.js';
 
 import * as dotenv from 'dotenv';
-dotenv.config();
+
+const envFile = process.env.NODE_ENV === 'production'
+    ? '.env.production'
+    : '.env.development';
+dotenv.config({ path: envFile });
 
 const AppDataSource = new DataSource(
     {
@@ -37,7 +41,7 @@ const AppDataSource = new DataSource(
             Tasks,
             TransferTemplates,
         ],
-        migrations: [],
+        migrations: ['./migration/**/*.js'],
         subscribers: [],
     }
 );
