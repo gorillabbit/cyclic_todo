@@ -79,7 +79,6 @@ const LogInputForm: React.FC<LogInputFormProp> = ({ propLog, openDialog, setIsOp
                 userId,
                 accessibleAccounts: newAccessibleAccounts ?? [],
                 id: new Date().getTime().toString(),
-                timestamp: new Date(),
             });
             fetchLogs(tabId, userId);
             setNewLog(defaultNewLog);

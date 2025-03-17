@@ -45,7 +45,7 @@ const Log: React.FC<LogProps> = ({ log, logsCompleteLogs, openDialog }) => {
     const isLastCompletedAvailable = !!lastCompletedLog && !!lastCompletedLog.timestamp;
     const lastCompleted =
         isLastCompletedAvailable && lastCompletedLog.timestamp
-            ? format(lastCompletedLog.timestamp.toDate(), 'yyyy-MM-dd HH:mm')
+            ? format(lastCompletedLog.timestamp, 'yyyy-MM-dd HH:mm')
             : '';
 
     //durationが開始しているかどうか

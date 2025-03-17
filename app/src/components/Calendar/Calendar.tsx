@@ -38,8 +38,8 @@ const Calendar = () => {
         while (completeLogs.length > 0) {
             events.push({
                 title: log.taskText,
-                start: completeLogs.pop()?.timestamp?.toDate() ?? '',
-                end: log.duration ? (completeLogs.pop()?.timestamp?.toDate() ?? '') : '',
+                start: completeLogs.pop()?.timestamp ?? '',
+                end: log.duration ? (completeLogs.pop()?.timestamp ?? '') : '',
                 display: 'list-item',
                 color: '#257e4a',
                 extendedProps: { source: 'logList', id: log.id },
@@ -67,7 +67,7 @@ const Calendar = () => {
             },
             {
                 title: task.text + ' 完了',
-                start: task.completed ? task.toggleCompletionTimestamp?.toDate() : '',
+                start: task.completed ? task.toggleCompletionTimestamp : '',
                 color: '#c43b31',
                 extendedProps,
             },

@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { calculateNext期日 } from '../../utilities/dateUtilities';
 import { getBackgroundColor } from '../../utilities/taskUtilities';
-
-import { Timestamp } from 'firebase/firestore';
 import TaskDetail from './TaskDetail';
 import { TaskType } from '../../types';
 import { Box, Button, Card, Dialog, DialogContent, Typography } from '@mui/material';
@@ -11,7 +9,6 @@ import { getAuth } from 'firebase/auth';
 import { BodyTypography } from '../TypographyWrapper';
 import EditIcon from '@mui/icons-material/Edit';
 import TaskInputForm from '../InputForms/TaskInputForm';
-import { getUnixTime } from 'date-fns';
 import { createTask, deleteTask, updateTask } from '../../api/combinedApi';
 
 interface TaskProps {
@@ -26,7 +23,7 @@ const auth = getAuth();
 const toggleCompletion = async (task: TaskType) => {
     await updateTask(task.id, {
         completed: !task.completed,
-        toggleCompletionTimestamp: new Timestamp(getUnixTime(new Date()), 0),
+        toggleCompletionTimestamp: new Date(),
     });
 
     if (task.completed === false && task.isCyclic === '完了後に追加' && auth.currentUser) {

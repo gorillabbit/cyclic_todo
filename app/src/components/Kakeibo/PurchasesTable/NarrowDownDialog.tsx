@@ -12,7 +12,6 @@ import { PurchaseDataType } from '../../../types/purchaseTypes';
 import { DatePicker } from '@mui/x-date-pickers';
 import CategorySelector from '../ScreenParts/CategorySelector';
 import MethodSelector from '../ScreenParts/MethodSelector';
-import { Timestamp } from 'firebase/firestore';
 import { useAssetStore } from '../../../stores/assetStore';
 
 type NarrowDownDialogProps = {
@@ -33,7 +32,6 @@ const NarrowDownDialog = ({
     const defaultAsset = {
         id: '',
         label: '未選択',
-        timestamp: new Timestamp(0, 0),
         userId: '',
         name: '',
         tabId: '',

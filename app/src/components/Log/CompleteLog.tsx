@@ -11,7 +11,7 @@ const CompleteLog: React.FC<CompleteLogProps> = ({ completeLog }) => {
     return completeLog.timestamp ? (
         <BodyTypography
             text={
-                format(completeLog.timestamp.toDate(), 'yyyy-MM-dd HH:mm') +
+                format(completeLog.timestamp, 'yyyy-MM-dd HH:mm') +
                 ' ' +
                 (completeLog.memo ? completeLog.memo : '')
             }

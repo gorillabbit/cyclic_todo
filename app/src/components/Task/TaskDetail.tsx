@@ -6,7 +6,7 @@ function TaskDetails({ task }: { task: TaskType }) {
     // 完了タイムスタンプのフォーマット
     const completionTimestamp =
         task.completed && task.toggleCompletionTimestamp
-            ? format(task.toggleCompletionTimestamp.toDate(), 'yyyy-MM-dd HH:mm')
+            ? format(task.toggleCompletionTimestamp, 'yyyy-MM-dd HH:mm')
             : null;
 
     return (

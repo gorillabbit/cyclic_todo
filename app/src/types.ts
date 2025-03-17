@@ -1,5 +1,3 @@
-import { Timestamp } from 'firebase/firestore';
-
 // 曜日を表す型を定義
 export type WeekDay = '日曜日' | '月曜日' | '火曜日' | '水曜日' | '木曜日' | '金曜日' | '土曜日';
 
@@ -15,7 +13,7 @@ export interface TaskInputType {
     cyclicCount: string;
     cyclicUnit: string;
     親taskId?: string;
-    toggleCompletionTimestamp?: Timestamp;
+    toggleCompletionTimestamp?: Date;
     icon: string;
     description: string;
     tabId: string;
@@ -26,7 +24,7 @@ export interface TaskType extends TaskInputType {
 }
 export interface LogsCompleteLogsInputType {
     logId: string;
-    timestamp?: Timestamp;
+    timestamp?: Date;
     type?: string;
     memo: string;
     tabId: string;

@@ -1,5 +1,3 @@
-import { Timestamp } from 'firebase/firestore';
-
 interface PurchaseBaseType {
     userId: string;
     title: string;
@@ -52,11 +50,6 @@ export const defaultPurchaseData: PurchaseDataType = {
     parentScheduleId: '',
     id: '',
 };
-export interface PurchaseRawDataType extends Omit<PurchaseDataType, 'date' | 'payDate'> {
-    id: string;
-    date: Timestamp;
-    payDate: Timestamp;
-}
 
 export interface TemplateButtonType extends InputFieldPurchaseType {
     id: string;

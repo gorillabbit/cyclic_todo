@@ -60,11 +60,7 @@ const LogFeature: React.FC<LogFeatureProp> = ({
     }, [lastCompleted, isLastCompletedAvailable]);
     const completedCounts = finishLogs.length;
     const todayCompletedCounts = finishLogs.filter(
-        (finishLog) =>
-            differenceInDays(
-                new Date(),
-                finishLog.timestamp ? finishLog.timestamp.toDate() : new Date()
-            ) < 1
+        (finishLog) => differenceInDays(new Date(), finishLog.timestamp ?? new Date()) < 1
     );
     const displayFeature = log.displayFeature;
     if (!displayFeature) {
