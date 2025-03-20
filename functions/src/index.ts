@@ -21,7 +21,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // http://localhost:3000 からのアクセスを許可する場合
-app.use(cors({ origin: ['http://localhost:3000', 'http://127.0.0.1:5173', 'https://desktop-1.tail150a76.ts.net'] }));
+app.use(cors({ origin: ['http://localhost:3000', 'http://127.0.0.1:5173', 'http://100.117.43.3:3000'] }));
 
 const handleServiceError = (res: Response, error: Error): void => {
     console.error('Service error:', error);

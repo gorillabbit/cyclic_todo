@@ -147,7 +147,7 @@ const LoginPage = () => {
                 successLogin();
             })
             .catch((error) => {
-                setError('Googleログインに失敗しました:' + error.code + error.message);
+                setError('Googleログインに失敗しました:' + error.code + ': ' + error.message);
             });
     }, [agreeWithTerms, auth, createDefaultTabs, successLogin, toggleButton]);
 

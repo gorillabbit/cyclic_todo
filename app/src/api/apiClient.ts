@@ -48,6 +48,7 @@ export const updateData = async <T>(
     id: string,
     data: Partial<T>
 ): Promise<Partial<T>> => {
+    console.log('updateData', endpoint, id, data);
     return sendData(`${endpoint}/${id}`, 'PUT', data);
 };
 
