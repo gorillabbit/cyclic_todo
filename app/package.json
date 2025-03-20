@@ -28,7 +28,7 @@
         "date-fns": "2.30.0",
         "eslint-plugin-import": "2.31.0",
         "eslint-plugin-jsdoc": "50.6.8",
-        "firebase": "11.4.0",
+        "firebase": "11.5.0",
         "firebase-admin": "13.2.0",
         "gapi-script": "1.2.0",
         "react": "19.0.0",
