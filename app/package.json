@@ -23,7 +23,7 @@
         "@mui/material": "7.0.2",
         "@mui/x-date-pickers": "7.29.2",
         "bootstrap": "5.3.5",
-        "bootstrap-icons": "1.11.4",
+        "bootstrap-icons": "1.12.1",
         "chart.js": "4.4.9",
         "date-fns": "2.30.0",
         "eslint-plugin-import": "2.31.0",
