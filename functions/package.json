@@ -21,7 +21,7 @@
         "firebase-admin": "13.4.0",
         "firebase-functions": "6.3.2",
         "mysql2": "3.14.1",
-        "typeorm": "0.3.23",
+        "typeorm": "0.3.24",
         "uuid": "11.1.0"
     },
     "devDependencies": {
