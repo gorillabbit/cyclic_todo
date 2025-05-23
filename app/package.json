@@ -21,7 +21,7 @@
         "@mui/icons-material": "7.1.0",
         "@mui/lab": "5.0.0-alpha.176",
         "@mui/material": "7.1.0",
-        "@mui/x-date-pickers": "7.29.3",
+        "@mui/x-date-pickers": "7.29.4",
         "bootstrap": "5.3.6",
         "bootstrap-icons": "1.13.1",
         "chart.js": "4.4.9",
