@@ -33,7 +33,7 @@
         "eslint-plugin-import": "2.31.0",
         "eslint-plugin-jsdoc": "51.0.3",
         "firebase-functions-test": "^3.4.0",
-        "jest": "30.0.0",
+        "jest": "30.0.1",
         "prettier": "3.5.3",
         "ts-jest": "29.4.0",
         "typescript": "5.8.3"
