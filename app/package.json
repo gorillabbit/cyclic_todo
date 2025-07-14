@@ -38,7 +38,7 @@
         "react-router-dom": "7.6.3",
         "recharts": "3.1.0",
         "reflect-metadata": "0.2.2",
-        "typescript-eslint": "8.36.0",
+        "typescript-eslint": "8.37.0",
         "zod": "3.25.76",
         "zustand": "^5.0.3"
     },
